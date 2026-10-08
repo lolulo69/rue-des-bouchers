@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { buildWorld } from './world.js';
 import { createDirector } from './scene/director.js';
 import { RULES, SKY, STREET, NOISE, EVIDENCE, INTERACT, ZONES, POLICE } from './config.js';
-import { createSim, makeConfig, fmt, createCampaign, contentFromGlob, SAVE_VERSION } from './sim/index.js';
+import { createSim, makeConfig, fmt, createCampaign, contentFromGlob, checkSave } from './sim/index.js';
 import * as narrative from './sim/narrative.js';
 import { createRng } from './sim/rng.js';
 import { WHATSAPP_GROUP } from './content/characters.js';
@@ -20,7 +20,8 @@ const ANCHORS = cfg.ANCHORS; // même objet que celui de la simulation (recalé 
 // ---------- Campagne (§3) ----------
 // Le jour (matin, après-midi, récap) est une interface 2D au-dessus de la scène (src/ui, agent UI ; repli : dayFallback.js).
 // Chaque nuit démarre d'une sauvegarde et d'un rechargement (?mode=night) : nouvelle disposition, nouveau décor.
-const SAVE_KEY = `rdb.save.v${SAVE_VERSION}`;
+// Emplacement de sauvegarde fixe (partagé avec src/ui) ; la version du schéma est DANS la sauvegarde (saveMigrations.js)
+const SAVE_KEY = 'rdb.save.v1';
 const content = contentFromGlob(import.meta.glob('./content/*.js', { eager: true }));
 const loadSave = () => { try { return JSON.parse(localStorage.getItem(SAVE_KEY)); } catch { return null; } };
 const storeSave = (c) => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(c.save())); } catch { /* stockage indisponible */ } };
@@ -349,6 +350,14 @@ if (campaign) {
   $('pause').addEventListener('click', () => { $('pause-text').textContent = 'Pause. Cliquez pour reprendre.'; $('pause-keys').replaceChildren(); }, { once: true });
   startNight();
 } else {
+  // Sauvegarde impossible à reprendre (trop ancienne, d'une version plus récente, abîmée) : on le dit gentiment,
+  // on la met de côté (rdb.save.backup) et l'interface propose une nouvelle campagne.
+  const verdict = checkSave(loadSave());
+  if (!verdict.ok && verdict.message) {
+    try { localStorage.setItem('rdb.save.backup', localStorage.getItem(SAVE_KEY)); localStorage.removeItem(SAVE_KEY); } catch { /* stockage indisponible */ }
+    $('save-notice').textContent = verdict.message;
+    $('save-notice').classList.remove('hidden');
+  }
   $('campaign').addEventListener('click', () => showDay());
   $('start').textContent = 'Nuit libre (une soirée isolée)';
 }

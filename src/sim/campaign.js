@@ -18,7 +18,9 @@ import { normalizeContent } from './content.js';
 import { performNightAction } from './nightActions.js';
 import { fmt } from './time.js';
 
-export const SAVE_VERSION = 1;
+import { SAVE_VERSION, migrateSave, sanitizeSave } from './saveMigrations.js';
+
+export { SAVE_VERSION };
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
 const ALLIES = new Set(['klaas', 'seb_nico', 'biloute', 'jeremie', 'hilde', 'tatie']);
@@ -61,8 +63,14 @@ export function initialState(seed, cfg = CONFIG) {
 export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, narrative = null } = {}) {
   const K = normalizeContent(content ?? {});
   const C = cfg.CAMPAIGN;
-  const S = save ? structuredClone(save) : initialState(seed, cfg);
-  if (S.version !== SAVE_VERSION) throw new Error(`sauvegarde v${S.version} incompatible (attendu v${SAVE_VERSION})`);
+  // Sauvegarde : migrée vers le schéma courant (SaveError si illisible ou d'une version plus récente), puis nettoyée
+  // contre le contenu chargé (ids renommés suivis, contenus disparus ignorés). Notes dans S.migrationNotes.
+  let S;
+  if (save) {
+    const m = migrateSave(save);
+    S = m.save;
+    S.migrationNotes = [...m.notes];
+  } else S = initialState(seed, cfg);
   const rng = createRng(1);
   rng.setState(S.rng);
   S.seen.tutorial ??= [];
@@ -79,6 +87,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
   const flags = () => (flagSet ??= new Set(S.flags));
   const byId = (list) => Object.fromEntries(list.map((x) => [x.id, x]));
   const EVENTS = byId(K.EVENTS), ACTIONS = byId(K.ACTIONS), DIALOGUE = byId(K.DIALOGUE), CMS = byId(K.COUNTERMOVES), ENDINGS = byId(K.ENDINGS);
+  if (save) S.migrationNotes.push(...sanitizeSave(S, K));
 
   const c = {
     state: S, content: K, cfg, rng,
@@ -220,6 +229,12 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     const card = S.cards[0];
     if (!card) return null;
     const src = { event: EVENTS, dialogue: DIALOGUE, countermove: CMS }[card.type]?.[card.id];
+    // Contenu disparu entre-temps (sauvegarde ancienne) : on saute la carte plutôt que de planter
+    if (!src && card.type !== 'info') {
+      S.cards.shift();
+      if (!S.cards.length && S.step === 'cards') afterCards();
+      return c.card();
+    }
     if (card.type === 'info') return { ...card, choices: [{ i: 0, label: 'OK', available: true }] };
     const choices = card.type === 'event' && src.choices?.length
       ? src.choices.map((ch, i) => ({ i, label: ch.label, available: c.check(ch.requires, false) }))
@@ -691,5 +706,6 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
 
   // ---------- démarrage ----------
   if (!save) beginDay();
+  else if (S.step === 'cards' && !S.cards.length) afterCards(); // cartes toutes retirées par le nettoyage
   return c;
 }

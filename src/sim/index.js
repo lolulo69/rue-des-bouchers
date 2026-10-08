@@ -5,6 +5,7 @@ export { makeConfig } from './config.js';
 export { POLICIES } from './policies.js';
 export { fmt } from './time.js';
 export { createCampaign, initialState, SAVE_VERSION } from './campaign.js';
+export { migrateSave, checkSave, SaveError, RENAMES } from './saveMigrations.js';
 export { normalizeContent, contentFromGlob, isEmptyContent } from './content.js';
 export { evalCondition, unsatisfiable } from './conditions.js';
 export { runCampaign, playNight } from './campaignRunner.js';

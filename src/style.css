@@ -48,3 +48,4 @@ kbd { background: #ffffff1a; border: 1px solid #ffffff33; border-radius: 4px; pa
 #nightmenu-list { display: flex; flex-direction: column; gap: 8px; }
 #log div.tuto { border-color: #4cc9f0; }
 #log div.bark { border-color: #ffffff44; font-style: italic; opacity: .85; }
+.notice { max-width: 560px; background: #e76f5122; border: 1px solid #e76f51; border-radius: 8px; padding: 10px 14px; line-height: 1.45; }

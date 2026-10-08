@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import os from 'node:os';
-import { createCampaign, runCampaign, playNight, CAMPAIGN_BOTS, checkCampaignInvariants, evalCondition, makeConfig, POLICIES } from '../../src/sim/index.js';
+import { createCampaign, runCampaign, playNight, CAMPAIGN_BOTS, checkCampaignInvariants, evalCondition, makeConfig, POLICIES, SAVE_VERSION, checkSave } from '../../src/sim/index.js';
 import * as content from '../fixtures/content.js';
 
 const ctx = (o = {}) => ({ day: 3, phase: 'afternoon', flags: new Set(['a']), stats: { asso: 50, risk: 10 }, hidden: { corruption: 60 }, ...o });
@@ -185,8 +185,34 @@ describe('sauvegarde', () => {
     expect(JSON.stringify(b.state.journal)).toBe(JSON.stringify(a.state.journal));
   });
 
-  it('une sauvegarde d\'une autre version est refusée', () => {
-    expect(() => createCampaign({ content, save: { version: 0 } })).toThrow(/incompatible/);
+  it('une sauvegarde illisible ou d\'une version plus récente est refusée avec un message clair', () => {
+    expect(() => createCampaign({ content, save: { version: 0 } })).toThrow(/illisible/);
+    const future = { ...createCampaign({ seed: 1, content }).save(), version: SAVE_VERSION + 1 };
+    expect(() => createCampaign({ content, save: future })).toThrow(/plus récente/);
+    expect(checkSave(future)).toMatchObject({ ok: false, reason: 'future' });
+    expect(checkSave(future).message).toMatch(/nouvelle campagne/);
+    expect(checkSave(createCampaign({ seed: 1, content }).save())).toMatchObject({ ok: true });
+  });
+
+  it('migration v1 → v2 : ids renommés suivis, contenu disparu ignoré, la partie continue jusqu\'au bout', () => {
+    const a = drive(createCampaign({ seed: 22, content }), CAMPAIGN_BOTS.legal(), (x) => x.state.day === 3 && x.step === 'cards');
+    const v1 = JSON.parse(JSON.stringify(a.save()));
+    v1.version = 1;
+    delete v1.seen.tutorial; delete v1.seen.media;
+    v1.flags.push('igpn_open', 'martine_dinner_seen', 'flag_supprime_depuis');
+    v1.cards.unshift({ type: 'event', id: 'evenement_supprime' }, { type: 'dialogue', id: 'dialogue_supprime' });
+    v1.pendingEnding = 'fin_supprimee';
+    const b = createCampaign({ content, save: v1 });
+    expect(b.state.version).toBe(SAVE_VERSION);
+    expect(b.has('inquiry_open')).toBe(true);
+    expect(b.has('colette_dinner_seen')).toBe(true);
+    expect(b.has('igpn_open')).toBe(false);
+    expect(b.state.seen.tutorial).toEqual([]);
+    expect(b.state.pendingEnding).toBeNull();
+    expect(b.state.migrationNotes.join(' ')).toMatch(/v1 → v2/);
+    expect(b.card()?.id).not.toBe('evenement_supprime');
+    drive(b, CAMPAIGN_BOTS.legal(), () => false);
+    expect(b.ended).toBe(true);
   });
 });
 
