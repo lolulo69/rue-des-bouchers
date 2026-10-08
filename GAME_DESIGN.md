@@ -271,19 +271,20 @@ removed: unlocks only gate *when*, and the balance agent re-checks §13.H after.
   (seeded; e.g. ~2 home days a week, never the D14 commission day). Same Koddex choices either way, but:
   - office day: he rides there on his **electric bike** (a short morning beat: the cobbles, Biloute chasing, the battery
     dying once in the campaign…); Stéphane and the colleagues are around; lunchtime gossip about Delphine's AC case.
-  - home day: he works at his desk **in the apartment's second bedroom, turned into an office**; distractions from the street
+  - home day: he works at his desk **in the living room, on the street side** (right by THE window); distractions from the street
     (deliveries, the terraces being set up, Ghislain on his stool, the smell of the exhaust at 11:30) can offer a small daytime
     evidence opportunity or cost focus (Job). Stéphane calls on video.
 - **Pilou's apartment** (2nd floor of 3, no lift, a small 4-unit building, ~60 m², east–west through, renovated): a long entry
   corridor with a 3.6 m built-in bookshelf, navy-blue ceiling and navy doors, pocket doors; a ~20 m² living room on the
   **street side** with two windows (THE window over the terrace) and an open kitchen (induction hob, wall oven, its own small
-  hood: irony), light parquet, a plum accent wall, a corner sofa, a dining nook with a gilt mirror and a TV; on the
-  **courtyard side** (quieter): the bedroom (dark green wall, double bed, sliding wardrobe) and the second bedroom = his
-  home office (two wardrobes, a desk with two screens, the door to a ~3 m² **balcony** on the courtyard: wooden decking,
-  a bench, brick walls); a bathroom with green zellige tiles, a bathtub with a glass screen, a stone basin on wood,
+  hood: irony), **Pilou's work desk with two screens**, light parquet, a plum accent wall, a corner sofa, a dining nook with a gilt mirror and a TV; on the
+  **courtyard side** (quieter): Pilou's bedroom (dark green wall, double bed, sliding wardrobe) and **his daughter's bedroom**
+  (two wardrobes, the door to a ~3 m² **balcony** on the courtyard: wooden decking, a bench, brick walls); a bathroom with green zellige tiles, a bathtub with a glass screen, a stone basin on wood,
   a backlit mirror and gold taps; separate WC. The e-bike is parked in the corridor.
   Gameplay nuance: sleeping in the courtyard-side bedroom is quieter than dozing on the sofa by the street windows;
   the exhaust smell reaches the living room first.
+  Pilou has a **daughter**; the second bedroom is hers [OPEN: name, age, which nights she's there]. Until Lucas answers,
+  she is only present through her room (drawings, a night light), never named and never on stage.
   Source: Lucas's own description and his apartment page (layout only).
 Checklist additions (v1.1) are in §13.J.
 
@@ -359,7 +360,7 @@ The campaign simulator plays 1000 seeded campaigns per strategy bot. Targets:
 - [ ] ≥ 16 night twists, every night of a campaign has one, never the same twice in a campaign; each changes the sim and has an intro card, lines and props. **T Q**
 - [ ] Tools unlock over time with a « Nouveau » card; ≥ 1 new verb every 2 nights until D10; §13.H still met after (balance re-run). **T**
 - [ ] Morning at Koddex in 3D (seated, terminal on the in-world monitor, readable); afternoon in the daytime street / workshop / town hall in 3D; keyboard + gamepad flow intact. **T Q**
-- [ ] Office vs home days (e-bike commute, home office in the 2nd bedroom) and Pilou's apartment modelled per §12b.D, walkable at night. **Q**
+- [ ] Office vs home days (e-bike commute, home desk in the living room) and Pilou's apartment modelled per §12b.D, walkable at night. **Q**
 - [ ] Story transcripts refreshed: two runs of the same style differ night by night (twists), and the night recap mentions the twist. **Q**
 
 ### Release tasks (done by the design agent when v1.0 lands)
