@@ -335,9 +335,13 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     const chosen = picks.slice(0, o.prompts);
     while (chosen.length < o.prompts) chosen.push('work');
     const lines = [];
+    // Chaque travail / projet perso au plus une fois par matin : un doublon compte comme un 'work' générique,
+    // qui prend le premier travail pas encore utilisé (sinon du travail ordinaire, sans texte répété).
+    const used = new Set();
     for (let id of chosen) {
-      // 'work' générique → le premier vrai travail disponible (s'il y en a)
-      if (id === 'work') id = o.work.find((w) => !chosen.includes(w.id))?.id ?? 'work';
+      if (id !== 'work' && used.has(id)) id = 'work';
+      if (id === 'work') id = o.work.find((w) => !used.has(w.id) && !chosen.includes(w.id))?.id ?? 'work';
+      used.add(id);
       S.counts.koddex[id] = (S.counts.koddex[id] ?? 0) + 1;
       const w = workItems().find((x) => x.id === id);
       if (id === 'work' || w) {

@@ -279,3 +279,31 @@ describe('preuves : relevé dB, horodatage, légalité', () => {
     expect(c.pressFile() - c.legalFile()).toBeCloseTo(bribe.value);
   });
 });
+
+describe('Koddex : un travail ou un projet perso au plus une fois par matin', () => {
+  it('un doublon devient un travail ordinaire : le résultat ne s\'affiche qu\'une fois', () => {
+    const K = { ...content, KODDEX: { ...content.KODDEX, work: [{ id: 'w_slides', label: 'Slides', job: 4, result: '42 diapositives.' }, { id: 'w_tests', label: 'Tests', job: 4, result: 'Tests verts.' }] } };
+    const c = createCampaign({ seed: 3, content: K });
+    while (c.step === 'cards') c.resolveCard(0);
+    const lines = c.koddex(['w_slides', 'w_slides', 'w_slides']);
+    expect(lines.filter((l) => l === '42 diapositives.')).toHaveLength(1);
+    expect(c.state.counts.koddex.w_slides).toBe(1);
+    expect(c.state.counts.koddex.w_tests).toBe(1); // le 2e doublon prend le travail suivant
+  });
+
+  it('les bots ("work" ×3) obtiennent des travaux distincts', () => {
+    const K = { ...content, KODDEX: { ...content.KODDEX, work: [{ id: 'a', label: 'A', result: 'A' }, { id: 'b', label: 'B', result: 'B' }] } };
+    const c = createCampaign({ seed: 4, content: K });
+    while (c.step === 'cards') c.resolveCard(0);
+    expect(c.koddex(['work', 'work', 'work'])).toEqual(['A', 'B']);
+  });
+
+  it('un projet perso en double ne s\'applique qu\'une fois', () => {
+    const c = createCampaign({ seed: 5, content });
+    while (c.step === 'cards') c.resolveCard(0);
+    const job = c.state.stats.job;
+    c.koddex(['db_logger', 'db_logger', 'db_logger']);
+    expect(c.state.counts.koddex.db_logger).toBe(1);
+    expect(c.state.stats.job).toBe(Math.min(100, job - 10 + 2 * c.cfg.CAMPAIGN.workJob));
+  });
+});
