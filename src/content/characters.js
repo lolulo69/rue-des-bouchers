@@ -11,7 +11,7 @@ export const CHARACTERS = {
   // ── Le joueur ────────────────────────────────────────────────────────────
   pilou: {
     name: 'Pilou',
-    fullName: 'Pierre-Louis Dubois',
+    fullName: 'Pierre-Louis Dubeton',
     group: 'player',
     home: "2e étage du n°10, au-dessus de l'estaminet. La gaine d'extraction monte jusque sous sa fenêtre.",
     bio: "Développeur Rust chez Koddex, où son travail consiste surtout à écrire des prompts à Clode Kode. Dort mal depuis que les terrasses ont débordé sur la rue, et encore moins depuis que l'estaminet a installé sa clim.",
@@ -51,7 +51,7 @@ export const CHARACTERS = {
     name: 'Tatie Bouchon',
     group: 'asso',
     home: 'Au milieu de la rue, n°19, fenêtre au premier.',
-    bio: "Vieille dame du milieu de la rue, distributrice de sagesse et d'e-mails. Écrit à l'estaminet pour l'odeur depuis des années ; on lui répond toujours que « c'est en cours de résolution ». Prend le thé avec Martine Aubrac, l'ancienne maire : une porte ouverte sur la mairie… dans les deux sens.",
+    bio: "Vieille dame du milieu de la rue, distributrice de sagesse et d'e-mails. Écrit à l'estaminet pour l'odeur depuis des années ; on lui répond toujours que « c'est en cours de résolution ». Prend le thé avec Colette Verhaeghe, l'ancienne maire : une porte ouverte sur la mairie… dans les deux sens.",
     voice: "Proverbes maison, souvent bancals et toujours définitifs : « Si vous voulez quelque chose dans la vie, faut résister et se battre pour. » Girouette : flattée par un verre offert, revigorée par un bon proverbe.",
   },
   seb: {
@@ -147,18 +147,18 @@ export const CHARACTERS = {
     bio: "Inspectrice chargée du dossier de la clim posée sans autorisation. Rigoureuse et lassée des passe-droits. Mariée à Stéphane, le patron de Pilou, ce qui rend tout canal informel aussi utile que compromettant.",
     voice: 'Nette, technique, humour sec. Ne promet rien, note tout. Déteste le mot « arrangement ».',
   },
-  martine: {
-    name: 'Martine Aubrac',
+  colette: {
+    name: 'Colette Verhaeghe',
     group: 'city',
     home: 'Ancienne maire. Toujours une table réservée à l’estaminet et un carnet d’adresses plus épais qu’un PLU.',
     bio: "Ancienne maire, toujours influente, protectrice historique des restaurateurs : « la convivialité, c'est l'ADN de Lille ». Prend le thé avec Tatie Bouchon. Travaille à saper son successeur.",
     voice: 'Grande dame, phrases de discours, « mes chers amis ». Ne dit jamais non, dit « on va regarder ça ».',
   },
-  delandre: {
-    name: 'Arnaud Delandre',
+  lescaut: {
+    name: 'Bertrand Lescaut',
     group: 'city',
     home: "Maire de Lille, à l'hôtel de ville.",
-    bio: "Le maire actuel, successeur de Martine Aubrac. A instauré la fermeture à 22h rue des Bouchers. Penche du côté des riverains, mais doit composer avec les réseaux de l'ancienne équipe.",
+    bio: "Le maire actuel, successeur de Colette Verhaeghe. A instauré la fermeture à 22h rue des Bouchers. Penche du côté des riverains, mais doit composer avec les réseaux de l'ancienne équipe.",
     voice: 'Courtois, prudent, technocrate sincère. « Je vous entends. » Aime les dossiers solides et déteste les surprises dans la presse.',
   },
   journaliste: {

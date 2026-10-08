@@ -4,28 +4,29 @@
 > **[OPEN]** = not decided. **[CHECK]** = Lucas to confirm against reality.
 > The game targets realism + satire, with a light touch of Ch'ti humour (only when it lands).
 
-## 0. Naming policy (public repo)
-The **street is real** (rue des Bouchers, Vieux-Lille). **Businesses get fictional names that resemble the
-real ones.** Never use a real restaurant name in code, assets, or text. Public figures are parodied under
-altered names.
+## 0. Fiction policy (public repo)
+**This game is a work of fiction set on a real street** (rue des Bouchers, Vieux-Lille, with its real geography and its real
+2026 terrace rules). **Every character, business, police officer, official and politician in it is fictional.** They are
+invented people with invented actions. No real person or business is depicted, named, or accused of anything. The satire is
+about a *situation* (terraces vs residents, complacent institutions, neighbourhood politics), not about real individuals.
+- Use only the fictional names below, in code, assets and text. A test (`tests/unit/names.test.js`) guards against real names.
+- Never write anything that presents a fictional character's misdeeds as a real person's.
+- The title screen and README carry a fiction disclaimer.
 
-| Real (do NOT use) | In game | Notes |
-|---|---|---|
-| Estaminet La Ch'tite Brigitte (n°10) | **Estaminet La Ch'tite Bernadette** | Main antagonist, directly under Pilou |
-| Les Bouchers Bien Élevés (n°14) | **Les Bouchers Mal Lunés** | Steakhouse next door |
-| Bloempot (n°22) | **Bloemkool** | Flemish neo-bistro, the "chic" one |
-| Bocal (n°33) | **Le Goulot** | Bistro, fish burger |
-| L'Adresse (n°34 bis) | **L'Endroit** | |
-| Truffe et Baguette (n°1) | **Truffe et Ficelle** | Street corner |
-| Cup (n°3) | **Mug** | Takeaway, customers drink standing in the street |
-| La Ripaille (n°4, closed) | **La Bombance** (closed) | Empty premises. Late-game threat: a new bar wants to open there |
-| Martine Aubry (ex-mayor) | **Martine Aubrac** | Tatie Bouchon's contact. Sides with the restaurants |
-| Current mayor (A. Deslandes) | **Arnaud Delandre** | Martine's successor, but **leans toward the residents** |
-| Claude Code | **Clode Kode** | Pilou's work tool (wink) |
-| Real neighbours Jérémy, Klaus | **Jérémie**, **Klaas** | First names slightly altered (Klaas = Flemish, fits Lille) |
-| La Voix du Nord | **La Voix du Nordiste** | Local newspaper |
-
-Sources: listings (PagesJaunes, Yelp, TheFork), the city's summer pedestrianisation page (zoomsurlille.fr, 2025).
+| In game | Role |
+|---|---|
+| **Estaminet La Ch'tite Bernadette** | The main antagonist restaurant, directly under Pilou |
+| **Les Bouchers Mal Lunés** | Steakhouse next door |
+| **Bloemkool** | Flemish neo-bistro, the "chic" one |
+| **Le Goulot** | Bistro, fish burger |
+| **L'Endroit** | Bistro toward the square |
+| **Truffe et Ficelle** | Street corner |
+| **Mug** | Takeaway, customers drink standing in the street |
+| **La Bombance** (closed) | Empty premises. Late-game threat: a new bar wants to open there |
+| **Colette Verhaeghe** | Former mayor, still influential, protects the restaurants. Tatie Bouchon's contact |
+| **Bertrand Lescaut** | Current mayor, **leans toward the residents** (brought in the 22:00 rule) |
+| **Clode Kode** | Pilou's AI coding tool at Koddex (wink) |
+| **La Voix du Nordiste** | Local newspaper |
 
 ## 1. Setting and rules (reality)
 - After Covid, Lille extended terraces onto the street to help restaurants recover.
@@ -65,7 +66,7 @@ Sources: listings (PagesJaunes, Yelp, TheFork), the city's summer pedestrianisat
 
 ## 2. Characters
 
-### Pilou: Pierre-Louis Dubois (player)
+### Pilou: Pierre-Louis Dubeton (player)
 Lives above Bernadette's; the exhaust is right under his window. Rust developer at **Koddex**, a startup
 where his job amounts to prompting **Clode Kode** all day and building silly side projects.
 
@@ -75,7 +76,7 @@ where his job amounts to prompting **Clode Kode** all day and building silly sid
 | **Jérémie** | President, Pilou's neighbour, has a **dachshund** | Leads the evening **rounds** (dog walk = patrol). Unlocks official channels. The dachshund barks: it helps (spots things) and hurts (draws attention when you sneak). |
 | **Klaas** | Elderly, Santa Claus look (big, not fat, white beard). **Sees everything, writes everything down.** | Passive **evidence engine**: his notebook logs infractions automatically. **Double-edged**: he also writes down what *Pilou* does. Only a lie or a bribe keeps an illegal act out of his notebook. |
 | **Hilde**, Klaas's wife | Very kind | Brings food and tisane → restores Sleep and morale. Calms Klaas. |
-| **Tatie Bouchon** | Old lady in the middle of the street who hands out wisdom: *« Si vous voulez quelque chose dans la vie, faut résister et se battre pour. »* Emails Bernadette about the smell. They always answer "it's being fixed"; she doesn't believe it. Also chats with **Martine Aubrac**. | Email thread = running gag and evidence ("promise #14 that it's fixed"). Her Martine connection makes her an unreliable channel: she can open a door at the mayor's office or leak your plan. |
+| **Tatie Bouchon** | Old lady in the middle of the street who hands out wisdom: *« Si vous voulez quelque chose dans la vie, faut résister et se battre pour. »* Emails Bernadette about the smell. They always answer "it's being fixed"; she doesn't believe it. Also chats with **Colette Verhaeghe**. | Email thread = running gag and evidence ("promise #14 that it's fixed"). Her Colette connection makes her an unreliable channel: she can open a door at the mayor's office or leak your plan. |
 | **Seb & Nico** (couple across the street, facing Pilou) | Know all the gossip, talk a lot, run the association's WhatsApp group (**« Radio Balcon »**, provisional name, one constant in `src/content/characters.js`). Their **cat** sits on the balcony. Written by their *role*: no humour based on orientation | The **WhatsApp group** is the association's nervous system: rally the troops, share photos, gossip. **Cat on the balcony = they are home and watching**: allies witness legal actions (+evidence) but also see illegal ones. |
 | **Hippolyte** | Owns an old building where **carriages (calèches)** were made since the 1800s | Old money, knows the old families and the city's heritage department. Late game: heritage-protection angle (exhaust and AC on a historic façade), a meeting room in the former carriage workshop. |
 
@@ -95,10 +96,10 @@ The restaurants form a **bloc**: Bernadette's leads it, and the others back her.
 - **The mayor's office inspector** **Delphine Vermeersch**: handles the AC case. **Married to
   Pilou's boss.** Real but compromising lever: a dinner at the boss's place = an informal channel to her
   (a conflict of interest that can come out).
-- **Martine Aubrac**: ex-mayor, still influential, protects the restaurants. Reached through Tatie Bouchon.
-- **Arnaud Delandre**: current mayor, **more on the residents' side** (he brought in the 22:00 rule). City hall is split:
-  the new mayor and the inspector lean toward the residents, while the old Martine network and parts of the municipal police protect the bloc.
-  Getting a meeting with Delandre is a mid-campaign goal. Martine works to undermine him.
+- **Colette Verhaeghe**: ex-mayor, still influential, protects the restaurants. Reached through Tatie Bouchon.
+- **Bertrand Lescaut**: current mayor, **more on the residents' side** (he brought in the 22:00 rule). City hall is split:
+  the new mayor and the inspector lean toward the residents, while the old Colette network and parts of the municipal police protect the bloc.
+  Getting a meeting with Lescaut is a mid-campaign goal. Colette works to undermine him.
 - **Koddex boss**: **Stéphane**, startup founder who is never there and talks about "vibes".
 
 ## 3. Structure: a 14-night campaign
@@ -117,7 +118,7 @@ Each **day** = 3 phases:
 
 **Calendar** (two weeks, starting on a Monday):
 - **Saturdays (days 6, 13)**: no vehicles → crowds, standing drinkers, peeing.
-- **Day 4**: Martine Aubrac comes to dinner at Bernadette's (event).
+- **Day 4**: Colette Verhaeghe comes to dinner at Bernadette's (event).
 - **Day 7**: association general meeting (vote on strategy: legal or "direct action").
 - **Day 9**: the inspector comes back about the AC.
 - **Day 11**: the exhaust meeting at the city (result depends on the dossier).
@@ -158,7 +159,7 @@ Every illegal act checks for **witnesses** in line of sight + hearing:
 - Dinner at the boss's with the inspector (conflict of interest).
 - Filming customers with their faces (privacy issue).
 - Flooding the police with calls (they stop coming).
-- Pushing Tatie Bouchon to "leak" fake plans to Martine.
+- Pushing Tatie Bouchon to "leak" fake plans to Colette.
 
 ### Illegal (stealth)
 - **Bucket of water** from the window (classic).
@@ -186,19 +187,19 @@ Outcome depends on: patrol on duty, time, how often you've called, whether you m
 - **The reversal**: the police come... for Pilou (a bloc complaint about "harassment", or Pilou doing something stupid).
 - **The bribe itself**: Dédé slips an envelope / invites them to eat. Catching it on camera = **jackpot evidence**, but only if
   you have a clean shot from a legal spot. Leads to an internal investigation (IGPN) → Lemaire transferred → Corruption drops.
-- **The mayor's office comes too**: an inspector visit is announced → the restaurants are perfect that night (tip-off via Martine).
+- **The mayor's office comes too**: an inspector visit is announced → the restaurants are perfect that night (tip-off via Colette).
   A surprise visit requires the Delphine channel or Hippolyte.
 
 ## 8. Restaurant bloc counter-moves
 "It's being fixed" emails · tables brought in at 21:59 and back out at 22:20 · staff smoking under Pilou's window ·
 bins in front of his door · free drinks to split the association (Tatie Bouchon) · petition of "happy customers" ·
-complaint for harassment / defamation against Pilou · call to Martine · lobbying for Saturday to become "festive" ·
+complaint for harassment / defamation against Pilou · call to Colette · lobbying for Saturday to become "festive" ·
 recruiting a resident (the traitor) · a fake post "Ch'tite Bernadette is being harassed by a resident, support us ❤️" → a wave of hate.
 
 ## 9. Endings (several)
 1. **Legal victory**: terrace permit (AOT) suspended or withdrawn for Bernadette, exhaust moved. Requires a strong legal dossier and low Risk.
 2. **Negotiated peace**: a good-neighbour charter signed by the bloc, 22:00 respected. Requires high Association and a "dialogue" stance.
-3. **Scandal**: corruption exposed in La Voix du Nordiste, Lemaire transferred, Martine embarrassed. Strong but the bloc hates you.
+3. **Scandal**: corruption exposed in La Voix du Nordiste, Lemaire transferred, Colette embarrassed. Strong but the bloc hates you.
 4. **Custody / trial**: caught red-handed. Variant: the « carbonnade sucrée » trial in the newspaper.
 5. **Moving out**: Sleep at 0 → Pilou moves to Wazemmes. ("At least at the Wazemmes market, it's noise in the morning.")
 6. **Fired**: Job at 0. Twist: it unlocks the full-time fight for the remaining days (hard mode).
@@ -224,7 +225,7 @@ Tunable rules live in `src/config.js`.
 |---|---|
 | **v0.2: core tension** | Sim logic split out of rendering + tests. Witnesses and line-of-sight stealth (Klaas, Seb & Nico + cat, waiter, customers filming). Police patrols with personalities, tip-off, "c'est encore vous", complaisance logging. Terrace zone + passage corridor evidence. Saturday variant (crowd, standing drinkers, peeing). |
 | **v0.3: art pass** | Cute low-poly restyle: characters (Pilou, the association, Dédé & Ghislain, the waiter, police, customers), stepped gables, the cat, the dachshund, animations, ambient audio (WebAudio: crowd murmur, chairs on cobbles, the exhaust hum). |
-| **v0.4: campaign** | The 14-day calendar, day phase (Koddex / Clode Kode prompts, afternoon association actions), save in localStorage, scripted events (Martine's dinner, general meeting, inspector, exhaust meeting, commission), bloc counter-moves, dialogue system with the association members. |
+| **v0.4: campaign** | The 14-day calendar, day phase (Koddex / Clode Kode prompts, afternoon association actions), save in localStorage, scripted events (Colette's dinner, general meeting, inspector, exhaust meeting, commission), bloc counter-moves, dialogue system with the association members. |
 | **v0.5: dirty tricks** | Hidden cameras + electricity/wifi hijack, cardboard on the exhaust, stink bomb, kitchen sabotage (salt/sugar), fake reviews, sabotage, bribing the waiter, photographing the bribe. Risk thresholds → complaint, custody, trial. |
 | **v1.0: endings + polish** | The 8 endings, balancing via simulated runs, French copy pass, performance, a full QA run in Chrome. |
 
@@ -237,11 +238,11 @@ Proof: **T** = automated test (vitest / Playwright / campaign simulator, runs in
 - [ ] Save/continue (localStorage), a new campaign, and one save slot minimum. Reload mid-campaign resumes the same day and state. **T Q**
 - [ ] **Duration**: a full campaign takes **2h30 to 4h** for a human (14 nights × ~10 min + day phases). Nights can't be skipped without consequence ("go to bed" = you lose what happens). **Q L**
 - [ ] Early endings (custody, fired, moving out) can't trigger before **night 5**. The "real" endings are decided at the **Day 14 commission**. **T**
-- [ ] Fixed events happen on their day: Saturdays 6 & 13, Martine's dinner (D4), the general meeting (D7), the inspector (D9), the exhaust meeting (D11), the commission (D14). **T Q**
+- [ ] Fixed events happen on their day: Saturdays 6 & 13, Colette's dinner (D4), the general meeting (D7), the inspector (D9), the exhaust meeting (D11), the commission (D14). **T Q**
 
 ### B. Characters (all present, recognisable, with a role and dialogue)
 - [ ] Pilou · Jérémie + dachshund · Klaas (Santa look, notebook) · Hilde · Tatie Bouchon (+ the "it's being fixed" email thread) · Seb & Nico + the cat · Hippolyte (carriage building). **Q**
-- [ ] Dédé · Ghislain (bun) · the waiter · Brigadier Lemaire · Agent Benali · the police chief · inspector Delphine Vermeersch · Stéphane (Koddex boss) · Martine Aubrac · mayor Arnaud Delandre. **Q**
+- [ ] Dédé · Ghislain (bun) · the waiter · Brigadier Lemaire · Agent Benali · the police chief · inspector Delphine Vermeersch · Stéphane (Koddex boss) · Colette Verhaeghe · mayor Bertrand Lescaut. **Q**
 - [ ] Each association member has at least **8 lines** of contextual dialogue (reacting to the current state) and at least 1 action or event tied to them. **T** (content count) **Q**
 
 ### C. Night systems
@@ -249,7 +250,7 @@ Proof: **T** = automated test (vitest / Playwright / campaign simulator, runs in
 - [ ] Evidence: photo, dB reading, headcount, corridor encroachment, timestamps. Quality + legality per piece. **T**
 - [ ] Witnesses / line of sight: Klaas (asleep ~01:00), Seb & Nico (cat = home), the waiter, customers filming, the dachshund. Darkness, time and disguise modifiers. **T Q**
 - [ ] Police: 3 patrols with personalities, hidden roster (Klaas can deduce it), tip-off, coffee/complaisance logged, "c'est encore vous", calling as the Association, the police coming for Pilou, the bribe caught on camera → internal investigation. **T**
-- [ ] Mayor's office: reports, inspector visits (announced = tip-off via Martine, surprise = via Delphine/Hippolyte). **T**
+- [ ] Mayor's office: reports, inspector visits (announced = tip-off via Colette, surprise = via Delphine/Hippolyte). **T**
 - [ ] Saturday: no vehicles, crowd, standing drinkers, peeing in doorways. **Q**
 
 ### D. Day systems

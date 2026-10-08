@@ -24,10 +24,10 @@ This file records the writing decisions so that every text stays consistent. Rea
 ## Cast quick reference
 | id | Who | Where (§1b) |
 |---|---|---|
-| pilou | Pierre-Louis Dubois, Rust dev at Koddex | n°10, 2nd floor, above the estaminet. Exhaust under his window |
+| pilou | Pierre-Louis Dubeton, Rust dev at Koddex | n°10, 2nd floor, above the estaminet. Exhaust under his window |
 | jeremie (+ biloute, dachshund) | Association president | n°10, 3rd floor |
 | klaas, hilde | Notebook man (Santa look) and his kind wife | Place Maurice-Schumann, window looking down the whole street |
-| tatie | Tatie Bouchon, proverbs and emails, tea with Martine | n°19, mid-street |
+| tatie | Tatie Bouchon, proverbs and emails, tea with Colette | n°19, mid-street |
 | seb, nico (+ gaufre, the cat) | The couple across the street, run the WhatsApp group | n°13, opposite Pilou, balcony |
 | hippolyte | Carriage-building heir, heritage network | Rue de la Baignerie, off the square |
 | regis | Régis Dewaele, holiday-let landlord, the bloc's recruit | n°27 |
@@ -35,8 +35,8 @@ This file records the writing decisions so that every text stays consistent. Rea
 | serveur | Théo, the waiter | n°10 |
 | lemaire, benali, chef | Police: free-meal brigadier, by-the-book agent, Commandant Desmet | |
 | delphine | Inspector, AC case, married to Stéphane | Mairie |
-| martine | Martine Aubrac, ex-mayor, pro-bloc | |
-| delandre | Arnaud Delandre, current mayor, brought in the 22:00 rule, leans residents | Hôtel de ville |
+| colette | Colette Verhaeghe, ex-mayor, pro-bloc | |
+| lescaut | Bertrand Lescaut, current mayor, brought in the 22:00 rule, leans residents | Hôtel de ville |
 | stephane | Koddex founder, "vibes", never there | |
 | clode | Clode Kode, too polite | |
 | journaliste, avocat | Anne-Sophie Lepoutre (La Voix du Nordiste), Maître Vandamme | |
@@ -47,12 +47,12 @@ This file records the writing decisions so that every text stays consistent. Rea
 - **Cobbles**: chairs dragged at 22:00, heels and suitcases at night, shattering bottles.
 - **Saturdays (D6, D13)**: no vehicles → crowds, standing drinkers, people peeing in doorways (Pilou's too).
 - **AC** installed without permission: an inspector (Delphine) came, the case is open. **Exhaust**: talks with the city, nothing decided.
-- Martine Aubrac = **ex**-mayor, pro-bloc. Arnaud Delandre = **current** mayor, leans residents. Delphine is **married to Stéphane**.
+- Colette Verhaeghe = **ex**-mayor, pro-bloc. Bertrand Lescaut = **current** mayor, leans residents. Delphine is **married to Stéphane**.
 - No CCTV on the street. Only Pilou's cameras.
 - Lore: built in **1729**, nicknamed **« le Trou »**, a **canal** under it until 1912, **n°40** is listed.
 
 ## Spoiler rule (flags)
-A line may only mention a fact once the player has unlocked it. Pilou knows from the start: the 22:00 rule, the 6-per-table rule, the AC case, the exhaust talks, that Delphine is his boss's wife, that Martine is the ex-mayor. Everything else is gated: Lemaire's free meals (`seen_complaisance`), the tip-offs (`seen_tipoff`), the patrol roster (`roster_known`), Régis's betrayal (`traitor_known`), anything read on the wifi (`read_*`), the waiter's name (`met_waiter`), the zones (`legal_view`), the bar at La Bombance (`bombance_rumour`).
+A line may only mention a fact once the player has unlocked it. Pilou knows from the start: the 22:00 rule, the 6-per-table rule, the AC case, the exhaust talks, that Delphine is his boss's wife, that Colette is the ex-mayor. Everything else is gated: Lemaire's free meals (`seen_complaisance`), the tip-offs (`seen_tipoff`), the patrol roster (`roster_known`), Régis's betrayal (`traitor_known`), anything read on the wifi (`read_*`), the waiter's name (`met_waiter`), the zones (`legal_view`), the bar at La Bombance (`bombance_rumour`).
 
 ## Decisions log
 - **WhatsApp group name**: `WHATSAPP_GROUP` constant, provisionally « Radio Balcon ». Never hard-code it in text.
