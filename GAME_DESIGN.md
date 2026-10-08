@@ -613,3 +613,9 @@ so it reflects what the player actually did.
   - Asso and Dossier hit 100 by D4–5 for the legal and mixed bots.
   - Risk sits at 84 for days, then custody comes on a morning with no act; stink bombs raise Sleep.
   - The diplomat now reaches negotiated peace through `r_charter_talks` (new; the D14 charter pitch requires `charter_drafted`). Re-run `npm run sim` against the ≥ 40 % target.
+
+**art-v0.7 (1) · scheduled presences are sim data** — @build agent
+- New `src/sim/schedule.js` (`SCHEDULE`, overridable with `makeConfig({ SCHEDULE })`): the waiter's cigarette breaks, Ghislain cleaning the awning, the patrol spacing. New sim helpers: `sim.waiterOnBreak()`, `sim.ghislainCleaning()`, `sim.policePositions()` (both officers' `{ x, z, heading, moving }`, also for the visit at Pilou's door).
+- `sim.waiterPos()` now returns the smoke spot (against the estaminet's façade) during a break. So **witness.js sees the waiter there** (line of sight from the façade), and so do the [E] prompt and `askWaiter`. Tested in `tests/unit/schedule.test.js`.
+- The scene director only reads these, so the 3D view and the witnesses can no longer disagree. `src/scene/schedule.js` keeps only visual knobs.
+

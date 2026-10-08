@@ -8,7 +8,7 @@
 // La simulation reste la seule source de vérité : le metteur en scène ne fait que la montrer.
 import * as THREE from 'three';
 import { customer, setState, bike as makeBike } from '../art/characters.js';
-import { WAITER_BREAKS, GHISLAIN_CLEAN, FILM_MINUTES, PATROL_CAST, inWindow } from './schedule.js';
+import { FILM_MINUTES, PATROL_CAST } from './schedule.js';
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
@@ -128,23 +128,13 @@ export function createDirector({ scene, world, art, audio }) {
     const lead = PATROL_CAST[P?.patrolId] ?? 'lemaire';
     dressOfficer(officers[0], lead, sat);
     dressOfficer(officers[1], 'police', sat);
-    const spawn = toV(sim.cfg.ANCHORS.policeSpawn, 0);
+    const pos = sim.policePositions(); // trajet calculé par la sim (src/sim/schedule.js)
     officers.forEach((o, i) => {
-      const p = o.p;
-      p.visible = true;
-      if (!P || P.phase === 'pending') { // visite : devant la porte de Pilou
-        p.position.set(sim.cfg.ANCHORS.streetDoor.x + 0.9, 0, sim.cfg.ANCHORS.streetDoor.z + (i ? 0.5 : -0.5));
-        p.rotation.y = -Math.PI / 2;
-        return;
-      }
-      const r = sim.rest(P.restId);
-      const dx = i ? 0.4 : -0.4;
-      let a = V(spawn.x + dx, 0, spawn.z), b = V(r.side * 0.4 + dx, 0, (r.z0 + r.z1) / 2), k = 1;
-      if (P.phase === 'walking') k = (S.min - P.enterAt) / Math.max(0.01, P.arriveAt - P.enterAt);
-      if (P.phase === 'leaving') { [a, b] = [b, a]; k = (S.min - P.leaveAt) / Math.max(0.01, P.exitAt - P.leaveAt); }
-      k = clamp(k, 0, 1);
-      p.position.lerpVectors(a, b, k);
-      p.rotation.y = k < 1 ? Math.atan2(b.x - a.x, b.z - a.z) : r.side < 0 ? -Math.PI / 2 : Math.PI / 2;
+      const p = o.p, q = pos[i];
+      p.visible = !!q;
+      if (!q) return;
+      p.position.set(q.x, 0, q.z);
+      p.rotation.y = q.heading;
     });
     // Sur place à l'estaminet : Dédé les accueille, café si complaisance, enveloppe si pot-de-vin
     if (P?.phase === 'onsite' && P.restId === 'bernadette') {
@@ -230,23 +220,18 @@ export function createDirector({ scene, world, art, audio }) {
     // Le serveur : va-et-vient de la sim, sauf pendant ses pauses clope (sous le store)
     const waiter = world.waiter;
     waiter.visible = sim.waiterOnDuty();
-    const onBreak = waiter.visible && inWindow(min, WAITER_BREAKS);
+    const onBreak = waiter.visible && !!sim.waiterOnBreak?.(); // horaires : src/sim/schedule.js (les témoins les connaissent)
     if (onBreak !== state.waiterBreak) {
       state.waiterBreak = onBreak;
       if (onBreak) art.anim.play('serveur', 'smoke', { move: false });
       else art.anim.stop('serveur', { place: false });
     }
-    if (onBreak) {
-      waiter.position.set(A.smokeSpot.x, 0, A.smokeSpot.z);
-      waiter.rotation.y = A.smokeSpot.x < 0 ? Math.PI / 2 : -Math.PI / 2;
-    } else {
-      const wp = sim.waiterPos();
-      waiter.position.set(wp.x, 0, wp.z);
-      waiter.rotation.y = Math.cos(min * sim.cfg.ANCHORS.waiter.speed) > 0 ? 0 : Math.PI;
-    }
+    const wp = sim.waiterPos();
+    waiter.position.set(wp.x, 0, wp.z);
+    waiter.rotation.y = onBreak ? (wp.x < 0 ? Math.PI / 2 : -Math.PI / 2) : Math.cos(min * sim.cfg.ANCHORS.waiter.speed) > 0 ? 0 : Math.PI;
 
     // Ghislain frotte le store sur son escabeau en début de soirée
-    const cleaning = inWindow(min, GHISLAIN_CLEAN);
+    const cleaning = !!sim.ghislainCleaning?.();
     if (cleaning !== state.cleaning) {
       state.cleaning = cleaning;
       if (cleaning) art.anim.play('ghislain', 'clean');

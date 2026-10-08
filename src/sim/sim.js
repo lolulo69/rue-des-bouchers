@@ -10,6 +10,7 @@ import { callPolice, updatePolice, patrolOnDuty } from './police.js';
 import { dist3, lineOfSight, corridorEncroachment } from './geometry.js';
 import { buildSummary } from './summary.js';
 import { fmt } from './time.js';
+import { SCHEDULE, inWindow, smokeSpot, patrolPositions } from './schedule.js';
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
@@ -97,7 +98,12 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
     },
     catPresent: () => S.min < S.catLeaveAt,
     waiterOnDuty: () => S.min < WAITER.offDutyAt,
-    waiterPos: (min = S.min) => ({ x: ANCHORS.waiter.x, z: ANCHORS.waiter.z + Math.sin(min * ANCHORS.waiter.speed) * ANCHORS.waiter.amplitude }),
+    // Pause clope (src/sim/schedule.js) : le serveur fume contre la façade, la 3D et les témoins le voient là
+    waiterOnBreak: (min = S.min) => min < WAITER.offDutyAt && inWindow(min, (cfg.SCHEDULE ?? SCHEDULE).waiterBreaks),
+    waiterPos: (min = S.min) => (sim.waiterOnBreak(min) ? smokeSpot(cfg)
+      : { x: ANCHORS.waiter.x, z: ANCHORS.waiter.z + Math.sin(min * ANCHORS.waiter.speed) * ANCHORS.waiter.amplitude }),
+    ghislainCleaning: (min = S.min) => inWindow(min, (cfg.SCHEDULE ?? SCHEDULE).ghislainClean),
+    policePositions: () => patrolPositions(sim),
     activeStanding: () => S.standing.filter((g) => S.min >= g.arriveAt && S.min < g.leaveAt),
     activePees: () => S.pees.filter((p) => S.min < p.end),
     noiseAt: (p, indoor) => noiseAt(sim, p, indoor),
