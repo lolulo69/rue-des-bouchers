@@ -299,6 +299,9 @@ The campaign simulator plays 1000 seeded campaigns per strategy bot. Targets:
 ### Release tasks (done by the design agent when v1.0 lands)
 - [ ] Set `WHATSAPP_GROUP` in `src/content/characters.js` to **« La Gaystapo »** (Lucas's choice: the real group's own name).
   Only the label changes; the writing around Seb & Nico stays role-based.
+- [ ] Rename the two politicians back to Lucas's preferred names: **Colette Verhaeghe → Martine Aubrac** (ids `colette` → `martine`,
+  flags `colette_*` → `martine_*`) and **Bertrand Lescaut → Arnaud Delandre** (`lescaut` → `delandre`, flags `*lescaut*` → `*delandre*`)
+  across `src/`, the docs and tests. Remove `/Aubrac/` and `/Delandre/` from `tests/unit/names.test.js`. Run the full test suite + sim after the swap.
 
 ### Deviations
 _(none yet)_
