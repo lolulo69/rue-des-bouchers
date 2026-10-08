@@ -57,7 +57,7 @@ Sources: listings (PagesJaunes, Yelp, TheFork), the city's summer pedestrianisat
 - Tatie Bouchon: **in the middle of the street**.
 - Klaas & Hilde: at the **far end, on place Maurice-Schumann**, with a window looking straight down the whole street
   (a long line of sight: he sees everything, but from far away. Details at night need his binoculars).
-- Hippolyte: also by **place Maurice-Schumann**, in a **small street at 90°** off the square: the old carriage building
+- Hippolyte: also by **place Maurice-Schumann**, on **rue de la Baignerie**, a small street at 90° off the square: the old carriage building
   (big wooden carriage door, cobbled courtyard). Meeting room for the association.
 - Lore nuggets: the street was nicknamed **"le Trou"** for centuries because it was so filthy (satire: the bloc says
   "it's always been a party street", the residents answer "it's always been a hole"). A **canal ran under the street until 1912**.
