@@ -272,7 +272,7 @@ export const ACTIONS = [
     cost: { minutes: 5 },
     requires: { flags: ['asked_waiter'], notFlags: ['waiter_bribed', 'waiter_fired'] },
     effects: { setFlags: ['waiter_bribed', 'met_waiter'] },
-    witnessed: { exposure: 0.4, by: ['dede', 'ghislain', 'customers'], effects: { risk: +10, hostility: +15, setFlags: ['waiter_fired'] } },
+    witnessed: { exposure: 0.4, by: ['dede', 'ghislain', 'customers'], effects: { risk: +10, hostility: +15, setFlags: ['waiter_fired'], clearFlags: ['waiter_informant'] } },
     result: "Il empoche le billet sans le regarder. « Je m’appelle Théo. Je finis à minuit et demie. Et je vous ai jamais vu. »",
   },
   {
@@ -780,7 +780,7 @@ export const ACTIONS = [
     cost: { time: 1 },
     requires: { flags: ['waiter_bribed'], notFlags: ['waiter_fired', 'waiter_informant'] },
     effects: { setFlags: ['waiter_informant', 'seen_complaisance'], dossier: +2 },
-    witnessed: { exposure: 0.2, by: ['dede'], effects: { setFlags: ['waiter_fired'], hostility: +10 } },
+    witnessed: { exposure: 0.2, by: ['dede'], effects: { setFlags: ['waiter_fired'], clearFlags: ['waiter_informant'], hostility: +10 } },
     result: "Au comptoir d’un café de la place, Théo parle bas : les jours où « le brigadier mange », les soirs où la cuisine ferme tôt, qui ment à qui. Il a l’air soulagé.",
   },
   // ── content-fixes : routes du scandal (README « Scandal proof ») ─────────
@@ -797,7 +797,7 @@ export const ACTIONS = [
       dossier: +4,
       evidence: { kind: 'testimony', quality: 0.75, legal: true, label: 'Attestation du serveur : repas offerts à la patrouille, coups de fil avant les passages' },
     },
-    witnessed: { exposure: 0.3, by: ['dede'], effects: { setFlags: ['waiter_fired'], hostility: +10 } },
+    witnessed: { exposure: 0.3, by: ['dede'], effects: { setFlags: ['waiter_fired'], clearFlags: ['waiter_informant'], hostility: +10 } },
     result: "Théo relit trois fois, signe, et pose le stylo comme on pose une grenade. « Je fais que mon taf, moi. Mais mon taf, c’est pas de servir des cafés à la police pour qu’elle regarde ailleurs. » Maître Vandamme appellera ça « une pièce ». Théo appelle ça « ma démission, en avance ».",
   },
   {

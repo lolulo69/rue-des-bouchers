@@ -396,7 +396,7 @@ export const COUNTERMOVES = [
     speaker: 'dede',
     when: { phase: 'afternoon', flags: ['waiter_bribed'], notFlags: ['waiter_fired'], hidden: { hostility: '>=60' }, chance: 0.3 },
     text: "Dédé a remarqué que le serveur sourit en regardant votre fenêtre. Il le renvoie « pour raisons économiques », en lui offrant une dernière carbonnade. Votre informateur est désormais au chômage, et vous avez mauvaise conscience.",
-    effects: { asso: -3, setFlags: ['waiter_fired'] },
+    effects: { asso: -3, setFlags: ['waiter_fired'], clearFlags: ['waiter_informant'] },
     once: true,
   },
   {
