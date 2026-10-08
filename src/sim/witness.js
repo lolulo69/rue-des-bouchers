@@ -1,0 +1,61 @@
+import { dist3, lineOfSight } from './geometry.js';
+
+export function nightFactor(sim) {
+  const { SKY } = sim.cfg;
+  return Math.min(1, Math.max(0, (sim.state.min - SKY.duskStart) / (SKY.nightFull - SKY.duskStart)));
+}
+
+// Probabilité que Klaas distingue un acte à `d` mètres : pleine jusqu'à near, nulle au-delà de far.
+export function klaasDetection(sim, d) {
+  const k = sim.cfg.WITNESS.klaas;
+  const n = nightFactor(sim);
+  const near = k.near[0] + (k.near[1] - k.near[0]) * n;
+  const far = k.far[0] + (k.far[1] - k.far[0]) * n;
+  return k.p * Math.min(1, Math.max(0, (far - d) / (far - near)));
+}
+
+// Qui pourrait voir un acte commis en `pos` en ce moment (ligne de vue + portée selon l'obscurité) ?
+export function potentialWitnesses(sim, pos) {
+  const { WITNESS, STREET, ANCHORS } = sim.cfg;
+  const S = sim.state;
+  const night = nightFactor(sim);
+  const range = WITNESS.sightDusk + (WITNESS.sightNight - WITNESS.sightDusk) * night;
+  const W = STREET.halfWidth;
+  // Les gens de la rue voient mal dans le noir ; Klaas et le balcon sont à hauteur de fenêtre, habitués.
+  const dark = 1 + (WITNESS.darkFactor - 1) * night;
+  const out = [];
+  const add = (id, kind, def, at, extra = {}) => {
+    if (dist3(at, pos) > range || !lineOfSight(at, pos, W)) return;
+    const p = def.p * (kind === 'waiter' || kind === 'customers' ? dark : 1);
+    out.push({ id, kind, name: def.name, pos: at, p, weight: def.weight, ally: def.ally, ...extra });
+  };
+  // Klaas : pas de portée générique, mais une détection qui baisse avec la distance (jumelles la nuit)
+  if (sim.klaasAwake() && lineOfSight(ANCHORS.klaasWindow, pos, W)) {
+    const p = klaasDetection(sim, dist3(ANCHORS.klaasWindow, pos));
+    if (p > 0) out.push({ id: 'klaas', kind: 'klaas', name: WITNESS.klaas.name, pos: ANCHORS.klaasWindow, p, weight: WITNESS.klaas.weight, ally: true });
+  }
+  if (sim.catPresent()) add('gaystapo', 'gaystapo', WITNESS.gaystapo, ANCHORS.balcony);
+  if (sim.waiterOnDuty()) add('waiter', 'waiter', WITNESS.waiter, { ...sim.waiterPos(), y: 1.6 });
+  const cover = sim.day.key === 'sat' ? WITNESS.saturdayCover : 1;
+  const c = WITNESS.customers;
+  for (const t of S.tables) {
+    if (t.out) add(`clients:${t.id}`, 'customers', { ...c, name: `des clients (${t.label})`, p: c.p * cover }, { x: t.x, y: 1.2, z: t.z }, { tableId: t.id });
+  }
+  for (const g of sim.activeStanding()) {
+    add(`clients:${g.id}`, 'customers', { ...c, name: 'des buveurs debout', p: c.p * cover }, { x: g.x, y: 1.6, z: g.z });
+  }
+  return out;
+}
+
+// Tire au sort qui a effectivement vu. wetTableIds : tables arrosées (elles lèvent la tête).
+export function rollWitnesses(sim, pos, { wetTableIds = [] } = {}) {
+  const c = sim.cfg.WITNESS.customers;
+  const seen = [];
+  for (const w of potentialWitnesses(sim, pos)) {
+    const p = w.p + (w.tableId && wetTableIds.includes(w.tableId) ? c.wetBonus * (w.p / c.p) : 0);
+    if (!sim.rng.chance(Math.min(1, p))) continue;
+    const filmed = w.kind === 'customers' && sim.rng.chance(c.filmChance);
+    seen.push({ ...w, filmed });
+  }
+  return seen;
+}
