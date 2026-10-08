@@ -370,7 +370,7 @@ export const TWISTS = [
     id: 'power_cut',
     title: 'Panne de courant',
     pool: true,
-    intro: "À 22h40, tout le quartier s’éteint. Plus de lampadaires, plus de néons, plus de gaine. Les terrasses allument des bougies. Pour la première fois depuis des mois, on voit des étoiles au-dessus du Trou.",
+    intro: "À 22h40, tout le quartier s’éteint. Plus de lampadaires, plus de néons, plus de gaine. Les terrasses allument des bougies. Pour la première fois depuis des mois, on voit des étoiles au-dessus de la rue.",
     sim: {
       darkness: 0.8,
       exhaustOff: true,
