@@ -455,3 +455,40 @@ so it reflects what the player actually did.
 - `pm_waiter_debrief` now also sets `seen_complaisance`, which unlocks the window bribe photo without the engine.
 - New `pm_answer_hate_wave` (sets `hate_wave_answered`, asso +3, placeholder).
 - No ending or countermove `when` / priority was touched. `the_return` may still be under the 2% target (rumour 35% → project 50%), so it's yours to check in the simulator.
+
+**Night actions (night-actions) — for the build agent and the UI agent**
+`src/sim/nightActions.js` (owner: content agent; tests: `tests/unit/nightActions.test.js`) plays every night ACTION of `src/content/actions.js` that has no `sim` field inside the 3D night. It is generic and content-driven, pure, DOM-free, and seeded through `sim.rng`. I did not edit `sim.js`, `campaign.js` or `main.js`: the hook lines below are for their owners.
+- **Stable API for the UI (in-game menu, key N):**
+  - `availableNightActions(sim, c, player)` → `[{ id, label, legality, minutes, at, where, available, reason, witnesses }]`.
+    - An action whose `requires` aren't met is **not listed** (anti-spoiler). One that is possible but not here or not now is listed with `available: false` and a French `reason` (« Il faut être sous le store. », « Pas avant 23h30. », « La cuisine est fermée. »…).
+    - `witnesses` = who could see it right now at that spot (an 👁 hint; empty for legal acts).
+  - `performNightAction(sim, c, id, player)` → `{ ok, reason?, result, seen: [{ id, kind, name, ally, filmed }], minutes, startedAt, art, sim }`.
+  - `player = { where: 'apartment' | 'window' | 'street', pos: { x, z } }`. From main.js: `where = player.loc === 'street' ? 'street' : nearWindow() ? 'window' : 'apartment'`, `pos` = the camera position. Without `player` (bots, headless) the location is not checked.
+- **Location mapping** (`LOCATIONS`, positions derived from config so they follow the street):
+  - `window` and `apartment`: Pilou's window and his flat.
+  - `street`: wherever Pilou stands.
+  - `terrace`: ≤ 8 m from the estaminet's terrace centre.
+  - `awning`: ≤ 3 m under the estaminet's awning.
+  - `kitchen_door`: the service door, rue de la Barre side, ≤ 3 m.
+  - `estaminet`: inside, entered by its door, ≤ 4 m.
+  - Each action's spot, time window and scene condition are in `NIGHT_ACTION_SPECS`. Scene conditions (`SCENE`): terrace out, exhaust running, kitchen open until 23:00, waiter on duty, patrol on site.
+- **What a perform does, in order:**
+  1. Track it: `once` per campaign, once per night unless `repeat` (stink bomb, filming faces).
+  2. Roll witnesses at the spot of the act, at its start. The sim's own witnesses go through `sim.witnessAct` (witness.js: Klaas's distance and binoculars, darkness, disguise, Saturday crowd, the dachshund's bark), filtered by the content's `witnessed.by` with its `exposure`. Dédé, Ghislain and the police (not modelled by the sim) are rolled in this module with the same exposure × darkness × disguise.
+  3. Apply effects, the same way `c.doNightAction` does: Asso and Sleep in the night; Risk **only** through `sim.punish` when someone saw; everything else via `c.apply`. `witnessed.effects` apply only if seen. Klaas seeing an illegal or grey act sets `klaas_noted_pilou`.
+  4. Mechanical effect (`SIM_EFFECTS`): the stink bomb clears the estaminet's terrace through `sim.clearTable(t, 'stink')`; the cardboard sets `sim.state.exhaustBlocked`.
+  5. Art hook: push `sim.events` `{ type: 'art', action, fx?, prop?, terrace?, anim?, pos }`.
+  6. Write a journal `night-action` entry `{ id, legality, at, pos, minutes, seen, filmed, … }` (for `narrative.js` / the recap).
+  7. Let the act's minutes pass with `sim.tick(1)` each minute.
+  - The night invariants stay green (tested on every action).
+- **Call sites (hook lines for the owners):**
+  - `main.js` `nightActionsHere()` / `renderNightMenu()`: list `availableNightActions(sim, campaign, player)` (grey the unavailable ones with `reason`); on click `performNightAction(sim, campaign, a.id, player)`, then `drainSim()`.
+  - `main.js` `drainSim()`: on `e.type === 'art'`:
+    - `art.fx[e.fx]?.(e.pos)`
+    - `e.prop && art.props.place(e.prop, e.pos)`
+    - `e.terrace && art.terrace[e.terrace]?.(…)` (rush / collapse / parasols / film on the estaminet's tables)
+    - `e.anim && art.anim.play(...e.anim)`
+    - and voice the witnesses with `pickNightLine('witness', sim, sim.rng, { witness })` for each `r.seen`.
+  - `campaign.js` (optional, keeps bots and the simulator on one code path): `c.doNightAction = (sim, id) => performNightAction(sim, c, id)`, and `c.nightActions` can stay as the base filter (`availableNightActions` uses it).
+  - `sim.js` `tick()` (one line, so the cardboard really stops the exhaust): `if (S.min < NOISE.exhaustOffMinute && !S.exhaustBlocked) d -= SLEEP.exhaustDrainPerMinute;`. Add the same `!S.exhaustBlocked` check where the exhaust hum / steam is drawn.
+  - `index.js`: `export { availableNightActions, performNightAction } from './nightActions.js';`
