@@ -253,7 +253,12 @@ council's night walk (Lescaut walking the street at 23:00, if lescaut_meeting). 
 « Nouveau » card that teaches it: dB reading (D1 night), the 22:00 round with Jérémie (when invited, ~D2), the legal-zone
 view L (after the AOT plan), the WhatsApp group (D2), the dB logger / scraper / bot (Koddex side projects), the window
 camera (~D4), the night action menu items appear only once their story requirement is met (waiter informant, wifi,
-backroom…). Rule: at least one new verb every 2 nights until D10. Nothing a bot or the balance targets rely on may be
+backroom…). Rule: at least one new verb every 2 nights until D10. **Every tool gets a small hands-on tutorial** (Lucas, 2026-10-09) the first time it
+becomes available in the night: a short coach mark (1–3 steps, ≤ 2 lines each) showing the key and the pad glyph, pointing
+at what to do (« Visez une table et appuyez sur P », « Montez à la fenêtre : la gaine est juste en dessous »…), detecting
+when the player has actually done it, then congratulating them in one line and fading out. Skippable, never blocking the clock
+for more than a few seconds (the night clock pauses while the coach mark is first shown), replayable from « Aide ». Covers the
+starting tools too (photo, police, waiter, bucket, the window, moving, the phone) on night 1, spread so the first night isn't a lecture. Nothing a bot or the balance targets rely on may be
 removed: unlocks only gate *when*, and the balance agent re-checks §13.H after.
 
 **C. The day in 3D.** The day phases stop being menus over a blurred backdrop:
@@ -358,6 +363,7 @@ The campaign simulator plays 1000 seeded campaigns per strategy bot. Targets:
 
 ### J. v1.1 « no two nights alike »
 - [ ] ≥ 16 night twists, every night of a campaign has one, never the same twice in a campaign; each changes the sim and has an intro card, lines and props. **T Q**
+- [ ] Every night tool has a hands-on coach-mark tutorial on first availability (key + pad glyph, completion detected, skippable, replayable from Aide). **T Q**
 - [ ] Tools unlock over time with a « Nouveau » card; ≥ 1 new verb every 2 nights until D10; §13.H still met after (balance re-run). **T**
 - [ ] Morning at Koddex in 3D (seated, terminal on the in-world monitor, readable); afternoon in the daytime street / workshop / town hall in 3D; keyboard + gamepad flow intact. **T Q**
 - [ ] Office vs home days (e-bike commute, home desk in the living room) and Pilou's apartment modelled per §12b.D, walkable at night. **Q**
