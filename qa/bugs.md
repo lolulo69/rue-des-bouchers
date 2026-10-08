@@ -5,15 +5,6 @@ When a bug is fixed, remove the `fixme` (the test then guards against regression
 
 ## Open
 
-### BUG-006 · CRITICAL · The production game mounts a second, engine-less day UI (ui.html's standalone) on top of its own
-- **Test**: `tests/e2e/edge.e2e.js` › « BUG-006 · le jeu (index.html) ne monte qu’une seule interface de jour, celle du jeu 3D »
-- **Files**: `vite.config.js` (cf61d8c): the `ui` code-splitting group `/src[\\/]ui[\\/]/` also captures `src/ui/standalone.js`, the entry module of `ui.html`. Its top-level side effect `window.__rdbUi = mount({}, { seed })` is now inside `dist/assets/ui-*.js`, which the game imports (`game.js` › `showDay()`).
-- **Steps**: `npm run build && vite preview`, open `/`, « Campagne (14 jours) » → « Nouvelle campagne ».
-- **Expected**: one day UI (the game's, with `onNight` → the 3D night).
-- **Actual**: two `.ui-layer`s in `#ui-root`; `window.__rdbUi` is defined; the click on « Nouvelle campagne » lands on the standalone instance (drawn on top), so **the player's campaign runs without the 3D night** (the standalone falls back to « Passer la nuit », a simulated passive night). `window.__rdb.ui.campaign` stays `null`, which also breaks every e2e test that drives the campaign through it (full runs, album, campaign-flow). Only in the production build (`vite preview` / deploy); `vite dev` serves modules unbundled.
-- **Owner guess**: build agent (vite.config.js): exclude the entry, e.g. `['ui', /src[\\/]ui[\\/](?!standalone\.js)/]`, or move `standalone.js` out of `src/ui/`. One line.
-
-
 ### BUG-005 · Keyboard navigation is impossible in the day UI (Tab is swallowed)
 - **Test**: `tests/e2e/edge.e2e.js` › « BUG-005 · une journée au clavier seul (Tab / Entrée) : Koddex puis après-midi »
 - **Files**: `src/main.js:369`: the global `keydown` listener does `if (e.code === 'Tab') e.preventDefault();` **before** checking whether a night is running, so it also fires on the title screen and in the whole day UI.
@@ -32,6 +23,7 @@ When a bug is fixed, remove the `fixme` (the test then guards against regression
 - **Duration (§13.A)**: see `qa/duration.md`. Both full campaigns land at ~3h05 (target 2h30–4h); the custody run stops at day 5 (1h16), as expected for an early ending.
 
 ## Fixed
+- **BUG-006** · the production build bundled `ui.html`'s `standalone.js` into the game's `ui` chunk, mounting a second, engine-less day UI (campaigns ran without the 3D night). Fixed by the build agent in c70745b. Guard test: `edge.e2e.js` › « BUG-006 (corrigé) » (one `.ui-layer`, no `window.__rdbUi`, the campaign belongs to the game's UI).
 - **BUG-002** · the Koddex end-of-morning was never shown. Fixed in 69aaa7e (UI agent): `shown()` keeps the Koddex screen until « Quitter Koddex ». Test un-fixme'd in `tests/e2e/campaign-flow.e2e.js`.
 - **BUG-003** · the D14 commission speeches were never shown. Fixed by the UI agent's card polish (`cardScreen()` renders `card.scene` as `.ui-scene` bubbles). Regression tests: `campaign-flow.e2e.js` › « BUG-003 (corrigé) » (seed 101 reaches D14, every speech on screen) and the nightly full run.
 - **BUG-004** · the last card of a phase lost its result. Fixed in `src/ui/index.js`: `choose()` tags `view.cardResult`, and `shown()` keeps the cards screen while that result is pending (same mechanism as BUG-002). Regression test: `campaign-flow.e2e.js` › « BUG-004 (corrigé) » (fails on the old code, passes now) and the nightly full run's `lostResults` check.
