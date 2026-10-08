@@ -45,6 +45,24 @@ Sources: listings (PagesJaunes, Yelp, TheFork), the city's summer pedestrianisat
 - **Unpermitted works**: Bernadette installed **air conditioning without authorisation**. A mayor's office
   inspector came, and the dispute is ongoing.
 
+## 1b. Geography (real layout, scaled for the game)
+- Rue des Bouchers is **~150 m long**, a narrow cobbled street created in **1729**, running from **rue de la Barre** (end A)
+  to **place Maurice-Schumann** (end B, a small square also reached by rue de la Baignerie, rue Thiers,
+  rue des Poissonceaux, rue de l'Hôpital-Militaire and rue de Tenremonde). Game scale can compress it to ~90–120 m, but keep the two ends.
+- Numbering: low numbers near rue de la Barre. Bernadette (n°10) and Les Bouchers Mal Lunés (n°14) sit in the first third (end A),
+  Bloemkool (n°22) mid-street, Le Goulot (n°33) and L'Endroit (n°34 bis) toward the square. La Bombance (n°4) and Mug (n°3) near end A.
+- Pilou: **2nd floor** above Bernadette (the exhaust duct climbs the façade to just under his window).
+  Jérémie: **3rd floor**, same building (his dachshund on the stairs).
+- Seb & Nico: opposite Pilou, balcony with the cat.
+- Tatie Bouchon: **in the middle of the street**.
+- Klaas & Hilde: at the **far end, on place Maurice-Schumann**, with a window looking straight down the whole street
+  (a long line of sight: he sees everything, but from far away. Details at night need his binoculars).
+- Hippolyte: also by **place Maurice-Schumann**, in a **small street at 90°** off the square: the old carriage building
+  (big wooden carriage door, cobbled courtyard). Meeting room for the association.
+- Lore nuggets: the street was nicknamed **"le Trou"** for centuries because it was so filthy (satire: the bloc says
+  "it's always been a party street", the residents answer "it's always been a hole"). A **canal ran under the street until 1912**.
+  Number 40 is a listed historic house.
+
 ## 2. Characters
 
 ### Pilou: Pierre-Louis Dubois (player)
@@ -57,7 +75,7 @@ where his job amounts to prompting **Clode Kode** all day and building silly sid
 | **Jérémie** | President, Pilou's neighbour, has a **dachshund** | Leads the evening **rounds** (dog walk = patrol). Unlocks official channels. The dachshund barks: it helps (spots things) and hurts (draws attention when you sneak). |
 | **Klaas** | Elderly, Santa Claus look (big, not fat, white beard). **Sees everything, writes everything down.** | Passive **evidence engine**: his notebook logs infractions automatically. **Double-edged**: he also writes down what *Pilou* does. Only a lie or a bribe keeps an illegal act out of his notebook. |
 | **Hilde**, Klaas's wife | Very kind | Brings food and tisane → restores Sleep and morale. Calms Klaas. |
-| **Tatie Bouchon** | Emails Bernadette about the smell. They always answer "it's being fixed"; she doesn't believe it. Also chats with **Martine Aubrac**. | Email thread = running gag and evidence ("promise #14 that it's fixed"). Her Martine connection makes her an unreliable channel: she can open a door at the mayor's office or leak your plan. |
+| **Tatie Bouchon** | Old lady in the middle of the street who hands out wisdom: *« Si vous voulez quelque chose dans la vie, faut résister et se battre pour. »* Emails Bernadette about the smell. They always answer "it's being fixed"; she doesn't believe it. Also chats with **Martine Aubrac**. | Email thread = running gag and evidence ("promise #14 that it's fixed"). Her Martine connection makes her an unreliable channel: she can open a door at the mayor's office or leak your plan. |
 | **The Gaystapo** (WhatsApp group of the gay members, across the street, facing Pilou) **Seb & Nico** | Talk a lot. Their **cat** sits on the balcony | The **WhatsApp group** is the association's nervous system: rally the troops, share photos, gossip. **Cat on the balcony = they are home and watching**: allies witness legal actions (+evidence) but also see illegal ones. |
 | **Hippolyte** | Owns an old building where **carriages (calèches)** were made since the 1800s | Old money, knows the old families and the city's heritage department. Late game: heritage-protection angle (exhaust and AC on a historic façade), a meeting room in the former carriage workshop. |
 
