@@ -415,7 +415,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
   // Conséquences d'un acte vu : Risque × poids des témoins (plafonné), Asso si un allié a vu ou si ça a été filmé.
   sim.punish = (seen, act, baseRisk, assoPenalty = 0) => {
     if (!seen.length) { sim.log(sim.say('witness', {}, 'Personne n’a rien vu… a priori.'), 'good'); return 0; }
-    if (narrator) for (const w of seen) sim.log(sim.say('witness', { witness: w }, null), 'bad');
+    if (narrator) for (const w of seen.filter((x, k) => seen.findIndex((y) => y.kind === x.kind && !!y.filmed === !!x.filmed) === k)) sim.log(sim.say('witness', { witness: w }, null), 'bad'); // une réplique par type de témoin
     const filmed = seen.some((w) => w.filmed);
     const weight = Math.min(WITNESS.riskCap, seen.reduce((s, w) => s + w.weight + (w.filmed ? WITNESS.customers.filmWeight : 0), 0));
     const names = [...new Set(seen.map((w) => (w.kind === 'customers' ? 'des clients' : w.name)))];

@@ -446,7 +446,29 @@ function nightActionsHere() {
   if (!campaign) return [];
   return campaign.nightActions(sim).filter((a) => (a.at === 'pilouWindow' ? nearWindow() : a.at === 'street' ? player.loc === 'street' : true));
 }
+function openNightEvent(ev) {
+  openOverlay('nightmenu');
+  $('nightmenu').querySelector('h2').textContent = ev.data.title ?? 'Cette nuit';
+  const list = $('nightmenu-list');
+  list.innerHTML = '';
+  const p = document.createElement('p');
+  p.textContent = ev.data.text ?? '';
+  list.append(p);
+  for (const ch of ev.choices) {
+    const b = document.createElement('button');
+    b.textContent = ch.label;
+    b.disabled = !ch.available;
+    b.addEventListener('click', () => {
+      const result = campaign.resolveNightEvent(sim, ch.i);
+      closeOverlay();
+      if (result) log(result, '', S.min);
+      drainSim();
+    });
+    list.append(b);
+  }
+}
 function renderNightMenu() {
+  $('nightmenu').querySelector('h2').textContent = 'Actions de nuit';
   const list = $('nightmenu-list');
   list.innerHTML = '';
   const acts = nightActionsHere();
@@ -513,6 +535,8 @@ function tick(dt) {
   now += dt;
   update(dt);
   drainSim(); // à chaque frame, même en pause : aucun événement de la simulation n'est perdu
+  // Événement de nuit à son heure (campaign.nightEventDue) : le jeu se met en pause sur la carte
+  if (campaign && !overlay && !S.ended) { const ev = campaign.nightEventDue?.(sim); if (ev) openNightEvent(ev); }
   director.update(sim, campaign?.state, dt);
   syncCamera();
   updateSky();

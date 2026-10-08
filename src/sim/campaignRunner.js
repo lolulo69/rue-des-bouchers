@@ -5,7 +5,8 @@ import { checkInvariants } from './invariants.js';
 
 // Joue une nuit déjà créée avec une politique de nuit { decide(sim) → actions[], content?(sim, c) → ids[] }
 // Les actions de nuit du contenu sont proposées au bot toutes les `contentEvery` minutes de jeu (coût).
-export function playNight(sim, policy, c, dt = 1, contentEvery = 10) {
+// choose(card, okChoices) → index du choix pour un événement de nuit (défaut : le premier disponible).
+export function playNight(sim, policy, c, dt = 1, contentEvery = 10, choose = null) {
   let nextContent = -Infinity;
   while (!sim.state.ended) {
     if (policy) {
@@ -14,6 +15,11 @@ export function playNight(sim, policy, c, dt = 1, contentEvery = 10) {
         nextContent = sim.state.min + contentEvery;
         for (const id of policy.content(sim, c)) c.doNightAction(sim, id);
       }
+    }
+    // Événements de nuit à leur heure (campaign.js : nightEventDue / resolveNightEvent)
+    for (let ev = c?.nightEventDue?.(sim); ev; ev = c.nightEventDue(sim)) {
+      const ok = ev.choices.filter((x) => x.available);
+      c.resolveNightEvent(sim, ok.length ? (choose ? choose(ev, ok) : ok[0].i) : 0);
     }
     sim.tick(dt);
     sim.events.length = 0;
@@ -41,7 +47,7 @@ export function runCampaign({ seed = 1, content, cfg, bot, maxSteps = 5000, narr
       }
       case 'night': {
         const sim = c.createNight();
-        playNight(sim, bot.night(c, sim), c);
+        playNight(sim, bot.night(c, sim), c, 1, 10, (card, ok) => bot.choose(c, card, ok));
         for (const e of checkInvariants(sim)) nightErrors.push(`J${c.state.day}: ${e}`);
         c.finishNight(sim);
         break;

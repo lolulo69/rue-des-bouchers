@@ -81,8 +81,10 @@ describe('§13.A1 · calendrier de 14 jours (lundi → dimanche S2), matin → a
     for (const id of ['d4_colette_dinner', 'd6_saturday', 'd7_general_meeting', 'd9_inspector', 'd11_exhaust_meeting', 'd13_saturday', 'd14_commission']) {
       expect(fixed.some((e) => e.id === id), id).toBe(true);
     }
+    // Les événements de nuit (D4) se jouent pendant la nuit (campaign.nightEventDue) : on lit le journal de campagne
+    const played = c.state.journal.filter((x) => x.type === 'event');
     for (const e of fixed) {
-      const seen = log.filter((x) => x.step === 'card' && x.id === e.id);
+      const seen = played.filter((x) => x.id === e.id);
       expect(seen.length, e.id).toBe(1);
       expect(seen[0].day, e.id).toBe(e.day);
       expect(seen[0].phase, e.id).toBe(e.phase ?? 'afternoon');
@@ -190,6 +192,8 @@ describe('§13.D3 · les contre-offensives du §8 se déclenchent selon l\'état
       else {
         c = drive(fresh(9), (x) => (morning ? x.step === 'recap' && x.state.day >= Math.max(1, lo - 1) : x.step === 'koddex' && x.state.day >= Math.max(2, lo)));
         satisfy(c, { ...m.when, phase: undefined, notFlags: [] });
+        // Isoler la contre-offensive testée : les autres ne prennent pas les places de la phase (plafond)
+        for (const x of K.COUNTERMOVES) if (x.id !== m.id) { c.state.seen.countermoves.push(x.id); c.state.lastShown[x.id] = c.state.day; }
         if (morning) c.nextDay(); else c.koddex(['work', 'work', 'work']); // les cartes de la phase sont tirées ici
       }
       const queued = [];

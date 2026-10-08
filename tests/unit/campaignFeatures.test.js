@@ -131,3 +131,52 @@ describe('téléphone et dialogue surfacés par la campagne', () => {
     expect(Object.keys(c.state.counts.dialogue).length).toBeGreaterThan(5);
   });
 });
+
+describe('événements de nuit et redites (QA « pass 2 (transcripts) »)', () => {
+  it('le dîner de Colette (J4) n\'est plus une carte avant la nuit : il se joue pendant la nuit, à 20h50', () => {
+    const c = fresh(12);
+    const preNight = [];
+    for (let i = 0; i < 2000 && !(c.state.day === 4 && c.step === 'night'); i++) {
+      if (c.step === 'cards') { const card = c.card(); if (c.state.day === 4 && c.state.phase === 'night') preNight.push(card.id); const ok = card.choices.findIndex((x) => x.available); c.resolveCard(Math.max(0, ok)); }
+      else advance(c, (x) => x.step === 'cards' || (x.state.day === 4 && x.step === 'night'));
+    }
+    expect(preNight).not.toContain('d4_colette_dinner');
+    expect(c.state.nightEvents.map((x) => x.id)).toContain('d4_colette_dinner');
+    const sim = c.createNight();
+    expect(c.nightEventDue(sim)).toBeNull(); // 20h30 : pas encore
+    playNight(sim, POLICIES.passive(), c);
+    const ev = sim.state.journal.find((e) => e.type === 'night-event' && e.id === 'd4_colette_dinner');
+    expect(ev?.t).toBeGreaterThanOrEqual(20 * 60 + 50);
+    expect(c.state.seen.events).toContain('d4_colette_dinner');
+  });
+
+  it('la drache vide toutes les terrasses en quelques minutes, et rien ne ressort', () => {
+    const c = advance(fresh(13), (x) => x.step === 'night');
+    c.state.nightEvents.push({ id: 'r_drache', at: 21 * 60 + 15 });
+    const sim = c.createNight();
+    while (sim.state.min < 21 * 60 + 15) sim.tick(0.5);
+    expect(sim.state.tables.some((t) => t.out)).toBe(true);
+    c.resolveNightEvent(sim, 0);
+    while (sim.state.min < 21 * 60 + 21) sim.tick(0.5);
+    expect(sim.state.tables.filter((t) => t.out)).toEqual([]);
+    while (!sim.state.ended) sim.tick(1);
+    expect(sim.state.journal.some((e) => e.type === 'table-return' && e.t > 21 * 60 + 15)).toBe(false);
+  });
+
+  it('pas de redite : la même réplique, contre-offensive, événement ou tâche Koddex ne revient pas avant le délai', () => {
+    const cooldown = C.repeatCooldownDays;
+    const repeatable = new Set([...K.DIALOGUE, ...K.COUNTERMOVES, ...K.EVENTS, ...K.KODDEX.work.filter((w) => typeof w === 'object')].filter((x) => x.repeatable).map((x) => x.id));
+    for (const bot of ['legal', 'reckless', 'diplomat']) {
+      for (const seed of [1, 2, 3]) {
+        const { c } = runCampaign({ seed, content: K, bot: CAMPAIGN_BOTS[bot](), narrative });
+        const last = {};
+        for (const e of c.state.journal) {
+          const id = e.type === 'event' ? e.id : e.type === 'koddex' && K.KODDEX.work.some((w) => w.id === e.id) ? e.id : e.type === 'countermove' ? e.id : null;
+          if (!id || repeatable.has(id)) continue;
+          if (last[id] !== undefined) expect(e.day - last[id], `${bot}#${seed} ${id} jours ${last[id]} et ${e.day}`).toBeGreaterThanOrEqual(cooldown);
+          last[id] = e.day;
+        }
+      }
+    }
+  });
+});

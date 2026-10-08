@@ -268,6 +268,9 @@ export const CAMPAIGN = {
   prompts: 3,
   afternoonTime: 3,              // créneaux d'actions l'après-midi
   unemployedBonusTime: 2,
+  repeatCooldownDays: 4,        // une entrée rejouable ne revient pas avant 4 jours (sauf `repeatable: true`)
+  nightEventsAtTime: true,      // les événements de nuit se jouent à leur heure pendant la nuit, pas en cartes avant
+  nightEventAt: 21 * 60,        // heure par défaut d'un événement de nuit sans `at`
   // Projets perso de Koddex (koddex.js) qui changent la mécanique
   dbLogger: { every: 30, quality: 0.7, valueScale: 0.5 }, // proj_db_logger : relevé auto à la fenêtre, toutes les 30 min après 22h
   whatsappBot: { actions: ['pm_whatsapp_rally', 'pm_petition_start', 'pm_banners', 'pm_recruit'], timeDiscount: 1, assoBonus: 2 }, // proj_whatsapp_bot

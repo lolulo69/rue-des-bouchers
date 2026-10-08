@@ -67,6 +67,13 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
   rng.setState(S.rng);
   S.seen.tutorial ??= [];
   S.seen.media ??= [];
+  // Pas de redite (QA « pass 2 (transcripts) ») : une entrée rejouable (`once: false`, travail Koddex, gag…) ne revient pas
+  // avant C.repeatCooldownDays jours, sauf `repeatable: true` dans le contenu. S.lastShown[id] = dernier jour montré.
+  S.lastShown ??= {};
+  const cooled = (x) => x.repeatable || S.lastShown[x.id] === undefined || S.day - S.lastShown[x.id] >= (C.repeatCooldownDays ?? 4);
+  const shown = (id) => { S.lastShown[id] = S.day; };
+  // Événements de nuit : joués pendant la nuit 3D à leur heure (`at`), plus en cartes avant 20h30 (c.nightEventDue)
+  S.nightEvents ??= [];
   // Ensemble des drapeaux, mis en cache (les conditions sont évaluées très souvent) ; invalidé à chaque modification
   let flagSet = null;
   const flags = () => (flagSet ??= new Set(S.flags));
@@ -174,15 +181,17 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     for (const e of K.EVENTS) {
       if (e.day === undefined || e.day !== S.day || (e.phase ?? 'afternoon') !== ph) continue;
       if (S.seen.events.includes(e.id) || !c.check(e.when)) continue;
-      cards.push({ type: 'event', id: e.id });
+      if (ph === 'night' && C.nightEventsAtTime !== false) S.nightEvents.push({ id: e.id, at: e.at ?? C.nightEventAt });
+      else cards.push({ type: 'event', id: e.id });
     }
     let random = 0;
     for (const e of K.EVENTS) {
       if (e.day !== undefined || random >= C.randomEventsPerPhase) continue;
       if (![e.phase ?? e.when?.phase ?? 'afternoon'].flat().includes(ph)) continue;
       if (e.once !== false && S.seen.events.includes(e.id)) continue;
-      if (!c.check(e.when)) continue;
-      cards.push({ type: 'event', id: e.id });
+      if (!cooled(e) || !c.check(e.when)) continue;
+      if (ph === 'night' && C.nightEventsAtTime !== false) S.nightEvents.push({ id: e.id, at: e.at ?? C.nightEventAt });
+      else cards.push({ type: 'event', id: e.id });
       random++;
     }
     // Contre-offensives du bloc : l'après-midi par défaut (§3), ou la phase de leur `when` (les e-mails de Tatie
@@ -192,7 +201,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
       if (cm >= C.maxCountermovesPerDay) break;
       if (![m.when?.phase ?? 'afternoon'].flat().includes(ph)) continue;
       if (m.once !== false && S.seen.countermoves.includes(m.id)) continue;
-      if (!c.check(m.when)) continue;
+      if (!cooled(m) || !c.check(m.when)) continue;
       cards.push({ type: 'countermove', id: m.id });
       cm++;
     }
@@ -200,7 +209,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     // privilégiant les plus précis (plus de conditions) et les jamais vus, sinon les premiers du fichier monopolisent.
     const precision = (x) => Object.keys(x.when ?? {}).length + (x.when?.flags?.length ?? 0);
     const eligible = K.DIALOGUE.filter((x) => [x.when?.phase ?? 'afternoon'].flat().includes(ph)
-      && !(x.once !== false && S.seen.dialogue.includes(x.id)) && c.check(x.when))
+      && !(x.once !== false && S.seen.dialogue.includes(x.id)) && cooled(x) && c.check(x.when))
       .map((x) => ({ x, k: precision(x) + rng.next() * 2 + (S.counts.dialogue[x.id] ? -3 : 0) }))
       .sort((a, b) => b.k - a.k);
     for (const { x } of eligible.slice(0, C.maxDialoguesPerPhase)) cards.push({ type: 'dialogue', id: x.id });
@@ -239,29 +248,38 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     return true;
   };
 
+  // Résolution d'un événement (carte du jour ou événement de nuit) : vu, choix, effets. Renvoie le texte du choix.
+  function resolveEvent(e, i) {
+    shown(e.id);
+    S.seen.events.push(e.id);
+    S.counts.events[e.id] = (S.counts.events[e.id] ?? 0) + 1;
+    c.note('event', { id: e.id, eventDay: e.day });
+    let result = null;
+    const ch = e.choices?.[i];
+    if (ch) {
+      if (!c.check(ch.requires, false)) throw new Error(`choix indisponible : ${e.id}[${i}]`);
+      apply(ch.effects, 'story', `${e.id}#${i}`);
+      result = ch.result ?? null;
+      c.note('choice', { id: e.id, i });
+    }
+    apply(e.effects, 'story', e.id);
+    return result;
+  }
+
   c.resolveCard = (i = 0) => {
     const card = c.card();
     if (!card) return null;
     S.cards.shift();
     let result = null;
     if (card.type === 'event') {
-      const e = card.data;
-      S.seen.events.push(e.id);
-      S.counts.events[e.id] = (S.counts.events[e.id] ?? 0) + 1;
-      c.note('event', { id: e.id, eventDay: e.day });
-      const ch = e.choices?.[i];
-      if (ch) {
-        if (!c.check(ch.requires, false)) throw new Error(`choix indisponible : ${e.id}[${i}]`);
-        apply(ch.effects, 'story', `${e.id}#${i}`);
-        result = ch.result ?? null;
-        c.note('choice', { id: e.id, i });
-      }
-      apply(e.effects, 'story', e.id);
+      result = resolveEvent(card.data, i);
     } else if (card.type === 'dialogue') {
+      shown(card.id);
       S.seen.dialogue.push(card.id);
       S.counts.dialogue[card.id] = (S.counts.dialogue[card.id] ?? 0) + 1;
       apply(card.data.effects, 'story', card.id);
     } else if (card.type === 'countermove') {
+      shown(card.id);
       S.seen.countermoves.push(card.id);
       S.counts.countermoves[card.id] = (S.counts.countermoves[card.id] ?? 0) + 1;
       c.note('countermove', { id: card.id });
@@ -316,11 +334,11 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
   // KODDEX.work : objets { id, label, job, requires, effects, result } (ou chaînes, ancien format) ; 'work' = le premier dispo.
   // KODDEX.gags : { id, speaker, when, once, lines } ; un gag éligible par matin.
   const workItems = () => K.KODDEX.work.map((w, i) => (typeof w === 'string' ? { id: `work_${i}`, label: w } : w));
-  const workAvailable = (w) => c.check(w.requires, false) && c.check(w.when, false) && !(w.once && S.seen.actions.includes(w.id));
+  const workAvailable = (w) => c.check(w.requires, false) && c.check(w.when, false) && !(w.once && S.seen.actions.includes(w.id)) && cooled(w);
   c.koddexOptions = () => {
     const seenGags = S.seen.gags ?? [];
     const gags = K.KODDEX.gags.map((g, i) => (typeof g === 'string' ? { id: `gag_${i}`, lines: [g] } : g))
-      .filter((g) => !(g.once !== false && seenGags.includes(g.id)) && c.check(g.when, false));
+      .filter((g) => !(g.once !== false && seenGags.includes(g.id)) && cooled(g) && c.check(g.when, false));
     return {
       prompts: K.PROMPTS_PER_MORNING ?? C.prompts,
       work: workItems().filter(workAvailable),
@@ -331,7 +349,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
   c.koddex = (picks) => {
     if (S.step !== 'koddex') throw new Error(`koddex hors du matin (${S.step})`);
     const o = c.koddexOptions();
-    if (o.gag) (S.seen.gags ??= []).push(o.gag.id);
+    if (o.gag) { (S.seen.gags ??= []).push(o.gag.id); shown(o.gag.id); }
     const chosen = picks.slice(0, o.prompts);
     while (chosen.length < o.prompts) chosen.push('work');
     const lines = [];
@@ -346,7 +364,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
       const w = workItems().find((x) => x.id === id);
       if (id === 'work' || w) {
         setStat('job', S.stats.job + (w?.job ?? C.workJob));
-        if (w) { apply(w.effects, 'koddex', w.id); if (w.result) lines.push(w.result); if (w.once) S.seen.actions.push(w.id); }
+        if (w) { shown(w.id); apply(w.effects, 'koddex', w.id); if (w.result) lines.push(w.result); if (w.once) S.seen.actions.push(w.id); }
         c.note('koddex', { id });
         continue;
       }
@@ -467,9 +485,43 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
   c.doNightAction = (sim, id, player) => performNightAction(sim, c, id, player);
 
   // Fin de nuit : on rapatrie stats, preuves, police, témoins ; drapeaux moteur ; fins anticipées.
+  // ---------- événements de nuit (à leur heure, pendant la nuit 3D) ----------
+  // c.nightEventDue(sim) → carte { type: 'event', id, data, choices, at } dès que l'horloge atteint `at`, sinon null.
+  // c.resolveNightEvent(sim, i) → texte du choix ; l'effet `simEffect` du contenu agit sur la nuit (ex. 'rain').
+  // Un événement dont l'heure n'arrive pas (fin de nuit avant) est abandonné à la fin de la nuit.
+  c.nightEventDue = (sim) => {
+    if (S.step !== 'night' || sim.state.ended) return null;
+    const n = S.nightEvents.filter((x) => !x.done && sim.state.min >= x.at).sort((a, b) => a.at - b.at)[0];
+    if (!n) return null;
+    const e = EVENTS[n.id];
+    const choices = (e.choices?.length ? e.choices : [{ label: 'OK' }]).map((ch, i) => ({ i, label: ch.label, available: c.check(ch.requires, false) }));
+    return { type: 'event', id: e.id, data: e, choices, at: n.at };
+  };
+  c.resolveNightEvent = (sim, i = 0) => {
+    const card = c.nightEventDue(sim);
+    if (!card) return null;
+    S.nightEvents.find((x) => x.id === card.id && !x.done).done = true;
+    const result = resolveEvent(card.data, i);
+    if (card.data.simEffect && NIGHT_EVENT_EFFECTS[card.data.simEffect]) NIGHT_EVENT_EFFECTS[card.data.simEffect](sim);
+    sim.note('night-event', { id: card.id, i });
+    return result;
+  };
+  const NIGHT_EVENT_EFFECTS = {
+    // La drache : toutes les terrasses rentrent en quatre minutes, les buveurs debout s'abritent, rien ne ressort ce soir
+    rain(sim) {
+      const N = sim.state;
+      const out = N.tables.filter((t) => t.out);
+      out.forEach((t, k) => { t.clearAt = N.min + 0.5 + (4 * k) / Math.max(1, out.length); t.pendingBy = 'rain'; });
+      for (const t of N.tables) if (t.hiddenUntil !== null && !t.out) t.hiddenUntil = null;
+      for (const g of N.standing ?? []) if (g.leaveAt > N.min) g.leaveAt = N.min + 2;
+      N.rained = true;
+    },
+  };
+
   c.finishNight = (sim) => {
     if (S.step !== 'night') throw new Error(`fin de nuit hors de la nuit (${S.step})`);
     const N = sim.state;
+    S.nightEvents = [];
     S.nightCount++;
     const sleepDelta = (N.sleep - C.sleepNeutral) * C.sleepCarry;
     setStat('sleep', S.stats.sleep + sleepDelta);

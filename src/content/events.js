@@ -2,6 +2,7 @@
 // Deux familles :
 //   • fixes : `day` + `phase`, ils arrivent toujours ce jour-là (J1, J4, J6, J7, J9, J11, J13, J14) ;
 //   • aléatoires : pas de `day`, une condition `when` (avec `chance`), `once` par défaut.
+// Événements de nuit : `at` = heure de jeu (minutes depuis minuit) où ils surviennent pendant la nuit 3D ; `simEffect` agit sur la nuit.
 // Chaque choix : { label, requires?, effects?, result }. Un choix sans `requires` est toujours proposé,
 // donc chaque événement fixe a au moins une issue de repli.
 // J14 : `scene` = discours modulaires (cf. d14_commission), affichés avant les choix.
@@ -41,6 +42,7 @@ export const EVENTS = [
   // ── J4 · jeudi : Colette Verhaeghe dîne à l'estaminet ──────────────────────
   {
     id: 'd4_colette_dinner',
+    at: 20 * 60 + 50, // joué pendant la nuit, à cette heure (campaign.nightEventDue)
     day: 4,
     phase: 'night',
     speaker: 'colette',
@@ -516,6 +518,8 @@ export const EVENTS = [
 
   {
     id: 'r_drache',
+    at: 21 * 60 + 15, // joué pendant la nuit, à cette heure (campaign.nightEventDue)
+    simEffect: 'rain', // les terrasses rentrent pour de bon (campaign.js NIGHT_EVENT_EFFECTS)
     when: { phase: 'night', notFlags: ['random_drache'], chance: 0.12 },
     once: true,
     title: 'Drache nationale',
@@ -541,6 +545,7 @@ export const EVENTS = [
 
   {
     id: 'r_suitcases',
+    at: 25 * 60 + 7, // joué pendant la nuit, à cette heure (campaign.nightEventDue)
     when: { phase: 'night', day: [3, 13], chance: 0.15 },
     once: true,
     title: '1h07 : roulettes sur pavés',
@@ -584,6 +589,7 @@ export const EVENTS = [
 
   {
     id: 'r_waiter_smoke',
+    at: 24 * 60 + 20, // joué pendant la nuit, à cette heure (campaign.nightEventDue)
     speaker: 'serveur',
     when: { phase: 'night', day: [2, 13], flags: ['talked_waiter'], notFlags: ['met_waiter'], chance: 0.3 },
     once: true,
@@ -607,6 +613,7 @@ export const EVENTS = [
 
   {
     id: 'r_bachelor_party',
+    at: 23 * 60 + 40, // joué pendant la nuit, à cette heure (campaign.nightEventDue)
     when: { phase: 'night', day: [5, 13], chance: 0.12 },
     once: true,
     title: 'Enterrement de vie de garçon, quatorze participants',
@@ -653,6 +660,7 @@ export const EVENTS = [
 
   {
     id: 'r_biloute_chairs',
+    at: 21 * 60 + 40, // joué pendant la nuit, à cette heure (campaign.nightEventDue)
     speaker: 'biloute',
     when: { phase: 'night', day: [2, 12], flags: ['joined_rounds'], chance: 0.25 },
     once: true,
@@ -713,6 +721,7 @@ export const EVENTS = [
 
   {
     id: 'r_fire_brigade',
+    at: 22 * 60 + 35, // joué pendant la nuit, à cette heure (campaign.nightEventDue)
     when: { phase: 'night', day: [3, 13], chance: 0.1 },
     once: true,
     title: 'Les pompiers ne passent pas',
@@ -843,6 +852,7 @@ export const EVENTS = [
 
   {
     id: 'r_influencer',
+    at: 21 * 60 + 30, // joué pendant la nuit, à cette heure (campaign.nightEventDue)
     when: { phase: 'night', day: [3, 13], chance: 0.12 },
     once: true,
     title: '« La rue la plus authentique de Lille »',
