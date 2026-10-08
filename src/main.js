@@ -7,6 +7,7 @@ import { RULES, SKY, STREET, NOISE, EVIDENCE, INTERACT, ZONES, POLICE } from './
 import { createSim, makeConfig, fmt, createCampaign, contentFromGlob, SAVE_VERSION } from './sim/index.js';
 import * as narrative from './sim/narrative.js';
 import { createRng } from './sim/rng.js';
+import { WHATSAPP_GROUP } from './content/characters.js';
 
 const $ = (id) => document.getElementById(id);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -276,6 +277,7 @@ function renderDossier() {
   $('dossier-list').innerHTML = items.length ? items.join('') : '<li>Rien pour l\'instant. Visez une table et appuyez sur P.</li>';
   $('dossier-score').textContent = `Score : ${sim.dossierScore().toFixed(1)} / ${EVIDENCE.dossierTarget} · ${S.evidence.length} pièce(s)`;
 }
+document.querySelector('#phone [data-call=asso]').textContent = `💬 Groupe WhatsApp « ${WHATSAPP_GROUP} »`;
 for (const b of document.querySelectorAll('#phone button')) {
   b.addEventListener('click', () => {
     const c = b.dataset.call;
