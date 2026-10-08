@@ -379,7 +379,12 @@ function openOverlay(name) {
   if (name === 'dossier') tuto('first_dossier');
   if (name === 'phone') {
     const P = S.police;
-    $('phone-status').textContent = P ? `Patrouille ${P.phase === 'pending' ? 'en route' : 'sur place'} (appel de ${fmt(P.calledAt)})` : `${S.calls} appel(s) à la police ce soir`;
+    const status = P ? `Patrouille ${P.phase === 'pending' ? 'en route' : 'sur place'} (appel de ${fmt(P.calledAt)})` : `${S.calls} appel(s) à la police ce soir`;
+    // Klaas a déduit le planning des patrouilles de son carnet (roster_known) : qui est de service ce soir
+    const roster = campaign?.has('roster_known')
+      ? ` · Carnet de Klaas : ${(cfg.POLICE.roster[sim.weekday] ?? []).map((id, i) => `${cfg.POLICE.patrols[id].name} ${i ? 'après' : 'avant'} ${fmt(cfg.POLICE.shiftChange)}`).join(', ')}`
+      : '';
+    $('phone-status').textContent = status + roster;
   }
   document.exitPointerLock?.();
 }

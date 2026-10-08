@@ -82,7 +82,8 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
       return k;
     },
     infractions: (restId) => S.tables.filter((t) => t.restId === restId && sim.tableInfractions(t).length),
-    dossierScore: (restId) => S.evidence.reduce((s, e) => s + (!restId || e.restId === restId ? e.value : 0), 0),
+    // Dossier officiel : pièces légales seulement (l'illégal ne sert qu'à la presse / l'IGPN)
+    dossierScore: (restId) => S.evidence.reduce((s, e) => s + (e.legal !== false && (!restId || e.restId === restId) ? e.value : 0), 0),
     klaasAwake: () => S.min < WITNESS.klaas.sleepAt,
     // Klaas consigne ce qu'il distingue nettement (détection > 0 à cette distance, à cette heure)
     klaasCanSee: (pos) => sim.klaasAwake() && lineOfSight(ANCHORS.klaasWindow, pos, STREET.halfWidth) && klaasDetection(sim, dist3(ANCHORS.klaasWindow, pos)) > 0,

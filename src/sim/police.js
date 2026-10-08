@@ -139,7 +139,7 @@ function resolve(sim, P) {
     if (rest.id === 'bernadette' && sim.flags.has('camera_awning')) {
       b.photographed = true;
       sim.addEvidence({
-        type: 'camera', kind: 'bribe', restId: rest.id, callId: P.callId, bribeId: b.id, legal: false, quality: 0.7, value: 0,
+        type: 'camera', kind: 'bribe', restId: rest.id, callId: P.callId, bribeId: b.id, legal: false, quality: 0.7, value: sim.cfg.EVIDENCE.bribeValue * 0.7,
         text: `Caméra du store : ${P.patrolName} empoche une enveloppe de Dédé (illégale : inutilisable au tribunal)`,
       });
     }

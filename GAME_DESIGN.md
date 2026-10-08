@@ -238,7 +238,7 @@ Proof: **T** = automated test (vitest / Playwright / campaign simulator, runs in
 - [ ] 14-day calendar Monday → Sunday of week 2, each day = Koddex morning → afternoon → night (3D). **T Q**
 - [ ] Save/continue (localStorage), a new campaign, and one save slot minimum. Reload mid-campaign resumes the same day and state. **T Q**
 - [ ] **Duration**: a full campaign takes **2h30 to 4h** for a human (14 nights × ~10 min + day phases). Nights can't be skipped without consequence ("go to bed" = you lose what happens). **Q L**
-- [ ] Early endings (custody, fired, moving out) can't trigger before **night 5**. The "real" endings are decided at the **Day 14 commission**. **T**
+- [x] Early endings (custody, fired, moving out) can't trigger before **night 5**. The "real" endings are decided at the **Day 14 commission**. **T** _(v0.4: campaign.test.js « fins », campaign invariant « fin anticipée avant la nuit 5 »)_
 - [ ] Fixed events happen on their day: Saturdays 6 & 13, Colette's dinner (D4), the general meeting (D7), the inspector (D9), the exhaust meeting (D11), the commission (D14). **T Q**
 
 ### B. Characters (all present, recognisable, with a role and dialogue)
@@ -248,9 +248,9 @@ Proof: **T** = automated test (vitest / Playwright / campaign simulator, runs in
 
 ### C. Night systems
 - [x] 22:00 rule (street-specific, 2026), 6 per table, zones + corridor, cobbles (chair clatter). **T** _(v0.2: tests/unit/rules.test.js)_
-- [ ] Evidence: photo, dB reading, headcount, corridor encroachment, timestamps. Quality + legality per piece. **T**
+- [x] Evidence: photo, dB reading, headcount, corridor encroachment, timestamps. Quality + legality per piece. **T** _(v0.4: rules.test.js, campaign.test.js « preuves »)_
 - [ ] Witnesses / line of sight: Klaas (asleep ~01:00), Seb & Nico (cat = home), the waiter, customers filming, the dachshund. Darkness, time and disguise modifiers. **T Q**
-- [ ] Police: 3 patrols with personalities, hidden roster (Klaas can deduce it), tip-off, coffee/complaisance logged, "c'est encore vous", calling as the Association, the police coming for Pilou, the bribe caught on camera → internal investigation. **T**
+- [x] Police: 3 patrols with personalities, hidden roster (Klaas can deduce it), tip-off, coffee/complaisance logged, "c'est encore vous", calling as the Association, the police coming for Pilou, the bribe caught on camera → internal investigation. **T** _(v0.4: police.test.js, campaign.test.js « chaîne IGPN » / « la police vient pour Pilou » ; the roster shows on the phone once `roster_known`)_
 - [ ] Mayor's office: reports, inspector visits (announced = tip-off via Colette, surprise = via Delphine/Hippolyte). **T**
 - [ ] Saturday: no vehicles, crowd, standing drinkers, peeing in doorways. **Q**
 
@@ -263,7 +263,7 @@ Proof: **T** = automated test (vitest / Playwright / campaign simulator, runs in
 - [ ] Legal: every item of section 6 "Legal". **T**
 - [ ] Grey: every item of section 6 "Grey". **T**
 - [ ] Illegal: bucket, cardboard on the exhaust, stink bomb, kitchen sabotage (salt/sugar), fake reviews, sabotage (chairs, parasols, locks), bribing the waiter, hidden cameras (window = grey, awning = illegal), power from Bernadette's electricity, cracking their wifi (+ reading reservations, emails, quotes), sneaking in to photograph the bribe. **T**
-- [ ] Illegally obtained evidence is unusable in court but usable for the press / internal police investigation. **T**
+- [x] Illegally obtained evidence is unusable in court but usable for the press / internal police investigation. **T** _(v0.4: campaign.test.js « caméra cachée » : out of the dossier, counted in `pressFile()`, opens the IGPN case)_
 
 ### F. Endings: all 8 reachable
 - [ ] 1 Legal victory · 2 Negotiated peace · 3 Scandal · 4 Custody/trial (incl. the « carbonnade sucrée » and « carbonnade laxative » variants) · 5 Moving out to Wazemmes · 6 Fired (+ continue twist) · 7 Turncoat (secret) · 8 The return (La Bombance). **T Q**
@@ -295,7 +295,7 @@ The campaign simulator plays 1000 seeded campaigns per strategy bot. Targets:
 - [x] Audio: crowd, chairs on cobbles, exhaust hum, 22:00 bell, mute (M). **Q** _(art v0.3; v0.5 adds sfx + day/hall loops)_
 - [ ] French only, satirical tone, Ch'ti touches. Copy proofread. **Q L**
 - [ ] 60 fps on a laptop iGPU (perf test logs the frame time). Loads in < 5 s. Bundle < 3 MB. **T Q**
-- [ ] CI green (unit + e2e + campaign simulator smoke). Deploy auto from main. **T**
+- [x] CI green (unit + e2e + campaign simulator smoke). Deploy auto from main. **T** _(v0.4: .github/workflows/ci.yml runs vitest, `npm run sim -- --runs 20`, Playwright; CT 105 deploys main every 2 min)_
 
 ### Release tasks (done by the design agent when v1.0 lands)
 - [ ] Set `WHATSAPP_GROUP` in `src/content/characters.js` to **« La Gaystapo »** (Lucas's choice: the real group's own name).
@@ -512,3 +512,44 @@ so it reflects what the player actually did.
 - **Gallery** (dev): `/src/art/gallery/`, with every prop, FX, state, portrait, vignette and sound on buttons, and `__gallery.step(n)` for QA in a background tab. It lives in a **subfolder** because `src/ui/dom.js` imports `../art/*.js` eagerly (the gallery broke the game for one push, c8518b6, fixed in 24396dd).
 - **[OPEN] for the build agent**: during `play('serveur', 'smoke')` and `play('ghislain', 'clean')`, `syncActors` must stop repositioning the waiter. `art.cast.officer(id, { bike })` can replace `person(0x1b2847)`. The patrol's path and duration follow the sim if you pass `path`.
 
+
+**v0.4 (build-v0.4, "campaign engine")**
+- **Engine** (`src/sim/campaign.js`, API in `src/sim/README.md`): 14 days, morning (Koddex) → afternoon (actions, time slots) → night (`sim.js`) → recap, as a step machine (`c.step`). The content is evaluated exactly as §14 describes, plus the content-side additions (`whenAny`, `continue`, `once`, `witnessed.exposure/by`, `sim`, `result`, `scene`, Koddex `work` items and `gags` with `when`/`effects`, `MEDIA`). Everything is seeded, and the state is plain JSON (`c.save()` / `createCampaign({ save })`, key `rdb.save.v1`, a save from another version is refused). The browser plays each night after a save + reload (`?mode=night`: a new layout and a fresh scene, no leaks), and the same seed gives the same night.
+- **Interpretations of §14** (to confirm):
+  - **Risk only from a witnessed act** (§4, §13.G): a Risk written in an action's `effects` counts as **exposure**. It only applies if the act is noticed (the action's `witnessed`, or a default chance by legality, `CAMPAIGN.dayWitness`). The linter warns.
+  - A side project's Risk counts only if Stéphane notices (`sideProjectDiscovery`).
+  - Events and counter-moves may raise Risk directly ("story" cause: a complaint, etc.).
+  - `ending` in an effect: an early ending requested before night 5 is ignored. Any other ending is kept as a candidate for the final resolution.
+  - Early endings = `early: true` or the ids `custody`, `fired`, `moving_out`.
+  - Final resolution after night 14: highest `priority` among the matching endings, else the lowest priority one.
+  - Day cards: fixed events of the day, then at most 1 random event per phase, then (afternoon) at most 2 counter-moves and 2 dialogues. Dialogues are drawn among the eligible ones, favouring the most specific.
+  - Night actions from the content: menu **N** in 3D. Witnesses come from the night sim at the `at` position (`pilouWindow`, `street`…, default: Bernadette's terrace). Their Risk goes through `sim.punish` (Risk × witness weights).
+  - Native actions (`sim: 'photo'|'police'|…`): their content effects apply once per night if the action really happened (Association call via `simArgs.asso`, or an id containing "asso").
+- **Carry-over between days**:
+  - The night starts with the campaign's Asso, Risk, hostility, corruption, police fatigue (calls minus 1/day), transfers and flags.
+  - At the end of the night: Sleep += (night's sleep − 60) × 0.5, Asso/Risk come back from the night, Risk −5/day, Job −6/day.
+  - Legal evidence → dossier (×0.9); illegal evidence → `pressFile()` only.
+  - The engine sets the "posés par le moteur" flags of `flags.js`, plus `bribe_photo(_illegal)`, `corruption_proof`, `igpn_open`, `lemaire_transferred`, `custody` (Risk ≥ 90 from night 5), `tatie_leaked_plan` (Tatie wavering + hostile bloc: 25 %/evening, `CAMPAIGN.tatieLeak`), `saturday1/2_done`, `boss_noticed`, `unemployed`.
+- **Balance (qa/balance.md, design agent's findings)**:
+  - Asso gain capped at +8/night, with diminishing returns per share.
+  - Evidence: same restaurant + same type the same night ×0.2.
+  - Campaign dossier out of 100, built over ~8–10 nights.
+  - Risk persists (−5/day), and the bucket is at 20 × witness weights (~32 when seen).
+  - Corruption drags the police down (−0.4 × (corruption − 50)/100), and the IGPN lifts it (−15 then −25 corruption).
+  - Since then, the numbers and `campaignBots.js` belong to the balance agent.
+- **Night v0.4 (v0.2 leftovers)**:
+  - **Klaas** is on place Maurice-Schumann (`klaasWindow` z≈67.6, read from the scene), about 90 m from Pilou. With the naked eye he barely sees anything at night. With his **binoculars** (every 12–25 min, for 4–8 min, and as soon as there's commotion: police in the street, chairs, the dachshund barking) he sees everything up to 170 m. The HUD says "Klaas (jumelles)".
+  - **Jérémie's round** with the dachshund (21:30–22:30): it spots one infraction per restaurant (a legal piece). Jérémie is an ally witness, and **the dog barks** near an illegal act (+0.25 for every street witness, and Klaas looks).
+  - **Disguises**: flags `disguise_hood` (×0.6) / `disguise_vest` (×0.5) for non-ally witnesses. They are declared in `ENGINE_FLAGS`; the content still needs an action to set them.
+  - **The police come for Pilou** (hostility ≥ 60, 35 % of nights): a planned visit to his door, with a "rappel à la loi" (+10 Risk) if hostile witnesses saw something in the past 7 days.
+  - **The bribe**: Lemaire + coffee → Dédé's envelope 50 % of the time, photographable for 3 min (from within 15 m, legal spot) → jackpot piece. The **camera under the awning** films it (illegal piece). A bribe that is sent (mairie / WhatsApp) or illegal → **IGPN**: case opened the next day, Lemaire transferred 3 days later (replaced by Benali).
+  - **dB reading** (B): one piece per half-hour if ≥ 55 dB after 22:00.
+  - The restaurants are at their §1b positions (Bernadette −30…−18, Mal Lunés −15…−5, Le Goulot 22…32).
+- **Narration**: `narrative.js` (content agent) is injected and never imported by the sim: `createSim({ narrator })`, `createCampaign({ narrative })`. It uses its own RNG, so the text never changes the outcome. Wired: police, waiter, witnesses, Klaas's notebook (precise/vague), end of night, the bell (21:55/22:00/22:05), barks near the tables, the night's tutorial triggers (the day ones are the UI's), the daily media feed (`c.mediaFeed()` / `c.readMedia()`), the recap headline (`c.state.lastHeadline`), the D14 scene (`card.scene`), and the ending front pages (`c.state.endingMedia`).
+- **UI integration**: `main.js` mounts `src/ui` (UI agent) via a lazy `import()`; a static import would put the 3D code into the `ui.html` chunk. `onNight` saves and reloads into the night; at the end of the night, `finishNight` runs and the UI resumes on the recap. There's no title screen in campaign mode (QA U6): one click to enter, with the controls shown on the first night only. "Nuit libre" (`Commencer la soirée`) is the v0.2 night.
+- **Tools**:
+  - `npm run sim -- --runs 1000 [--write] [--strict] [--fixture] [--bots …]` prints the distribution of endings per bot, the §13.H targets (✅/❌), the content never reached and the invariants.
+  - Linter (`tests/unit/content-lint.test.js`): stays tolerant ("flag never set" = warning) while one of the announced files is missing.
+  - Campaign invariants (`campaignInvariants.js`): days and phases in order, fixed events on their day, early endings gated, Risk only from a witnessed act or story, evidence → real source, one night per day. Not checked: "a closed shop stays closed" (no shops modelled).
+  - `E2E_PORT` for running Playwright when several worktrees share the machine.
+- **§13**: ticked A4, C2 (evidence), C4 (police), E4 (illegal evidence), I5 (CI + deploy). The automated side (T) of A1, A2, A5, C3 is done too, but the Q checks are still pending.

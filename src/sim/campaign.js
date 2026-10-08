@@ -86,6 +86,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     save() { S.rng = rng.getState(); return structuredClone(S); },
     // Le dossier de campagne : pièces légales (le reste ne sert qu'à la presse / l'IGPN)
     pressFile: () => S.evidence.reduce((s, e) => s + e.value, 0),
+    legalFile: () => S.evidence.reduce((s, e) => s + (e.legal ? e.value : 0), 0),
   };
 
   // ---------- effets ----------
@@ -443,7 +444,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     // Preuves de la nuit → dossier (légales) ou dossier presse/IGPN (illégales)
     let gained = 0;
     for (const e of N.evidence) {
-      const value = e.legal ? e.value * C.nightEvidenceScale : 0;
+      const value = e.value * C.nightEvidenceScale; // l'illégal garde sa valeur pour la presse, mais pas au dossier
       const ev = { id: S.evidence.length + 1, day: S.day, kind: e.kind ?? e.type, label: e.text, quality: e.quality, legal: e.legal, value, source: `nuit:${e.id}`, nightType: e.type };
       S.evidence.push(ev);
       c.note('evidence', { evidenceId: ev.id, kind: ev.kind, legal: ev.legal, source: ev.source, night: true });

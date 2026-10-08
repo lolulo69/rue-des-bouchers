@@ -224,3 +224,39 @@ describe('nouveautés de la nuit (v0.4)', () => {
     expect(sim.state.journal.some((e) => e.type === 'call')).toBe(false);
   });
 });
+
+describe('preuves : relevé dB, horodatage, légalité', () => {
+  it('relevé dB : une pièce horodatée par demi-heure, seulement en tapage après 22h', () => {
+    const c = drive(createCampaign({ seed: 31, content }), CAMPAIGN_BOTS.passive(), (x) => x.step === 'night');
+    const sim = c.createNight();
+    while (sim.state.min < 21 * 60) sim.tick(0.5);
+    expect(sim.act({ type: 'db', noiseDb: 70 }).ok).toBe(false); // avant 22h
+    while (sim.state.min < 22 * 60 + 10) sim.tick(0.5);
+    expect(sim.act({ type: 'db', noiseDb: 40 }).ok).toBe(false); // trop calme
+    const r = sim.act({ type: 'db', noiseDb: 68 });
+    expect(r.ok).toBe(true);
+    expect(r.found[0]).toMatchObject({ kind: 'db', legal: true, db: 68, time: sim.state.min });
+    expect(r.found[0].text).toMatch(/22:1\d : 68 dB/);
+    expect(sim.act({ type: 'db', noiseDb: 70 }).ok).toBe(false); // déjà un relevé dans la demi-heure
+  });
+
+  it('caméra cachée : le pot-de-vin filmé est illégal (hors dossier) mais ouvre l\'enquête IGPN', () => {
+    const cfg = makeConfig({ POLICE: { roster: { mon: ['lemaire', 'lemaire'] }, maxAct: 0, minAct: 0, bribeChance: 1, patrols: { lemaire: { tipoff: { bernadette: 0, default: 0 } } } }, RESTAURANTS: makeConfig().RESTAURANTS.map((r) => ({ ...r, compliance: 0 })) });
+    const c = drive(createCampaign({ seed: 12, content, cfg }), CAMPAIGN_BOTS.passive(), (x) => x.step === 'night');
+    c.apply({ setFlags: ['camera_awning'] }, 'story', 'test');
+    const sim = c.createNight();
+    while (sim.state.min < 22 * 60 + 20) sim.tick(0.5);
+    sim.act({ type: 'police' });
+    while (!sim.state.ended) sim.tick(0.5);
+    const cam = sim.state.evidence.find((e) => e.kind === 'bribe');
+    expect(cam).toMatchObject({ type: 'camera', legal: false });
+    c.finishNight(sim);
+    expect(c.has('bribe_photo_illegal')).toBe(true);
+    expect(c.has('igpn_open')).toBe(true);
+    const bribe = c.state.evidence.find((e) => e.kind === 'bribe');
+    expect(bribe.legal).toBe(false);
+    expect(bribe.value).toBeGreaterThan(0);
+    // l'illégal compte pour la presse / l'IGPN, pas au dossier officiel
+    expect(c.pressFile() - c.legalFile()).toBeCloseTo(bribe.value);
+  });
+});
