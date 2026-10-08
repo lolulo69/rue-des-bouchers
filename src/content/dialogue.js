@@ -1484,6 +1484,16 @@ export const DIALOGUE = [
     once: true,
   },
   {
+    id: 'regis_ag',
+    speaker: 'regis',
+    when: { flags: ['ag_held'], notFlags: ['traitor_known'] },
+    lines: [
+      "Belle assemblée générale, hein ? J’ai voté pour la nuance. Ce n’était pas sur le bulletin, mais je l’ai écrit dans la marge.",
+      "Et j’ai pris des notes. Beaucoup de notes. Pour le compte rendu : on n’est jamais trop transparent.",
+    ],
+    once: true,
+  },
+  {
     id: 'regis_after',
     speaker: 'regis',
     when: { flags: ['traitor_known'], chance: 0.3 },
