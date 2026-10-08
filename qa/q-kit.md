@@ -103,3 +103,19 @@ A file named `F-<id>-UNREACHED.jpg` means the choice was greyed out in the headl
 ## Not covered by a capture
 - **A3 / I3 (L)**: the human-feel and duration parts need a real playthrough.
 - **B1 gallery**: dev server only (`src/art/gallery/` is not in the production build).
+
+## build (build agent, v0.8: release hardening)
+Checks I'd like done in Chrome on http://192.168.1.163:8090 (real browser, pointer lock on: no `?nolock=1` unless stated).
+
+| # | What | How | Expected |
+|---|---|---|---|
+| b1 | Loading screen | Hard reload (Cmd+Shift+R) with DevTools → Network → "Fast 4G" | Dark screen « Rue des Bouchers », gold bar advancing through « moteur 3D / décor / simulation / textes », then « Construction de la rue… », then the title. Never a black screen. |
+| b2 | Chunks | DevTools → Network → JS | Separate `three-*.js`, `art-*.js`, `content-*.js`, `sim-*.js`, `ui-*.js`, `game-*.js`; total transferred < 1 MB gzip. |
+| b3 | Error screen | Console: `setTimeout(() => { throw new Error('test QA') })` | French screen « Oups. La rue des Bouchers a planté. », the message under it. « Copier le rapport » → paste somewhere: date, version (git sha), page, browser, save summary, stack. « Recharger » reloads. |
+| b4 | Unhandled promise | Console: `Promise.reject(new Error('promesse QA'))` | Same screen. |
+| b5 | Old / broken save | Console on the title: `localStorage.setItem('rdb.save.v1', JSON.stringify({ version: 99, day: 3, stats: {} })); location.reload()` | A red notice on the title explains the save can't be resumed and to start a new campaign; `localStorage['rdb.save.backup']` holds the old one; « Campagne » → only « Nouvelle campagne ». |
+| b6 | Migrated save | Play a campaign to day 2, then console: `s = JSON.parse(localStorage['rdb.save.v1']); s.version = 1; s.flags.push('igpn_open'); s.cards.unshift({ type: 'event', id: 'supprime' }); localStorage['rdb.save.v1'] = JSON.stringify(s); location.reload()` → Campagne → Continuer | Day 2 resumes without error; `__rdb.campaign.has('inquiry_open')` is true; `__rdb.campaign.state.migrationNotes` lists « migrée v1 → v2 » and the removed card. |
+| b7 | Night start (U6) | Campaign → Descendre dans la rue | No second title screen: the street appears with « Jour N · … cliquez pour descendre dans la rue » (first night: the controls listed); one click captures the mouse. |
+| b8 | Échap in the 3D night | Press Échap during a night | With the UI menu (`openMenu`, UI agent): the pause / settings menu opens; « Reprendre » recaptures the mouse. Without it: « Pause. Cliquez pour reprendre. » |
+| b9 | Audio cues | Night, sound on (M toggles) | P (photo): shutter. Phone → police: radio crackle, and again when the patrol enters the street. Phone → WhatsApp with photos to share: WhatsApp ping. F at the window: splash. |
+| b10 | Free night weekdays | `/?day=mardi` → « Nuit libre » | Header « Mardi · nuit libre »; `?day=sat` adds « (sans voitures) » and the crowd. |
