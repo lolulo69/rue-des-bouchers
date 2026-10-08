@@ -44,6 +44,9 @@ export function buildSummary(sim) {
     if (S.risk >= RISK.complaint) verdict.push('Dédé a porté plainte. Ça va revenir.');
     else if (S.risk >= RISK.warning) verdict.push('Une vidéo de la fenêtre circule sur les réseaux.');
   }
+  // Le twist de la nuit (v1.1) : le bilan en parle
+  const twist = sim.twist ? { id: sim.twist.id, title: sim.twist.title, recap: sim.twist.lines?.recap?.[0] ?? null } : null;
+  if (twist) verdict.unshift(twist.recap ?? `Ce soir : ${twist.title}.`);
   if (S.scandal) verdict.push('La hiérarchie de la police municipale s’intéresse aux cafés offerts. Lemaire transpire.');
   if (S.blocKnows) verdict.push('Le bloc sait que c’est vous qui appelez au nom de l’Association.');
   if (S.asso < 30) verdict.push('L’Association prend ses distances.');
@@ -62,5 +65,6 @@ export function buildSummary(sim) {
     shifts,
     witnesses: S.witnessMemories.map((w) => ({ time: fmt(w.time), name: w.name, act: w.act, filmed: w.filmed })),
     verdict,
+    twist,
   };
 }

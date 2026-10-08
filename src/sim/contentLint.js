@@ -3,6 +3,7 @@
 // La liste des noms réels interdits vit dans les tests (tests/unit/realNames.js), pas dans src/.
 import { unsatisfiable, PHASES } from './conditions.js';
 import { CONFIG } from '../config.js';
+import { TWIST_SIM_KEYS } from './twists.js';
 
 // Drapeaux que le moteur pose lui-même (nuit, Koddex, IGPN, chômage)
 export const ENGINE_SET_FLAGS = [
@@ -15,7 +16,7 @@ export const ENGINE_SET_FLAGS = [
 const conds = (x) => [x.when, x.requires, ...(x.whenAny ?? [])].filter(Boolean);
 // Répliques de scène (J14 : event.scene = [{ speaker, when, text }]) : conditions et locuteurs vérifiés aussi
 const sceneConds = (x) => (x.scene ?? []).map((p) => p.when).filter(Boolean);
-const effectsOf = (x) => [x.effects, x.witnessed?.effects, x.continue?.effects, ...(x.choices ?? []).map((c) => c.effects)].filter(Boolean);
+const effectsOf = (x) => [x.effects, x.witnessed?.effects, x.continue?.effects, x.after, ...(x.choices ?? []).map((c) => c.effects)].filter(Boolean);
 
 // Tous les textes affichés d'une entrée (pour la recherche de noms réels)
 export function textsOf(content) {
@@ -46,7 +47,7 @@ export function lintContent(K, { cfg = CONFIG, realNames = [], incomplete = fals
     ...(K.TWISTS ?? []).map((t) => ({ id: t.id, when: t.when, effects: t.after })), ...(K.UNLOCKS ?? []).map((u) => ({ id: u.id, when: u.when }))];
   for (const x of all) {
     for (const e of effectsOf(x)) for (const f of e.setFlags ?? []) settable.add(f);
-    if (x.unlocks) settable.add(x.unlocks);
+    if (typeof x.unlocks === 'string') settable.add(x.unlocks); // Koddex : le drapeau débloqué (UNLOCKS : un objet)
   }
   for (const f of ENGINE_SET_FLAGS) if (!declared.has(f)) warnings.push(`drapeau moteur "${f}" non déclaré dans FLAGS`);
 
@@ -59,7 +60,7 @@ export function lintContent(K, { cfg = CONFIG, realNames = [], incomplete = fals
     for (const w of sceneConds(x)) used.push(...(w.flags ?? []), ...(w.notFlags ?? []));
     for (const p of x.scene ?? []) if (p.speaker && !speakers.has(p.speaker)) errors.push(`${where} : réplique de scène, locuteur "${p.speaker}" absent`);
     for (const e of effectsOf(x)) used.push(...(e.setFlags ?? []), ...(e.clearFlags ?? []));
-    if (x.unlocks) used.push(x.unlocks);
+    if (typeof x.unlocks === 'string') used.push(x.unlocks);
     for (const f of used) if (!declared.has(f)) errors.push(`${where} : drapeau "${f}" non déclaré`);
     // Locuteur
     if (x.speaker && !speakers.has(x.speaker)) errors.push(`${where} : locuteur "${x.speaker}" absent de characters.js`);
@@ -116,7 +117,17 @@ export function lintContent(K, { cfg = CONFIG, realNames = [], incomplete = fals
     }
   }
   for (const t of K.TUTORIAL ?? []) { uniq('tutorial', t); check(`tutoriel ${t.id}`, t); }
-  for (const t of K.TWISTS ?? []) { uniq('twist', t); check(`twist ${t.id}`, { id: t.id, when: t.when, effects: t.after }); }
+  // v1.1 : twists de nuit et déblocages
+  const restIds = new Set(cfg.RESTAURANTS.map((r) => r.id));
+  for (const t of K.TWISTS ?? []) {
+    uniq('twist', t); check(`twist ${t.id}`, t);
+    for (const k of Object.keys(t.sim ?? {})) if (!TWIST_SIM_KEYS.includes(k)) errors.push(`twist ${t.id} : champ sim « ${k} » inconnu du moteur (${TWIST_SIM_KEYS.join(', ')})`);
+    for (const tb of t.sim?.tables ?? []) if (!restIds.has(tb.rest)) errors.push(`twist ${t.id} : resto « ${tb.rest} » inconnu`);
+    if (t.day === undefined && t.pool === false) warnings.push(`twist ${t.id} : ni jour fixe ni pool (jamais tiré)`);
+    if (t.intro && t.intro.length > 300) warnings.push(`twist ${t.id} : intro > 300 caractères`);
+  }
+  if ((K.TWISTS ?? []).length && K.TWISTS.filter((t) => t.day === undefined).length < cfg.CAMPAIGN.days) warnings.push(`seulement ${K.TWISTS.filter((t) => t.day === undefined).length} twists de pool pour ${cfg.CAMPAIGN.days} nuits`);
+  for (const u of K.UNLOCKS ?? []) { uniq('unlock', u); check(`unlock ${u.id}`, u); if (!u.card?.title) warnings.push(`unlock ${u.id} : pas de carte « Nouveau »`); }
   for (const e of K.ENDINGS) {
     uniq('ending', e); check(`ending ${e.id}`, e);
     if (!cfg.CAMPAIGN.endings.includes(e.id)) warnings.push(`ending ${e.id} : id non canonique (${cfg.CAMPAIGN.endings.join(', ')})`);

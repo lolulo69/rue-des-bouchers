@@ -74,7 +74,8 @@ export const ANCHORS = {
   klaasWindow: { x: 0, y: 5.7, z: 67.6 },    // au fond de la place Maurice-Schumann, en enfilade sur toute la rue
   balcony: { x: 3.0, y: 7.8, z: -22.5 },     // Seb & Nico, juste en face de Pilou
   waiter: { x: -0.7, z: -24.5, amplitude: 6, speed: 0.24 }, // va-et-vient devant la terrasse
-  policeSpawn: { x: 0, z: -43 },             // le commissariat est côté rue de la Barre
+  policeSpawn: { x: 0, z: -43 },
+  van: { x: 0.3, y: 1, z: -11 },              // twist corridorBlocked : la camionnette de livraison au milieu du passage             // le commissariat est côté rue de la Barre
   doorways: [
     { x: -3.0, z: -18.2, label: 'la porte de Pilou', pilou: true },
     { x: 2.95, z: -36, label: 'une porte cochère en face' },
@@ -125,6 +126,7 @@ export const EVIDENCE = {
   peeValue: 0.5,
   complaisanceValue: 2,
   tipoffValue: 2.5,              // carnet de Klaas : tables rentrées juste avant la police, ressorties après
+  vanValue: 1.5,                 // twist : photo de la camionnette qui bloque le couloir (sécurité incendie)
   dbValue: 0.6,                  // relevé sonore horodaté (sonomètre du téléphone, ou le démon Rust de Pilou)
   dbThreshold: 55,               // au-dessus, après 22:00 : tapage nocturne documenté
   dbEvery: 30,                   // un relevé utile par demi-heure

@@ -26,6 +26,8 @@ export function normalizeContent(modules) {
     TUTORIAL: merged.TUTORIAL ?? [],
     NIGHT: merged.NIGHT ?? {},
     PROMPTS_PER_MORNING: merged.PROMPTS_PER_MORNING,
+    TWISTS: merged.TWISTS ?? [],     // v1.1 : twists de nuit (src/content/twists.js)
+    UNLOCKS: merged.UNLOCKS ?? [],   // v1.1 : outils progressifs (src/content/unlocks.js)
     WHATSAPP_GROUP: merged.WHATSAPP_GROUP,
     PLACES: merged.PLACES,
     TWISTS: merged.TWISTS ?? [], // v1.1 (§12b) : rebondissements de nuit

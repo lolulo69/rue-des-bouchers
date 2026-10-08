@@ -1,4 +1,5 @@
 import { dist3, lineOfSight } from './geometry.js';
+import { twistWitnesses } from './twistNight.js';
 
 export function nightFactor(sim) {
   const { SKY } = sim.cfg;
@@ -27,18 +28,20 @@ export function potentialWitnesses(sim, pos) {
   const W = STREET.halfWidth;
   // Les gens de la rue voient mal dans le noir ; Klaas et le balcon sont à hauteur de fenêtre, habitués.
   const dark = 1 + (WITNESS.darkFactor - 1) * night;
+  // Obscurité du twist (coupure de courant…) : tout le monde voit moins (bonus de discrétion)
+  const twistDark = 1 - 0.6 * (S.darkness ?? 0);
   const out = [];
   const add = (id, kind, def, at, extra = {}) => {
     if (dist3(at, pos) > range || !lineOfSight(at, pos, W)) return;
     // Obscurité : les gens de la rue ; déguisement : tous ceux qui ne sont pas des alliés (ils ne reconnaissent pas Pilou)
-    const p = def.p * (kind === 'waiter' || kind === 'customers' || kind === 'jeremie' ? dark : 1) * (def.ally ? 1 : sim.disguise);
+    const p = def.p * (kind === 'waiter' || kind === 'customers' || kind === 'jeremie' || kind === 'twist' ? dark : 1) * (def.ally ? 1 : sim.disguise) * twistDark;
     out.push({ id, kind, name: def.name, pos: at, p, baseP: def.p, weight: def.weight, ally: def.ally, ...extra });
   };
   // Klaas : pas de portée générique, mais une détection qui baisse avec la distance (jumelles la nuit)
   if (sim.klaasAwake() && lineOfSight(ANCHORS.klaasWindow, pos, W)) {
     const p = klaasDetection(sim, dist3(ANCHORS.klaasWindow, pos));
     const name = sim.klaasWatching() ? `${WITNESS.klaas.name.split(' (')[0]} (jumelles)` : WITNESS.klaas.name;
-    if (p > 0) out.push({ id: 'klaas', kind: 'klaas', name, pos: ANCHORS.klaasWindow, p, baseP: WITNESS.klaas.p, weight: WITNESS.klaas.weight, ally: true });
+    if (p > 0) out.push({ id: 'klaas', kind: 'klaas', name, pos: ANCHORS.klaasWindow, p: p * twistDark, baseP: WITNESS.klaas.p, weight: WITNESS.klaas.weight, ally: true });
   }
   if (sim.catPresent()) add('seb_nico', 'seb_nico', WITNESS.seb_nico, ANCHORS.balcony);
   if (sim.dogActive()) add('jeremie', 'jeremie', WITNESS.jeremie, { ...sim.dogPos(), y: 1.6 });
@@ -51,6 +54,8 @@ export function potentialWitnesses(sim, pos) {
   for (const g of sim.activeStanding()) {
     add(`clients:${g.id}`, 'customers', { ...c, name: 'des buveurs debout', p: c.p * cover }, { x: g.x, y: 1.6, z: g.z });
   }
+  // Témoins du twist (influenceuse qui filme, guide et son groupe…)
+  for (const tw of twistWitnesses(sim, sim.twist)) add(tw.id, 'twist', tw.def, tw.pos, { filming: tw.filming, twistWitness: tw.twistWitness });
   return out;
 }
 
@@ -66,7 +71,7 @@ export function rollWitnesses(sim, pos, { wetTableIds = [], bark = 0, exposure, 
     const base = exposure !== undefined ? exposure * (w.p / w.baseP) : w.p;
     const p = base + (w.tableId && wetTableIds.includes(w.tableId) ? c.wetBonus * (w.p / c.p) : 0) + (street ? bark * sim.disguise : 0);
     if (!sim.rng.chance(Math.min(1, p))) continue;
-    const filmed = w.kind === 'customers' && sim.rng.chance(c.filmChance);
+    const filmed = !!w.filming || (w.kind === 'customers' && sim.rng.chance(c.filmChance));
     seen.push({ ...w, filmed });
   }
   return seen;

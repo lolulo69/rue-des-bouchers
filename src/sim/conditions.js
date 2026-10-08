@@ -30,6 +30,8 @@ export function evalCondition(cond, ctx, rng) {
     const ph = Array.isArray(cond.phase) ? cond.phase : [cond.phase];
     if (!ph.includes(ctx.phase)) return false;
   }
+  // weekday : 'sat' | ['fri', 'sat'] (v1.1, twists) ; ignoré si le contexte ne connaît pas le jour de la semaine
+  if (cond.weekday && ctx.weekday && ![cond.weekday].flat().includes(ctx.weekday)) return false;
   for (const f of cond.flags ?? []) if (!ctx.flags.has(f)) return false;
   for (const f of cond.notFlags ?? []) if (ctx.flags.has(f)) return false;
   for (const [k, e] of Object.entries(cond.stats ?? {})) if (!compare(ctx.stats[k] ?? 0, e)) return false;
@@ -48,6 +50,7 @@ export function unsatisfiable(cond, settable, { days = 14 } = {}) {
     if (lo > hi || hi < 1 || lo > days) why.push(`jours impossibles ${JSON.stringify(cond.day)}`);
   }
   if (cond.phase) for (const p of [cond.phase].flat()) if (!PHASES.includes(p)) why.push(`phase inconnue "${p}"`);
+  if (cond.weekday) for (const w of [cond.weekday].flat()) if (!['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].includes(w)) why.push(`jour de semaine inconnu "${w}"`);
   for (const f of cond.flags ?? []) {
     if (!settable.has(f)) why.push(`drapeau "${f}" jamais posé`);
     if ((cond.notFlags ?? []).includes(f)) why.push(`drapeau "${f}" à la fois requis et interdit`);

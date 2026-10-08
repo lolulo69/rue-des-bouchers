@@ -48,3 +48,16 @@ describe('linter de contenu (§14)', () => {
     expect(errors).toEqual([]);
   });
 });
+
+describe('linter : twists et déblocages (v1.1)', () => {
+  it('les twists et déblocages de test sont propres ; un champ sim inconnu est signalé', async () => {
+    const tw = await import('../fixtures/twists.js');
+    const K = normalizeContent({ ...fixture, TWISTS: tw.TWISTS, UNLOCKS: tw.UNLOCKS });
+    expect(lintContent(K, { realNames: REAL }).errors).toEqual([]);
+    const bad = normalizeContent({ ...fixture, TWISTS: [{ id: 'x', pool: true, sim: { volcano: true, tables: [{ rest: 'nulle_part' }] }, after: { setFlags: ['pas_declare'] } }] });
+    const { errors } = lintContent(bad, { realNames: REAL });
+    expect(errors.some((e) => e.includes('volcano'))).toBe(true);
+    expect(errors.some((e) => e.includes('nulle_part'))).toBe(true);
+    expect(errors.some((e) => e.includes('pas_declare'))).toBe(true);
+  });
+});

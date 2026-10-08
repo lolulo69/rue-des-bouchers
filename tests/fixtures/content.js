@@ -11,7 +11,7 @@ export const FLAGS = {
   met_klaas: '', stance_legal: '', stance_direct: '', stance_dialogue: '', petition_started: '', press_contacted: '',
   won_legal: '', won_peace: '', commission_won: '', commission_lost: '', commission_done: '', carbonnade_1: '', carbonnade_2: '', carbonnade_3: '',
   bombance_bar_project: '', cm_bins: '', cm_harassment_complaint: '', proj_db_logger: '', proj_fake_reviews: '', stink_bomb: '',
-  disguise_hood: '', martine_seen: '', random_drache: '',
+  disguise_hood: '', martine_seen: '', random_drache: '', twist_colette_seen: '', lescaut_meeting: '',
 };
 
 export const CHARACTERS = { pilou: { name: 'Pilou' }, klaas: { name: 'Klaas' }, jeremie: { name: 'Jérémie' }, dede: { name: 'Dédé' } };

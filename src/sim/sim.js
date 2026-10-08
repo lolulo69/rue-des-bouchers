@@ -4,6 +4,7 @@
 import { CONFIG } from '../config.js';
 import { createRng } from './rng.js';
 import { generateLayout } from './layout.js';
+import { setupTwist, updateTwist } from './twistNight.js';
 import { noiseAt } from './noise.js';
 import { potentialWitnesses, rollWitnesses, klaasDetection } from './witness.js';
 import { callPolice, updatePolice, patrolOnDuty } from './police.js';
@@ -20,7 +21,8 @@ const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 //     flags: [], earlyEndings: bool, reversal: bool, enemyMemories: n }
 // narrator(kind, sim, args) → texte ou null : la narration (src/sim/narrative.js) injectée par main.js. Sans narrateur
 // (tests, simulateur), les textes par défaut ci-dessous. Elle doit utiliser son propre RNG pour ne rien changer à la nuit.
-export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry = {}, narrator = null } = {}) {
+// twist (v1.1) : { id, title, intro, lines, props, sim } (twists.js nightTwist) ; la nuit applique twist.sim.
+export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry = {}, narrator = null, twist = null } = {}) {
   const rng = createRng(seed);
   const dayCfg = cfg.DAYS[day] ?? cfg.DAYS.mon;
   const { RULES, NOISE, SLEEP, EVIDENCE, WAITER, WITNESS, BUCKET, RISK, ASSO, ANCHORS, ZONES, STREET, DOG, DISGUISE, POLICE, CAMPAIGN } = cfg;
@@ -68,6 +70,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
 
   const sim = {
     waiterId,
+    twist,
     cfg, rng, day: dayCfg, weekday: weekday ?? dayCfg.key, state: S, restaurants, close, late, flags,
     events: [],
     seed,
@@ -199,6 +202,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
       if (S.ended) return;
       S.min += dMin;
       applyWeather(sim);
+      updateTwist(sim);
       for (const t of S.tables) {
         if (t.hiddenUntil !== null && S.min >= t.hiddenUntil) returnTable(t);
         if (t.out && S.min >= t.clearAt) sim.clearTable(t, t.pendingBy || 'resto');
@@ -213,7 +217,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
         let d = 0;
         if (S.min >= SLEEP.drainAfter) {
           d -= Math.max(0, S.noiseBed - SLEEP.thresholdDb) * SLEEP.drainPerDbMinute;
-          if (S.min < NOISE.exhaustOffMinute && !S.exhaustBlocked) d -= SLEEP.exhaustDrainPerMinute; // carton sur la gaine (nightActions.js)
+          if (S.min < NOISE.exhaustOffMinute && !S.exhaustBlocked && !S.exhaustOff) d -= SLEEP.exhaustDrainPerMinute; // carton sur la gaine (nightActions.js), coupure (twist)
         }
         if (S.sleeping && S.noiseBed < SLEEP.thresholdDb) d += SLEEP.recoverPerMinute;
         S.sleep = clamp(S.sleep + d * dMin, earlyEndings ? 0 : CAMPAIGN.preGate.sleepFloor, 100);
@@ -294,6 +298,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
     const db = Math.round(noiseDb);
     const found = [];
     if (target.kind === 'police') return photoPolice(distance, quality);
+    if (target.kind === 'van') return photoVan(quality);
     if (target.kind === 'pee') {
       const p = S.pees.find((x) => x.id === target.id && S.min < x.end);
       if (!p || p.photographed) { sim.log('Photo… rien d’exploitable dans le cadre.'); return { ok: false, found }; }
@@ -441,6 +446,15 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
     return { ok: true, db, found: [ev] };
   }
 
+  // Twist corridorBlocked : la camionnette au milieu du passage libre, une pièce par nuit
+  function photoVan(quality) {
+    if (!S.corridorBlocked || S.vanPhotographed) { sim.log(S.vanPhotographed ? 'La camionnette est déjà dans le dossier.' : 'Photo… rien d’exploitable dans le cadre.'); return { ok: false, found: [] }; }
+    S.vanPhotographed = true;
+    const ev = sim.addEvidence({ type: 'photo', kind: 'corridor_blocked', restId: null, quality, value: EVIDENCE.vanValue * quality, pos: { x: ANCHORS.van.x, z: ANCHORS.van.z }, text: `Camionnette de livraison garée dans le passage libre à ${fmt(S.min)} (pompiers bloqués)` });
+    sim.log('📸 Preuve ajoutée : la camionnette bloque le couloir de passage.', 'good');
+    return { ok: true, found: [ev] };
+  }
+
   // Photo de la patrouille : le jackpot si l'enveloppe passe à ce moment-là, d'un endroit légal et d'assez près.
   function photoPolice(distance, quality) {
     const b = sim.activeBribe();
@@ -488,5 +502,6 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
     }
   }
 
+  setupTwist(sim, twist);
   return sim;
 }

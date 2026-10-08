@@ -10,7 +10,12 @@ export function playNight(sim, policy, c, dt = 1, contentEvery = 10, choose = nu
   let nextContent = -Infinity;
   while (!sim.state.ended) {
     if (policy) {
-      for (const a of policy.decide(sim)) { sim.act(a); if (sim.state.ended) break; }
+      for (const a of policy.decide(sim)) {
+        // Mêmes verrous que le joueur (v1.1, unlocks.js) : un verbe natif pas encore débloqué est ignoré
+        if (c?.nativeAllowed && a.type !== 'sleep' && !c.nativeAllowed(a.type, { asso: a.asso }, sim)) continue;
+        sim.act(a);
+        if (sim.state.ended) break;
+      }
       if (c && policy.content && !sim.state.ended && sim.state.min >= nextContent) {
         nextContent = sim.state.min + contentEvery;
         for (const id of policy.content(sim, c)) c.doNightAction(sim, id);

@@ -43,7 +43,8 @@ export function callPolice(sim, { asso = false } = {}) {
   const delay = sim.rng.range(POLICE.delayMin, POLICE.delayMax) * patrol.delayMult
     * (1 + POLICE.delayPerExtraCall * (S.calls - 1)) * (asso ? POLICE.assoDelayMult : 1)
     + (firstCall ? patrol.firstCallExtra : 0);
-  const arriveAt = S.min + delay;
+  // Camionnette dans le couloir (twist) : la patrouille fait le tour, +50 %
+  const arriveAt = S.min + delay * (S.corridorBlocked ? 1.5 : 1);
   const tipoffP = patrol.tipoff[rest.id] ?? patrol.tipoff.default;
   sim.note('call', { callId, asso, patrolId });
   S.police = {

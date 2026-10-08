@@ -1,7 +1,7 @@
 // Sauvegardes : schéma versionné, migrations, renommages d'ids du contenu, et nettoyage contre le contenu courant.
 // Le contenu change pendant que les auteurs écrivent : une sauvegarde ne doit jamais planter parce qu'un drapeau
 // ou un id a été renommé ou supprimé. Ce qui est renommé suit la table ; ce qui est inconnu est ignoré sans bruit.
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
 
 // Renommages connus (ancien → nouveau). Ajouter ici chaque renommage d'id du contenu. (Les renommages des élus,
 // antérieurs à toute sauvegarde publiée, n'y figurent pas : la garde des noms réels les refuserait.)
@@ -38,6 +38,16 @@ const MIGRATIONS = {
     s.cards ??= [];
     s.journal ??= [];
     s.version = 2;
+    return s;
+  },
+  // v2 → v3 (v1.1) : twists de nuit et outils débloqués. Une campagne en cours n'a rien débloqué : on lui donne
+  // tout ce que le contenu verrouille, pour ne pas retirer des verbes au joueur en pleine partie (voir campaign.js).
+  2: (s) => {
+    s.twistHistory ??= [];
+    s.tonightTwist ??= null;
+    s.unlocked ??= null; // null = « tout ce qui est verrouillable », résolu au chargement contre le contenu
+    s.pushedMedia ??= [];
+    s.version = 3;
     return s;
   },
 };

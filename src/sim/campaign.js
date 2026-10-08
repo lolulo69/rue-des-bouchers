@@ -15,6 +15,8 @@ import { createRng } from './rng.js';
 import { createSim } from './sim.js';
 import { evalCondition, STAT_KEYS, HIDDEN_KEYS } from './conditions.js';
 import { normalizeContent } from './content.js';
+import { pickTwist, nightTwist } from './twists.js';
+import { createUnlocks } from './unlocks.js';
 import { performNightAction } from './nightActions.js';
 import { fmt } from './time.js';
 
@@ -52,6 +54,10 @@ export function initialState(seed, cfg = CONFIG) {
     nightCount: 0,
     nights: [],
     pendingEnding: null,
+    twistHistory: [],    // v1.1 : [{ day, id }], jamais deux fois le même twist
+    tonightTwist: null,  // { day, id } : choisi à l'entrée de la nuit, rejoué tel quel après un rechargement
+    unlocked: [],        // v1.1 : ids de UNLOCKS acquis
+    pushedMedia: [],     // ids de médias poussés par les conséquences d'un twist (after.media)
     ending: null,
     epilogue: [],
     journal: [],
@@ -90,12 +96,15 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
   const byId = (list) => Object.fromEntries(list.map((x) => [x.id, x]));
   const EVENTS = byId(K.EVENTS), ACTIONS = byId(K.ACTIONS), DIALOGUE = byId(K.DIALOGUE), CMS = byId(K.COUNTERMOVES), ENDINGS = byId(K.ENDINGS);
   if (save) migrationNotes.push(...sanitizeSave(S, K));
+  const U = createUnlocks(K.UNLOCKS);
+  if (S.unlocked === null) S.unlocked = K.UNLOCKS.map((u) => u.id); // sauvegarde d'avant la v1.1 : rien ne disparaît
+  const TWISTS = byId(K.TWISTS);
 
   const c = {
     state: S, content: K, cfg, rng, migrationNotes,
     get step() { return S.step; },
     get ended() { return S.step === 'ended'; },
-    ctx: () => ({ day: S.day, phase: S.phase, flags: flags(), stats: S.stats, hidden: S.hidden }),
+    ctx: () => ({ day: S.day, phase: S.phase, weekday: c.weekday(), flags: flags(), stats: S.stats, hidden: S.hidden }),
     check: (cond, useChance = true) => evalCondition(cond, c.ctx(), useChance ? rng : null),
     has: (f) => S.flags.includes(f),
     weekday: (day = S.day) => C.weekdays[(day - 1) % 7],
@@ -261,7 +270,14 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     return t ?? null;
   };
   // Fil du téléphone du jour (non lus). c.readMedia(feed, id) : marque lu et applique ses effets.
-  c.mediaFeed = () => narrative?.mediaFeed(S, S.day, { seen: S.seen.media }) ?? { whatsapp: [], press: [], social: [] };
+  c.mediaFeed = () => {
+    const feed = narrative?.mediaFeed(S, S.day, { seen: S.seen.media }) ?? { whatsapp: [], press: [], social: [] };
+    // Médias poussés par un twist (after.media) : affichés même hors de leur `when`
+    for (const [f, list] of Object.entries(K.MEDIA ?? {})) {
+      for (const m of list ?? []) if (S.pushedMedia?.includes(m.id) && !S.seen.media.includes(m.id) && !(feed[f] ?? []).some((x) => x.id === m.id)) (feed[f] ??= []).push(m);
+    }
+    return feed;
+  };
   c.readMedia = (feed, id) => {
     const m = (K.MEDIA?.[feed] ?? []).find((x) => x.id === id);
     if (!m || S.seen.media.includes(id)) return false;
@@ -322,7 +338,17 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
   function beginPhase(phase) {
     S.phase = phase;
     c.note('phase', { phase });
-    S.cards = [...S.cards.filter((x) => x.type === 'info'), ...buildCards()];
+    // Outils débloqués (v1.1) : une carte « Nouveau » la première fois, en tête de la phase
+    const fresh = U.due(c.ctx(), S.unlocked);
+    for (const u of fresh) { S.unlocked.push(u.id); c.note('unlock', { id: u.id }); }
+    const unlockCards = fresh.map((u) => ({ type: 'info', id: `unlock:${u.id}`, unlock: u.id, title: u.card?.title ?? 'Nouveau', text: u.card?.text ?? '', hint: u.card?.hint ?? null }));
+    // Le twist de la nuit (v1.1) : choisi à l'entrée de la nuit, annoncé par sa carte d'intro
+    let twistCard = [];
+    if (phase === 'night') {
+      const t = c.twistTonight();
+      if (t?.intro) twistCard = [{ type: 'info', id: `twist:${t.id}`, twist: t.id, title: t.title ?? 'Ce soir', text: t.intro }];
+    }
+    S.cards = [...unlockCards, ...S.cards.filter((x) => x.type === 'info'), ...twistCard, ...buildCards()];
     S.step = 'cards';
     if (!S.cards.length) afterCards();
   }
@@ -414,9 +440,32 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     return lines;
   };
 
+  // ---------- twists et déblocages (v1.1) ----------
+  c.twistTonight = () => {
+    if (S.tonightTwist?.day !== S.day) {
+      const t = K.TWISTS.length ? pickTwist(K.TWISTS, { ...c.ctx(), phase: 'night' }, (S.twistHistory ?? []).map((x) => x.id), rng) : null;
+      S.tonightTwist = { day: S.day, id: t?.id ?? null };
+      if (t) c.note('twist', { id: t.id });
+    }
+    return S.tonightTwist.id ? TWISTS[S.tonightTwist.id] ?? null : null;
+  };
+  const opportunities = (sim) => sim?.twist?.sim?.opportunities ?? [];
+  c.actionAllowed = (id, sim) => U.action(id, S.unlocked, opportunities(sim));
+  c.keyAllowed = (key, sim) => {
+    const opp = opportunities(sim);
+    const viaOpp = K.UNLOCKS.filter((u) => (u.unlocks?.actions ?? []).some((a) => opp.includes(a))).flatMap((u) => (u.unlocks?.keys ?? []).map((k) => k.toUpperCase()));
+    return U.key(key, S.unlocked, viaOpp);
+  };
+  // Verbe natif de la nuit (photo, db, police…) : verrouillé si toutes les actions du contenu qui le portent le sont
+  c.nativeAllowed = (type, { asso = false } = {}, sim) => {
+    const carriers = K.ACTIONS.filter((a) => a.sim === type && (type !== 'police' || !!(a.simArgs?.asso ?? /asso/.test(a.id)) === !!asso));
+    return !carriers.length || carriers.some((a) => c.actionAllowed(a.id, sim));
+  };
+
   // ---------- après-midi : actions ----------
-  const usable = (a, phase) => (a.phase ?? 'afternoon') === phase
+  const usable = (a, phase, sim) => (a.phase ?? 'afternoon') === phase
     && !(a.once && S.seen.actions.includes(a.id))
+    && c.actionAllowed(a.id, sim)
     && c.check(a.requires, false);
   // Bot WhatsApp (proj_whatsapp_bot) : la mobilisation coûte un créneau de moins (minimum 1) et rapporte plus d'Asso
   const botHelps = (a) => c.has('proj_whatsapp_bot') && C.whatsappBot.actions.includes(a.id);
@@ -476,6 +525,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
         weather: S.journal.some((e) => e.day === S.day && e.type === 'event' && e.id === 'r_drache') ? 'drache' : undefined,
       },
       narrator,
+      twist: nightTwist(c.twistTonight()),
     });
     sim.campaignDay = S.day;
     sim.contentActions = [];
@@ -503,7 +553,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
       });
     };
   }
-  c.nightActions = (sim) => K.ACTIONS.filter((a) => (a.phase ?? 'afternoon') === 'night' && !a.sim && usable(a, 'night') && !sim.contentActions.includes(a.id));
+  c.nightActions = (sim) => K.ACTIONS.filter((a) => (a.phase ?? 'afternoon') === 'night' && !a.sim && usable(a, 'night', sim) && !sim.contentActions.includes(a.id));
   // Action de nuit du contenu (hors actions natives de la sim) : lieu, créneau, témoins, effets → nightActions.js
   // (même chemin pour le joueur, les bots et le simulateur ; `player` facultatif : sans lui, le lieu n'est pas vérifié)
   c.doNightAction = (sim, id, player) => performNightAction(sim, c, id, player);
@@ -628,6 +678,15 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     S.nights.push({ day: S.day, reason: N.endReason, sleep: Math.round(N.sleep), risk: Math.round(N.risk), evidence: N.evidence.length, gained: Math.round(gained * 10) / 10, police: summary.police.length, witnesses: N.witnessMemories.length });
     S.lastNight = summary;
     S.lastHeadline = narrative ? narrative.recapHeadline(summary, sim.state) : null;
+    // Twist joué : historique (jamais deux fois) et conséquences les jours suivants (after)
+    if (sim.twist) {
+      const t = TWISTS[sim.twist.id];
+      S.twistHistory.push({ day: S.day, id: sim.twist.id });
+      if (t?.after) {
+        apply({ setFlags: t.after.setFlags, clearFlags: t.after.clearFlags }, 'story', `twist:${t.id}`);
+        for (const m of t.after.media ?? []) if (!S.pushedMedia.includes(m)) S.pushedMedia.push(m);
+      }
+    }
     c.note('night-end', { reason: N.endReason, evidence: N.evidence.length });
     if (c.isSaturday()) setFlag(S.day === 6 ? 'saturday1_done' : 'saturday2_done');
     if (N.endReason === 'custody' && c.gateOpen()) { setFlag('custody'); S.pendingEnding = S.pendingEnding ?? 'custody'; }
