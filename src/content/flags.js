@@ -112,8 +112,6 @@ export const FLAGS = {
   cardboard_exhaust: 'Carton scotché sur la sortie d’extraction',
   kitchen_fire: 'Début de feu dans la cuisine de l’estaminet',
   stink_bomb: "Boule puante lâchée sur la terrasse",
-  kitchen_sabotage_done: 'Sel et sucre inversés en cuisine (carbonnade sucrée)',
-  kitchen_sabotage_caught: 'Pilou identifié pour la carbonnade sucrée',
   fake_reviews: 'Faux avis publiés',
   fake_reviews_traced: 'Les faux avis ont été remontés jusqu’à Pilou',
   sabotage_chairs: 'Chaises dévissées',
