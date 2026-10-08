@@ -5,7 +5,7 @@ const OUTCOME = {
   act: 'PV', complaisance: 'café offert, 0 PV', nothing: 'rien à signaler', tipoff: 'tout rangé juste avant (tuyau ?)',
   ignored: '« c’est encore vous », personne',
 };
-const BY = { police: 'la police', waiter: 'le serveur', bucket: 'le seau', tipoff: 'un tuyau' };
+const BY = { police: 'la police', waiter: 'le serveur', bucket: 'le seau', tipoff: 'un tuyau', rain: 'la pluie' };
 
 export function buildSummary(sim) {
   const S = sim.state;

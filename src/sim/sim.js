@@ -11,6 +11,7 @@ import { dist3, lineOfSight, corridorEncroachment } from './geometry.js';
 import { buildSummary } from './summary.js';
 import { fmt } from './time.js';
 import { SCHEDULE, inWindow, smokeSpot, patrolPositions } from './schedule.js';
+import { planWeather, weatherNow, applyWeather } from './weather.js';
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
@@ -58,6 +59,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
       t += d + rng.range(...b.every);
     }
   }
+  S.weather = planWeather(seed, carry, cfg); // drache (événement de campagne) ou bruine d'ambiance : src/sim/weather.js
   if (carry.reversal) S.visit = { at: rng.range(...CAMPAIGN.reversal.window), phase: 'pending', enemyMemories: carry.enemyMemories ?? 0 };
   const earlyEndings = carry.earlyEndings ?? true;
 
@@ -102,6 +104,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
     waiterOnBreak: (min = S.min) => min < WAITER.offDutyAt && inWindow(min, (cfg.SCHEDULE ?? SCHEDULE).waiterBreaks),
     waiterPos: (min = S.min) => (sim.waiterOnBreak(min) ? smokeSpot(cfg)
       : { x: ANCHORS.waiter.x, z: ANCHORS.waiter.z + Math.sin(min * ANCHORS.waiter.speed) * ANCHORS.waiter.amplitude }),
+    weather: () => weatherNow(S),
     ghislainCleaning: (min = S.min) => inWindow(min, (cfg.SCHEDULE ?? SCHEDULE).ghislainClean),
     policePositions: () => patrolPositions(sim),
     activeStanding: () => S.standing.filter((g) => S.min >= g.arriveAt && S.min < g.leaveAt),
@@ -191,6 +194,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
     tick(dMin) {
       if (S.ended) return;
       S.min += dMin;
+      applyWeather(sim);
       for (const t of S.tables) {
         if (t.hiddenUntil !== null && S.min >= t.hiddenUntil) returnTable(t);
         if (t.out && S.min >= t.clearAt) sim.clearTable(t, t.pendingBy || 'resto');

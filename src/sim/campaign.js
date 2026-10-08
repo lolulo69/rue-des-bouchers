@@ -430,6 +430,8 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
         calls: S.police.fatigue, serialComplainer: S.police.serialComplainer,
         benaliTransferred: S.police.benaliTransferred, lemaireTransferred: S.police.lemaireTransferred,
         flags: S.flags, earlyEndings: c.gateOpen(), reversal, enemyMemories: enemyMemories(),
+        // la drache du soir (événement r_drache tiré ce jour-là) : la sim fait pleuvoir et vider les terrasses
+        weather: S.journal.some((e) => e.day === S.day && e.type === 'event' && e.id === 'r_drache') ? 'drache' : undefined,
       },
       narrator,
     });

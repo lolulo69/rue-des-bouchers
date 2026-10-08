@@ -89,6 +89,10 @@ function heldItems(addW, k, o) {
   addW('film', 'ball', 'handR', [0.045, 0.095, 0.03], 0.012, 0xff3030, null, true, true);
   addW('envelope', 'box', 'handR', [0, 0.04, 0.05], [0.2, 0.13, 0.015], 0xf6f0dc, [-0.3, 0, 0]);
   addW('envelope', 'box', 'handR', [0, 0.065, 0.06], [0.2, 0.012, 0.02], 0xd9c79a, [-0.3, 0, 0]);
+  // parapluie ouvert au-dessus de la tête (pluie)
+  addW('umbrella', 'cyl', 'handR', [0, 0.45, 0.02], [0.025, 0.95, 0.025], 0x2a2a2a);
+  addW('umbrella', 'cone', 'handR', [0, 0.98, 0.02], [1.15, 0.32, 1.15], o.umbrella ?? 0x2b4d7a, null, false, true);
+  addW('umbrella', 'ball', 'handR', [0, 1.16, 0.02], 0.03, 0x2a2a2a);
   addW('fork', 'cyl', 'handR', [0, 0.06, 0.04], [0.012, 0.16, 0.012], 0xc0c4ca, [0.3, 0, 0]);
   addW('fork', 'ball', 'handR', [0, 0.14, 0.07], [0.03, 0.025, 0.03], 0x8a4a22);
   addW('key', 'cyl', 'handR', [0, 0.03, 0.07], [0.02, 0.1, 0.02], 0xe8c45a, [Math.PI / 2, 0, 0]);
@@ -255,6 +259,8 @@ function animHuman(rig, t, dt, proxy) {
     if (held !== 'cig' && !sit && !lean) raiseR = Math.min(raiseR, lerp(-0.7, -2.3, s)); // debout : verre à hauteur de poitrine
   } else if (held === 'phone') {
     raiseR = -1.3; yawR = 0.5; nod = 0.35; turn *= 0.2;
+  } else if (held === 'umbrella') {
+    raiseR = -0.95; yawR = 0.55; spreadR = 0; turn *= 0.3;
   } else if (held === 'envelope' || held === 'key') {
     raiseR = -1.2; yawR = 0.3;
   }

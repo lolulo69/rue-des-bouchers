@@ -8,6 +8,7 @@ import { createFx } from './fx.js';
 import { createProps } from './propkit.js';
 import { createDirector } from './anim.js';
 import { perfHud } from './perf.js';
+import { createWeather } from './weather.js';
 import { audio } from '../audio/index.js';
 import { portrait, portraitIds, portraitExpressions } from './portraits.js';
 import { scenes } from './scenes.js';
@@ -36,6 +37,7 @@ export function attachArt(scene, world) {
         return p;
       },
     },
+    weather: createWeather(scene, world, { onFrame, fx }),
     terrace: { parasols: director.parasols, collapse: director.collapse, rush: director.rush, film: director.film },
     expressions: Object.keys(EXPRESSIONS),
     audio,

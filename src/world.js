@@ -123,9 +123,12 @@ export function buildWorld(scene, opts = {}) {
   const gutter = new THREE.Mesh(new THREE.PlaneGeometry(0.5, STREET.length), new THREE.MeshStandardMaterial({ map: slabTex(), roughness: 0.8 }));
   gutter.rotation.x = -Math.PI / 2; gutter.position.y = 0.006; gutter.userData.keepUV = true;
   city.add(gutter);
+  const groundMaterials = [cobble, gutter.material]; // la pluie les rend sombres et brillants (art/weather.js)
   const plaza = (x0, x1, z0, z1) => {
     const t = cobbleTex(); t.repeat.set((x1 - x0) / 3.2, (z1 - z0) / 3.4);
-    const m = new THREE.Mesh(new THREE.PlaneGeometry(x1 - x0, z1 - z0), new THREE.MeshStandardMaterial({ map: t, roughness: 0.95 }));
+    const pm = new THREE.MeshStandardMaterial({ map: t, roughness: 0.95 });
+    groundMaterials.push(pm);
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(x1 - x0, z1 - z0), pm);
     m.rotation.x = -Math.PI / 2; m.position.set((x0 + x1) / 2, -0.002, (z0 + z1) / 2); m.userData.keepUV = true;
     city.add(m);
   };
@@ -524,6 +527,7 @@ export function buildWorld(scene, opts = {}) {
     anchors,
     gameMinutes: null, // le gameplay peut renseigner l'heure ici (sinon lue dans window.__rdb.sim.state.min) : cloche de 22h
     setCatVisible(v) { cast.cat.visible = v; },
+    groundMaterials,
     standingCrowd: (o) => standingCrowd(scene, o),
   };
   world.audio = audio.attachStreet({ tables, exhaust, steam, apt, getMinutes: () => world.gameMinutes ?? window.__rdb?.sim?.state?.min ?? window.__rdb?.S?.min });

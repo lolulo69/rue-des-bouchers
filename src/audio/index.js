@@ -13,7 +13,7 @@ const BELL_MINUTE = 22 * 60;
 function createEngine() {
   let ctx = null, master = null, muted = false;
   let crowd = null, hum = null, bellBus = null, sfx = null, noise = null;
-  let streetBus = null, musicBus = null, sounds = null, music = null, lastCamera = null, modeName = 'night';
+  let streetBus = null, musicBus = null, sounds = null, music = null, lastCamera = null, modeName = 'night', rainNode = null, lastInApt = false;
   // Rue branchée par world.js (attachStreet)
   let street = null, tables = [], exhaust = new THREE.Vector3(), steam = null, apt = { x1: -1e9, floor: 1e9 }, getMinutes = null;
   // Une table est "dehors" tant que son groupe est visible (le gameplay le cache quand elle rentre)
@@ -50,6 +50,18 @@ function createEngine() {
     crowd = makeCrowd();
     hum = makeHum();
     bellBus = makeReverbBus(4.5, 0.55);
+    // Pluie : souffle large + crépitement (gouttes sur les pavés et les stores), muselé chez Pilou
+    {
+      const src = ctx.createBufferSource(); src.buffer = noise; src.loop = true;
+      const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2800; bp.Q.value = 0.4;
+      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 6000;
+      const g = ctx.createGain(); g.gain.value = 0;
+      const am = ctx.createGain(); am.gain.value = 0.85;
+      const lfo = ctx.createOscillator(); lfo.type = 'square'; lfo.frequency.value = 23; const lg = ctx.createGain(); lg.gain.value = 0.15;
+      lfo.connect(lg).connect(am.gain); lfo.start();
+      src.connect(bp).connect(am).connect(lp).connect(g).connect(master); src.start();
+      rainNode = { g, lp };
+    }
     sounds = makeSfx(ctx, sfx, noise, bellBus.input);
     music = makeMusic(ctx, musicBus, noise, makeReverbBus);
     for (const [name, on] of pendingLoops) music.loop(name, on);
@@ -245,6 +257,13 @@ function createEngine() {
       if (!music) { pendingLoops.set(name, on); return; }
       music.loop(name, on);
     },
+    // Pluie (0..1), pilotée par le metteur en scène depuis sim.weather()
+    rain(level = 0) {
+      if (!rainNode) return;
+      const on = modeName === 'night' ? level : 0;
+      rainNode.g.gain.setTargetAtTime(on * 0.45, ctx.currentTime, 0.6);
+      rainNode.lp.frequency.setTargetAtTime(lastInApt ? 1600 : 6000, ctx.currentTime, 0.3);
+    },
     // 'night' : la rue s'entend · 'day' / 'hall' / 'off' : la rue se tait (les boucles se gèrent avec loop())
     mode(m) {
       modeName = m;
@@ -255,6 +274,7 @@ function createEngine() {
       if (!ctx || ctx.state !== 'running' || !street) return;
       const now = ctx.currentTime;
       const inApt = camera.position.x < apt.x1 + 0.3 && camera.position.y > apt.floor;
+      lastInApt = inApt;
       // Terrasses : niveau ~ somme des têtes / distance², panoramique pondéré
       let L = 0, P = 0, heads = 0;
       for (const t of tables) {

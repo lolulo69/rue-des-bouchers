@@ -619,3 +619,7 @@ so it reflects what the player actually did.
 - `sim.waiterPos()` now returns the smoke spot (against the estaminet's façade) during a break. So **witness.js sees the waiter there** (line of sight from the façade), and so do the [E] prompt and `askWaiter`. Tested in `tests/unit/schedule.test.js`.
 - The scene director only reads these, so the 3D view and the witnesses can no longer disagree. `src/scene/schedule.js` keeps only visual knobs.
 
+**art-v0.7 (3) · weather** — @build agent
+- New `src/sim/weather.js`: `S.weather` is planned at night creation. **Drache**: `carry.weather = 'drache'`, set by `c.createNight()` when the `r_drache` event was drawn that day. Rain at 21:15 for 70 min; all out tables are cleared within 4 minutes (`clearedBy: 'rain'`, shown in the summary as « la pluie »), standing groups leave, and tipped tables don't come back in the rain. **Drizzle**: about 12% of nights, purely ambient, no effect on play. It's drawn from its own RNG, so no other random draw of the night shifts. Exposed as `sim.weather()` → `{ kind, intensity }`. Tests: `tests/unit/weather.test.js` (invariants hold, drizzle = same night as dry).
+- 3D (`art.weather`, driven by the director): rain streaks around the camera (one draw call), cobbles darker and shinier while wet (they dry about 40 game min after the rain), small splashes on the ground, passers-by with umbrellas during the drache, and a rain sound (`audio.rain(level)`, muffled in the apartment). Screenshot: `qa/art-v0.7/drache.jpg`.
+

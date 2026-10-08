@@ -303,6 +303,13 @@ export function createDirector({ scene, world, art, audio }) {
     if (blocked !== state.exhaust) { state.exhaust = blocked; art.fx.exhaustBlocked(blocked); }
     want('cardboard', !!S.exhaustBlocked, () => art.props.place('cardboard'));
 
+    // Météo (sim.weather) : pluie / bruine, pavés qui restent mouillés ~40 min de jeu après la pluie
+    const w = sim.weather?.() ?? null;
+    const plan = S.weather;
+    const wet = plan && min >= plan.start ? (min < plan.end ? (w?.intensity ?? 0) / (plan.kind === 'drache' ? 1 : 0.35) * (plan.kind === 'drache' ? 1 : 0.5) : Math.max(0, (plan.kind === 'drache' ? 1 : 0.5) - (min - plan.end) / 40)) : 0;
+    art.weather?.set(w?.kind ?? null, w?.intensity ?? 0, wet);
+    audio?.rain?.(w ? w.intensity : 0);
+
     // Drapeaux de campagne (banderoles, uritrottoir, caméras)
     syncFlags(cs?.flags ?? []);
 
