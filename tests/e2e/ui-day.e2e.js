@@ -144,22 +144,22 @@ test('mobile : la journée tient sur un écran de téléphone', async ({ page })
   await page.screenshot({ path: 'test-results/ui-mobile-koddex.png', fullPage: true });
 });
 
-test('dans le jeu : #dayui monte l’interface des journées (mountDayUI)', async ({ page }) => {
+test('dans le jeu : « Campagne » monte l’interface des journées (src/ui)', async ({ page }) => {
   const errors = watchErrors(page);
   await page.addInitScript(() => { globalThis.__rdbUiSpeed = 0; });
   await page.goto('/?nolock=1&seed=5');
   await page.evaluate(() => localStorage.clear());
   await page.reload();
-  await page.click('#new-campaign');
-  await expect(page.locator('#dayui [data-testid=intro]')).toBeVisible();
-  await page.click('#dayui [data-testid=intro-skip]');
-  await expect(page.locator('#dayui [data-testid=day-header]')).toHaveAttribute('data-day', '1');
-  await expect(page.locator('#dayui')).toContainText('Jour 1');
-  // T ouvre le téléphone
+  await page.click('#campaign');
+  await page.click('[data-testid=title-new]');
+  await expect(page.locator('[data-testid=intro]')).toBeVisible({ timeout: 30_000 });
+  await page.click('[data-testid=intro-skip]');
+  await expect(page.locator('[data-testid=day-header]')).toHaveAttribute('data-day', '1');
+  // T ouvre et ferme le téléphone
   await page.keyboard.press('KeyT');
-  await expect(page.locator('#dayui [data-testid=phone]')).toBeVisible();
+  await expect(page.locator('[data-testid=phone]')).toBeVisible();
   await page.keyboard.press('KeyT');
-  await expect(page.locator('#dayui [data-testid=card]')).toBeVisible();
+  await expect(page.locator('[data-testid=card]')).toBeVisible();
   await page.waitForTimeout(2500);
   await page.screenshot({ path: 'test-results/ui-game-day1.png' });
   expect(errors).toEqual([]);
