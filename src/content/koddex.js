@@ -66,7 +66,7 @@ export const KODDEX = {
       id: 'work_voice_memo',
       label: 'Résumer le message vocal de Stéphane (11 minutes)',
       job: +4,
-      result: "Résumé de Clode Kode : « Il faut shipper. » Durée de lecture : 1 seconde. Stéphane trouve le résumé « un peu froid » et en renvoie un vocal de 6 minutes.",
+      result: "Résumé de Clode Kode : « Il faut shipper. » Durée de lecture : 1 seconde. Stéphane trouve le résumé « un peu froid » et renvoie un vocal de 6 minutes.",
     },
     {
       id: 'work_unit_tests',
@@ -114,7 +114,7 @@ export const KODDEX = {
       job: +10,
       once: true,
       requires: { day: [3, 10] },
-      result: "Démo impeccable. Un investisseur demande si « c’est fait en Rust ». Clode Kode répond « Oui, plusieurs fois ». Stéphane lève 200 000 € et un débat.",
+      result: "Démo impeccable. Un investisseur demande si « c’est fait en Rust ». Clode Kode répond « Oui, plusieurs fois ». Stéphane lève 200 000 € et un débat.",
     },
     {
       id: 'work_dinner_recap',
@@ -248,7 +248,7 @@ export const KODDEX = {
       requires: { flags: ['met_klaas'], day: [2, 13] },
       effects: { dossier: +2 },
       lines: [
-        { speaker: 'clode', text: "L’écriture de M. Klaas est… exigeante. J’ai identifié 1 312 occurrences du mot « ja ». Je travaille sur le reste, avec humilité." },
+        { speaker: 'clode', text: "L’écriture de M. Klaas est… exigeante. J’ai identifié 1 312 occurrences du mot « ja ». Je travaille sur le reste, avec humilité." },
         { speaker: 'klaas', text: "Ja. Page 14, c’est un 7. Pas un 1. Un 7 belge." },
       ],
       result: "Le carnet devient un tableur : date, heure, table, nombre de couverts. Klaas exige une copie papier « au cas où l’ordinateur oublie ». Il a raison, mais ne le dites pas à Clode Kode.",
@@ -278,9 +278,9 @@ export const KODDEX = {
       risk: +5,
       unlocks: 'proj_fake_reviews',
       lines: [
-        { speaker: 'clode', text: "Je préfère ne pas rédiger de faux avis : c’est trompeur pour les consommateurs. En revanche, je peux vous aider à écrire un vrai avis, honnête et nuancé ?" },
+        { speaker: 'clode', text: "Je préfère ne pas rédiger de faux avis : c’est trompeur pour les consommateurs. En revanche, puis-je vous aider à écrire un vrai avis, honnête et nuancé ?" },
         { speaker: 'pilou', text: "Honnête : « Une étoile, je n’ai pas dormi depuis mars. »" },
-        { speaker: 'clode', text: "Celui-là est vrai. C’est les onze autres qui m’inquiètent." },
+        { speaker: 'clode', text: "Celui-là est vrai. Ce sont les onze autres qui m’inquiètent." },
       ],
       result: "Le générateur est prêt, écrit par vous seul, de mauvaise humeur. Douze profils, douze styles, une seule plume fatiguée. Ghislain lit tous les avis. Tous.",
     },
@@ -440,7 +440,7 @@ export const KODDEX = {
       speaker: 'stephane',
       when: { flags: ['video_viral'] },
       once: true,
-      lines: ["C’est toi, la vidéo qui tourne ? 40 000 vues ! Tu peux la reposter sur LinkedIn avec #résilience ? Non ? Bon. Je respecte."],
+      lines: ["C’est toi, la vidéo qui tourne ? 40 000 vues ! Tu peux la reposter sur LinkedIn avec #résilience ? Non ? Bon. Je respecte."],
     },
     {
       id: 'stephane_custody',

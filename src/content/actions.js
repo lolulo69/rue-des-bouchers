@@ -143,7 +143,7 @@ export const ACTIONS = [
     cost: { minutes: 2 },
     effects: {},
     witnessed: { exposure: 0.6, by: ['klaas', 'seb_nico', 'waiter', 'customers'], effects: { setFlags: ['klaas_noted_pilou'] } },
-    result: "Splatch. La terrasse se lève d’un bloc, comme pour une ola. Une méthode ancestrale, déjà pratiquée quand la rue s’appelait « le Trou ».",
+    result: "Splatch. La terrasse se lève d’un bloc, comme pour une ola. Une méthode ancestrale, déjà pratiquée dans cette rue en 1729.",
   },
   {
     id: 'night_camera_awning',
@@ -228,7 +228,7 @@ export const ACTIONS = [
     requires: { flags: ['waiter_informant'], notFlags: ['laxative_done'] },
     effects: { setFlags: ['laxative_done'], hostility: +30, asso: -10 },
     witnessed: { exposure: 0.6, by: ['waiter', 'dede', 'ghislain'], effects: { risk: +60, asso: -15, setFlags: ['laxative_caught'] } },
-    result: "Vers 21h40, la terrasse découvre la notion de file d’attente. Une seule toilette, quatorze clients, un Dédé qui hurle « c’est pas la carbonnade, c’est le Covid ! ». La terrasse est vide à 22h pile. Pour la première fois. Vous n’en êtes pas fier. Enfin, pas complètement.",
+    result: "Vers 21h40, la terrasse découvre la notion de file d’attente. Un seul WC, quatorze clients, un Dédé qui hurle « c’est pas la carbonnade, c’est le Covid ! ». La terrasse est vide à 22h pile. Pour la première fois. Vous n’en êtes pas fier. Enfin, pas complètement.",
   },
   {
     id: 'night_sabotage_chairs',
@@ -470,7 +470,7 @@ export const ACTIONS = [
     cost: { time: 1 },
     requires: { flags: ['igpn_open', 'bribe_photo'] },
     effects: { setFlags: ['lemaire_transferred'], corruption: -20 },
-    result: "Le brigadier Lemaire est muté à la surveillance des parcmètres d’Hellemmes. On dit qu’il y mange moins bien.",
+    result: "Le brigadier Lemaire est muté à la surveillance des parcmètres de Lomme. On dit qu’il y mange moins bien.",
   },
   {
     id: 'pm_klaas_roster',
@@ -558,7 +558,7 @@ export const ACTIONS = [
     cost: { time: 1 },
     requires: { stats: { asso: '>=25' } },
     effects: { setFlags: ['banners_up'], asso: +6, hostility: +10 },
-    result: "Six banderoles, une sur le balcon de Seb et Nico où Gaufre dort dessus. Les touristes les prennent en photo. Le bloc parle de « pollution visuelle ».",
+    result: "Six banderoles, dont une au balcon de Seb et Nico : Gaufre dort dessus. Les touristes les prennent en photo. Le bloc parle de « pollution visuelle ».",
   },
   {
     id: 'pm_recruit',
@@ -631,7 +631,7 @@ export const ACTIONS = [
     cost: { time: 1 },
     requires: { stats: { asso: '>=25' } },
     effects: { setFlags: ['lawyer_hired'], asso: -3 },
-    result: "Maître Vandamme facture à la demi-heure et soupire à la minute. Il accepte. « La cotisation de l’association couvrira… le premier courrier. »",
+    result: "Maître Vandamme facture à l’heure entamée et soupire à la minute. Il accepte. « La cotisation de l’association couvrira… le premier courrier. »",
   },
   {
     id: 'pm_formal_notice',
@@ -642,7 +642,7 @@ export const ACTIONS = [
     cost: { time: 1 },
     requires: { flags: ['lawyer_hired'], stats: { dossier: '>=12' } },
     effects: { setFlags: ['formal_notice'], dossier: +3, hostility: +20 },
-    result: "Lettre recommandée avec accusé de réception. Ghislain a signé l’accusé. Réponse attendue sous quinze jours : vous parierez qu’elle dira « c’est en cours ».",
+    result: "Lettre recommandée avec accusé de réception. Ghislain a signé l’accusé. Réponse attendue sous quinze jours : vous pariez déjà qu’elle dira « c’est en cours ».",
   },
 
   // ════════════════════════════════════════════════════════════════════════
@@ -824,6 +824,6 @@ export const ACTIONS = [
     cost: { time: 1 },
     requires: { flags: ['cm_fake_post'], notFlags: ['hate_wave_answered'] },
     effects: { setFlags: ['hate_wave_answered'], asso: +3 },
-    result: "Pas d’insulte, pas de majuscules : trois photos horodatées, l’arrêté du 22h, et « Bernadette n’existe pas, mais nos nuits, si ». Nico relit, valide, publie. Les commentaires se calment. Un seul demande encore « vous fermez à quelle heure ? ». Vous répondez : 22h.",
+    result: "Pas d’insulte, pas de majuscules : trois photos horodatées, l’arrêté des 22h, et « Bernadette n’existe pas, mais nos nuits, si ». Nico relit, valide, publie. Les commentaires se calment. Un seul demande encore « vous fermez à quelle heure ? ». Vous répondez : 22h.",
   },
 ];

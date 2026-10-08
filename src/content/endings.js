@@ -303,7 +303,7 @@ export const ENDINGS = [
     epilogue: [
       {
         when: { flags: ['won_legal'] },
-        text: "Vous avez gagné. L’autorisation de terrasse de l’estaminet est suspendue. Les tables de l’estaminet ont disparu de la rue.",
+        text: "Vous avez gagné. L’autorisation de terrasse de l’estaminet est suspendue. Ses chaises et ses tables ont disparu de la rue.",
       },
       {
         when: { flags: ['won_legal', 'exhaust_meeting_won'] },
@@ -320,7 +320,7 @@ export const ENDINGS = [
       {
         when: {},
         text:
-          "Pendant une semaine, la rue des Bouchers a été une rue. Puis, un vendredi, l’affiche « BIENTÔT » sur la vitrine de La Bombance est devenue « OPENING ». Néons roses, enceintes sur la façade, carte de cocktails au nom de la rue : le « Trou Sour », le « Canal 1912 ». Le nouveau gérant vous a salué : « Ah, c’est vous le riverain ? On m’a dit que vous étiez très bien. On va s’entendre. »",
+          "Pendant une semaine, la rue des Bouchers a été une rue. Puis, un vendredi, l’affiche « BIENTÔT » sur la vitrine de La Bombance est devenue « OPENING ». Néons roses, enceintes sur la façade, carte de cocktails au nom de la rue : le « Bouchers Spritz », le « Canal 1912 ». Le nouveau gérant vous a salué : « Ah, c’est vous le riverain ? On m’a dit que vous étiez très bien. On va s’entendre. »",
       },
       {
         when: { flags: ['knows_trou'] },
@@ -366,7 +366,7 @@ export const ENDINGS = [
       },
       {
         when: { flags: ['klaas_log_certified'] },
-        text: "Les carnets certifiés de Klaas ont fait le reste : cinq minutes d’avance avant chaque patrouille, toujours les mêmes soirs. L’enquête interne les a appelés « la grille horaire ». Klaas a demandé qu’on écrive « le carnet ».",
+        text: "Les carnets certifiés de Klaas ont fait le reste : cinq minutes d’avance sur chaque patrouille, toujours les mêmes soirs. L’enquête interne les a appelés « la grille horaire ». Klaas a demandé qu’on écrive « le carnet ».",
       },
       {
         when: { flags: ['waiter_testimony'] },
@@ -409,7 +409,7 @@ export const ENDINGS = [
       },
       {
         when: { flags: ['ac_violation_confirmed'] },
-        text: "La clim posée sans autorisation a été démontée. Il reste quatre trous dans la brique de 1729 et une jardinière de géraniums, qui elle a été autorisée.",
+        text: "La clim posée sans autorisation a été démontée. Il reste quatre trous dans la brique de 1729 et une jardinière de géraniums, qui, elle, a été autorisée.",
       },
       {
         when: { flags: ['colette_dinner_photo'] },

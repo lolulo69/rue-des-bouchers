@@ -46,7 +46,7 @@ export const EVENTS = [
     speaker: 'colette',
     title: "J4 · Une ancienne maire en terrasse",
     text:
-      "20h50. Une berline se gare rue de la Barre là où rien ne se gare. Colette Verhaeghe descend, foulard de soie et sourire de campagne, et prend LA table de l’estaminet, celle qui mord sur le couloir de passage. Dédé lui embrasse les deux mains. Ghislain apporte une carte qui n’existe pas pour les autres clients. Huit couverts. À une table. Rue des Bouchers.",
+      "20h50. Une berline se gare rue de la Barre, là où rien ne se gare. Colette Verhaeghe descend, foulard de soie et sourire de campagne, et prend LA table de l’estaminet, celle qui mord sur le couloir de passage. Dédé lui embrasse les deux mains. Ghislain apporte une carte qui n’existe pas pour les autres clients. Huit couverts. À une table. Rue des Bouchers.",
     choices: [
       {
         label: 'Photographier la tablée depuis la fenêtre',
@@ -193,7 +193,7 @@ export const EVENTS = [
         requires: { flags: ['delphine_channel'] },
         effects: { dossier: +8, corruption: -5, setFlags: ['inspector_surprise', 'ac_violation_confirmed'] },
         result:
-          "Delphine arrive à 15h04 sans prévenir, avec un mètre laser et un humour sec. Ghislain essaie « on allait justement déposer la demande ». Elle note : « Groupe extérieur, façade, aucune autorisation. Demande « justement » non déposée. » Infraction confirmée.",
+          "Delphine arrive à 15h04 sans prévenir, avec un mètre laser et un humour sec. Ghislain essaie « on allait justement déposer la demande ». Elle note : « Groupe extérieur, façade, aucune autorisation. Demande ‹ justement › non déposée. » Infraction confirmée.",
       },
       {
         label: 'Passer par Hippolyte et le service du patrimoine',
@@ -345,7 +345,7 @@ export const EVENTS = [
       {
         speaker: 'jeremie',
         when: { flags: ['tatie_emails_shared'] },
-        text: "« Madame Bouchon a reçu sept réponses écrites de l’établissement, toutes identiques sur le fond : « c’est en cours de résolution ». Nous les versons au dossier. Elles parlent d’elles-mêmes. Elles ne parlent que de ça. »",
+        text: "« Madame Bouchon a reçu des réponses écrites de l’établissement, toutes identiques sur le fond : ‹ c’est en cours de résolution ›. Nous les versons au dossier. Elles parlent d’elles-mêmes. Elles ne parlent que de ça. »",
       },
       {
         speaker: 'jeremie',
@@ -367,7 +367,7 @@ export const EVENTS = [
       {
         speaker: 'ghislain',
         when: { flags: ['cm_happy_petition'] },
-        text: "« Je verse au dossier une pétition de 412 clients satisfaits, dont plusieurs habitent Tourcoing, et un à Bruges. Leur attachement à la rue est sincère. »",
+        text: "« Je verse au dossier une pétition de 412 clients satisfaits, dont plusieurs habitent à Tourcoing, et un à Bruges. Leur attachement à la rue est sincère. »",
       },
       {
         speaker: 'ghislain',
@@ -397,7 +397,7 @@ export const EVENTS = [
       {
         speaker: 'ghislain',
         when: { flags: ['traitor_recruited'], notFlags: ['traitor_known'] },
-        text: "« Les riverains eux-mêmes sont divisés. J’ai ici le message d’un membre de l’association qui « comprend les deux côtés ». » Jérémie se fige. Régis regarde le plafond.",
+        text: "« Les riverains eux-mêmes sont divisés. J’ai ici le message d’un membre de l’association qui ‹ comprend les deux côtés ›. » Jérémie se fige. Régis regarde le plafond.",
       },
       {
         speaker: 'ghislain',
@@ -471,7 +471,7 @@ export const EVENTS = [
         requires: { stats: { dossier: '>=50', risk: '<40' }, flags: ['exhaust_meeting_won'] },
         effects: { setFlags: ['commission_done', 'won_legal', 'commission_won'] },
         result:
-          "« La ville elle-même a acté le problème de la gaine au J11. Combien de « en cours » faut-il encore ? » Le technicien hoche la tête. Le maire aussi. L’AOT est suspendue en attendant les travaux.",
+          "« La ville elle-même a acté le problème de la gaine au J11. Combien de ‹ en cours › faut-il encore ? » Le technicien hoche la tête. Le maire aussi. L’AOT est suspendue en attendant les travaux.",
       },
       {
         label: 'Présenter la charte de bon voisinage, signée par les deux camps',
@@ -492,7 +492,7 @@ export const EVENTS = [
         requires: { flags: ['corruption_proof', 'press_contacted'] },
         effects: { hostility: +25, corruption: -40, setFlags: ['commission_done', 'won_scandal', 'commission_won', 'press_scandal'] },
         result:
-          "Une du journal : « Terrasses et waterzooi : la police municipale mange-t-elle à l’œil ? » La salle bruisse. Colette se découvre un rendez-vous urgent. Le Commandant Desmet annonce, sans qu’on lui demande, que « l’affaire est prise très au sérieux ». La commission devient un point presse. Le bloc a perdu, et ne l’oubliera pas.",
+          "La une du journal : « Terrasses et waterzooi : la police municipale mange-t-elle à l’œil ? » La salle bruisse. Colette se découvre un rendez-vous urgent. Le Commandant Desmet annonce, sans qu’on lui demande, que « l’affaire est prise très au sérieux ». La commission devient un point presse. Le bloc a perdu, et ne l’oubliera pas.",
       },
       {
         label: 'Venir… en habitué de l’estaminet',
@@ -567,7 +567,7 @@ export const EVENTS = [
     once: true,
     title: 'Hilde frappe à la porte',
     text:
-      "Une casserole emballée dans un torchon, un thermos et un regard inquiet. « Klaas m’a dit que ta lumière était encore allumée à trois heures. Tu as une tête de chicon cuit, min p’tit. Mange. »",
+      "Une casserole emballée dans un torchon, un thermos et un regard inquiet. « Klaas m’a dit que votre lumière était encore allumée à trois heures. Vous avez une tête de chicon cuit. Mangez. »",
     choices: [
       {
         label: 'Accepter la soupe et la tisane',
@@ -636,7 +636,7 @@ export const EVENTS = [
     once: true,
     title: 'Message vocal de 4 min 12',
     text:
-      "« Hello la team ! Petite vibe check. Je sens qu’on est un peu en mode pantoufle cette semaine, et c’est ok, on est une famille, mais une famille qui ship. Pilou, j’ai vu tes commits à 3h du mat', j’adore l’énergie, par contre ça parle beaucoup de décibels ? Bisous de… peu importe d’où. »",
+      "« Hello la team ! Petite vibe check. Je sens qu’on est un peu en mode pantoufle cette semaine, et c’est ok, on est une famille, mais une famille qui ship. Pilou, j’ai vu tes commits à 3h du mat’, j’adore l’énergie, par contre ça parle beaucoup de décibels ? Bisous de… peu importe d’où. »",
     choices: [
       {
         label: 'Répondre par un vocal de 4 min 13 sur la « roadmap »',
@@ -689,7 +689,7 @@ export const EVENTS = [
       {
         label: 'Recopier le planning',
         effects: { dossier: +2, setFlags: ['roster_known'] },
-        result: "Vous savez maintenant quel soir appeler. Klaas ajoute, sans lever les yeux : « Et toi, je note aussi quand tu appelles. »",
+        result: "Vous savez maintenant quel soir appeler. Klaas ajoute, sans lever les yeux : « Et vous, je note aussi quand vous appelez. »",
       },
     ],
   },
@@ -701,7 +701,7 @@ export const EVENTS = [
     once: true,
     title: "Visite guidée : « le Trou »",
     text:
-      "Un guide de l’office de tourisme arrête son groupe sous votre fenêtre : « Rue des Bouchers, 1729. Pendant des siècles, on l’appelait « le Trou », tant elle était sale. Un canal coulait dessous jusqu’en 1912. » Hippolyte, qui passait, corrige un détail sur le canal. Le guide le remercie, vexé.",
+      "Un guide de l’office de tourisme arrête son groupe sous votre fenêtre : « Rue des Bouchers, 1729. Pendant des siècles, on l’appelait ‹ le Trou ›, tant elle était sale. Un canal coulait dessous jusqu’en 1912. » Hippolyte, qui passait, corrige un détail sur le canal. Le guide le remercie, vexé.",
     choices: [
       {
         label: 'Retenir la formule',
@@ -765,7 +765,7 @@ export const EVENTS = [
     once: true,
     title: 'Une affiche sur la vitrine de La Bombance',
     text:
-      "Sur la vitrine blanchie du n°4, l’affiche « À LOUER » a été remplacée par « BIENTÔT ». Bientôt quoi ? Tatie Bouchon a sa petite idée : « Colette m’a dit qu’un garçon très bien voulait y faire un bar à cocktails. Avec DJ. Elle trouvait ça « dynamique ». »",
+      "Sur la vitrine blanchie du n°4, l’affiche « À LOUER » a été remplacée par « BIENTÔT ». Bientôt quoi ? Tatie Bouchon a sa petite idée : « Colette m’a dit qu’un garçon très bien voulait y faire un bar à cocktails. Avec DJ. Elle trouvait ça ‹ dynamique ›. »",
     choices: [
       {
         label: 'Prévenir Hippolyte',
@@ -814,7 +814,7 @@ export const EVENTS = [
       {
         label: 'Remplir les 47 questions sérieusement',
         effects: { dossier: +2, job: -2 },
-        result: "Question 46 : « Avez-vous des suggestions ? » Champ limité à 140 caractères. Vous écrivez « Appliquer l’arrêté existant. » Il en reste 107.",
+        result: "Question 46 : « Avez-vous des suggestions ? » Champ limité à 140 caractères. Vous écrivez « Appliquer l’arrêté existant. » Il en reste 112.",
       },
       {
         label: `Partager le lien sur « ${WHATSAPP_GROUP} »`,
@@ -855,7 +855,7 @@ export const EVENTS = [
           dossier: +3,
           evidence: { kind: 'video', quality: 0.6, legal: true, label: 'Vidéo publique : tables dans le couloir et porte arrosée, en fond de vlog' },
         },
-        result: "Merci, la vraie vie lilloise. Sa vidéo fait 80 000 vues, et elle est datée, géolocalisée et publique. Le meilleur témoin de la rue est une ring light.",
+        result: "Merci, la vraie vie lilloise. Sa vidéo fait 80 000 vues, et elle est datée, géolocalisée et publique. Le meilleur témoin de la rue est une ring light.",
       },
       {
         label: 'Ignorer',
@@ -917,7 +917,7 @@ export const EVENTS = [
     once: true,
     title: 'Permis déposé au n°4',
     text:
-      "Un panneau blanc est apparu sur la façade de La Bombance : « Déclaration préalable de travaux · Changement de destination · Bar de nuit ». Tatie, ravie d’avoir eu raison : « Je vous l’avais dit. C’est Colette qui m’a dit. Je ne devrais pas vous le dire. »",
+      "Un panneau blanc est apparu sur la façade de La Bombance : « Déclaration préalable de travaux · Changement de destination · Bar de nuit ». Tatie, ravie d’avoir eu raison : « Je vous l’avais dit. C’est Colette qui me l’a dit. Je ne devrais pas vous le dire. »",
     choices: [
       {
         label: "Lancer Hippolyte sur l’angle patrimoine du n°4",

@@ -32,7 +32,7 @@ export const MEDIA = {
       id: 'wa_welcome_nico',
       when: { day: [1, 1] },
       author: 'nico',
-      text: "Règle 3 : parce qu’on a eu 200 messages sur la carbonnade en mars et zéro sur les décibels. Bienvenue Pilou.",
+      text: "Règle 3 : parce qu’on a eu 200 messages sur la carbonnade en mars et zéro sur les décibels. Bienvenue, Pilou.",
     },
     {
       id: 'wa_jeremie_ag',
@@ -64,7 +64,7 @@ export const MEDIA = {
       when: { day: [4, 8] },
       author: 'nico',
       photo: 'Gaufre endormie sur une pile de tracts',
-      text: "La chatte a dormi sur les convocations de l’AG. On les a quand même distribués. Ils sentent le chat. C’est plus militant.",
+      text: "La chatte a dormi sur les convocations de l’AG. On les a quand même distribuées. Elles sentent le chat. C’est plus militant.",
     },
     {
       id: 'wa_cat_3',
@@ -277,7 +277,7 @@ export const MEDIA = {
       id: 'wa_carbonnade_again',
       when: { flags: ['carbonnade_2'] },
       author: 'seb',
-      text: "Pilou. Deux fois. DEUX carbonnades. On va devoir en parler à l’AG. Elle est bonne au moins ?",
+      text: "Pilou. Deux fois. DEUX carbonnades. On va devoir en parler à l’AG. Elle est bonne, au moins ?",
     },
 
     // ── Mobilisation et calendrier ──────────────────────────────────────────
@@ -285,7 +285,7 @@ export const MEDIA = {
       id: 'wa_bot_live',
       when: { flags: ['proj_whatsapp_bot'] },
       author: 'nico',
-      text: "Le bot est en ligne. Il s’appelle Bip. Il a dit bonjour à tout le monde, puis « il est 22h04, les terrasses ferment à 22h ». Tatie lui a répondu « merci jeune homme ».",
+      text: "Le bot est en ligne. Il s’appelle Bip. Il a dit bonjour à tout le monde, puis « il est 22h04, les terrasses ferment à 22h ». Tatie lui a répondu « merci, jeune homme ».",
     },
     {
       id: 'wa_bot_reminder',
@@ -310,7 +310,7 @@ export const MEDIA = {
       id: 'wa_happy_petition',
       when: { flags: ['cm_happy_petition'] },
       author: 'nico',
-      text: "Leur pétition des « clients heureux » : 2 300 signatures, dont une de Bruxelles nommée « Jean Bon ». J’ai fait une capture.",
+      text: "Leur pétition des « clients heureux » : 2 300 signatures, dont une de Bruxelles nommée « Jean Bon ». J’ai fait une capture.",
     },
     {
       id: 'wa_saturday_1',
@@ -412,7 +412,7 @@ export const MEDIA = {
       id: 'wa_hate_wave',
       when: { flags: ['cm_fake_post'] },
       author: 'nico',
-      text: "Le post « Bernadette harcelée » a 4 000 partages. Personne ne répond, personne ne s’énerve, on garde les captures. Pilou, éteins ton téléphone.",
+      text: "Le post « Bernadette harcelée » a 4 000 partages. Personne ne répond, personne ne s’énerve, on garde les captures. Pilou, éteins ton téléphone.",
       effects: { sleep: -2 },
     },
     {
@@ -439,14 +439,14 @@ export const MEDIA = {
       when: { day: [1, 2] },
       author: 'journaliste',
       headline: 'Rue des Bouchers : 22h, l’heure du couvre-terrasse',
-      text: "Depuis cette année, les terrasses de la rue des Bouchers doivent fermer à 22h, contre 23h ou minuit ailleurs dans le Vieux-Lille. « On n’est pas des citrouilles », proteste un restaurateur. Les riverains, eux, attendent de voir : « 22h, c’est sur le papier. Sous ma fenêtre, la dernière chaise rentre à 0h40. »",
+      text: "Rue des Bouchers, les terrasses ferment à 22h, contre 23h ou minuit ailleurs. « On n’est pas des citrouilles », proteste un patron. Un riverain : « Sur le papier. Sous ma fenêtre, la dernière chaise rentre à 0h40. »",
     },
     {
       id: 'press_trou',
       when: { day: [3, 5] },
       author: 'journaliste',
       headline: 'Patrimoine : le « Trou », une rue qui revient de loin',
-      text: "Créée en 1729, la rue des Bouchers fut longtemps surnommée « le Trou » pour sa saleté. Un canal y coulait jusqu’en 1912. Aujourd’hui, ce sont les pintes qui coulent. « Ça a toujours été une rue festive », assure un restaurateur. « Ça a toujours été un trou », répond un riverain.",
+      text: "Créée en 1729, la rue fut surnommée « le Trou » pour sa saleté. Un canal y coulait jusqu’en 1912 ; aujourd’hui, ce sont les pintes. « Une rue festive », assure un restaurateur. « Un trou », répond un riverain.",
       setFlags: ['knows_trou'],
     },
     {
@@ -454,7 +454,7 @@ export const MEDIA = {
       when: { flags: ['saturday1_done'] },
       author: 'journaliste',
       headline: 'Samedi sans voitures : la rue des Bouchers déborde',
-      text: "Foule compacte, verres à la main, poussettes en slalom : le premier samedi piéton a fait le plein. Les sanitaires, eux, n’ont pas suivi, et certaines portes d’entrée ont servi de solution. Un habitant parle de « Fête de la musique sans musique ».",
+      text: "Foule compacte, poussettes en slalom : le premier samedi piéton a fait le plein. Faute de sanitaires, certaines portes d’entrée ont servi de solution. Un habitant parle de « Fête de la musique sans musique ».",
     },
     {
       id: 'press_saturday_2',
@@ -475,7 +475,7 @@ export const MEDIA = {
       when: { flags: ['press_article'] },
       author: 'journaliste',
       headline: 'Rue des Bouchers : des riverains à bout de souffle',
-      text: "Photos horodatées, relevés en décibels, carnet tenu à la main : l’Association de la rue des Bouchers a monté un dossier. « On ne veut pas fermer les restaurants, on veut dormir », résume son président. L’estaminet visé assure que « tout est en cours ».",
+      text: "Photos horodatées, décibels, carnet à la main : l’Association de la rue des Bouchers a monté un dossier. « On ne veut pas fermer les restaurants, on veut dormir », dit son président. L’estaminet : « tout est en cours ».",
     },
     {
       id: 'press_petition',
@@ -489,7 +489,7 @@ export const MEDIA = {
       when: { flags: ['petition_delivered', 'cm_happy_petition'] },
       author: 'journaliste',
       headline: 'Deux pétitions pour une rue',
-      text: "Les riverains ont déposé leur pétition en mairie. Les restaurateurs aussi, avec dix fois plus de signatures, dont une large majorité hors de Lille. « La rue des Bouchers est aimée dans le monde entier », se félicite un restaurateur.",
+      text: "Les riverains ont déposé leur pétition en mairie. Les restaurateurs aussi, avec dix fois plus de signatures, surtout hors de Lille. « La rue des Bouchers est aimée dans le monde entier », se félicite un restaurateur.",
     },
     {
       id: 'press_ac',
@@ -517,14 +517,14 @@ export const MEDIA = {
       when: { flags: ['press_scandal'] },
       author: 'journaliste',
       headline: 'Police municipale : cafés offerts et coups de fil, l’enquête',
-      text: "Selon nos informations, des riverains ont documenté des arrangements répétés entre un établissement de la rue et certaines patrouilles. La police municipale « prend ces allégations très au sérieux ». Le café, lui, reste offert.",
+      text: "Des riverains ont documenté des arrangements répétés entre un établissement de la rue et certaines patrouilles. La police municipale « prend ces allégations très au sérieux ». Le café, lui, reste offert.",
     },
     {
       id: 'press_igpn',
       when: { flags: ['igpn_open'] },
       author: 'journaliste',
       headline: 'Une enquête interne ouverte',
-      text: "Après la transmission de documents par des riverains, une enquête interne vise des agents de la police municipale. Le maire Bertrand Lescaut promet « la transparence totale ». L’ancienne maire Colette Verhaeghe, elle, n’a « aucun commentaire, sauf que c’est scandaleux », sans préciser quoi.",
+      text: "Des riverains ont transmis des documents : une enquête interne vise des agents municipaux. Le maire promet « la transparence totale ». L’ex-maire Colette Verhaeghe n’a « aucun commentaire, sauf que c’est scandaleux ».",
     },
     {
       id: 'press_lemaire',
@@ -559,7 +559,7 @@ export const MEDIA = {
       when: { day: [13, 13] },
       author: 'journaliste',
       headline: 'Terrasses : la commission tranche dimanche',
-      text: "Riverains et restaurateurs de la rue des Bouchers sont attendus demain en mairie. D’un côté, des classeurs. De l’autre, des chaises. Le maire Bertrand Lescaut promet « d’écouter tout le monde ». Tout le monde a l’intention de parler.",
+      text: "Riverains et restaurateurs de la rue des Bouchers sont attendus demain en mairie. D’un côté, des classeurs. De l’autre, des chaises. Le maire promet « d’écouter tout le monde ». Tout le monde compte parler.",
     },
 
     // ── Les « unes » des fins (une par fin) ─────────────────────────────────
@@ -569,7 +569,7 @@ export const MEDIA = {
       ending: 'legal_victory',
       author: 'journaliste',
       headline: 'Rue des Bouchers : la commission donne raison aux riverains',
-      text: "Autorisation de terrasse suspendue, gaine d’extraction déplacée : le dossier de l’Association a convaincu. « Horodaté, mesuré, recevable », résume son président, ému. Un restaurateur annonce qu’il va « faire appel à la rue de Gand ».",
+      text: "Autorisation de terrasse suspendue, gaine d’extraction déplacée : le dossier de l’Association a convaincu. « Horodaté, mesuré, recevable », résume son président, ému. Un restaurateur va « faire appel à la rue de Gand ».",
     },
     {
       id: 'press_end_peace',
@@ -691,7 +691,7 @@ export const MEDIA = {
       when: { flags: ['cm_happy_petition'] },
       author: 'bernadette',
       kind: 'petition',
-      text: "📝 Pétition « Pour une rue des Bouchers VIVANTE » : 2 300 signatures ! Merci à nos clients de Lille, de Bruxelles et de Lisbonne ❤️ Une rue qui dort est une rue qui meurt.",
+      text: "📝 Pétition « Pour une rue des Bouchers VIVANTE » : 2 300 signatures ! Merci à nos clients de Lille, de Bruxelles et de Lisbonne ❤️ Une rue qui dort est une rue qui meurt.",
     },
     {
       id: 'so_fake_post',
@@ -771,7 +771,7 @@ export const MEDIA = {
       handle: 'MarieLouise_B',
       kind: 'review',
       stars: 5,
-      text: "Le meilleur mardi de ma vie. Le serveur nous a dit que la terrasse fermait à 22h mais on est restés jusqu’à minuit, il était trop gentil. 10/10.",
+      text: "Le meilleur mardi de ma vie. Le serveur nous a dit que la terrasse fermait à 22h, mais on est restés jusqu’à minuit, il était trop gentil. 10/10.",
     },
     {
       id: 'rv_boast_3',
@@ -867,7 +867,7 @@ export const MEDIA = {
       handle: 'Steph_Tourisme',
       kind: 'review',
       stars: 3,
-      text: "Drache à 21h, tout le monde à l’intérieur. Bizarrement c’était super calme et la carbonnade était meilleure. Bonne soirée, mais je crois que les voisins ont applaudi.",
+      text: "Drache à 21h, tout le monde à l’intérieur. Bizarrement, c’était super calme et la carbonnade était meilleure. Bonne soirée, mais je crois que les voisins ont applaudi.",
     },
     {
       id: 'rv_tourist',

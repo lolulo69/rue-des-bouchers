@@ -141,7 +141,7 @@ export const POLICE_LINES = {
     ],
     complaisance: [
       'Lemaire chez {rest} : un café, une tape dans le dos, « bonne soirée messieurs-dames ». 0 PV.',
-      'Lemaire s’assoit « deux minutes ». Il en reste dix-sept. Une assiette apparaît. 0 PV.',
+      'Lemaire s’assoit « deux minutes ». Il y reste dix-sept. Une assiette apparaît. 0 PV.',
       '« Tout est sous contrôle », dit Lemaire, une serviette en papier encore au col. 0 PV.',
     ],
     tipoff: [
@@ -272,13 +272,13 @@ export const BARKS = {
     '« Encore une tournée et on y va. »',
     '« Il est quelle heure ? … Ah, ça va, il est tôt. »',
     '« La carbonnade, elle est à tomber. »',
-    '« Rue de Gand ils ferment à minuit, eux ! »',
+    '« Rue de Gand, ils ferment à minuit, eux ! »',
     '« On rajoute une chaise ? Ils diront rien. »',
     '« Moi, je dis, l’ambiance, c’est l’ADN de Lille. »',
     '« Tu crois qu’il y a des gens qui habitent au-dessus ? »',
     '« Chut… non, je rigole. »',
     '« Mon VTC arrive dans quarante minutes, on a le temps. »',
-    '« Monsieur ! Monsieur ! Une autre bière s’il vous plaît ! »',
+    '« Monsieur ! Monsieur ! Une autre bière, s’il vous plaît ! »',
     '« Il fait tellement bon, c’est criminel de rentrer. »',
     '« Attends, je mets une story. »',
     '« C’est le plus vieux quartier, ici, non ? Tout est vieux. »',
@@ -304,7 +304,7 @@ export const BARKS = {
     '« Musique ! Quelqu’un a une enceinte ? »',
     '« Chante avec nous, le monsieur de la fenêtre ! »',
     '« Un pas de danse sur les pavés ! … Aïe. »',
-    '« On a cassé un verre, c’est pas grave, c’est le samedi ! »',
+    '« On a cassé un verre, c’est pas grave, c’est samedi ! »',
     '« Hé, la police, elle passe jamais ici ? Ah si. Bon, elle repart. »',
   ],
   // Murmures quand une patrouille passe
@@ -381,7 +381,7 @@ export const WAITER_LINES = {
   ],
   // Variantes une fois `met_waiter` (le moteur peut les préférer)
   theo: {
-    ok: ['Théo : « Pour vous, je rentre. Mais vous m’avez pas vu, hein. »'],
+    ok: ['Théo : « Pour toi, je rentre. Mais tu m’as pas vu, hein. »'],
     refused: ['Théo : « Pas ce soir, Pilou. Dédé est sur les nerfs. Demain, peut-être. »'],
   },
 };
