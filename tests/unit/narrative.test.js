@@ -86,7 +86,7 @@ describe('narrative.js : chaque entrée de contenu est atteignable', () => {
       [BELL.after.saturday, 'bell:after', night('sat'), cycler(), {}],
       [WITNESS_LINES.nobody, 'witness', night('mon'), cycler(), {}],
       [WITNESS_LINES.customers_filmed, 'witness', night('mon'), cycler(), { witness: { kind: 'customers', filmed: true } }],
-      ...['klaas', 'gaystapo', 'waiter', 'customers', 'biloute', 'dede', 'ghislain', 'police']
+      ...['klaas', 'seb_nico', 'waiter', 'customers', 'biloute', 'dede', 'ghislain', 'police']
         .map((k) => [WITNESS_LINES[k], 'witness', night('mon'), cycler(), { witness: { kind: k } }]),
       ...Object.keys(NIGHT_END).map((r) => [NIGHT_END[r], 'end', night('mon'), cycler(), { reason: r }]),
       ...['early', 'offduty', 'cooldown', 'none'].map((r) => [WAITER_LINES[r], 'waiter', night('mon', { min: 21 * 60 + 50 }), cycler(), { result: { ok: false, reason: r } }]),

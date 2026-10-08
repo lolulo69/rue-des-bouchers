@@ -88,7 +88,7 @@ export const nightCtx = {
 // ════════════════════════════════════════════════════════════════════════════
 
 // Alias des témoins : ids d'actions.js / campagne → clés de WITNESS_LINES
-const WITNESS_ALIAS = { seb_nico: 'gaystapo', jeremie: 'biloute' };
+const WITNESS_ALIAS = { jeremie: 'biloute' };
 
 // Raison du serveur depuis le retour de sim.act({ type: 'waiter' })
 export function waiterReason(result, simState) {

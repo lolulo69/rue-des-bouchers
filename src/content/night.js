@@ -15,7 +15,7 @@
 //   police outcomes (police.js) : act · complaisance · tipoff · nothing · ignored · busy
 //     + never_came (patrouille jamais arrivée, summary.js) + for_pilou (la police vient pour Pilou, v0.5)
 //   patrouilles (config POLICE.patrols) : lemaire · benali · chief
-//   témoins (witness.js kind) : klaas · gaystapo (balcon de Seb & Nico) · waiter · customers
+//   témoins (witness.js kind) : klaas · seb_nico (balcon de Seb & Nico) · waiter · customers
 //     + biloute · dede · ghislain · police (ids `witnessed.by` d'actions.js)
 //   serveur (sim.askWaiter reasons) : early · offduty · cooldown · none · ok · refused · refused_bloc_knows
 //   fins de nuit (sim.end reason) : time · sleep · custody
@@ -222,7 +222,7 @@ export const WITNESS_LINES = {
     'Au bout de la rue, une lampe s\'allume, puis un crayon bouge. Klaas.',
     'Klaas ne détourne pas les yeux. Il ne détourne jamais les yeux.',
   ],
-  gaystapo: [
+  seb_nico: [
     `Sur le balcon d'en face, Seb a la bouche ouverte. Nico, lui, a le téléphone levé. Ce sera sur « ${WHATSAPP_GROUP} » dans trois minutes.`,
     'En face, Gaufre vous fixe, impassible. Derrière elle, Seb et Nico aussi. Moins impassibles.',
     'Seb, depuis le balcon : « Attends, attends… il a vraiment fait ça ? » Nico : « Il a vraiment fait ça. »',
