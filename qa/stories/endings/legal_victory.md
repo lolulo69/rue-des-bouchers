@@ -251,7 +251,7 @@ _→ Seb relaie avec trois gyrophares. Tatie ne trouve pas FranceConnect. Klaas 
 - `22:37` Tiens ? Estaminet La Ch’tite Bernadette rentre 6 table(s) d’un coup…
 - `22:39` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table… enfin.
 - `22:39` Lemaire arrive, salue les terrasses de loin avant de saluer qui que ce soit d’autre.
-- `22:42` Lemaire arrive devant Estaminet La Ch’tite Bernadette, d’une sagesse exemplaire. Il s’en étonne à peine.
+- `22:42` Lemaire arrive devant Estaminet La Ch’tite Bernadette, soudain d’une sagesse exemplaire. Il ne s’en étonne même pas.
 - `22:59` **Pilou** : demande au serveur de rentrer les tables
 - `22:59` 📓 Carnet de Klaas : 22:37 : rangement soudain chez Estaminet La Ch’tite Bernadette, sans client parti. 22:41 : patrouille. 22:59 : les tables reviennent. Le hasard est très ponctuel.
 - `22:59` Les tables de Estaminet La Ch’tite Bernadette ressortent. Klaas a tout noté.
@@ -524,7 +524,7 @@ _Sommeil 65 · Asso 57 · Risque 0 · Job 62 · Dossier 13 · (caché) hostilit�
 - **Avis · Ghislain** `rv_owner_reply` Réponse du propriétaire à un avis 2 étoiles : « Chère cliente, nous avons bien pris en compte votre remarque. C’est en cours de résolution. Bien cordialement. »
 
 ## Jour 5 · vendredi
-_Sommeil 58 · Asso 60 · Risque 0 · Job 59 · Dossier 19 · (caché) hostilité 100, corruption 20_
+_Sommeil 58 · Asso 60 · Risque 0 · Job 59 · Dossier 20 · (caché) hostilité 100, corruption 20_
 
 ### 🍺 Contre-offensive : Fil Tatie · promesse n°5 `tatie_mail_05`
 > « Chère Madame, le technicien vient d’être papa. Toutes nos félicitations à lui. Le dossier est en cours de reprise par un collègue. » Tatie : « Je lui ai envoyé une brassière. On verra bien si elle arrive. »
@@ -654,7 +654,7 @@ _Sommeil 58 · Asso 60 · Risque 0 · Job 59 · Dossier 19 · (caché) hostilit�
 - **Colette Verhaeghe** `so_lescaut_attack` De mon temps, on savait que Lille vivait la nuit. Certains préfèrent une ville-dortoir. Je ne citerai personne. (Bertrand.)
 
 ## Jour 6 · samedi (sans voitures)
-_Sommeil 57 · Asso 59 · Risque 0 · Job 56 · Dossier 24 · (caché) hostilité 100, corruption 5_
+_Sommeil 57 · Asso 59 · Risque 0 · Job 56 · Dossier 25 · (caché) hostilité 100, corruption 5_
 
 ### 🍺 Contre-offensive : Fil Tatie · promesse n°6 `tatie_mail_06`
 > « Chère Madame, après analyse, l’odeur proviendrait peut-être de l’ancien canal sous la rue. C’est en cours de vérification historique. » Tatie : « Le canal est couvert depuis 1912. Il sent la carbonnade depuis des années. Drôle de canal. »
@@ -802,7 +802,7 @@ _→ Vous savez maintenant quel soir appeler. Klaas ajoute, sans lever les yeux�
 - **Avis ★★★★ · Thibault.EVG** `rv_boast_3` Enterrement de vie de garçon top ! On a chanté jusqu’à 1h devant l’estaminet. -1 étoile parce qu’un vieux monsieur barbu, tout au bout de la rue, nous regardait en écrivant dans un carnet. Flippant.
 
 ## Jour 7 · dimanche
-_Sommeil 37 · Asso 73 · Risque 0 · Job 56 · Dossier 31 · (caché) hostilité 100, corruption 5_
+_Sommeil 37 · Asso 73 · Risque 0 · Job 56 · Dossier 32 · (caché) hostilité 100, corruption 5_
 
 ### 🍺 Contre-offensive : Fil Tatie · promesse n°7 `tatie_mail_07`
 > « Chère Madame, nous avons mandaté un consultant olfactif. Son rapport préliminaire parle d’une odeur ‹ chaleureuse, conviviale, typiquement nordiste ›. C’est en cours d’interprétation. » Tatie : « Moi aussi, je peux être consultante. L’odeur est ‹ dégoûtante ›. C’est gratuit. »
@@ -861,7 +861,7 @@ _→ Sous les poutres de l’ancienne carrosserie, avec une calèche de 1880 en 
 - `20:30` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 3 : 9 personnes (max 6), 36 dB
 - `20:45` 🍻 « J’adore cette rue, elle est vivante. »
 - `21:30` **Pilou** : Faire la ronde de 22h avec Jérémie et Biloute
-- `21:50` 🃏 **Biloute flaire une livraison** `r_biloute_chairs` : Pendant la ronde, Biloute s’arrête net devant la porte de service de l’estaminet et grogne. Une camionnette décharge, en pleine ronde, douze chaises pliantes neuves. *Biloute s’assoit. Biloute fixe les chaises. Biloute juge.*
+- `21:50` 🃏 **Biloute flaire une livraison** `r_biloute_chairs` : Pendant la ronde, Biloute s’arrête net devant la porte de service de l’estaminet et grogne. Une camionnette décharge douze chaises pliantes neuves. *Biloute s’assoit. Biloute fixe les chaises. Biloute juge.*
 - `21:50` → **Photographier la livraison** : Douze chaises de plus pour une terrasse dont la surface n’a pas bougé. Jérémie dira « c’est mathématique ». Dédé dira « c’est pour la réserve ». La réserve fait dix mètres carrés.
 - `21:30` Jérémie compte les tables à voix haute, Biloute renifle chaque pied de chaise, vous notez. Biloute s’arrête net devant chaque table qui déborde et la fixe, comme un huissier. Personne ne sait comment il fait, mais il a raison.
 - `21:38` Jérémie passe avec le teckel et note Estaminet La Ch’tite Bernadette, table 1.
@@ -886,15 +886,15 @@ _→ Sous les poutres de l’ancienne carrosserie, avec une calèche de 1880 en 
 - `22:10` Police : « Ah, c’est encore vous… On note, monsieur. » Personne ne viendra.
 - `22:15` **Pilou** : demande au serveur de rentrer les tables
 - `22:15` Jérémie passe avec le teckel et note Le Goulot, table 1.
-- `22:15` Théo : « Je te jure, j’ai essayé. Il m’a répondu « encore une tournée ». »
+- `22:15` Théo : « Je te jure, j’ai essayé. Il m’a répondu ‹ encore une tournée ›. »
 - `22:24` Raclement de chaises sur les pavés : Le Goulot rentre sa terrasse… enfin.
 - `22:25` **Pilou** : demande au serveur de rentrer les tables
-- `22:25` Théo : « Je te jure, j’ai essayé. Il m’a répondu « encore une tournée ». »
+- `22:25` Théo : « Je te jure, j’ai essayé. Il m’a répondu ‹ encore une tournée ›. »
 - `22:30` **Pilou** : partage ses pièces sur le groupe WhatsApp
 - `22:30` WhatsApp : 20 pièce(s) partagée(s). Seb : « 😱 On imprime tout pour la commission ! »
 - `22:30` 📟 61 dB relevés et horodatés.
 - `22:35` **Pilou** : demande au serveur de rentrer les tables
-- `22:35` Théo : « Je te jure, j’ai essayé. Il m’a répondu « encore une tournée ». »
+- `22:35` Théo : « Je te jure, j’ai essayé. Il m’a répondu ‹ encore une tournée ›. »
 - `22:35` 🍻 « Rue de Gand, ils ferment à minuit, eux ! »
 - `22:45` **Pilou** : demande au serveur de rentrer les tables
 - `22:45` Théo : « Pas ce soir, Pilou. Dédé est sur les nerfs. Demain, peut-être. »
@@ -934,7 +934,7 @@ _→ Sous les poutres de l’ancienne carrosserie, avec une calèche de 1880 en 
 - **La Voix du Nordiste** `press_uritrottoir` **Un uritrottoir rue des Bouchers : la ville s’engage** Rouge, fleuri et inauguré sans discours : la ville a installé un uritrottoir rue des Bouchers. Les riverains se disent « soulagés ». Le mot a été choisi par eux.
 
 ## Jour 8 · lundi
-_Sommeil 35 · Asso 87 · Risque 5 · Job 58 · Dossier 38 · (caché) hostilité 100, corruption 5_
+_Sommeil 35 · Asso 87 · Risque 5 · Job 58 · Dossier 39 · (caché) hostilité 100, corruption 5_
 
 ### 🍺 Contre-offensive : Fil Tatie · promesse n°8 `tatie_mail_08`
 > « Chère Madame, une nouvelle gaine fabriquée à Roubaix est en cours de conception. Elle sera inaugurée. » Tatie : « Inaugurée. Avec un ruban. Il veut que je vienne couper le ruban de ma propre nuisance. »
@@ -959,14 +959,14 @@ _Sommeil 35 · Asso 87 · Risque 5 · Job 58 · Dossier 38 · (caché) hostilit�
 > Jusqu’en 1912, un canal coulait sous la rue. On l’a couvert. On aurait pu, dans un élan d’audace, y verser les chaises.
 > Je plaisante, naturellement. Le patrimoine ne mérite pas ça.
 
-**🗂 Après-midi : Demander le document AOT (le plan des zones de terrasse)** `pm_aot_request`
-> Jérémie dépose la demande au nom de l’association, article et alinéa à l’appui. Le plan arrive en PDF, scanné de travers. Les zones ne sont toujours pas peintes au sol, mais vous, maintenant, vous les voyez.
-
 **🗂 Après-midi : Mobiliser le groupe WhatsApp** `pm_whatsapp_rally`
 > Seb poste un appel, Nico l’épingle. 42 messages en une heure, dont 11 sur l’ordre du jour et 31 sur Gaufre.
 
 **🗂 Après-midi : Écrire à l’inspectrice Delphine Vermeersch (dossier clim)** `pm_email_inspector`
 > Réponse en 48 minutes, signée « D. Vermeersch ». Courtoise, précise, et vaguement inquiète de voir que vous travaillez chez Koddex.
+
+**🗂 Après-midi : Demander le document AOT (le plan des zones de terrasse)** `pm_aot_request`
+> Jérémie dépose la demande au nom de l’association, article et alinéa à l’appui. Accusé de réception automatique : « Votre demande sera traitée dans les meilleurs délais. » Jérémie note la date. Et l’heure.
 
 **💬 Biloute** `biloute_22h`
 > *22h00. Les chaises raclent les pavés. Grogne en direction de l’estaminet. Jérémie murmure « bon chien ».*
@@ -1034,7 +1034,7 @@ _Sommeil 35 · Asso 87 · Risque 5 · Job 58 · Dossier 38 · (caché) hostilit�
 - **Avis ★★★★★ · Jan_from_Gent** `rv_tourist` Very authentic street, very nice beer, very angry man at the window at midnight. 5 stars, would shout again.
 
 ## Jour 9 · mardi
-_Sommeil 38 · Asso 94 · Risque 0 · Job 65 · Dossier 43 · (caché) hostilité 100, corruption 10_
+_Sommeil 38 · Asso 94 · Risque 0 · Job 65 · Dossier 44 · (caché) hostilité 100, corruption 10_
 
 ### 🃏 La Voix du Nordiste : « Colette Verhaeghe : laissez vivre Lille ! » `r_colette_interview`
 > Pleine page. Colette pose devant un estaminet qui ressemble beaucoup à l’estaminet : « La convivialité, c’est l’ADN de Lille. Je comprends les riverains, j’en ai été une, mais rue de Gand ferme bien à minuit, non ? » Pas un mot sur la règle des 22h. Ni sur le couloir.
@@ -1055,19 +1055,25 @@ _→ Anne-Sophie Lepoutre répond en dix minutes : « Vous avez des éléments
 Choix possibles : Glisser à Delphine que la visite doit rester surprise _(grisé)_ · **→ Passer par Hippolyte et le service du patrimoine** · Laisser la mairie annoncer la visite, mais fournir les photos de la clim · Laisser la procédure suivre son cours
 _→ L’architecte du patrimoine accompagne l’inspectrice « par hasard ». Il regarde la clim comme on regarde une verrue sur un Rubens. Personne n’a eu le temps de prévenir personne. Infraction confirmée, avec un adjectif en plus : « inacceptable »._
 
+### 🃏 Le plan des zones arrive (scanné de travers) `r_aot_pdf`
+> Après onze relances, la mairie envoie enfin l’autorisation d’occupation temporaire de l’estaminet, avec son plan. PDF scanné de biais, une tache de café sur la cote du couloir, mais lisible. Jérémie l’imprime en A3. Puis en A2.
+
+Choix possibles : **→ Étudier le plan, mètre ruban en main**
+_→ La zone autorisée s’arrête bien avant là où commencent les tables. Vous voyez désormais la rue comme un géomètre : en fantômes verts et en couloir rouge._
+
 ### 🍺 Contre-offensive : Le samedi « festif » `cm_festive_saturday`
 > Le bloc envoie à la mairie un dossier glacé : « Samedi festif rue des Bouchers : terrasses jusqu’à minuit, comme rue de Gand ». Colette Verhaeghe aurait « trouvé l’idée sympathique ». La photo de couverture date d’avant la règle des 22h.
 
 ### 🍺 Contre-offensive : Annexion `cm_uritrottoir_terrace`
 > Dédé a posé deux tables hautes contre l’uritrottoir et l’appelle « l’espace jardin ». Il demande une extension d’AOT pour « valoriser le mobilier urbain ». La mairie ne sait pas si c’est une blague. Dédé non plus.
 
+**💬 Jérémie** `jeremie_dossier_growing`
+> J’ai relu le dossier hier soir. Il commence à ressembler à quelque chose. Il a même une table des matières.
+> Un dossier solide, c’est ce qui fait la différence entre « des riverains qui râlent » et « des riverains qui ont raison ».
+
 **💬 Delphine Vermeersch** `delphine_ac`
 > J’ai bien reçu votre e-mail. Les photos sont nettes, les dates aussi. C’est rare. Merci.
 > Je ne vous promets rien. Je ne promets jamais rien. Mais je lis tout.
-
-**💬 Tatie Bouchon** `tatie_emails`
-> J’ai encore écrit à l’estaminet pour l’odeur de friture. Réponse dans l’heure : « c’est en cours de résolution ».
-> En cours depuis trois ans. À ce rythme-là, je serai résolue avant eux.
 
 **🗂 Après-midi : Donner une interview sur les terrasses** `pm_press_article`
 > Page 7 : « Rue des Bouchers, le sommeil en terrasse ». Photo de vous, fatigué, devant la gaine. Ghislain répond en encadré que « c’est en cours ».
@@ -1075,79 +1081,61 @@ _→ L’architecte du patrimoine accompagne l’inspectrice « par hasard ».
 **🗂 Après-midi : Envoyer un signalement complet à la mairie** `pm_report_mairie`
 > Accusé de réception automatique : « Votre demande est importante pour nous. » Elle est importante pour eux comme le sont toutes les autres, c’est-à-dire en pile.
 
+**💬 Théo** `serveur_named`
+> Tu m’appelles Théo maintenant ? Ça fait bizarre. Ici on m’appelle « s’il vous plaît », « hep » ou « garçon ».
+
 **💬 Théo** `serveur_22h`
 > Je sais, il est 22h. Je sais. Moi je rentrerais tout. Mais c’est pas moi qui décide, c’est le monsieur au chignon.
 
-**💬 Gaufre** `gaufre_leaves`
-> *Se lève, s’étire, tourne le dos à la rue et rentre. Même elle en a assez.*
-
 ### 🌙 Nuit 9 (semaine)
-- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 1 empiète de 23 cm sur le passage libre (mesuré)
-- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 2 empiète de 41 cm sur le passage libre (mesuré)
-- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 3 : 7 personnes (max 6), 36 dB · Estaminet La Ch’tite Bernadette, table 3 empiète de 29 cm sur le passage libre (mesuré)
-- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 4 : 8 personnes (max 6), 36 dB
-- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 5 empiète de 51 cm sur le passage libre (mesuré)
-- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 6 empiète de 34 cm sur le passage libre (mesuré)
-- `20:30` 📸 Preuve ajoutée (nette) : Le Goulot, table 2 : 8 personnes (max 6), 36 dB · Le Goulot, table 2 empiète de 25 cm sur le passage libre (mesuré)
-- `20:30` 📸 Preuve ajoutée (nette) : Le Goulot, table 3 : 7 personnes (max 6), 36 dB
-- `20:30` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 1 : 9 personnes (max 6), 36 dB
-- `20:30` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 2 : 7 personnes (max 6), 36 dB
+- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 1 empiète de 32 cm sur le passage libre (mesuré)
+- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 2 : 8 personnes (max 6), 36 dB · Estaminet La Ch’tite Bernadette, table 2 empiète de 27 cm sur le passage libre (mesuré)
+- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 5 : 8 personnes (max 6), 36 dB · Estaminet La Ch’tite Bernadette, table 5 empiète de 22 cm sur le passage libre (mesuré)
+- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 6 : 7 personnes (max 6), 36 dB
+- `20:30` 📸 Preuve ajoutée (nette) : Le Goulot, table 1 : 8 personnes (max 6), 36 dB
+- `20:30` 📸 Preuve ajoutée (nette) : Le Goulot, table 4 empiète de 22 cm sur le passage libre (mesuré)
+- `20:30` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 4 : 8 personnes (max 6), 36 dB
 - `20:45` 🍻 « Tu crois qu’il y a des gens qui habitent au-dessus ? »
 - `21:30` **Pilou** : Faire la ronde de 22h avec Jérémie et Biloute
 - `21:30` Jérémie compte les tables à voix haute, Biloute renifle chaque pied de chaise, vous notez. Biloute s’arrête net devant chaque table qui déborde et la fixe, comme un huissier. Personne ne sait comment il fait, mais il a raison.
 - `21:38` Jérémie passe avec le teckel et note Estaminet La Ch’tite Bernadette, table 1.
-- `21:49` Jérémie passe avec le teckel et note Les Bouchers Mal Lunés, table 1.
 - `21:50` 🍻 « Il fait tellement bon, c’est criminel de rentrer. »
+- `21:55` Jérémie passe avec le teckel et note Les Bouchers Mal Lunés, table 4.
 - `21:55` 🔔 21h55. Le serveur regarde l’horloge. Dédé regarde le serveur.
-- `21:56` Raclement de chaises sur les pavés : Le Goulot rentre une table.
-- `21:56` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table.
-- `22:00` Raclement de chaises sur les pavés : Estaminet La Ch’tite Bernadette rentre une table.
+- `21:59` Raclement de chaises sur les pavés : Estaminet La Ch’tite Bernadette rentre une table.
+- `21:59` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table.
 - `22:00` 🔔 Dix coups de cloche. 22h00. Les chaises vont racler les pavés… ou pas.
-- `22:04` Raclement de chaises sur les pavés : Le Goulot rentre une table.
+- `22:01` Raclement de chaises sur les pavés : Le Goulot rentre une table.
+- `22:04` Raclement de chaises sur les pavés : Estaminet La Ch’tite Bernadette rentre une table.
 - `22:05` **Pilou** : demande au serveur de rentrer les tables
-- `22:05` Raclement de chaises sur les pavés : Le Goulot rentre sa terrasse… enfin.
-- `22:05` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table… enfin.
 - `22:05` Théo, sans s’arrêter : « J’ai six tables et un patron. Plus tard. »
 - `22:05` 🔔 Une partie des chaises racle les pavés. L’autre partie reste assise, verre levé.
-- `22:06` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 1 encore dehors à 22:06, 51 dB
-- `22:06` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 3 encore dehors à 22:06, 51 dB
-- `22:06` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 4 encore dehors à 22:06, 51 dB
-- `22:06` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 5 encore dehors à 22:06, 51 dB
-- `22:06` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 6 encore dehors à 22:06, 51 dB
-- `22:06` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 2 encore dehors à 22:06, 51 dB
-- `22:06` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 4 encore dehors à 22:06, 51 dB
+- `22:06` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 1 encore dehors à 22:06, 47 dB
+- `22:06` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 2 encore dehors à 22:06, 47 dB
+- `22:06` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 4 encore dehors à 22:06, 47 dB
+- `22:06` 📸 Preuve ajoutée (nette) : Le Goulot, table 3 encore dehors à 22:06, 47 dB
+- `22:06` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 2 encore dehors à 22:06, 47 dB
 - `22:10` **Pilou** : appelle la police municipale (« pour l’Association »)
 - `22:10` Police : « Ah, c’est encore vous… On note, monsieur. » Personne ne viendra.
 - `22:15` **Pilou** : demande au serveur de rentrer les tables
-- `22:15` Théo, sans s’arrêter : « J’ai six tables et un patron. Plus tard. »
-- `22:25` **Pilou** : demande au serveur de rentrer les tables
-- `22:25` Théo, sans s’arrêter : « J’ai six tables et un patron. Plus tard. »
+- `22:15` Théo : « Pour toi, je rentre. Mais tu m’as pas vu, hein. »
+- `22:18` Jérémie passe avec le teckel et note Le Goulot, table 3.
+- `22:23` Raclement de chaises sur les pavés : Le Goulot rentre sa terrasse… enfin.
 - `22:30` **Pilou** : partage ses pièces sur le groupe WhatsApp
-- `22:30` WhatsApp : 23 pièce(s) partagée(s). Seb : « 😱 On imprime tout pour la commission ! »
-- `22:30` 📟 61 dB relevés et horodatés.
-- `22:35` **Pilou** : demande au serveur de rentrer les tables
-- `22:35` Théo, sans s’arrêter : « J’ai six tables et un patron. Plus tard. »
-- `22:35` 🍻 « Attends, je mets une story. »
-- `22:45` **Pilou** : demande au serveur de rentrer les tables
-- `22:45` Théo, sans s’arrêter : « J’ai six tables et un patron. Plus tard. »
-- `22:55` **Pilou** : demande au serveur de rentrer les tables
-- `22:55` Théo, sans s’arrêter : « J’ai six tables et un patron. Plus tard. »
-- `23:00` 📟 63 dB relevés et horodatés.
-- `23:05` **Pilou** : demande au serveur de rentrer les tables
-- `23:05` Théo hausse les épaules vers la vitrine, où Dédé le regarde. Ça veut dire non.
+- `22:30` WhatsApp : 19 pièce(s) partagée(s). Seb : « 😱 On imprime tout pour la commission ! »
+- `22:30` 📟 59 dB relevés et horodatés.
+- `22:35` 🍻 « Monsieur ! Monsieur ! Une autre bière, s’il vous plaît ! »
+- `23:00` 📟 59 dB relevés et horodatés.
 - `23:10` **Pilou** : appelle la police municipale (« pour l’Association »)
-- `23:10` Police : « Ah, c’est encore vous… On note, monsieur. » Personne ne viendra.
-- `23:13` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table… enfin.
-- `23:15` **Pilou** : demande au serveur de rentrer les tables
-- `23:15` Théo : « Pour toi, je rentre. Mais tu m’as pas vu, hein. »
-- `23:30` 📟 46 dB. Pénible, mais pas assez pour un dossier.
+- `23:10` Police : « Monsieur, encore vous ? On a d’autres priorités. » Personne ne viendra.
+- `23:30` 📟 48 dB. Pénible, mais pas assez pour un dossier.
+- `23:44` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre sa terrasse… enfin.
 - `23:45` **Pilou** : partage ses pièces sur le groupe WhatsApp
 - `23:45` **Pilou** : envoie un signalement à la mairie
 - `23:45` WhatsApp : 3 pièce(s) partagée(s). Seb : « 😱 On imprime tout pour la commission ! »
-- `23:45` Signalement envoyé à la mairie avec 26 pièce(s) jointe(s). Le service ouvre à 8h30.
-- `00:00` 📟 46 dB. Pénible, mais pas assez pour un dossier.
-- `00:01` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre sa terrasse… enfin.
-- `01:30` La rue s’éteint. Une bouteille roule quelque part sur les pavés, puis plus rien.
+- `23:45` Signalement envoyé à la mairie avec 22 pièce(s) jointe(s). Le service ouvre à 8h30.
+- `00:00` 📟 36 dB. Pénible, mais pas assez pour un dossier.
+- `01:30` Les derniers clients remontent vers la place, en chantant faux. La rue se tait, à regret.
 
 **📰 SERVICE PUBLIC · « C’est encore vous » : la police municipale ne décroche plus pour la rue des Bouchers**
 - Dossier solide. La commission du jour 14 va devoir l’écouter.
@@ -1162,7 +1150,13 @@ _→ L’architecte du patrimoine accompagne l’inspectrice « par hasard ».
 - **La Voix du Nordiste** `press_ac` **Clim sans autorisation : l’infraction est constatée** L’inspectrice de la mairie a constaté qu’un groupe de climatisation avait été installé sans autorisation sur une façade de la rue des Bouchers. L’exploitant parle d’un « malentendu thermique ».
 
 ## Jour 10 · mercredi
-_Sommeil 39 · Asso 96 · Risque 0 · Job 71 · Dossier 47 · (caché) hostilité 100, corruption 10_
+_Sommeil 44 · Asso 96 · Risque 0 · Job 71 · Dossier 49 · (caché) hostilité 100, corruption 10_
+
+### 🃏 Message vocal de 4 min 12 `r_stephane_vocal`
+> « Hello la team ! Petite vibe check. Je sens qu’on est un peu en mode pantoufle cette semaine, et c’est ok, on est une famille, mais une famille qui ship. Pilou, j’ai vu tes commits à 3h du mat’, j’adore l’énergie, par contre ça parle beaucoup de décibels ? Bisous de… peu importe d’où. »
+
+Choix possibles : **→ Répondre par un vocal de 4 min 13 sur la « roadmap »** · Lui dire la vérité : vous ne dormez plus
+_→ Vous dites « synergie », « scalable » et « on itère ». Stéphane répond par un pouce. Votre dignité répond par un silence._
 
 ### 🍺 Contre-offensive : Fil Tatie · promesse n°9 `tatie_mail_09`
 > « Chère Madame, nous préparons un dossier pour faire reconnaître l’odeur de carbonnade comme patrimoine immatériel des Hauts-de-France. C’est en cours de candidature. » Tatie : « Hippolyte a failli s’étouffer avec son thé. Pour une fois, c’était pas la gaine. »
@@ -1181,7 +1175,7 @@ Choix possibles : Prévenir Hippolyte · **→ « Un problème à la fois. »*
 _→ Sage. Mais l’affiche « BIENTÔT » reste là, et elle vous regarde chaque fois que vous passez._
 
 ### 🍺 Contre-offensive : Plainte pour diffamation `cm_defamation_press`
-> Après l’article, le bloc porte plainte pour diffamation. Maître Vandamme lit la plainte, sourit, et dit : « La vérité est une excellente défense. Vous avez gardé les photos horodatées, n’est-ce pas ? »
+> Après l’article, le bloc porte plainte pour diffamation. Jérémie lit la plainte, sourit, et dit : « La vérité est une excellente défense. Vous avez gardé les photos horodatées, n’est-ce pas ? »
 
 ### 🍺 Contre-offensive : « Bernadette harcelée » `cm_fake_post_press`
 > Riposte à l’article : un post larmoyant de l’estaminet, « harcelé par un riverain qui déteste la convivialité ». Commentaires : « Honte à lui », « Il a qu’à habiter à la campagne », et un « Vous fermez à quelle heure ? » resté sans réponse.
@@ -1216,19 +1210,19 @@ _→ Sage. Mais l’affiche « BIENTÔT » reste là, et elle vous regarde cha
 - `20:30` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 2 : 7 personnes (max 6), 36 dB
 - `20:30` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 3 empiète de 29 cm sur le passage libre (mesuré)
 - `20:30` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 4 : 7 personnes (max 6), 36 dB
-- `20:45` 🍻 « Moi, je dis, l’ambiance, c’est l’ADN de Lille. »
+- `20:45` 🍻 « Monsieur ! Monsieur ! Une autre bière, s’il vous plaît ! »
 - `21:15` 🃏 **Drache nationale** `r_drache` : 21h15 : le ciel du Nord se souvient qu’il est le ciel du Nord. Une drache tombe d’un coup, droite, épaisse. Les terrasses se vident en quatre minutes chrono. Les parasols, ça décore, mais ça n’abrite pas grand-chose.
 - `21:15` → **Ouvrir grand la fenêtre et écouter la pluie** : Le plus beau bruit du monde : des pavés mouillés et personne dessus. Vous vous endormez avant 22h, pour la première fois depuis mai.
 - `21:30` **Pilou** : Faire la ronde de 22h avec Jérémie et Biloute
 - `21:30` Jérémie compte les tables à voix haute, Biloute renifle chaque pied de chaise, vous notez. Biloute s’arrête net devant chaque table qui déborde et la fixe, comme un huissier. Personne ne sait comment il fait, mais il a raison.
-- `21:50` 🍻 « Il y a un monsieur à la fenêtre qui nous regarde. »
+- `21:50` 🍻 « Il fait tellement bon, c’est criminel de rentrer. »
 - `21:55` 🔔 21h55. Le serveur regarde l’horloge. Dédé regarde le serveur.
 - `22:00` 🔔 Au loin, une cloche sonne dix coups. 22h00. Rue des Bouchers, les terrasses doivent fermer.
 - `22:05` 🔔 Raclement de chaises généralisé. Pour une fois, la rue range à l’heure. Profitez-en, ça ne durera pas.
 - `22:30` **Pilou** : partage ses pièces sur le groupe WhatsApp
 - `22:30` WhatsApp : 13 pièce(s) partagée(s). Seb : « 😱 On imprime tout pour la commission ! »
 - `22:30` 📟 59 dB relevés et horodatés.
-- `22:35` 🍻 « Mon VTC arrive dans quarante minutes, on a le temps. »
+- `22:35` 🍻 « Tu sens la friture ? J’adore cette odeur. »
 - `23:00` 📟 59 dB relevés et horodatés.
 - `23:30` 📟 36 dB. Pénible, mais pas assez pour un dossier.
 - `23:45` **Pilou** : partage ses pièces sur le groupe WhatsApp
@@ -1255,16 +1249,13 @@ _→ Sage. Mais l’affiche « BIENTÔT » reste là, et elle vous regarde cha
 - **Avis ★★★ · Steph_Tourisme** `rv_drache` Drache à 21h, tout le monde à l’intérieur. Bizarrement, c’était super calme et la carbonnade était meilleure. Bonne soirée, mais je crois que les voisins ont applaudi.
 
 ## Jour 11 · jeudi
-_Sommeil 56 · Asso 96 · Risque 0 · Job 87 · Dossier 48 · (caché) hostilité 100, corruption 0_
-
-### 🃏 Message vocal de 4 min 12 `r_stephane_vocal`
-> « Hello la team ! Petite vibe check. Je sens qu’on est un peu en mode pantoufle cette semaine, et c’est ok, on est une famille, mais une famille qui ship. Pilou, j’ai vu tes commits à 3h du mat’, j’adore l’énergie, par contre ça parle beaucoup de décibels ? Bisous de… peu importe d’où. »
-
-Choix possibles : **→ Répondre par un vocal de 4 min 13 sur la « roadmap »** · Lui dire la vérité : vous ne dormez plus
-_→ Vous dites « synergie », « scalable » et « on itère ». Stéphane répond par un pouce. Votre dignité répond par un silence._
+_Sommeil 57 · Asso 96 · Risque 0 · Job 93 · Dossier 50 · (caché) hostilité 100, corruption 0_
 
 ### 🍺 Contre-offensive : Fil Tatie · promesse n°10 `tatie_mail_10`
 > « Chère Madame, c’est réparé. » Tatie, une heure plus tard : « J’ai ouvert la fenêtre. Ce n’est pas réparé. J’ai répondu ‹ non ›. Il m’a répondu ‹ c’est en cours de re-réparation ›. »
+
+### 🍺 Contre-offensive : Les poubelles, saison 2 `cm_bins_again`
+> Les bacs sont revenus. Quelqu’un a collé dessus une étiquette « Pilou » au feutre. L’administration des déchets n’a jamais été aussi personnalisée.
 
 **☕ Koddex · Stéphane** `standup_three`
 > Tour de table : Pilou, ta vibe du jour ? Clode, ta vibe du jour ? … Clode a répondu « Reconnaissant ». Pilou, tu as répondu « décibels ». On va creuser ça en one-to-one.
@@ -1278,9 +1269,9 @@ _→ Vous dites « synergie », « scalable » et « on itère ». Stépha
 Choix possibles : Poser les mesures, la plainte à l’ARS et l’avis du patrimoine _(grisé)_ · Poser les devis jamais signés de l’estaminet _(grisé)_ · **→ Poser les relevés en dB et les photos de la gaine** · Raconter ses nuits
 _→ « Éléments recevables mais insuffisants pour trancher. » Décision : une étude complémentaire, confiée à un bureau d’études, qui rendra ses conclusions « à l’automne ». On ne précise pas lequel._
 
-**💬 Hippolyte** `hippolyte_bombance`
-> La Bombance, au numéro 4. Un bar voudrait s’y installer. Ce local était une sellerie en 1880. J’ai les plans.
-> Les plans sont une arme élégante, monsieur Dubeton. Ils ne font aucun bruit.
+**💬 Seb** `seb_pee_door`
+> Pilou. Je l’ai vu depuis le balcon. Contre TA porte. Gaufre a détourné le regard, c’est dire.
+> J’ai la photo. De dos, rassure-toi. Nico l’a déjà archivée dans « Captures ».
 
 **💬 Anne-Sophie Lepoutre** `journaliste_solid`
 > Ça, c’est un dossier. Horodaté, chiffré, recoupé. Je le montre à mon rédac’ chef avant le bouclage. Ne parlez à personne d’autre.
@@ -1295,87 +1286,60 @@ _→ « Éléments recevables mais insuffisants pour trancher. » Décision :
 > *Au balcon du 13. Clignement lent. Seb et Nico sont là, et ils regardent.*
 
 ### 🌙 Nuit 11 (semaine)
-- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 3 : 9 personnes (max 6), 36 dB · Estaminet La Ch’tite Bernadette, table 3 empiète de 43 cm sur le passage libre (mesuré)
-- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 4 : 7 personnes (max 6), 36 dB · Estaminet La Ch’tite Bernadette, table 4 empiète de 17 cm sur le passage libre (mesuré)
-- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 5 empiète de 22 cm sur le passage libre (mesuré)
-- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 6 : 7 personnes (max 6), 36 dB
-- `20:30` 📸 Preuve ajoutée (nette) : Le Goulot, table 3 empiète de 21 cm sur le passage libre (mesuré)
-- `20:30` 📸 Preuve ajoutée (nette) : Le Goulot, table 4 : 7 personnes (max 6), 36 dB
-- `20:30` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 3 : 9 personnes (max 6), 36 dB · Les Bouchers Mal Lunés, table 3 empiète de 21 cm sur le passage libre (mesuré)
-- `20:30` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 4 : 7 personnes (max 6), 36 dB · Les Bouchers Mal Lunés, table 4 empiète de 32 cm sur le passage libre (mesuré)
-- `20:45` 🍻 « Chut… non, je rigole. »
-- `21:30` 🍻 « Une dernière, une vraie dernière. »
-- `21:41` Jérémie passe avec le teckel et note Estaminet La Ch’tite Bernadette, table 3.
-- `21:53` Jérémie passe avec le teckel et note Les Bouchers Mal Lunés, table 3.
-- `21:55` 🔔 21h55. Le serveur regarde l’horloge. Dédé regarde le serveur.
-- `22:00` Raclement de chaises sur les pavés : Le Goulot rentre une table.
-- `22:00` 🔔 Au loin, une cloche sonne dix coups. 22h00. Rue des Bouchers, les terrasses doivent fermer.
+- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 1 : 8 personnes (max 6), 36 dB
+- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 2 : 9 personnes (max 6), 36 dB
+- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 3 empiète de 42 cm sur le passage libre (mesuré)
+- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 4 : 7 personnes (max 6), 36 dB · Estaminet La Ch’tite Bernadette, table 4 empiète de 41 cm sur le passage libre (mesuré)
+- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 6 : 8 personnes (max 6), 36 dB
+- `20:30` 📸 Preuve ajoutée (nette) : Le Goulot, table 2 : 7 personnes (max 6), 36 dB
+- `20:30` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 2 : 8 personnes (max 6), 36 dB · Les Bouchers Mal Lunés, table 2 empiète de 39 cm sur le passage libre (mesuré)
+- `20:30` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 3 : 7 personnes (max 6), 36 dB
+- `20:45` 🍻 « Il y a un monsieur à la fenêtre qui nous regarde. »
+- `21:30` 🍻 « Il a dit que les tables rentraient à quelle heure ? Bah, on verra. »
+- `21:38` Jérémie passe avec le teckel et note Estaminet La Ch’tite Bernadette, table 1.
+- `21:51` Jérémie passe avec le teckel et note Les Bouchers Mal Lunés, table 2.
+- `21:55` 🔔 21h55. Dans cinq minutes, la loi s’applique. En théorie.
+- `22:00` 🔔 Dix coups de cloche. 22h00. Les chaises vont racler les pavés… ou pas.
+- `22:02` Raclement de chaises sur les pavés : Estaminet La Ch’tite Bernadette rentre une table.
+- `22:03` Raclement de chaises sur les pavés : Le Goulot rentre une table.
+- `22:03` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table.
 - `22:05` **Pilou** : demande au serveur de rentrer les tables
-- `22:05` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 1 encore dehors à 22:05, 50 dB
-- `22:05` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 2 encore dehors à 22:05, 50 dB
-- `22:05` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 3 encore dehors à 22:05, 50 dB
-- `22:05` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 4 encore dehors à 22:05, 50 dB
-- `22:05` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 5 encore dehors à 22:05, 50 dB
-- `22:05` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 6 encore dehors à 22:05, 50 dB
-- `22:05` 📸 Preuve ajoutée (nette) : Le Goulot, table 2 encore dehors à 22:05, 50 dB
-- `22:05` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 1 encore dehors à 22:05, 50 dB
-- `22:05` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 2 encore dehors à 22:05, 50 dB
-- `22:05` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 3 encore dehors à 22:05, 50 dB
-- `22:05` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 4 encore dehors à 22:05, 50 dB
+- `22:05` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 1 encore dehors à 22:05, 53 dB
+- `22:05` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 2 encore dehors à 22:05, 53 dB
+- `22:05` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 3 encore dehors à 22:05, 53 dB
+- `22:05` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 4 encore dehors à 22:05, 53 dB
+- `22:05` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 5 encore dehors à 22:05, 53 dB
+- `22:05` 📸 Preuve ajoutée (nette) : Le Goulot, table 1 encore dehors à 22:05, 53 dB
+- `22:05` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 2 encore dehors à 22:05, 53 dB
 - `22:05` Théo, sans s’arrêter : « J’ai six tables et un patron. Plus tard. »
-- `22:05` 🔔 Quelques tables rentrent, pour la forme. Les autres font semblant de ne pas avoir entendu la cloche.
+- `22:05` 🔔 Une partie des chaises racle les pavés. L’autre partie reste assise, verre levé.
 - `22:10` **Pilou** : appelle la police municipale (« pour l’Association »)
-- `22:10` Le standard soupire avant de décrocher. Vous l’avez entendu soupirer. Personne ne viendra.
+- `22:10` Police : « Monsieur, encore vous ? On a d’autres priorités. » Personne ne viendra.
 - `22:15` **Pilou** : demande au serveur de rentrer les tables
-- `22:15` Théo, sans s’arrêter : « J’ai six tables et un patron. Plus tard. »
-- `22:15` 🍻 « Une dernière, une vraie dernière. »
-- `22:17` Jérémie passe avec le teckel et note Le Goulot, table 2.
+- `22:15` Jérémie passe avec le teckel et note Le Goulot, table 1.
+- `22:15` Théo hausse les épaules vers la vitrine, où Dédé le regarde. Ça veut dire non.
+- `22:15` 🍻 « Il a dit que les tables rentraient à quelle heure ? Bah, on verra. »
 - `22:25` **Pilou** : demande au serveur de rentrer les tables
-- `22:25` Théo : « Je te jure, j’ai essayé. Il m’a répondu « encore une tournée ». »
+- `22:25` Théo, sans s’arrêter : « J’ai six tables et un patron. Plus tard. »
 - `22:30` **Pilou** : partage ses pièces sur le groupe WhatsApp
-- `22:30` WhatsApp : 28 pièce(s) partagée(s). Seb : « 😱 On imprime tout pour la commission ! »
-- `22:30` 📟 62 dB relevés et horodatés.
+- `22:30` WhatsApp : 22 pièce(s) partagée(s). Seb : « 😱 On imprime tout pour la commission ! »
+- `22:30` 📟 61 dB relevés et horodatés.
 - `22:35` **Pilou** : demande au serveur de rentrer les tables
-- `22:35` Théo : « Je te jure, j’ai essayé. Il m’a répondu « encore une tournée ». »
+- `22:35` Théo, sans s’arrêter : « J’ai six tables et un patron. Plus tard. »
 - `22:45` **Pilou** : demande au serveur de rentrer les tables
-- `22:45` Théo : « Pas ce soir, Pilou. Dédé est sur les nerfs. Demain, peut-être. »
-- `22:55` **Pilou** : demande au serveur de rentrer les tables
-- `22:55` Théo hausse les épaules vers la vitrine, où Dédé le regarde. Ça veut dire non.
-- `23:00` 📟 64 dB relevés et horodatés.
-- `23:05` **Pilou** : demande au serveur de rentrer les tables
-- `23:05` Théo, sans s’arrêter : « J’ai six tables et un patron. Plus tard. »
-- `23:06` Raclement de chaises sur les pavés : Le Goulot rentre sa terrasse… enfin.
+- `22:45` Théo : « Pour toi, je rentre. Mais tu m’as pas vu, hein. »
+- `23:00` 📟 59 dB relevés et horodatés.
+- `23:04` Raclement de chaises sur les pavés : Le Goulot rentre sa terrasse… enfin.
 - `23:10` **Pilou** : appelle la police municipale (« pour l’Association »)
-- `23:10` Police : « Monsieur, encore vous ? On a d’autres priorités. » Personne ne viendra.
-- `23:15` **Pilou** : demande au serveur de rentrer les tables
-- `23:15` Théo, sans s’arrêter : « J’ai six tables et un patron. Plus tard. »
-- `23:18` Raclement de chaises sur les pavés : Estaminet La Ch’tite Bernadette rentre une table… enfin.
-- `23:25` **Pilou** : demande au serveur de rentrer les tables
-- `23:25` Théo : « Pas ce soir, Pilou. Dédé est sur les nerfs. Demain, peut-être. »
-- `23:30` 📟 62 dB relevés et horodatés.
-- `23:35` **Pilou** : demande au serveur de rentrer les tables
-- `23:35` Théo, sans s’arrêter : « J’ai six tables et un patron. Plus tard. »
-- `23:43` Raclement de chaises sur les pavés : Estaminet La Ch’tite Bernadette rentre une table… enfin.
-- `23:45` **Pilou** : demande au serveur de rentrer les tables
+- `23:10` Le standard soupire avant de décrocher. Vous l’avez entendu soupirer. Personne ne viendra.
+- `23:23` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre sa terrasse… enfin.
+- `23:30` 📟 36 dB. Pénible, mais pas assez pour un dossier.
 - `23:45` **Pilou** : partage ses pièces sur le groupe WhatsApp
 - `23:45` **Pilou** : envoie un signalement à la mairie
-- `23:45` Théo : « Je te jure, j’ai essayé. Il m’a répondu « encore une tournée ». »
-- `23:45` WhatsApp : 5 pièce(s) partagée(s). Seb : « 😱 On imprime tout pour la commission ! »
-- `23:45` Signalement envoyé à la mairie avec 33 pièce(s) jointe(s). Le service ouvre à 8h30.
-- `23:47` On sonne : la police, pour vous. Contrôle d’identité… rien à vous reprocher. Le bloc a essayé.
-- `23:48` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table… enfin.
-- `23:55` **Pilou** : demande au serveur de rentrer les tables
-- `23:55` Raclement de chaises sur les pavés : Estaminet La Ch’tite Bernadette rentre une table… enfin.
-- `23:55` Théo : « Pas ce soir, Pilou. Dédé est sur les nerfs. Demain, peut-être. »
-- `00:00` 📟 59 dB relevés et horodatés.
-- `00:02` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table… enfin.
-- `00:05` **Pilou** : demande au serveur de rentrer les tables
-- `00:05` Théo : « Pas ce soir, Pilou. Dédé est sur les nerfs. Demain, peut-être. »
-- `00:23` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table… enfin.
-- `00:28` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre sa terrasse… enfin.
-- `00:47` Raclement de chaises sur les pavés : Estaminet La Ch’tite Bernadette rentre une table… enfin.
-- `01:10` Raclement de chaises sur les pavés : Estaminet La Ch’tite Bernadette rentre sa terrasse… enfin.
-- `01:30` La rue s’éteint. Une bouteille roule quelque part sur les pavés, puis plus rien.
+- `23:45` WhatsApp : 3 pièce(s) partagée(s). Seb : « 😱 On imprime tout pour la commission ! »
+- `23:45` Signalement envoyé à la mairie avec 25 pièce(s) jointe(s). Le service ouvre à 8h30.
+- `00:00` 📟 36 dB. Pénible, mais pas assez pour un dossier.
+- `01:30` Les derniers clients remontent vers la place, en chantant faux. La rue se tait, à regret.
 
 **📰 SERVICE PUBLIC · « C’est encore vous » : la police municipale ne décroche plus pour la rue des Bouchers**
 - Dossier solide. La commission du jour 14 va devoir l’écouter.
@@ -1385,7 +1349,7 @@ _→ « Éléments recevables mais insuffisants pour trancher. » Décision :
 - **WhatsApp · Nico** `wa_exhaust_delayed` Résultat de la réunion extraction : « une étude complémentaire ». J’ai lancé un compte à rebours. Il n’a pas de fin.
 
 ## Jour 12 · vendredi
-_Sommeil 46 · Asso 96 · Risque 0 · Job 94 · Dossier 49 · (caché) hostilité 100, corruption 0_
+_Sommeil 66 · Asso 96 · Risque 0 · Job 94 · Dossier 51 · (caché) hostilité 100, corruption 0_
 
 ### 🍺 Contre-offensive : Fil Tatie · promesse n°11 `tatie_mail_11`
 > « Chère Madame, Clode Kode nous aide désormais à rédiger nos réponses. Nous sommes sincèrement désolés pour la gêne occasionnée et nous nous engageons à… [Réponse générée automatiquement. Je ne peux pas promettre une réparation que je ne peux pas vérifier.] » Tatie : « Même la machine ne le croit plus. »
@@ -1399,14 +1363,14 @@ _Sommeil 46 · Asso 96 · Risque 0 · Job 94 · Dossier 49 · (caché) hostilit�
 ### 🃏 Permis déposé au n°4 `r_bombance_project`
 > Un panneau blanc est apparu sur la façade de La Bombance : « Déclaration préalable de travaux · Changement de destination · Bar de nuit ». Tatie, ravie d’avoir eu raison : « Je vous l’avais dit. C’est Colette qui me l’a dit. Je ne devrais pas vous le dire. »
 
-Choix possibles : **→ Lancer Hippolyte sur l’angle patrimoine du n°4** · Former un recours avec Maître Vandamme _(grisé)_ · On verra après la commission
+Choix possibles : **→ Lancer Hippolyte sur l’angle patrimoine du n°4** · Former un recours avec Maître Vandamme · On verra après la commission
 _→ Hippolyte sort un plan de 1730. Le n°4 est en périmètre protégé, la devanture aussi. « Un DJ ici ? Il faudra d’abord passer sur le corps de l’architecte des Bâtiments de France. Il est très vivant. » Projet bloqué._
 
-**💬 Maître Vandamme** `avocat_reply`
-> Leur conseil répond que la terrasse « participe à l’animation du quartier ». C’est joli. En droit, cela ne veut strictement rien dire.
+**💬 Maître Vandamme** `avocat_solid`
+> Des preuves licites, horodatées, recoupées. Je n’ai rien à redire. C’est extrêmement désagréable pour un avocat.
 
-**💬 Bertrand Lescaut** `lescaut_scandal`
-> Je déteste les surprises dans la presse. Celle-là, je dois l’avouer, je la déteste un peu moins.
+**💬 Nico** `nico_screenshots`
+> J’ai un dossier « Captures » sur le téléphone. Deux mille quatre cents images. Dont quatre de vacances.
 
 **🗂 Après-midi : Saisir l’ARS et le service d’hygiène pour l’extraction** `pm_ars_complaint`
 > Formulaire de 9 pages, dont une sur « la nature olfactive de la nuisance ». Vous écrivez « frite rance, nuance carbonnade ». Le service d’hygiène programmera une visite. Un jour.
@@ -1419,17 +1383,17 @@ _→ Hippolyte sort un plan de 1730. Le n°4 est en périmètre protégé, la de
 - `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 5 : 8 personnes (max 6), 36 dB · Estaminet La Ch’tite Bernadette, table 5 empiète de 31 cm sur le passage libre (mesuré)
 - `20:30` 📸 Preuve ajoutée (nette) : Le Goulot, table 2 empiète de 24 cm sur le passage libre (mesuré)
 - `20:30` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 2 : 7 personnes (max 6), 36 dB · Les Bouchers Mal Lunés, table 2 empiète de 38 cm sur le passage libre (mesuré)
-- `20:45` 🍻 « C’est le plus vieux quartier, ici, non ? Tout est vieux. »
+- `20:45` 🍻 « Une dernière, une vraie dernière. »
 - `21:30` **Pilou** : Faire la ronde de 22h avec Jérémie et Biloute
 - `21:30` Jérémie compte les tables à voix haute, Biloute renifle chaque pied de chaise, vous notez. Biloute s’arrête net devant chaque table qui déborde et la fixe, comme un huissier. Personne ne sait comment il fait, mais il a raison.
 - `21:42` Jérémie passe avec le teckel et note Estaminet La Ch’tite Bernadette, table 4.
-- `21:50` 🍻 « J’adore cette rue, elle est vivante. »
+- `21:50` 🍻 « L’addition ? Rien ne presse. »
 - `21:51` Jérémie passe avec le teckel et note Les Bouchers Mal Lunés, table 2.
-- `21:55` 🔔 21h55. Dans cinq minutes, la loi s’applique. En théorie.
+- `21:55` 🔔 21h55. Le serveur regarde l’horloge. Dédé regarde le serveur.
 - `22:00` 🔔 Au loin, une cloche sonne dix coups. 22h00. Rue des Bouchers, les terrasses doivent fermer.
 - `22:05` **Pilou** : demande au serveur de rentrer les tables
-- `22:05` Théo : « Je te jure, j’ai essayé. Il m’a répondu « encore une tournée ». »
-- `22:05` 🔔 22h05 : toutes les tables sont encore dehors. Quelqu’un commande une nouvelle tournée.
+- `22:05` Théo hausse les épaules vers la vitrine, où Dédé le regarde. Ça veut dire non.
+- `22:05` 🔔 Personne ne bouge. La cloche a sonné pour rien. Elle a l’habitude, elle aussi.
 - `22:06` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 1 encore dehors à 22:06, 49 dB
 - `22:06` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 2 encore dehors à 22:06, 49 dB
 - `22:06` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 3 encore dehors à 22:06, 49 dB
@@ -1445,35 +1409,35 @@ _→ Hippolyte sort un plan de 1730. Le n°4 est en périmètre protégé, la de
 - `22:06` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 3 encore dehors à 22:06, 49 dB
 - `22:06` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 4 encore dehors à 22:06, 49 dB
 - `22:10` **Pilou** : appelle la police municipale (« pour l’Association »)
-- `22:10` Police : « Ah, c’est encore vous… On note, monsieur. » Personne ne viendra.
+- `22:10` Police : « Monsieur, encore vous ? On a d’autres priorités. » Personne ne viendra.
 - `22:15` **Pilou** : demande au serveur de rentrer les tables
 - `22:15` Jérémie passe avec le teckel et note Le Goulot, table 1.
-- `22:15` Théo hausse les épaules vers la vitrine, où Dédé le regarde. Ça veut dire non.
+- `22:15` Théo, sans s’arrêter : « J’ai six tables et un patron. Plus tard. »
 - `22:25` **Pilou** : demande au serveur de rentrer les tables
-- `22:25` Théo : « Je te jure, j’ai essayé. Il m’a répondu « encore une tournée ». »
+- `22:25` Théo : « Pas ce soir, Pilou. Dédé est sur les nerfs. Demain, peut-être. »
 - `22:30` **Pilou** : partage ses pièces sur le groupe WhatsApp
 - `22:30` WhatsApp : 25 pièce(s) partagée(s). Seb : « 😱 On imprime tout pour la commission ! »
 - `22:30` 📟 61 dB relevés et horodatés.
 - `22:35` **Pilou** : demande au serveur de rentrer les tables
-- `22:35` Théo hausse les épaules vers la vitrine, où Dédé le regarde. Ça veut dire non.
+- `22:35` Théo, sans s’arrêter : « J’ai six tables et un patron. Plus tard. »
 - `22:35` 🍻 « Tu sens la friture ? J’adore cette odeur. »
 - `22:45` **Pilou** : demande au serveur de rentrer les tables
 - `22:45` Théo : « Pas ce soir, Pilou. Dédé est sur les nerfs. Demain, peut-être. »
 - `22:54` Raclement de chaises sur les pavés : Le Goulot rentre une table… enfin.
 - `22:55` **Pilou** : demande au serveur de rentrer les tables
-- `22:55` Théo hausse les épaules vers la vitrine, où Dédé le regarde. Ça veut dire non.
+- `22:55` Théo : « Pas ce soir, Pilou. Dédé est sur les nerfs. Demain, peut-être. »
 - `23:00` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table… enfin.
 - `23:00` 📟 64 dB relevés et horodatés.
 - `23:05` **Pilou** : demande au serveur de rentrer les tables
-- `23:05` Théo : « Je te jure, j’ai essayé. Il m’a répondu « encore une tournée ». »
+- `23:05` Théo : « Je te jure, j’ai essayé. Il m’a répondu ‹ encore une tournée ›. »
 - `23:10` **Pilou** : appelle la police municipale (« pour l’Association »)
-- `23:10` Le standard soupire avant de décrocher. Vous l’avez entendu soupirer. Personne ne viendra.
+- `23:10` Police : « Monsieur, encore vous ? On a d’autres priorités. » Personne ne viendra.
 - `23:15` **Pilou** : demande au serveur de rentrer les tables
-- `23:15` Théo hausse les épaules vers la vitrine, où Dédé le regarde. Ça veut dire non.
+- `23:15` Théo : « Je te jure, j’ai essayé. Il m’a répondu ‹ encore une tournée ›. »
 - `23:18` Raclement de chaises sur les pavés : Le Goulot rentre une table… enfin.
 - `23:22` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table… enfin.
 - `23:25` **Pilou** : demande au serveur de rentrer les tables
-- `23:25` Théo hausse les épaules vers la vitrine, où Dédé le regarde. Ça veut dire non.
+- `23:25` Théo : « Pas ce soir, Pilou. Dédé est sur les nerfs. Demain, peut-être. »
 - `23:28` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table… enfin.
 - `23:30` Raclement de chaises sur les pavés : Estaminet La Ch’tite Bernadette rentre une table… enfin.
 - `23:30` Raclement de chaises sur les pavés : Le Goulot rentre sa terrasse… enfin.
@@ -1484,19 +1448,19 @@ _→ Hippolyte sort un plan de 1730. Le n°4 est en périmètre protégé, la de
 - `23:45` **Pilou** : demande au serveur de rentrer les tables
 - `23:45` **Pilou** : partage ses pièces sur le groupe WhatsApp
 - `23:45` **Pilou** : envoie un signalement à la mairie
-- `23:45` Théo : « Je te jure, j’ai essayé. Il m’a répondu « encore une tournée ». »
+- `23:45` Théo : « Je te jure, j’ai essayé. Il m’a répondu ‹ encore une tournée ›. »
 - `23:45` WhatsApp : 5 pièce(s) partagée(s). Seb : « 😱 On imprime tout pour la commission ! »
 - `23:45` Signalement envoyé à la mairie avec 30 pièce(s) jointe(s). Le service ouvre à 8h30.
 - `23:50` Raclement de chaises sur les pavés : Estaminet La Ch’tite Bernadette rentre une table… enfin.
 - `23:55` **Pilou** : demande au serveur de rentrer les tables
-- `23:55` Théo : « Je te jure, j’ai essayé. Il m’a répondu « encore une tournée ». »
+- `23:55` Théo : « Je te jure, j’ai essayé. Il m’a répondu ‹ encore une tournée ›. »
 - `00:00` 📟 59 dB relevés et horodatés.
 - `00:05` **Pilou** : demande au serveur de rentrer les tables
-- `00:05` Théo : « Pas ce soir, Pilou. Dédé est sur les nerfs. Demain, peut-être. »
+- `00:05` Théo, sans s’arrêter : « J’ai six tables et un patron. Plus tard. »
 - `00:21` Raclement de chaises sur les pavés : Estaminet La Ch’tite Bernadette rentre une table… enfin.
 - `00:56` Raclement de chaises sur les pavés : Estaminet La Ch’tite Bernadette rentre une table… enfin.
 - `01:14` Raclement de chaises sur les pavés : Estaminet La Ch’tite Bernadette rentre sa terrasse… enfin.
-- `01:30` 01h30. La dernière chaise a raclé. La gaine s’est tue. Il reste quatre heures de nuit, en théorie.
+- `01:30` La rue s’éteint. Une bouteille roule quelque part sur les pavés, puis plus rien.
 
 **📰 SERVICE PUBLIC · « C’est encore vous » : la police municipale ne décroche plus pour la rue des Bouchers**
 - Dossier solide. La commission du jour 14 va devoir l’écouter.
@@ -1506,13 +1470,10 @@ _→ Hippolyte sort un plan de 1730. Le n°4 est en périmètre protégé, la de
 - **La Voix du Nordiste** `press_bombance` **La Bombance : un bar de nuit dans les cartons** Le local vide de La Bombance pourrait accueillir un bar à cocktails ouvert « jusqu’à tard ». Le porteur de projet promet « une ambiance feutrée ». Les riverains ont acheté des bouchons d’oreille feutrés.
 
 ## Jour 13 · samedi (sans voitures)
-_Sommeil 35 · Asso 96 · Risque 0 · Job 94 · Dossier 51 · (caché) hostilité 100, corruption 0_
+_Sommeil 54 · Asso 96 · Risque 0 · Job 94 · Dossier 53 · (caché) hostilité 100, corruption 0_
 
 ### 🍺 Contre-offensive : Fil Tatie · promesse n°12 `tatie_mail_12`
 > Réponse automatique : « Ghislain est absent jusqu’au lendemain de la commission des terrasses. Pour toute urgence olfactive, merci de patienter. C’est en cours. » Tatie imprime, agrafe et classe. « Douze. Une douzaine, comme les huîtres. Et ça sent pareil. »
-
-### 🍺 Contre-offensive : Les poubelles, saison 2 `cm_bins_again`
-> Les bacs sont revenus. Quelqu’un a collé dessus une étiquette « Pilou » au feutre. L’administration des déchets n’a jamais été aussi personnalisée.
 
 **☕ Koddex · Stéphane** `stephane_family`
 > On est une famille. Mais une famille qui ship. Et qui ne fait pas de projets perso pendant les heures de bureau, hein, je dis ça en général.
@@ -1526,13 +1487,13 @@ _Sommeil 35 · Asso 96 · Risque 0 · Job 94 · Dossier 51 · (caché) hostilit�
 Choix possibles : Mobiliser tout le monde aux fenêtres, carnets et téléphones prêts · Répondre au lobbying « samedi festif » avec la pétition · **→ Faire profil bas pour arriver frais à la commission**
 _→ Bouchons d’oreilles, masque, ventilateur pour couvrir le reste. Vous dormez par morceaux, mais demain vous saurez au moins dire « aménagement du domaine public » sans bafouiller._
 
-**💬 Klaas** `klaas_saturday`
-> Samedi dernier : quarante-trois personnes debout, des pipis contre les portes que j’ai arrêté de compter, une qui a chanté. Faux.
-> Ce soir je prends un carnet neuf. Par précaution.
-
 **💬 Jérémie** `jeremie_commission_eve`
 > Demain, la commission. J’ai repassé ma chemise et classé les pièces par ordre chronologique, puis par ordre de gravité, puis de nouveau chronologique.
 > Quoi qu’il arrive, on aura essayé. Proprement. Enfin, le plus proprement possible.
+
+**💬 Nico** `nico_legal_view`
+> Tu as le plan des zones ? Montre. … Ah. Donc les trois tables collées à notre porte d’entrée sont, techniquement, chez nous.
+> Je vais imprimer ça en A3. Pour le frigo.
 
 **🗂 Après-midi : Mobiliser le groupe WhatsApp** `pm_whatsapp_rally`
 > Seb poste un appel, Nico l’épingle. 42 messages en une heure, dont 11 sur l’ordre du jour et 31 sur Gaufre.
@@ -1547,78 +1508,79 @@ _→ Bouchons d’oreilles, masque, ventilateur pour couvrir le reste. Vous dorm
 > *N’est pas sortie du tout. Samedi : trop de monde, trop de bruit. Elle a raison.*
 
 ### 🌙 Nuit 13 (samedi, foule)
-- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 1 : 9 personnes (max 6), 36 dB · Estaminet La Ch’tite Bernadette, table 1 empiète de 23 cm sur le passage libre (mesuré)
-- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 2 : 7 personnes (max 6), 36 dB
-- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 4 : 7 personnes (max 6), 36 dB · Estaminet La Ch’tite Bernadette, table 4 empiète de 51 cm sur le passage libre (mesuré)
-- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 5 : 9 personnes (max 6), 36 dB
-- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 6 : 7 personnes (max 6), 36 dB
-- `20:30` 📸 Preuve ajoutée (nette) : Le Goulot, table 1 : 8 personnes (max 6), 36 dB
-- `20:30` 📸 Preuve ajoutée (nette) : Le Goulot, table 2 : 7 personnes (max 6), 36 dB
-- `20:30` 📸 Preuve ajoutée (nette) : Le Goulot, table 3 : 7 personnes (max 6), 36 dB
+- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 1 : 8 personnes (max 6), 36 dB
+- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 2 : 9 personnes (max 6), 36 dB
+- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 3 : 9 personnes (max 6), 36 dB
+- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 4 : 7 personnes (max 6), 36 dB
+- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 5 : 8 personnes (max 6), 36 dB
+- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 6 : 8 personnes (max 6), 36 dB
+- `20:30` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 7 : 9 personnes (max 6), 36 dB · Estaminet La Ch’tite Bernadette, table 7 empiète de 23 cm sur le passage libre (mesuré)
+- `20:30` 📸 Preuve ajoutée (nette) : Le Goulot, table 2 : 9 personnes (max 6), 36 dB
+- `20:30` 📸 Preuve ajoutée (nette) : Le Goulot, table 3 empiète de 42 cm sur le passage libre (mesuré)
 - `20:30` 📸 Preuve ajoutée (nette) : Le Goulot, table 4 : 9 personnes (max 6), 36 dB
-- `20:30` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 2 : 7 personnes (max 6), 36 dB · Les Bouchers Mal Lunés, table 2 empiète de 42 cm sur le passage libre (mesuré)
-- `20:30` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 5 : 9 personnes (max 6), 36 dB
-- `20:45` 🍻 « Un pas de danse sur les pavés ! … Aïe. »
-- `21:30` Quelqu’un urine contre votre porte d’entrée. Classique du samedi.
-- `21:30` 📸 Preuve ajoutée (nette) : Un client urine contre la porte de Pilou
-- `21:30` 🍻 « Encore une tournée et on y va. »
+- `20:30` 📸 Preuve ajoutée (nette) : Le Goulot, table 5 : 8 personnes (max 6), 36 dB
+- `20:30` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 1 : 7 personnes (max 6), 36 dB
+- `20:30` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 2 : 8 personnes (max 6), 36 dB
+- `20:30` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 4 : 7 personnes (max 6), 36 dB · Les Bouchers Mal Lunés, table 4 empiète de 50 cm sur le passage libre (mesuré)
+- `20:30` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 5 : 7 personnes (max 6), 36 dB
+- `20:45` 🍻 « Une dernière, une vraie dernière. »
+- `21:30` 📸 Preuve ajoutée (nette) : Un client urine contre un porche en face
+- `21:30` 🍻 « La carbonnade, elle est à tomber. »
 - `21:38` Jérémie passe avec le teckel et note Estaminet La Ch’tite Bernadette, table 1.
-- `21:50` Jérémie passe avec le teckel et note Les Bouchers Mal Lunés, table 2.
-- `21:54` Quelqu’un urine contre votre porte d’entrée. Classique du samedi.
-- `21:55` 📸 Preuve ajoutée (nette) : Un client urine contre la porte de Pilou
+- `21:42` Quelqu’un urine contre votre porte d’entrée. Classique du samedi.
+- `21:49` Jérémie passe avec le teckel et note Les Bouchers Mal Lunés, table 1.
 - `21:55` 🔔 21h55. Le serveur regarde l’horloge. Dédé regarde le serveur.
-- `21:58` Raclement de chaises sur les pavés : Le Goulot rentre une table.
-- `21:58` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table.
-- `22:00` 🔔 Dix coups de cloche. 22h00. Les chaises vont racler les pavés… ou pas.
-- `22:03` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table.
+- `21:56` Raclement de chaises sur les pavés : Le Goulot rentre une table.
+- `22:00` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table.
+- `22:00` 🔔 Dong. Dong. Dong… Dix. 22h00, rue des Bouchers. Le reste de Lille a encore une heure, ou deux. Pas vous.
 - `22:05` **Pilou** : demande au serveur de rentrer les tables
-- `22:05` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 1 encore dehors à 22:05, 55 dB
-- `22:05` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 2 encore dehors à 22:05, 55 dB
-- `22:05` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 3 encore dehors à 22:05, 55 dB
-- `22:05` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 4 encore dehors à 22:05, 55 dB
-- `22:05` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 5 encore dehors à 22:05, 55 dB
-- `22:05` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 6 encore dehors à 22:05, 55 dB
-- `22:05` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 7 encore dehors à 22:05, 55 dB
-- `22:05` 📸 Preuve ajoutée (nette) : Le Goulot, table 1 encore dehors à 22:05, 55 dB
-- `22:05` 📸 Preuve ajoutée (nette) : Le Goulot, table 2 encore dehors à 22:05, 55 dB
-- `22:05` 📸 Preuve ajoutée (nette) : Le Goulot, table 3 encore dehors à 22:05, 55 dB
-- `22:05` 📸 Preuve ajoutée (nette) : Le Goulot, table 5 encore dehors à 22:05, 55 dB
-- `22:05` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 4 encore dehors à 22:05, 55 dB
-- `22:05` Théo : « Je te jure, j’ai essayé. Il m’a répondu « encore une tournée ». »
+- `22:05` Raclement de chaises sur les pavés : Estaminet La Ch’tite Bernadette rentre une table… enfin.
+- `22:05` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table… enfin.
+- `22:05` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 1 encore dehors à 22:05, 57 dB
+- `22:05` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 3 encore dehors à 22:05, 57 dB
+- `22:05` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 4 encore dehors à 22:05, 57 dB
+- `22:05` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 5 encore dehors à 22:05, 57 dB
+- `22:05` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 6 encore dehors à 22:05, 57 dB
+- `22:05` 📸 Preuve ajoutée (nette) : Estaminet La Ch’tite Bernadette, table 7 encore dehors à 22:05, 57 dB
+- `22:05` 📸 Preuve ajoutée (nette) : Le Goulot, table 1 encore dehors à 22:05, 57 dB
+- `22:05` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 1 encore dehors à 22:05, 57 dB
+- `22:05` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 4 encore dehors à 22:05, 57 dB
+- `22:05` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 5 encore dehors à 22:05, 57 dB
+- `22:05` Théo : « Je te jure, j’ai essayé. Il m’a répondu ‹ encore une tournée ›. »
 - `22:05` 🔔 La cloche est couverte par une chanson. Personne n’a entendu 22h00. Personne ne veut l’avoir entendu.
 - `22:10` **Pilou** : appelle la police municipale (« pour l’Association »)
-- `22:10` 📸 Preuve ajoutée (nette) : Un client urine contre une porte au milieu de la rue
-- `22:10` Le standard soupire avant de décrocher. Vous l’avez entendu soupirer. Personne ne viendra.
+- `22:10` Police : « Monsieur, encore vous ? On a d’autres priorités. » Personne ne viendra.
 - `22:15` **Pilou** : demande au serveur de rentrer les tables
 - `22:15` Jérémie passe avec le teckel et note Le Goulot, table 1.
-- `22:15` Théo, sans s’arrêter : « J’ai six tables et un patron. Plus tard. »
-- `22:15` 🍻 « Il est où, Kevin ? KEVIN ! »
+- `22:15` Théo : « Pas ce soir, Pilou. Dédé est sur les nerfs. Demain, peut-être. »
+- `22:15` 🍻 « Tu sens la friture ? J’adore cette odeur. »
 - `22:25` **Pilou** : demande au serveur de rentrer les tables
 - `22:25` Théo : « Pour toi, je rentre. Mais tu m’as pas vu, hein. »
 - `22:30` **Pilou** : partage ses pièces sur le groupe WhatsApp
-- `22:30` WhatsApp : 34 pièce(s) partagée(s). Seb : « 😱 On imprime tout pour la commission ! »
+- `22:30` WhatsApp : 33 pièce(s) partagée(s). Seb : « 😱 On imprime tout pour la commission ! »
 - `22:30` 📟 66 dB relevés et horodatés.
-- `22:36` Quelqu’un urine contre votre porte d’entrée. Classique du samedi.
-- `22:42` Raclement de chaises sur les pavés : Le Goulot rentre une table… enfin.
-- `22:47` Quelqu’un urine contre votre porte d’entrée. Classique du samedi.
-- `22:51` Raclement de chaises sur les pavés : Le Goulot rentre une table… enfin.
-- `22:59` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre sa terrasse… enfin.
-- `23:00` 📟 62 dB relevés et horodatés.
-- `23:06` Raclement de chaises sur les pavés : Le Goulot rentre une table… enfin.
+- `22:45` 📸 Preuve ajoutée (nette) : Un client urine contre un porche en face
+- `23:00` 📟 63 dB relevés et horodatés.
+- `23:03` Quelqu’un urine contre votre porte d’entrée. Classique du samedi.
 - `23:10` **Pilou** : appelle la police municipale (« pour l’Association »)
-- `23:10` Le standard soupire avant de décrocher. Vous l’avez entendu soupirer. Personne ne viendra.
-- `23:11` Quelqu’un urine contre votre porte d’entrée. Classique du samedi.
-- `23:12` Raclement de chaises sur les pavés : Le Goulot rentre sa terrasse… enfin.
-- `23:25` 📸 Preuve ajoutée (correcte) : Un client urine contre une porte cochère en face
-- `23:30` 📟 58 dB relevés et horodatés.
+- `23:10` Police : « Ah, c’est encore vous… On note, monsieur. » Personne ne viendra.
+- `23:26` Raclement de chaises sur les pavés : Le Goulot rentre sa terrasse… enfin.
+- `23:30` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table… enfin.
+- `23:30` 📸 Preuve ajoutée (correcte) : Un client urine contre une porte cochère en face
+- `23:30` 📟 61 dB relevés et horodatés.
 - `23:45` **Pilou** : partage ses pièces sur le groupe WhatsApp
 - `23:45` **Pilou** : envoie un signalement à la mairie
-- `23:45` WhatsApp : 6 pièce(s) partagée(s). Seb : « 😱 On imprime tout pour la commission ! »
-- `23:45` Signalement envoyé à la mairie avec 40 pièce(s) jointe(s). Le service ouvre à 8h30.
+- `23:45` 📸 Preuve ajoutée (correcte) : Un client urine contre une porte au milieu de la rue
+- `23:45` WhatsApp : 8 pièce(s) partagée(s). Seb : « 😱 On imprime tout pour la commission ! »
+- `23:45` Signalement envoyé à la mairie avec 41 pièce(s) jointe(s). Le service ouvre à 8h30.
+- `23:56` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table… enfin.
+- `23:57` Quelqu’un urine contre votre porte d’entrée. Classique du samedi.
 - `00:00` 📟 58 dB relevés et horodatés.
-- `00:05` 📸 Preuve ajoutée (correcte) : Un client urine contre un porche en face
-- `00:50` Quelqu’un urine contre votre porte d’entrée. Classique du samedi.
-- `01:30` 01h30. La dernière chaise a raclé. La gaine s’est tue. Il reste quatre heures de nuit, en théorie.
+- `00:05` Quelqu’un urine contre votre porte d’entrée. Classique du samedi.
+- `00:05` 📸 Preuve ajoutée (correcte) : Un client urine contre la porte de Pilou
+- `00:22` Quelqu’un urine contre votre porte d’entrée. Classique du samedi.
+- `00:26` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre sa terrasse… enfin.
+- `01:30` Les derniers clients remontent vers la place, en chantant faux. La rue se tait, à regret.
 
 **📰 SERVICE PUBLIC · « C’est encore vous » : la police municipale ne décroche plus pour la rue des Bouchers**
 - Dossier solide. La commission du jour 14 va devoir l’écouter.
@@ -1631,7 +1593,7 @@ _→ Bouchons d’oreilles, masque, ventilateur pour couvrir le reste. Vous dorm
 - **La Voix du Nordiste** `press_commission_eve` **Terrasses : la commission tranche dimanche** Riverains et restaurateurs de la rue des Bouchers sont attendus demain en mairie. D’un côté, des classeurs. De l’autre, des chaises. Le maire promet « d’écouter tout le monde ». Tout le monde compte parler.
 
 ## Jour 14 · dimanche
-_Sommeil 35 · Asso 96 · Risque 0 · Job 94 · Dossier 53 · (caché) hostilité 100, corruption 0_
+_Sommeil 54 · Asso 96 · Risque 0 · Job 94 · Dossier 55 · (caché) hostilité 100, corruption 0_
 
 **☕ Koddex · Stéphane** `stephane_voice`
 > 🎤 Message vocal (9 min 40). Clode Kode en résumé : « Il est dans une forêt. Il a eu une idée. Ce n’est pas clair laquelle. »
@@ -1659,10 +1621,10 @@ Choix possibles : Plaider le dossier complet : photos, dB, couloir, PV _(grisé
 _→ Delphine confirme au micro : groupe de climatisation sans autorisation, constaté. « Un établissement qui ne respecte pas l’urbanisme ne peut pas prétendre gérer un domaine public. » L’AOT est suspendue. Dédé applaudit, par réflexe, puis s’arrête._
 
 ## 🏁 Fin : Victoire juridique `legal_victory`
-_Sommeil 35 · Asso 96 · Risque 0 · Job 100 · Dossier 53 · (caché) hostilité 100, corruption 0_
+_Sommeil 54 · Asso 96 · Risque 0 · Job 100 · Dossier 55 · (caché) hostilité 100, corruption 0_
 
 **📰 Rue des Bouchers : la commission donne raison aux riverains**
-> Autorisation de terrasse suspendue, gaine d’extraction déplacée : le dossier de l’Association a convaincu. « Horodaté, mesuré, recevable », résume son président, ému. Un restaurateur va « faire appel à la rue de Gand ».
+> Autorisation de terrasse suspendue : le dossier de l’Association a convaincu. La gaine d’extraction, elle, attend toujours son étude. « Une victoire, pas une fin », résume son président, ému. Un restaurateur va « faire appel à la rue de Gand ».
 
 > Arrêté municipal, article 2 : « L’autorisation d’occupation temporaire du domaine public accordée à l’établissement sis au n°10 est suspendue. » Une phrase. Deux semaines de nuits blanches pour une phrase. Jérémie l’a lue à voix haute dans l’escalier. Biloute a aboyé à la virgule.
 >
@@ -1672,7 +1634,7 @@ _Sommeil 35 · Asso 96 · Risque 0 · Job 100 · Dossier 53 · (caché) hostilit
 >
 > La photo du dîner de Colette Verhaeghe, huit couverts sur une table de six, a été citée à la commission comme « illustration du problème ». Colette a parlé de « malentendu sur le mobilier ».
 >
-> Vos mesures au mètre ruban, couloir de passage grignoté de 15 à 55 cm, ont été reprises au centimètre près dans l’arrêté. Le mètre ruban est désormais rangé dans une vitrine chez Hippolyte.
+> Vos mesures au mètre ruban, soir après soir, ont été versées au dossier. Personne ne les a contestées. Le mètre ruban est désormais rangé dans une vitrine chez Hippolyte.
 >
 > Maître Vandamme a envoyé sa facture. Elle était d’une politesse terrifiante, elle aussi.
 >
@@ -1680,9 +1642,15 @@ _Sommeil 35 · Asso 96 · Risque 0 · Job 100 · Dossier 53 · (caché) hostilit
 >
 > La pétition des riverains, reliée cuir par Hippolyte, est restée sur la table du maire pendant toute la séance. Personne ne l’a ouverte. Tout le monde l’a regardée.
 >
-> Le brigadier Lemaire a été muté au contrôle du stationnement, à Lomme. Il paraît qu’on n’y offre pas le waterzooi.
+> Ce n’est ni une photo ni un relevé qui a fait tomber la terrasse : c’est une clim. Un architecte du patrimoine l’a regardée comme on regarde un graffiti sur un Rubens, et Delphine a prononcé au micro la phrase la plus sèche de sa carrière. Hippolyte l’a fait encadrer. La phrase, pas Delphine.
 >
-> L’uritrottoir de la rue des Bouchers est devenu une attraction. Une guide de l’office de tourisme le présente entre la maison du n°40 et le canal disparu. Votre porte, elle, sèche enfin.
+> Les plaintes du bloc ont été classées. Le courrier du parquet tient en trois lignes. Maître Vandamme l’a lu à voix haute, deux fois, en savourant les virgules.
+>
+> Le tableur du carnet de Klaas a été versé au dossier : mille lignes, zéro faute. Klaas l’a imprimé, relié, puis a corrigé deux horaires au stylo. « Ja. L’ordinateur était en avance. »
+>
+> Le bloc a perdu, et il le sait. Ghislain vous dit encore bonjour. Par écrit, avec accusé de réception.
+>
+> Le brigadier Lemaire a été muté au contrôle du stationnement, à Lomme. Il paraît qu’on n’y offre pas le waterzooi.
 >
 > Bertrand Lescaut cite désormais « l’exemple de la rue des Bouchers » dans ses discours. Il ne dit jamais exemple de quoi. C’est plus prudent.
 >
@@ -1700,9 +1668,13 @@ _Sommeil 35 · Asso 96 · Risque 0 · Job 100 · Dossier 53 · (caché) hostilit
 >
 > La vague de haine du faux post « Bernadette harcelée » s’est retirée comme elle était venue. Votre réponse, calme et sourcée, a été partagée trois fois moins que le post. Mais elle est restée en ligne, et le post, non.
 >
-> Votre démon Rust de relevé de décibels tourne toujours. Il a enregistré 2,1 millions de mesures. Clode Kode vous a proposé de le réécrire en Rust. Il est déjà en Rust.
+> Au n°4, l’affiche « BIENTÔT » a jauni sans jamais rien annoncer. Hippolyte passe devant chaque matin, son plan de 1730 sous le bras, au cas où. Le bar de nuit est allé ouvrir rue Royale. Rue Royale ne vous a pas remercié.
 >
-> L’appli de to-do de Stéphane en est à son énième réécriture. Elle contient une seule tâche : « vibes ».
+> L’uritrottoir figure désormais sur la carte de l’estaminet, rubrique « espace jardin ». Dédé y a mis des géraniums. Votre porte, elle, sèche enfin. C’est l’essentiel, hein.
+>
+> Votre démon Rust de relevé de décibels tourne toujours. Il a tout enregistré, nuit après nuit, sans jamais se plaindre. Clode Kode vous a proposé de le réécrire en Rust. Il est déjà en Rust.
+>
+> L’appli de to-do de Stéphane en est à son énième réécriture. Elle ne contient plus qu’une tâche : « vibes ».
 >
 > Le premier soir, à 22h00, les cloches ont sonné, et les chaises ont raclé les pavés pour la dernière fois de la journée. Puis le silence. Vous l’avez enregistré : 31 dB. Vous en avez fait votre fond d’écran.
 >

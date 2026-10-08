@@ -228,7 +228,7 @@ export const ACTIONS = [
     requires: { flags: ['waiter_informant'], notFlags: ['laxative_done'] },
     effects: { setFlags: ['laxative_done'], hostility: +30, asso: -10 },
     witnessed: { exposure: 0.6, by: ['waiter', 'dede', 'ghislain'], effects: { risk: +60, asso: -15, setFlags: ['laxative_caught'] } },
-    result: "Vers 21h40, la terrasse découvre la notion de file d’attente. Un seul WC, quatorze clients, un Dédé qui hurle « c’est pas la carbonnade, c’est le Covid ! ». La terrasse est vide à 22h pile. Pour la première fois. Vous n’en êtes pas fier. Enfin, pas complètement.",
+    result: "Vers 21h40, la terrasse découvre la notion de file d’attente. Un seul WC, quatorze clients, un Dédé qui hurle « c’est pas la carbonnade, c’est le canal d’avant 1912 ! ». La terrasse est vide à 22h pile. Pour la première fois. Vous n’en êtes pas fier. Enfin, pas complètement.",
   },
   {
     id: 'night_sabotage_chairs',

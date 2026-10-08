@@ -384,7 +384,7 @@ _Sommeil 79 · Asso 22 · Risque 84 · Job 24 · Dossier 3 · (caché) hostilit�
 - `20:50` 🃏 **J4 · Une ancienne maire en terrasse** `d4_colette_dinner` : 20h50. Une berline se gare rue de la Barre, là où rien ne se gare. Colette Verhaeghe descend, foulard de soie et sourire de campagne, et prend LA table de l’estaminet, celle qui mord sur le couloir de passage. Dédé lui embrasse les deux mains. Ghislain apporte une carte qui n’existe pas pour les autres clients. Huit couverts. À une table. Rue des Bouchers.
 - `20:50` → **Photographier la tablée depuis la fenêtre** : Clic. Huit personnes, une table, un couloir réduit à la largeur d’une poussette pliée. Colette lève son verre vers votre fenêtre. Elle ne vous a pas vu. Probablement. Elle trinque peut-être juste avec la façade.
 - `21:30` 🍻 « Rue de Gand, ils ferment à minuit, eux ! »
-- `21:40` 🃏 **Biloute flaire une livraison** `r_biloute_chairs` : Pendant la ronde, Biloute s’arrête net devant la porte de service de l’estaminet et grogne. Une camionnette décharge, en pleine ronde, douze chaises pliantes neuves. *Biloute s’assoit. Biloute fixe les chaises. Biloute juge.*
+- `21:40` 🃏 **Biloute flaire une livraison** `r_biloute_chairs` : Pendant la ronde, Biloute s’arrête net devant la porte de service de l’estaminet et grogne. Une camionnette décharge douze chaises pliantes neuves. *Biloute s’assoit. Biloute fixe les chaises. Biloute juge.*
 - `21:40` → **Photographier la livraison** : Douze chaises de plus pour une terrasse dont la surface n’a pas bougé. Jérémie dira « c’est mathématique ». Dédé dira « c’est pour la réserve ». La réserve fait dix mètres carrés.
 - `21:55` Jérémie passe avec le teckel et note Les Bouchers Mal Lunés, table 4.
 - `21:55` 🔔 21h55. Le serveur regarde l’horloge. Dédé regarde le serveur.
@@ -437,9 +437,19 @@ _Sommeil 85 · Asso 1 · Risque 94 · Job 24 · Dossier 13 · (caché) hostilit�
 **📰 Un riverain en garde à vue : la guerre des terrasses dérape**
 > Un habitant de la rue des Bouchers a été placé en garde à vue. Les restaurateurs se disent « choqués ». L’association se dit « choquée aussi, mais pas pour les mêmes raisons ». Une voisine a apporté de la soupe.
 
-> Ce n’est pas la police municipale qui est venue, cette fois. Ce sont deux agents de la nationale, en pleine nuit, sur les pavés devant le n°10, avec une politesse inquiétante. Vous avez passé le reste de la nuit et la journée suivante dans une pièce sans fenêtre. Pour la première fois depuis des semaines, il n’y avait aucun bruit. Vous avez très bien dormi. C’est la seule victoire de cette fin.
+> Ce n’est pas la police municipale qui est venue, cette fois. Ce sont deux agents de la nationale, sur le palier du n°10, avec une politesse inquiétante. Vous avez passé vingt-quatre heures dans une pièce sans fenêtre. Pour la première fois depuis des semaines, il n’y avait aucun bruit. Vous avez très bien dormi. C’est la seule victoire de cette fin.
 >
 > La vidéo de vous à la fenêtre a fait le tour des réseaux. Les commentaires se divisent entre « héros » et « fou furieux ». Votre mère a choisi « fatigué ».
+>
+> Au commissariat, on vous lit la liste. La caméra sous le store, branchée sur le courant de l’estaminet : « vol d’électricité », savoure l’agent, qui l’écrit pour la première fois de sa carrière. L’estaminet réclame 4,12 € de courant. Ghislain a joint le ticket.
+>
+> Les boules puantes figurent au procès-verbal sous l’intitulé « nuisance olfactive en réunion ». Vous étiez seul. L’agent a laissé « en réunion », par habitude.
+>
+> Les faux avis sont au dossier, imprimés et surlignés par Ghislain. Ils ont tous la même faute d’accord. Le greffier l’a corrigée sur la dernière copie, par réflexe.
+>
+> Les parasols ont été retrouvés dans votre salon, ouverts, faute de place. L’agent a demandé si vous comptiez ouvrir une terrasse. Lui a trouvé ça drôle.
+>
+> L’association n’a publié aucun communiqué. Sur le groupe WhatsApp, Seb a écrit « attends, attends… », puis plus rien. C’est le premier silence de l’histoire du groupe.
 >
 > Il y a une page du carnet de Klaas où il est écrit, en tout et pour tout : « Rien vu. » C’est la seule ligne fausse de sa vie. Hilde le sait. Elle n’en parle pas.
 >

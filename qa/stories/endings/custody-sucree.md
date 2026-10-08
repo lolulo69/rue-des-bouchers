@@ -385,14 +385,23 @@ _Sommeil 79 · Asso 22 · Risque 84 · Job 24 · Dossier 3 · (caché) hostilit�
 - `20:45` 🍻 « Il est quelle heure ? … Ah, ça va, il est tôt. »
 - `20:50` 🃏 **J4 · Une ancienne maire en terrasse** `d4_colette_dinner` : 20h50. Une berline se gare rue de la Barre, là où rien ne se gare. Colette Verhaeghe descend, foulard de soie et sourire de campagne, et prend LA table de l’estaminet, celle qui mord sur le couloir de passage. Dédé lui embrasse les deux mains. Ghislain apporte une carte qui n’existe pas pour les autres clients. Huit couverts. À une table. Rue des Bouchers.
 - `20:50` → **Photographier la tablée depuis la fenêtre** : Clic. Huit personnes, une table, un couloir réduit à la largeur d’une poussette pliée. Colette lève son verre vers votre fenêtre. Elle ne vous a pas vu. Probablement. Elle trinque peut-être juste avec la façade.
-- `21:15` 🃏 **Drache nationale** `r_drache` : 21h15 : le ciel du Nord se souvient qu’il est le ciel du Nord. Une drache tombe d’un coup, droite, épaisse. Les terrasses se vident en quatre minutes chrono. Les parasols, ça décore, mais ça n’abrite pas grand-chose.
-- `21:15` → **Photographier les tables rentrées en quatre minutes** : Quatre minutes pour tout rentrer. Le soir de la pluie. Les autres soirs, il leur en faut quarante. Jérémie appelle ça « une démonstration de faisabilité ».
 - `21:30` 🍻 « Rue de Gand, ils ferment à minuit, eux ! »
+- `21:55` Jérémie passe avec le teckel et note Les Bouchers Mal Lunés, table 4.
 - `21:55` 🔔 21h55. Le serveur regarde l’horloge. Dédé regarde le serveur.
+- `22:00` Raclement de chaises sur les pavés : Le Goulot rentre une table.
 - `22:00` 🔔 Dong. Dong. Dong… Dix. 22h00, rue des Bouchers. Le reste de Lille a encore une heure, ou deux. Pas vous.
-- `22:05` 🔔 Raclement de chaises généralisé. Pour une fois, la rue range à l’heure. Profitez-en, ça ne durera pas.
+- `22:03` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table.
+- `22:05` 🔔 Quelques tables rentrent, pour la forme. Les autres font semblant de ne pas avoir entendu la cloche.
 - `22:15` 🍻 « Serveur, on peut pousser la table un peu plus au milieu ? »
+- `22:18` Jérémie passe avec le teckel et note Le Goulot, table 3.
+- `23:09` Raclement de chaises sur les pavés : Le Goulot rentre une table… enfin.
+- `23:30` Raclement de chaises sur les pavés : Le Goulot rentre sa terrasse… enfin.
+- `23:30` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table… enfin.
+- `23:35` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table… enfin.
 - `23:46` On sonne : la police, pour vous. Plainte du bloc pour « harcèlement ». Rappel à la loi.
+- `00:16` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre sa terrasse… enfin.
+- `01:07` 🃏 **1h07 : roulettes sur pavés** `r_suitcases` : Une valise à roulettes sur des pavés de 1729, c’est un concert de batterie lent. Deux, c’est un orchestre. Un groupe de touristes cherche « le n°27, l’appart avec la terrasse en bas ». Ils sonnent chez vous. Deux fois.
+- `01:07` → **Noter l’heure et le numéro** : 1h07, n°27, 78 dB de roulettes. Ce n’est pas une infraction. C’est une information.
 - `01:30` Les derniers clients remontent vers la place, en chantant faux. La rue se tait, à regret.
 
 **📰 FAITS DIVERS · Une odeur suspecte vide une terrasse du Vieux-Lille**
@@ -405,18 +414,15 @@ _Sommeil 79 · Asso 22 · Risque 84 · Job 24 · Dossier 3 · (caché) hostilit�
 - **WhatsApp · Seb** `wa_sugar_rumour` Attends attends attends. Un client a craché sa carbonnade sur la terrasse en criant « C’EST SUCRÉ ». Je n’ai pas de vidéo. Je ne m’en remettrai jamais.
 - **WhatsApp · Nico** `wa_sugar_nico` Règle 3, Seb.
 - **WhatsApp · Seb** `wa_colette_dinner` Les photos de Pilou du dîner de Colette Verhaeghe à l’estaminet ! Elle a eu un dessert. Personne d’autre n’a eu de dessert. Je dis ça.
-- **WhatsApp · Seb** `wa_drache` DRACHE ! Terrasse vidée en quatre minutes. La pluie a fait en un soir ce que la mairie n’a pas fait en deux ans.
-- **La Voix du Nordiste** `press_drache` **Météo : la drache, meilleure alliée des riverains ?** Une averse soudaine a vidé les terrasses du Vieux-Lille en quelques minutes hier soir. « Le seul couvre-feu qui marche », sourit un habitant de la rue des Bouchers, avant de rentrer son linge.
 - **La Voix du Nordiste** `press_sugar` **Vieux-Lille : mystère sucré dans une cuisine** Frites au sucre glace, crème brûlée salée : un estaminet de la rue des Bouchers a servi un soir une carte « inversée ». La direction évoque « un fournisseur de la rue de Gand ». La rue de Gand dément.
 - **Estaminet La Ch’tite Bernadette** `so_promo_2200` Petit rappel : notre terrasse ferme à 22h. 😉 La salle, elle, reste ouverte, et les fenêtres aussi. Venez nombreux !
 - **Avis ★ · Julien_Lambersart** `rv_sugar_1` Carbonnade SUCRÉE. Pas « un peu sucrée comme d’habitude » : sucrée comme un dessert. Les frites avaient du sucre glace. J’ai cru à un concept.
 - **Avis ★ · Anaïs.Croix** `rv_sugar_2` Crème brûlée salée. Je ne suis pas contre l’innovation, mais prévenez. Le patron a accusé la rue de Gand. La rue de Gand n’était pas là.
 - **Avis ★★★★★ · Bruno_Waterzooi** `rv_sugar_3` La carbonnade au goût de pain d’épices, c’est exactement comme chez ma grand-mère. Enfin un estaminet authentique !! Ne changez rien.
 - **Avis · Ghislain** `rv_owner_reply` Réponse du propriétaire à un avis 2 étoiles : « Chère cliente, nous avons bien pris en compte votre remarque. C’est en cours de résolution. Bien cordialement. »
-- **Avis ★★★ · Steph_Tourisme** `rv_drache` Drache à 21h, tout le monde à l’intérieur. Bizarrement, c’était super calme et la carbonnade était meilleure. Bonne soirée, mais je crois que les voisins ont applaudi.
 
 ## Jour 5 · vendredi
-_Sommeil 89 · Asso 1 · Risque 84 · Job 39 · Dossier 10 · (caché) hostilité 70, corruption 60_
+_Sommeil 79 · Asso 1 · Risque 84 · Job 39 · Dossier 8 · (caché) hostilité 70, corruption 60_
 
 ### 🍺 Contre-offensive : Fil Tatie · promesse n°5 `tatie_mail_05`
 > « Chère Madame, le technicien vient d’être papa. Toutes nos félicitations à lui. Le dossier est en cours de reprise par un collègue. » Tatie : « Je lui ai envoyé une brassière. On verra bien si elle arrive. »
@@ -434,20 +440,30 @@ _Sommeil 89 · Asso 1 · Risque 84 · Job 39 · Dossier 10 · (caché) hostilit�
 > Vous avez fini à la main, sans aide, en vous sentant observé par votre propre terminal. L’outil marche. Le risque, lui, porte votre nom.
 
 ## 🏁 Fin : Garde à vue `custody` (anticipée, jour 5)
-_Sommeil 89 · Asso 1 · Risque 94 · Job 24 · Dossier 13 · (caché) hostilité 70, corruption 60_
+_Sommeil 79 · Asso 1 · Risque 94 · Job 24 · Dossier 11 · (caché) hostilité 70, corruption 60_
 
 **📰 L’affaire de la « carbonnade sucrée » devant la justice**
 > Le sel et le sucre avaient été inversés dans la cuisine d’un estaminet : le suspect est un voisin. Aucun client n’a été blessé, mais plusieurs ont « perdu foi en la frite ». L’audience promet d’être croustillante.
 
-> Ce n’est pas la police municipale qui est venue, cette fois. Ce sont deux agents de la nationale, en pleine nuit, sur les pavés devant le n°10, avec une politesse inquiétante. Vous avez passé le reste de la nuit et la journée suivante dans une pièce sans fenêtre. Pour la première fois depuis des semaines, il n’y avait aucun bruit. Vous avez très bien dormi. C’est la seule victoire de cette fin.
+> Ce n’est pas la police municipale qui est venue, cette fois. Ce sont deux agents de la nationale, sur le palier du n°10, avec une politesse inquiétante. Vous avez passé vingt-quatre heures dans une pièce sans fenêtre. Pour la première fois depuis des semaines, il n’y avait aucun bruit. Vous avez très bien dormi. C’est la seule victoire de cette fin.
 >
 > Variante « carbonnade sucrée ». La Voix du Nordiste titre : « Vieux-Lille : un riverain inverse le sel et le sucre d’un estaminet ». L’audience devant le tribunal de police dure quarante minutes, dont vingt sur la question de savoir si une carbonnade est censée être sucrée. L’avocat de l’estaminet plaide « l’atteinte à un patrimoine culinaire régional ». Dédé témoigne en tablier. Vous êtes condamné à une amende, à des dommages et intérêts, et à une célébrité locale dont vous vous seriez passé.
 >
 > La vidéo de vous à la fenêtre a fait le tour des réseaux. Les commentaires se divisent entre « héros » et « fou furieux ». Votre mère a choisi « fatigué ».
+>
+> Au commissariat, on vous lit la liste. La caméra sous le store, branchée sur le courant de l’estaminet : « vol d’électricité », savoure l’agent, qui l’écrit pour la première fois de sa carrière. L’estaminet réclame 4,12 € de courant. Ghislain a joint le ticket.
+>
+> Les boules puantes figurent au procès-verbal sous l’intitulé « nuisance olfactive en réunion ». Vous étiez seul. L’agent a laissé « en réunion », par habitude.
+>
+> Les faux avis sont au dossier, imprimés et surlignés par Ghislain. Ils ont tous la même faute d’accord. Le greffier l’a corrigée sur la dernière copie, par réflexe.
+>
+> Les parasols ont été retrouvés dans votre salon, ouverts, faute de place. L’agent a demandé si vous comptiez ouvrir une terrasse. Lui a trouvé ça drôle.
+>
+> L’association n’a publié aucun communiqué. Sur le groupe WhatsApp, Seb a écrit « attends, attends… », puis plus rien. C’est le premier silence de l’histoire du groupe.
 >
 > Il y a une page du carnet de Klaas où il est écrit, en tout et pour tout : « Rien vu. » C’est la seule ligne fausse de sa vie. Hilde le sait. Elle n’en parle pas.
 >
 > Klaas est venu vous chercher à la sortie. Il n’a rien dit. Il a juste rangé son carnet dans sa poche, côté cœur.
 >
 
-Drapeaux en fin de partie : boss_noticed, camera_awning, camera_window, cardboard_exhaust, cm_air_freshener, cm_bins, cm_defamation, cm_free_drinks, cm_smokers, colette_dinner_photo, colette_dinner_seen, corridor_measured, custody, fake_reviews, fake_reviews_traced, filmed_faces, hippolyte_room, joined_rounds, kitchen_sabotage_caught, kitchen_sabotaged, klaas_lied_to, klaas_persuaded, knows_trou, met_hilde, met_hippolyte, met_jeremie, met_klaas, met_tatie, night_db, power_stolen, proj_db_logger, proj_db_report, proj_fake_reviews, proj_klaas_ocr, proj_scraper, proj_whatsapp_bot, proj_wifi_cracker, random_drache, regis_courted, sabotage_chairs, sabotage_locks, sabotage_parasols, scraper_boasts, stink_bomb, tatie_fake_leak, tatie_mail_1, tatie_mail_2, tatie_mail_3, tatie_mail_4, tatie_mail_5, tatie_wavering, todo_app_rust, traitor_recruited, video_viral
+Drapeaux en fin de partie : boss_noticed, camera_awning, camera_window, cardboard_exhaust, cm_air_freshener, cm_bins, cm_defamation, cm_free_drinks, cm_smokers, colette_dinner_photo, colette_dinner_seen, corridor_measured, custody, fake_reviews, fake_reviews_traced, filmed_faces, hippolyte_room, joined_rounds, kitchen_sabotage_caught, kitchen_sabotaged, klaas_lied_to, klaas_persuaded, knows_trou, met_hilde, met_hippolyte, met_jeremie, met_klaas, met_tatie, night_db, power_stolen, proj_db_logger, proj_db_report, proj_fake_reviews, proj_klaas_ocr, proj_scraper, proj_whatsapp_bot, proj_wifi_cracker, regis_courted, sabotage_chairs, sabotage_locks, sabotage_parasols, scraper_boasts, stink_bomb, tatie_fake_leak, tatie_mail_1, tatie_mail_2, tatie_mail_3, tatie_mail_4, tatie_mail_5, tatie_wavering, todo_app_rust, traitor_recruited, video_viral

@@ -732,6 +732,7 @@ export const EVENTS = [
         label: 'Filmer, de la fenêtre, le camion bloqué',
         effects: {
           dossier: +8,
+          setFlags: ['fire_brigade_filmed'],
           hostility: +5,
           evidence: { kind: 'video', quality: 0.85, legal: true, label: '22h35 · Secours bloqués 2 min par des tables dans le couloir de passage' },
         },
@@ -739,7 +740,7 @@ export const EVENTS = [
       },
       {
         label: 'Descendre aider à pousser les tables',
-        effects: { asso: +5, sleep: -5, hostility: -3 },
+        effects: { asso: +5, sleep: -5, hostility: -3, setFlags: ['fire_brigade_helped'] },
         result: "Vous poussez, le serveur pousse, même Dédé pousse. Pendant deux minutes, il n’y a plus de bloc et plus de riverains. Puis tout le monde se rassoit.",
       },
     ],

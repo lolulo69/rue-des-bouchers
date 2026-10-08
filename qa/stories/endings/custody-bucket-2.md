@@ -451,13 +451,27 @@ _Sommeil 79 · Asso 6 · Risque 94 · Job 38 · Dossier 15 · (caché) hostilit�
 **📰 Un riverain en garde à vue : la guerre des terrasses dérape**
 > Un habitant de la rue des Bouchers a été placé en garde à vue. Les restaurateurs se disent « choqués ». L’association se dit « choquée aussi, mais pas pour les mêmes raisons ». Une voisine a apporté de la soupe.
 
-> Ce n’est pas la police municipale qui est venue, cette fois. Ce sont deux agents de la nationale, en pleine nuit, sur les pavés devant le n°10, avec une politesse inquiétante. Vous avez passé le reste de la nuit et la journée suivante dans une pièce sans fenêtre. Pour la première fois depuis des semaines, il n’y avait aucun bruit. Vous avez très bien dormi. C’est la seule victoire de cette fin.
+> Ce n’est pas la police municipale qui est venue, cette fois. Ce sont deux agents de la nationale, sur le palier du n°10, avec une politesse inquiétante. Vous avez passé vingt-quatre heures dans une pièce sans fenêtre. Pour la première fois depuis des semaines, il n’y avait aucun bruit. Vous avez très bien dormi. C’est la seule victoire de cette fin.
 >
 > La vidéo de vous à la fenêtre a fait le tour des réseaux. Les commentaires se divisent entre « héros » et « fou furieux ». Votre mère a choisi « fatigué ».
 >
+> Au commissariat, on vous lit la liste. La caméra sous le store, branchée sur le courant de l’estaminet : « vol d’électricité », savoure l’agent, qui l’écrit pour la première fois de sa carrière. L’estaminet réclame 4,12 € de courant. Ghislain a joint le ticket.
+>
+> Les boules puantes figurent au procès-verbal sous l’intitulé « nuisance olfactive en réunion ». Vous étiez seul. L’agent a laissé « en réunion », par habitude.
+>
+> Les parasols ont été retrouvés dans votre salon, ouverts, faute de place. L’agent a demandé si vous comptiez ouvrir une terrasse. Lui a trouvé ça drôle.
+>
+> Le réseau « BERNADETTE_INVITES » figure au procès-verbal. Sur réquisition, Clode Kode a fourni le journal de ses refus, horodaté. Il s’en excuse encore.
+>
+> Le post « Bernadette harcelée » a été mis à jour : « Le harceleur est en garde à vue. Merci pour votre soutien ❤️ ». Bernadette n’existe toujours pas. Elle a gagné quand même.
+>
+> Régis, démasqué la semaine d’avant, vous a envoyé un message de soutien. Le seul. Il dîne toujours gratis : la compassion, ça ne lui coûte rien.
+>
+> L’association n’a publié aucun communiqué. Sur le groupe WhatsApp, Seb a écrit « attends, attends… », puis plus rien. C’est le premier silence de l’histoire du groupe.
+>
 > Dans le carnet de Klaas, entre « 22h14, tables rentrées » et « 22h30, tables ressorties », il y a aussi vos nuits à vous. Il ne les a montrées à personne. Il ne les a pas effacées non plus. « Ja. Un carnet, ça ne choisit pas son camp. »
 >
-> Klaas est venu vous chercher à la sortie. Il n’a rien dit. Il a juste rangé son carnet dans sa poche, côté cœur.
+> À la sortie, il y avait Jérémie et Biloute. Jérémie tenait le dossier sous le bras, par habitude. Biloute vous a reniflé la cheville, l’air de dire que lui n’avait jamais arrêté d’enquêter.
 >
 
 Drapeaux en fin de partie : boss_noticed, camera_awning, camera_window, cardboard_exhaust, cm_air_freshener, cm_bins, cm_fake_post, cm_free_drinks, cm_harassment_complaint, cm_smokers, colette_dinner_photo, colette_dinner_seen, corridor_measured, custody, delphine_channel, delphine_dinner, fake_reviews, filmed_faces, hippolyte_room, joined_rounds, klaas_noted_pilou, knows_trou, met_delphine, met_hippolyte, met_jeremie, met_tatie, night_db, power_stolen, proj_db_logger, proj_db_report, proj_fake_reviews, proj_scraper, proj_whatsapp_bot, proj_wifi_cracker, random_drache, regis_courted, sabotage_chairs, sabotage_locks, sabotage_parasols, scraper_boasts, stink_bomb, tatie_fake_leak, tatie_mail_1, tatie_mail_2, tatie_mail_3, tatie_mail_4, tatie_mail_5, tatie_wavering, todo_app_rust, traitor_known, traitor_public, traitor_recruited, video_viral, wifi_cracked

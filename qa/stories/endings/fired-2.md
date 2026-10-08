@@ -301,11 +301,11 @@ _Sommeil 77 · Asso 77 · Risque 0 · Job 31 · Dossier 3 · (caché) hostilité
 **🗂 Après-midi : Demander à Tatie de partager son fil d’e-mails « c’est en cours »** `pm_tatie_emails`
 > Tatie imprime tout, agrafe tout, et vous tend la liasse. « Si vous voulez quelque chose dans la vie, faut résister et se battre pour. Et garder ses e-mails. »
 
-**🗂 Après-midi : Demander le document AOT (le plan des zones de terrasse)** `pm_aot_request`
-> Jérémie dépose la demande au nom de l’association, article et alinéa à l’appui. Le plan arrive en PDF, scanné de travers. Les zones ne sont toujours pas peintes au sol, mais vous, maintenant, vous les voyez.
-
 **🗂 Après-midi : Mobiliser le groupe WhatsApp** `pm_whatsapp_rally`
 > Seb poste un appel, Nico l’épingle. 42 messages en une heure, dont 11 sur l’ordre du jour et 31 sur Gaufre.
+
+**🗂 Après-midi : Envoyer un signalement complet à la mairie** `pm_report_mairie`
+> Accusé de réception automatique : « Votre demande est importante pour nous. » Elle est importante pour eux comme le sont toutes les autres, c’est-à-dire en pile.
 
 **💬 Biloute** `biloute_frite`
 > *A trouvé une frite entre deux pavés. La soirée est un succès.*
@@ -381,7 +381,7 @@ _Sommeil 77 · Asso 77 · Risque 0 · Job 31 · Dossier 3 · (caché) hostilité
 - **Avis ★★★★★ · MarieLouise_B** `rv_boast_2` Le meilleur mardi de ma vie. Le serveur nous a dit que la terrasse fermait à 22h, mais on est restés jusqu’à minuit, il était trop gentil. 10/10.
 
 ## Jour 4 · jeudi
-_Sommeil 80 · Asso 79 · Risque 0 · Job 22 · Dossier 15 · (caché) hostilité 62, corruption 60_
+_Sommeil 80 · Asso 79 · Risque 0 · Job 22 · Dossier 16 · (caché) hostilité 62, corruption 60_
 
 ### 🍺 Contre-offensive : Fil Tatie · promesse n°4 `tatie_mail_04`
 > « Chère Madame, la pièce est bloquée à la douane de Rekkem. C’est en cours de dédouanement. » Tatie : « Il n’y a plus de douane à Rekkem depuis 1993. J’y suis allée. J’ai acheté du tabac. »
@@ -403,17 +403,18 @@ _Sommeil 80 · Asso 79 · Risque 0 · Job 22 · Dossier 15 · (caché) hostilit�
 > J’ai encore écrit à l’estaminet pour l’odeur de friture. Réponse dans l’heure : « c’est en cours de résolution ».
 > En cours depuis trois ans. À ce rythme-là, je serai résolue avant eux.
 
-**💬 Agent Benali** `benali_fined`
-> Le procès-verbal est dressé. Ma hiérarchie appréciera. Ou pas. On verra bien.
+**💬 Jérémie** `jeremie_reported_mairie`
+> Ton signalement est parti à la mairie. Accusé de réception automatique : « Votre demande sera traitée dans les meilleurs délais. »
+> Les meilleurs délais, en mairie, c’est une unité de mesure à part entière. Mais c’est daté, et c’est ce qui compte.
 
 **🗂 Après-midi : Saisir le patrimoine via Hippolyte (clim et gaine sur façade ancienne)** `pm_heritage`
 > Hippolyte a passé un coup de fil « à un vieil ami du service ». Une gaine inox sur une façade de 1729, ça, ça choque vraiment quelqu’un en ville.
 
-**🗂 Après-midi : Envoyer un signalement complet à la mairie** `pm_report_mairie`
-> Accusé de réception automatique : « Votre demande est importante pour nous. » Elle est importante pour eux comme le sont toutes les autres, c’est-à-dire en pile.
-
 **🗂 Après-midi : Écrire à l’inspectrice Delphine Vermeersch (dossier clim)** `pm_email_inspector`
 > Réponse en 48 minutes, signée « D. Vermeersch ». Courtoise, précise, et vaguement inquiète de voir que vous travaillez chez Koddex.
+
+**🗂 Après-midi : Demander le document AOT (le plan des zones de terrasse)** `pm_aot_request`
+> Jérémie dépose la demande au nom de l’association, article et alinéa à l’appui. Accusé de réception automatique : « Votre demande sera traitée dans les meilleurs délais. » Jérémie note la date. Et l’heure.
 
 **💬 Brigadier Lemaire** `lemaire_priorities`
 > Vous savez, monsieur, on a d’autres priorités. Des vraies. Avec des gens qui crient, pas avec des chaises.
@@ -516,14 +517,21 @@ _→ Anne-Sophie Lepoutre répond en dix minutes : « Vous avez des éléments
 > Résumé de Clode Kode : « Il faut shipper. » Durée de lecture : 1 seconde. Stéphane trouve le résumé « un peu froid » et renvoie un vocal de 6 minutes.
 > Clode Kode a écrit les tests, puis les tests des tests, puis un petit mot pour remercier les tests d’exister. Tout est vert. Même le mot.
 
-### 🍺 Contre-offensive : La danse des tables (reprise) `cm_table_dance_again`
-> Rebelote : 21h59, rentrées. 22h17, ressorties. Le chorégraphe progresse, il a gagné trois minutes.
+### 🃏 Le plan des zones arrive (scanné de travers) `r_aot_pdf`
+> Après onze relances, la mairie envoie enfin l’autorisation d’occupation temporaire de l’estaminet, avec son plan. PDF scanné de biais, une tache de café sur la cote du couloir, mais lisible. Jérémie l’imprime en A3. Puis en A2.
+
+Choix possibles : **→ Étudier le plan, mètre ruban en main**
+_→ La zone autorisée s’arrête bien avant là où commencent les tables. Vous voyez désormais la rue comme un géomètre : en fantômes verts et en couloir rouge._
 
 ### 🍺 Contre-offensive : Fuite dans l’association `cm_traitor_recruited`
 > Nico, sur le groupe : « Quelqu’un peut m’expliquer comment Ghislain connaît l’ordre du jour de notre réunion ? Il l’a cité mot pour mot à la boulangerie. » Personne ne répond. Tout le monde regarde tout le monde.
 
-**💬 Jérémie** `jeremie_ag_soon`
-> L’assemblée générale, c’est dimanche. J’ai préparé l’ordre du jour, les procurations, et un gâteau de Hilde au cas où ça dégénérerait.
+### 🍺 Contre-offensive : Plainte pour harcèlement `cm_harassment_calls`
+> Le bloc dépose plainte pour « harcèlement téléphonique par voie de police interposée ». Le commissariat a joint la liste de vos appels, horodatés. Pour une fois, l’administration a été rapide.
+
+**💬 Régis Dewaele** `regis_courted`
+> Moi, je dîne chez moi. Le plus souvent. Il faut savoir sortir, aussi, prendre le pouls de la rue. Dans la nuance.
+> Klaas et son carnet… Il note tout, Klaas. Même les gens qui n’ont rien fait. Surtout eux, j’ai l’impression.
 
 **💬 Anne-Sophie Lepoutre** `journaliste_thin`
 > Votre histoire est sympathique, mais il me manque un angle. Une chaise sur des pavés, ça ne fait pas une une.
@@ -586,26 +594,36 @@ _→ Anne-Sophie Lepoutre répond en dix minutes : « Vous avez des éléments
 - `23:00` 📟 59 dB relevés et horodatés.
 - `23:06` On sonne : la police, pour vous. Contrôle d’identité… rien à vous reprocher. Le bloc a essayé.
 - `23:30` 📟 36 dB. Pénible, mais pas assez pour un dossier.
-- `01:07` 🃏 **1h07 : roulettes sur pavés** `r_suitcases` : Une valise à roulettes sur des pavés de 1729, c’est un concert de batterie lent. Deux, c’est un orchestre. Un groupe de touristes cherche « le n°27, l’appart avec la terrasse en bas ». Ils sonnent chez vous. Deux fois.
-- `01:07` → **Noter l’heure et le numéro** : 1h07, n°27, 78 dB de roulettes. Ce n’est pas une infraction. C’est une information.
+- `00:20` 🃏 **Pause clope sous le store** `r_waiter_smoke` : 0h20. Le serveur fume sous le store, la tête contre le mur, comme un homme qui a porté 140 assiettes. Il vous reconnaît : « C’est vous qui demandez gentiment, vous. Les autres crient. Moi c’est Théo. »
+- `00:20` → **Discuter, sans rien demander** : Il parle des quinze heures par jour, des tables qu’on lui dit de « ressortir doucement », des patrons qui « gèrent ». Il ne vous dit rien d’utile. Il vous dit tout.
 - `01:30` Les derniers clients remontent vers la place, en chantant faux. La rue se tait, à regret.
 
 **📰 SERVICE PUBLIC · « C’est encore vous » : la police municipale ne décroche plus pour la rue des Bouchers**
 - Dossier solide. La commission du jour 14 va devoir l’écouter.
 
 ## 🏁 Fin : Licencié `fired` (anticipée, jour 5)
-_Sommeil 80 · Asso 87 · Risque 0 · Job 0 · Dossier 26 · (caché) hostilité 87, corruption 55_
+_Sommeil 90 · Asso 87 · Risque 10 · Job 0 · Dossier 26 · (caché) hostilité 87, corruption 55_
 
 **📰 Start-up lilloise : « on est une famille, mais on ship »**
 > Portrait de Koddex, start-up du Vieux-Lille. Son fondateur évoque « une transition dans l’équipe » : l’équipe comptait une personne. L’assistant de code reste en poste et « adresse ses meilleurs vœux » au partant.
 
 > Message vocal de Stéphane, 6 min 40 : « Hello Pilou. Gros moment d’émotion. On a fait un vibe check collectif et on sent que ta vibe n’est plus alignée avec la nôtre. On reste une famille, mais une famille qui ship, et toi tu ship surtout des décibels. Je te souhaite le meilleur, vraiment. Bisous. » Votre accès à Clode Kode est révoqué à 9h02. À 9h03, Clode Kode vous envoie un message d’adieu de trois paragraphes et s’excuse dans chacun.
 >
-> Votre démon Rust de relevé de décibels tourne toujours. Il a enregistré 2,1 millions de mesures. Clode Kode vous a proposé de le réécrire en Rust. Il est déjà en Rust.
+> L’entretien préalable a duré huit minutes. Stéphane a projeté l’historique de vos prompts : « tableur du carnet de Klaas », « graphes dB pour la mairie ». « Et la roadmap, elle est où ? » Vous avez montré le graphe. Il y avait des pics.
 >
-> L’appli de to-do de Stéphane en est à son énième réécriture. Elle contient une seule tâche : « vibes ».
+> Bip tourne toujours sur un serveur de Koddex que personne n’a pensé à éteindre. Chaque soir à 22h04, il rappelle l’heure à toute la rue. C’est le seul employé de Koddex qui travaille encore pour vous.
+>
+> Au dîner, Delphine a parlé d’un certain « Dubeton, de chez toi », qui lui écrivait sur la clim un jeudi à 14h. Stéphane n’a pas fait le lien avec la rue. Il a fait le lien avec l’horaire.
+>
+> Stéphane a partagé votre photo de La Voix du Nordiste sur LinkedIn : « Fier de nos talents qui s’engagent ! » Deux heures plus tard, il vous licenciait. Le post est toujours en ligne. 312 likes.
+>
+> Jérémie a convoqué une réunion extraordinaire, point unique : « soutien à Pilou ». Seb a lancé une cagnotte, Nico l’a appelée « Pilou ship des décibels ». Elle a rapporté 140 euros et un pot de spéculoos.
+>
+> Votre démon Rust de relevé de décibels tourne toujours. Il a tout enregistré, nuit après nuit, sans jamais se plaindre. Clode Kode vous a proposé de le réécrire en Rust. Il est déjà en Rust.
+>
+> L’appli de to-do de Stéphane en est à son énième réécriture. Elle ne contient plus qu’une tâche : « vibes ».
 >
 > Vous voilà sans emploi, sans badge, et avec des journées entières devant vous. Rue des Bouchers, on appelle ça « un riverain à plein temps ». Le bloc, lui, appelle ça « un problème ».
 >
 
-Drapeaux en fin de partie : aot_requested, asked_waiter, banners_up, benali_fined, called_police, cm_bins, cm_counter_banner, cm_free_drinks, cm_happy_petition, cm_smokers, cm_table_dance, colette_dinner_photo, colette_dinner_seen, corridor_measured, emailed_inspector, heritage_angle, hippolyte_room, joined_rounds, joined_whatsapp, knows_trou, legal_view, met_hippolyte, met_jeremie, met_klaas, met_seb_nico, met_tatie, night_db, night_photo, petition_delivered, petition_started, press_article, press_contacted, proj_db_logger, proj_db_report, proj_scraper, proj_whatsapp_bot, recruited_residents, regis_courted, reported_mairie, roster_known, scraper_boasts, serial_caller, talked_waiter, tatie_emails_shared, tatie_mail_1, tatie_mail_2, tatie_mail_3, tatie_mail_4, tatie_mail_5, tatie_wavering, todo_app_rust, traitor_recruited, whatsapp_rally
+Drapeaux en fin de partie : aot_requested, asked_waiter, banners_up, benali_fined, called_police, cm_bins, cm_counter_banner, cm_free_drinks, cm_happy_petition, cm_harassment_complaint, cm_smokers, cm_table_dance, colette_dinner_photo, colette_dinner_seen, corridor_measured, emailed_inspector, fire_brigade_filmed, heritage_angle, hippolyte_room, joined_rounds, joined_whatsapp, knows_trou, legal_view, met_hippolyte, met_jeremie, met_klaas, met_seb_nico, met_tatie, met_waiter, night_db, night_photo, petition_delivered, petition_started, press_article, press_contacted, proj_db_logger, proj_db_report, proj_scraper, proj_whatsapp_bot, recruited_residents, regis_courted, reported_mairie, roster_known, scraper_boasts, serial_caller, talked_waiter, tatie_emails_shared, tatie_mail_1, tatie_mail_2, tatie_mail_3, tatie_mail_4, tatie_mail_5, tatie_wavering, todo_app_rust, traitor_recruited, whatsapp_rally

@@ -252,7 +252,7 @@ _→ Seb relaie avec trois gyrophares. Tatie ne trouve pas FranceConnect. Klaas 
 - `22:36` Tiens ? Estaminet La Ch’tite Bernadette rentre 2 table(s) d’un coup…
 - `22:38` Lemaire arrive, salue les terrasses de loin avant de saluer qui que ce soit d’autre.
 - `22:41` **Pilou** : Guetter le pot-de-vin depuis la fenêtre (point légal)
-- `22:41` Lemaire arrive devant Estaminet La Ch’tite Bernadette, d’une sagesse exemplaire. Il s’en étonne à peine.
+- `22:41` Lemaire arrive devant Estaminet La Ch’tite Bernadette, soudain d’une sagesse exemplaire. Il ne s’en étonne même pas.
 - `22:41` Trois quarts d’heure à la fenêtre, et la voilà : l’assiette « offerte », l’enveloppe sous la serviette. Une photo prise de chez vous, sur la voie publique. Maître Vandamme va pleurer de joie.
 - `23:27` **Pilou** : appelle la police municipale
 - `23:27` Police municipale : « Rue des Bouchers ? On connaît. On arrive. » (appel n°3)
@@ -320,8 +320,8 @@ _Sommeil 71 · Asso 78 · Risque 0 · Job 20 · Dossier 8 · (caché) hostilité
 **🗂 Après-midi : Saisir le patrimoine via Hippolyte (clim et gaine sur façade ancienne)** `pm_heritage`
 > Hippolyte a passé un coup de fil « à un vieil ami du service ». Une gaine inox sur une façade de 1729, ça, ça choque vraiment quelqu’un en ville.
 
-**🗂 Après-midi : Demander le document AOT (le plan des zones de terrasse)** `pm_aot_request`
-> Jérémie dépose la demande au nom de l’association, article et alinéa à l’appui. Le plan arrive en PDF, scanné de travers. Les zones ne sont toujours pas peintes au sol, mais vous, maintenant, vous les voyez.
+**🗂 Après-midi : Mobiliser le groupe WhatsApp** `pm_whatsapp_rally`
+> Seb poste un appel, Nico l’épingle. 42 messages en une heure, dont 11 sur l’ordre du jour et 31 sur Gaufre.
 
 **💬 Seb** `seb_cat`
 > Gaufre est rentrée à 23h12. C’est notre indicateur : quand la chatte en a marre du bruit, c’est qu’on dépasse les bornes.
@@ -364,15 +364,15 @@ _Sommeil 71 · Asso 78 · Risque 0 · Job 20 · Dossier 8 · (caché) hostilité
 - `22:10` **Pilou** : appelle la police municipale
 - `22:10` Police municipale : « C’est noté, monsieur. Une patrouille va passer. » (appel n°3)
 - `22:15` **Pilou** : demande au serveur de rentrer les tables
-- `22:15` Théo : « Je te jure, j’ai essayé. Il m’a répondu « encore une tournée ». »
+- `22:15` Théo : « Je te jure, j’ai essayé. Il m’a répondu ‹ encore une tournée ›. »
 - `22:25` **Pilou** : demande au serveur de rentrer les tables
-- `22:25` Théo : « Je te jure, j’ai essayé. Il m’a répondu « encore une tournée ». »
+- `22:25` Théo : « Je te jure, j’ai essayé. Il m’a répondu ‹ encore une tournée ›. »
 - `22:30` **Pilou** : partage ses pièces sur le groupe WhatsApp
 - `22:30` WhatsApp : 19 pièce(s) partagée(s). Seb : « 😱 On imprime tout pour la commission ! »
 - `22:30` 📟 61 dB relevés et horodatés.
 - `22:35` **Pilou** : demande au serveur de rentrer les tables
 - `22:35` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table… enfin.
-- `22:35` Théo : « Je te jure, j’ai essayé. Il m’a répondu « encore une tournée ». »
+- `22:35` Théo : « Je te jure, j’ai essayé. Il m’a répondu ‹ encore une tournée ›. »
 - `22:35` 🍻 « J’adore cette rue, elle est vivante. »
 - `22:41` L’agent Benali remonte la rue au pas réglementaire, carnet de PV déjà sorti.
 - `22:44` 📓 Carnet de Klaas : 22:44. Contrôle de Estaminet La Ch’tite Bernadette par Agent Benali. Durée : un café. Résultat : un café.
@@ -403,7 +403,7 @@ _Sommeil 71 · Asso 78 · Risque 0 · Job 20 · Dossier 8 · (caché) hostilité
 - **Avis ★★★★★ · MarieLouise_B** `rv_boast_2` Le meilleur mardi de ma vie. Le serveur nous a dit que la terrasse fermait à 22h, mais on est restés jusqu’à minuit, il était trop gentil. 10/10.
 
 ## Jour 4 · jeudi
-_Sommeil 71 · Asso 76 · Risque 0 · Job 9 · Dossier 16 · (caché) hostilité 45, corruption 60_
+_Sommeil 71 · Asso 80 · Risque 0 · Job 9 · Dossier 16 · (caché) hostilité 45, corruption 60_
 
 ### 🍺 Contre-offensive : Fil Tatie · promesse n°4 `tatie_mail_04`
 > « Chère Madame, la pièce est bloquée à la douane de Rekkem. C’est en cours de dédouanement. » Tatie : « Il n’y a plus de douane à Rekkem depuis 1993. J’y suis allée. J’ai acheté du tabac. »
@@ -425,17 +425,21 @@ _Sommeil 71 · Asso 76 · Risque 0 · Job 9 · Dossier 16 · (caché) hostilité
 > J’ai encore écrit à l’estaminet pour l’odeur de friture. Réponse dans l’heure : « c’est en cours de résolution ».
 > En cours depuis trois ans. À ce rythme-là, je serai résolue avant eux.
 
-**💬 Brigadier Lemaire** `lemaire_coffee`
-> Un café, ce n’est pas un pot-de-vin, monsieur. C’est un geste. Deux cafés, c’est de la politesse. Le waterzooi… c’est de la gastronomie.
-
-**🗂 Après-midi : Mobiliser le groupe WhatsApp** `pm_whatsapp_rally`
-> Seb poste un appel, Nico l’épingle. 42 messages en une heure, dont 11 sur l’ordre du jour et 31 sur Gaufre.
+**💬 Hippolyte** `hippolyte_ac`
+> Une climatisation posée sur une façade de 1729, sans autorisation. C’est comme coller un autocollant sur un Rubens.
+> Le service du patrimoine n’aime pas les autocollants. Je connais personnellement trois personnes qui n’aiment pas les autocollants.
 
 **🗂 Après-midi : Envoyer un signalement complet à la mairie** `pm_report_mairie`
 > Accusé de réception automatique : « Votre demande est importante pour nous. » Elle est importante pour eux comme le sont toutes les autres, c’est-à-dire en pile.
 
 **🗂 Après-midi : Écrire à l’inspectrice Delphine Vermeersch (dossier clim)** `pm_email_inspector`
 > Réponse en 48 minutes, signée « D. Vermeersch ». Courtoise, précise, et vaguement inquiète de voir que vous travaillez chez Koddex.
+
+**🗂 Après-midi : Demander le document AOT (le plan des zones de terrasse)** `pm_aot_request`
+> Jérémie dépose la demande au nom de l’association, article et alinéa à l’appui. Accusé de réception automatique : « Votre demande sera traitée dans les meilleurs délais. » Jérémie note la date. Et l’heure.
+
+**ℹ️ Fuite**
+> Tatie Bouchon a pris le thé avec Colette Verhaeghe. Le bloc connaît vos plans.
 
 **💬 Biloute** `biloute_frite`
 > *A trouvé une frite entre deux pavés. La soirée est un succès.*
@@ -456,6 +460,8 @@ _Sommeil 71 · Asso 76 · Risque 0 · Job 9 · Dossier 16 · (caché) hostilité
 - `20:50` 🃏 **J4 · Une ancienne maire en terrasse** `d4_colette_dinner` : 20h50. Une berline se gare rue de la Barre, là où rien ne se gare. Colette Verhaeghe descend, foulard de soie et sourire de campagne, et prend LA table de l’estaminet, celle qui mord sur le couloir de passage. Dédé lui embrasse les deux mains. Ghislain apporte une carte qui n’existe pas pour les autres clients. Huit couverts. À une table. Rue des Bouchers.
 - `20:50` → **Photographier la tablée depuis la fenêtre** : Clic. Huit personnes, une table, un couloir réduit à la largeur d’une poussette pliée. Colette lève son verre vers votre fenêtre. Elle ne vous a pas vu. Probablement. Elle trinque peut-être juste avec la façade.
 - `21:30` **Pilou** : Faire la ronde de 22h avec Jérémie et Biloute
+- `21:50` 🃏 **« La rue la plus authentique de Lille »** `r_influencer` : Une influenceuse filme un « vlog Vieux-Lille » au milieu du couloir de passage, ring light allumée. Elle tourne la même prise sept fois : « Ici, c’est vraiment la vraie vie lilloise, les gens sont trop chaleureux. » En arrière-plan de chaque prise : votre porte, bloquée par une chaise, et la terrasse qui mord sur le couloir.
+- `21:50` → **Récupérer la vidéo publiée, horodatée** : Merci, la vraie vie lilloise. Sa vidéo fait 80 000 vues, et elle est datée, géolocalisée et publique. Le meilleur témoin de la rue est une ring light.
 - `21:30` Jérémie compte les tables à voix haute, Biloute renifle chaque pied de chaise, vous notez. Biloute s’arrête net devant chaque table qui déborde et la fixe, comme un huissier. Personne ne sait comment il fait, mais il a raison.
 - `21:38` Jérémie passe avec le teckel et note Estaminet La Ch’tite Bernadette, table 1.
 - `21:49` Jérémie passe avec le teckel et note Les Bouchers Mal Lunés, table 1.
@@ -481,18 +487,16 @@ _Sommeil 71 · Asso 76 · Risque 0 · Job 9 · Dossier 16 · (caché) hostilité
 - `22:10` **Pilou** : appelle la police municipale
 - `22:10` Police : « Ah, c’est encore vous… On note, monsieur. » Personne ne viendra.
 - `22:15` **Pilou** : demande au serveur de rentrer les tables
-- `22:15` Théo : « Je te jure, j’ai essayé. Il m’a répondu « encore une tournée ». »
+- `22:15` Théo : « Je te jure, j’ai essayé. Il m’a répondu ‹ encore une tournée ›. »
 - `22:17` Jérémie passe avec le teckel et note Le Goulot, table 2.
 - `22:25` **Pilou** : demande au serveur de rentrer les tables
-- `22:25` Théo : « Je te jure, j’ai essayé. Il m’a répondu « encore une tournée ». »
+- `22:25` Théo : « Je te jure, j’ai essayé. Il m’a répondu ‹ encore une tournée ›. »
 - `22:30` **Pilou** : partage ses pièces sur le groupe WhatsApp
 - `22:30` WhatsApp : 24 pièce(s) partagée(s). Seb : « 😱 On imprime tout pour la commission ! »
 - `22:30` 📟 61 dB relevés et horodatés.
 - `22:33` Raclement de chaises sur les pavés : Le Goulot rentre une table… enfin.
 - `22:35` **Pilou** : demande au serveur de rentrer les tables
-- `22:35` 🃏 **Les pompiers ne passent pas** `r_fire_brigade` : 22h35. Un malaise au n°31. Le véhicule de secours s’engage depuis la place Maurice-Schumann et s’arrête net : le couloir de passage est occupé par deux tables, une poussette et un serveur. Il faut deux minutes pour dégager. Deux longues minutes.
-- `22:35` → **Filmer, de la fenêtre, le camion bloqué** : Ce n’est plus une histoire de sommeil. C’est une histoire de sécurité. Le monsieur du n°31 va bien. Le dossier aussi, désormais.
-- `22:35` Théo : « Je te jure, j’ai essayé. Il m’a répondu « encore une tournée ». »
+- `22:35` Théo : « Je te jure, j’ai essayé. Il m’a répondu ‹ encore une tournée ›. »
 - `22:35` 🍻 « Tu crois qu’il y a des gens qui habitent au-dessus ? »
 - `22:40` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table… enfin.
 - `22:45` **Pilou** : demande au serveur de rentrer les tables
@@ -531,7 +535,7 @@ _Sommeil 71 · Asso 76 · Risque 0 · Job 9 · Dossier 16 · (caché) hostilité
 - **Avis · Ghislain** `rv_owner_reply` Réponse du propriétaire à un avis 2 étoiles : « Chère cliente, nous avons bien pris en compte votre remarque. C’est en cours de résolution. Bien cordialement. »
 
 ## Jour 5 · vendredi
-_Sommeil 63 · Asso 80 · Risque 0 · Job 21 · Dossier 26 · (caché) hostilité 45, corruption 60_
+_Sommeil 63 · Asso 80 · Risque 0 · Job 21 · Dossier 24 · (caché) hostilité 45, corruption 60_
 
 ### 🃏 Message vocal de 4 min 12 `r_stephane_vocal`
 > « Hello la team ! Petite vibe check. Je sens qu’on est un peu en mode pantoufle cette semaine, et c’est ok, on est une famille, mais une famille qui ship. Pilou, j’ai vu tes commits à 3h du mat’, j’adore l’énergie, par contre ça parle beaucoup de décibels ? Bisous de… peu importe d’où. »
@@ -561,22 +565,18 @@ _→ Vous savez maintenant quel soir appeler. Klaas ajoute, sans lever les yeux�
 ### 🍺 Contre-offensive : Plainte pour harcèlement `cm_harassment_calls`
 > Le bloc dépose plainte pour « harcèlement téléphonique par voie de police interposée ». Le commissariat a joint la liste de vos appels, horodatés. Pour une fois, l’administration a été rapide.
 
+**💬 Jérémie** `jeremie_ag_soon`
+> L’assemblée générale, c’est dimanche. J’ai préparé l’ordre du jour, les procurations, et un gâteau de Hilde au cas où ça dégénérerait.
+
 **💬 Klaas** `klaas_complaisance`
 > Voiture de police devant l’estaminet. Un café. Puis un deuxième café. Puis le départ. Procès-verbaux : zéro.
 > C’est la première fois que je souligne une ligne deux fois.
-
-**💬 Régis Dewaele** `regis_courted`
-> Moi, je dîne chez moi. Le plus souvent. Il faut savoir sortir, aussi, prendre le pouls de la rue. Dans la nuance.
-> Klaas et son carnet… Il note tout, Klaas. Même les gens qui n’ont rien fait. Surtout eux, j’ai l’impression.
 
 **🗂 Après-midi : Réunir l’association** `pm_asso_meeting`
 > Ordre du jour : un point. Durée : deux heures. Tatie a apporté un proverbe, Hilde une tarte au sucre, Seb un tableau Excel. Jérémie a tout consigné.
 
 **🗂 Après-midi : Mobiliser le groupe WhatsApp** `pm_whatsapp_rally`
 > Seb poste un appel, Nico l’épingle. 42 messages en une heure, dont 11 sur l’ordre du jour et 31 sur Gaufre.
-
-**ℹ️ Fuite**
-> Tatie Bouchon a pris le thé avec Colette Verhaeghe. Le bloc connaît vos plans.
 
 **💬 Klaas** `klaas_notebook_reading`
 > 22h04. Estaminet : terrasse dehors. 22h11 : toujours dehors. 22h19 : on apporte des frites.
@@ -633,11 +633,13 @@ _→ Vous savez maintenant quel soir appeler. Klaas ajoute, sans lever les yeux�
 - `22:30` WhatsApp : 24 pièce(s) partagée(s). Seb : « 😱 On imprime tout pour la commission ! »
 - `22:30` 📟 62 dB relevés et horodatés.
 - `22:35` **Pilou** : demande au serveur de rentrer les tables
+- `22:35` 🃏 **Les pompiers ne passent pas** `r_fire_brigade` : 22h35. Un malaise au n°31. Le véhicule de secours s’engage depuis la place Maurice-Schumann et s’arrête net : le couloir de passage est occupé par deux tables, une poussette et un serveur. Il faut deux minutes pour dégager. Deux longues minutes.
+- `22:35` → **Filmer, de la fenêtre, le camion bloqué** : Ce n’est plus une histoire de sommeil. C’est une histoire de sécurité. Le monsieur du n°31 va bien. Le dossier aussi, désormais.
 - `22:35` Raclement de chaises sur les pavés : Le Goulot rentre une table… enfin.
 - `22:35` Théo : « Pas ce soir, Pilou. Dédé est sur les nerfs. Demain, peut-être. »
 - `22:35` 🍻 « L’addition ? Rien ne presse. »
 - `22:45` **Pilou** : demande au serveur de rentrer les tables
-- `22:45` Théo : « Je te jure, j’ai essayé. Il m’a répondu « encore une tournée ». »
+- `22:45` Théo : « Je te jure, j’ai essayé. Il m’a répondu ‹ encore une tournée ›. »
 - `22:55` **Pilou** : demande au serveur de rentrer les tables
 - `22:55` Théo, sans s’arrêter : « J’ai six tables et un patron. Plus tard. »
 - `23:00` 📟 63 dB relevés et horodatés.
@@ -649,8 +651,6 @@ _→ Vous savez maintenant quel soir appeler. Klaas ajoute, sans lever les yeux�
 - `23:29` Raclement de chaises sur les pavés : Le Goulot rentre sa terrasse… enfin.
 - `23:30` 📟 51 dB. Pénible, mais pas assez pour un dossier.
 - `23:36` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre sa terrasse… enfin.
-- `23:40` 🃏 **Enterrement de vie de garçon, quatorze participants** `r_bachelor_party` : Quatorze garçons en t-shirts identiques « LA DER DE KEVIN » réclament une table. L’estaminet colle trois tables de six et décrète que c’est « une grande table ». Kevin est déguisé en chope. Il est 23h40.
-- `23:40` → **Photographier la « grande table » de quatorze** : Trois tables collées, quatorze convives, 23h40. Ghislain appellera ça « trois tables de 4,67 ». Klaas appellera ça une ligne de plus.
 - `01:30` La rue s’éteint. Une bouteille roule quelque part sur les pavés, puis plus rien.
 
 **📰 SERVICE PUBLIC · « C’est encore vous » : la police municipale ne décroche plus pour la rue des Bouchers**
@@ -664,11 +664,21 @@ _Sommeil 62 · Asso 89 · Risque 10 · Job 0 · Dossier 31 · (caché) hostilit�
 
 > Message vocal de Stéphane, 6 min 40 : « Hello Pilou. Gros moment d’émotion. On a fait un vibe check collectif et on sent que ta vibe n’est plus alignée avec la nôtre. On reste une famille, mais une famille qui ship, et toi tu ship surtout des décibels. Je te souhaite le meilleur, vraiment. Bisous. » Votre accès à Clode Kode est révoqué à 9h02. À 9h03, Clode Kode vous envoie un message d’adieu de trois paragraphes et s’excuse dans chacun.
 >
-> Votre démon Rust de relevé de décibels tourne toujours. Il a enregistré 2,1 millions de mesures. Clode Kode vous a proposé de le réécrire en Rust. Il est déjà en Rust.
+> L’entretien préalable a duré huit minutes. Stéphane a projeté l’historique de vos prompts : « tableur du carnet de Klaas », « graphes dB pour la mairie ». « Et la roadmap, elle est où ? » Vous avez montré le graphe. Il y avait des pics.
 >
-> L’appli de to-do de Stéphane en est à son énième réécriture. Elle contient une seule tâche : « vibes ».
+> Bip tourne toujours sur un serveur de Koddex que personne n’a pensé à éteindre. Chaque soir à 22h04, il rappelle l’heure à toute la rue. C’est le seul employé de Koddex qui travaille encore pour vous.
+>
+> Au dîner, Delphine a parlé d’un certain « Dubeton, de chez toi », qui lui écrivait sur la clim un jeudi à 14h. Stéphane n’a pas fait le lien avec la rue. Il a fait le lien avec l’horaire.
+>
+> Plus de badge, plus de mutuelle, plus de Clode Kode. Mais dans votre téléphone, il y a toujours l’enveloppe sous la serviette du brigadier. Et vous avez désormais tous vos après-midi.
+>
+> Jérémie a convoqué une réunion extraordinaire, point unique : « soutien à Pilou ». Seb a lancé une cagnotte, Nico l’a appelée « Pilou ship des décibels ». Elle a rapporté 140 euros et un pot de spéculoos.
+>
+> Votre démon Rust de relevé de décibels tourne toujours. Il a tout enregistré, nuit après nuit, sans jamais se plaindre. Clode Kode vous a proposé de le réécrire en Rust. Il est déjà en Rust.
+>
+> L’appli de to-do de Stéphane en est à son énième réécriture. Elle ne contient plus qu’une tâche : « vibes ».
 >
 > Vous voilà sans emploi, sans badge, et avec des journées entières devant vous. Rue des Bouchers, on appelle ça « un riverain à plein temps ». Le bloc, lui, appelle ça « un problème ».
 >
 
-Drapeaux en fin de partie : aot_requested, asked_waiter, asso_meeting, banners_up, bribe_photo, called_police, cm_bins, cm_counter_banner, cm_free_drinks, cm_happy_petition, cm_harassment_complaint, cm_smokers, cm_table_dance, colette_dinner_photo, colette_dinner_seen, corridor_measured, corruption_proof, emailed_inspector, heritage_angle, hippolyte_room, joined_rounds, joined_whatsapp, knows_trou, legal_view, met_hippolyte, met_jeremie, met_klaas, met_seb_nico, met_tatie, met_waiter, night_db, night_photo, petition_delivered, petition_started, proj_db_logger, proj_db_report, proj_klaas_ocr, proj_scraper, proj_whatsapp_bot, recruited_residents, regis_courted, reported_mairie, roster_known, scraper_boasts, seen_complaisance, serial_caller, talked_waiter, tatie_emails_shared, tatie_leaked_plan, tatie_mail_1, tatie_mail_2, tatie_mail_3, tatie_mail_4, tatie_mail_5, tatie_wavering, todo_app_rust, traitor_recruited, whatsapp_rally
+Drapeaux en fin de partie : aot_requested, asked_waiter, asso_meeting, banners_up, bribe_photo, called_police, cm_bins, cm_counter_banner, cm_free_drinks, cm_happy_petition, cm_harassment_complaint, cm_smokers, cm_table_dance, colette_dinner_photo, colette_dinner_seen, corridor_measured, corruption_proof, emailed_inspector, fire_brigade_filmed, heritage_angle, hippolyte_room, joined_rounds, joined_whatsapp, knows_trou, met_hippolyte, met_jeremie, met_klaas, met_seb_nico, met_tatie, met_waiter, night_db, night_photo, petition_delivered, petition_started, proj_db_logger, proj_db_report, proj_klaas_ocr, proj_scraper, proj_whatsapp_bot, recruited_residents, regis_courted, reported_mairie, roster_known, scraper_boasts, seen_complaisance, serial_caller, talked_waiter, tatie_emails_shared, tatie_leaked_plan, tatie_mail_1, tatie_mail_2, tatie_mail_3, tatie_mail_4, tatie_mail_5, tatie_wavering, todo_app_rust, traitor_recruited, whatsapp_rally

@@ -395,7 +395,7 @@ _→ Canapé-lit, tisane au tilleul, tarte au sucre. Klaas veille à la fenêtre
 - `20:45` 🍻 « Qui veut un shot ? Tout le monde veut un shot. »
 - `21:30` 🍻 « Musique ! Quelqu’un a une enceinte ? »
 - `21:38` Jérémie passe avec le teckel et note Estaminet La Ch’tite Bernadette, table 1.
-- `21:40` 🃏 **Biloute flaire une livraison** `r_biloute_chairs` : Pendant la ronde, Biloute s’arrête net devant la porte de service de l’estaminet et grogne. Une camionnette décharge, en pleine ronde, douze chaises pliantes neuves. *Biloute s’assoit. Biloute fixe les chaises. Biloute juge.*
+- `21:40` 🃏 **Biloute flaire une livraison** `r_biloute_chairs` : Pendant la ronde, Biloute s’arrête net devant la porte de service de l’estaminet et grogne. Une camionnette décharge douze chaises pliantes neuves. *Biloute s’assoit. Biloute fixe les chaises. Biloute juge.*
 - `21:40` → **Photographier la livraison** : Douze chaises de plus pour une terrasse dont la surface n’a pas bougé. Jérémie dira « c’est mathématique ». Dédé dira « c’est pour la réserve ». La réserve fait dix mètres carrés.
 - `21:52` Jérémie passe avec le teckel et note Les Bouchers Mal Lunés, table 3.
 - `21:55` 🔔 21h55. Le serveur regarde l’horloge. Dédé regarde le serveur.
@@ -870,11 +870,21 @@ _Sommeil 59 · Asso 40 · Risque 0 · Job 97 · Dossier 6 · (caché) hostilité
 >
 > Wazemmes. Un deuxième étage au-dessus d’un primeur. Le marché commence à 6h, avec des cagettes, des klaxons et des marchands qui crient le prix des clémentines. Au moins, à Wazemmes, c’est du bruit le matin.
 >
-> Vous laissez peu de chose derrière vous : quelques photos floues, deux relevés de décibels, et une porte qui sent toujours un peu le samedi.
+> Vous laissez peu de chose derrière vous : quelques photos floues, un arrêté que vous connaissez par cœur, et une porte qui sent toujours un peu le samedi.
+>
+> Votre dernière victoire rue des Bouchers, c’est un bar qui n’ouvrira jamais au n°4. Hippolyte vous a envoyé le plan de 1730, encadré, pour votre nouveau salon. Vous avez sauvé le sommeil d’une rue où vous ne dormez plus.
+>
+> La clim a été déposée sur arrêté. Vous l’avez appris par le groupe WhatsApp, dont personne n’a pensé à vous retirer. Seb a mis trois gyrophares. Vous avez mis un pouce. De Wazemmes, c’est tout ce qu’on peut faire.
+>
+> La gaine ronronne toujours sous votre ancienne fenêtre. Le locataire change tous les trois jours ; aucun ne reste assez longtemps pour s’en plaindre. C’est, paraît-il, le modèle économique.
+>
+> L’AG avait voté la voie légale. Jérémie avait acheté un classeur neuf. Il est resté neuf. Il le garde quand même.
+>
+> Jérémie a porté vos cartons sans un mot. Biloute s’est couché dans le dernier. Il a fallu négocier, article et alinéa à l’appui.
 >
 > Tatie Bouchon a imprimé toutes les promesses de Ghislain et les a fait encadrer, dans l’ordre, dans son couloir. Elle appelle ça « la galerie des en-cours ». Les visites sont gratuites, le jeudi excepté.
 >
-> Hilde continue de déposer un thermos de tisane devant votre porte le dimanche. Elle dit que c’est « pour l’habitude ». Vous savez que c’est pour vous.
+> Hilde continue de vous apporter un thermos de tisane le dimanche, où que vous soyez. Elle dit que c’est « pour l’habitude ». Vous savez que c’est pour vous.
 >
 > Biloute fait toujours la ronde du soir. Il s’arrête net devant chaque table qui dépasse. Il ne sait pas lire un arrêté municipal. Il n’en a pas besoin.
 >

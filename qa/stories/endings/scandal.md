@@ -181,7 +181,7 @@ _→ Le bloc dit « ça a toujours été une rue festive ». Vous pourrez rép
 - `22:18` Jérémie passe avec le teckel et note Le Goulot, table 3.
 - `22:46` Tiens ? Estaminet La Ch’tite Bernadette rentre 6 table(s) d’un coup…
 - `22:48` Lemaire arrive, salue les terrasses de loin avant de saluer qui que ce soit d’autre.
-- `22:51` Lemaire arrive devant Estaminet La Ch’tite Bernadette, d’une sagesse exemplaire. Il s’en étonne à peine.
+- `22:51` Lemaire arrive devant Estaminet La Ch’tite Bernadette, soudain d’une sagesse exemplaire. Il ne s’en étonne même pas.
 - `23:05` 📓 Carnet de Klaas : 22:46. Estaminet La Ch’tite Bernadette rentre ses tables. Toutes. D’un coup. 22:50 : police. « Tout est en ordre. » 23:05 : tout ressort.
 - `23:05` Les tables de Estaminet La Ch’tite Bernadette ressortent. Klaas a tout noté.
 - `23:11` Raclement de chaises sur les pavés : Le Goulot rentre sa terrasse… enfin.
@@ -256,7 +256,7 @@ _Sommeil 56 · Asso 38 · Risque 11 · Job 39 · Dossier 2 · (caché) hostilit�
 - `20:45` 🍻 « La carbonnade, elle est à tomber. »
 - `21:30` 🍻 « La carbonnade, elle est à tomber. »
 - `21:38` Jérémie passe avec le teckel et note Estaminet La Ch’tite Bernadette, table 1.
-- `21:40` 🃏 **Biloute flaire une livraison** `r_biloute_chairs` : Pendant la ronde, Biloute s’arrête net devant la porte de service de l’estaminet et grogne. Une camionnette décharge, en pleine ronde, douze chaises pliantes neuves. *Biloute s’assoit. Biloute fixe les chaises. Biloute juge.*
+- `21:40` 🃏 **Biloute flaire une livraison** `r_biloute_chairs` : Pendant la ronde, Biloute s’arrête net devant la porte de service de l’estaminet et grogne. Une camionnette décharge douze chaises pliantes neuves. *Biloute s’assoit. Biloute fixe les chaises. Biloute juge.*
 - `21:40` → **Photographier la livraison** : Douze chaises de plus pour une terrasse dont la surface n’a pas bougé. Jérémie dira « c’est mathématique ». Dédé dira « c’est pour la réserve ». La réserve fait dix mètres carrés.
 - `21:51` Jérémie passe avec le teckel et note Les Bouchers Mal Lunés, table 2.
 - `21:55` 🔔 21h55. Le serveur regarde l’horloge. Dédé regarde le serveur.
@@ -440,7 +440,7 @@ _→ « Une clim en façade d’une maison de 1729. » Il prend son stylo-plum
 - `22:15` 🍻 « Les gens qui se plaignent du bruit, ils ont qu’à habiter à la campagne. »
 - `22:33` Tiens ? Estaminet La Ch’tite Bernadette rentre 3 table(s) d’un coup…
 - `22:35` Lemaire arrive, salue les terrasses de loin avant de saluer qui que ce soit d’autre.
-- `22:38` Lemaire arrive devant Estaminet La Ch’tite Bernadette, d’une sagesse exemplaire. Il s’en étonne à peine.
+- `22:38` Lemaire arrive devant Estaminet La Ch’tite Bernadette, soudain d’une sagesse exemplaire. Il ne s’en étonne même pas.
 - `22:41` Raclement de chaises sur les pavés : Le Goulot rentre une table… enfin.
 - `22:50` 📓 Carnet de Klaas : 22:33 : rangement soudain chez Estaminet La Ch’tite Bernadette, sans client parti. 22:37 : patrouille. 22:50 : les tables reviennent. Le hasard est très ponctuel.
 - `22:50` Les tables de Estaminet La Ch’tite Bernadette ressortent. Klaas a tout noté.
@@ -538,7 +538,7 @@ _→ Vous savez maintenant quel soir appeler. Klaas ajoute, sans lever les yeux�
 - `22:38` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table… enfin.
 - `22:42` Tiens ? Estaminet La Ch’tite Bernadette rentre 5 table(s) d’un coup…
 - `22:44` Lemaire arrive, salue les terrasses de loin avant de saluer qui que ce soit d’autre.
-- `22:47` Lemaire arrive devant Estaminet La Ch’tite Bernadette, d’une sagesse exemplaire. Il s’en étonne à peine.
+- `22:47` Lemaire arrive devant Estaminet La Ch’tite Bernadette, soudain d’une sagesse exemplaire. Il ne s’en étonne même pas.
 - `22:49` Quelqu’un urine contre votre porte d’entrée. Classique du samedi.
 - `22:59` Raclement de chaises sur les pavés : Le Goulot rentre sa terrasse… enfin.
 - `23:04` 📓 Carnet de Klaas : 22:42. Estaminet La Ch’tite Bernadette rentre ses tables. Toutes. D’un coup. 22:46 : police. « Tout est en ordre. » 23:04 : tout ressort.
@@ -852,7 +852,7 @@ _→ Hippolyte : « Un bar à cocktails, au n°4. Dans une maison de 1730. Ave
 - **WhatsApp · Nico** `wa_bombance_nico` Tu ne paniques pas. Tu fais une capture.
 
 ## Jour 11 · jeudi
-_Sommeil 40 · Asso 17 · Risque 12 · Job 70 · Dossier 30 · (caché) hostilité 95, corruption 70_
+_Sommeil 40 · Asso 17 · Risque 12 · Job 70 · Dossier 31 · (caché) hostilité 95, corruption 70_
 
 ### 🍺 Contre-offensive : Fil Tatie · promesse n°10 `tatie_mail_10`
 > « Chère Madame, c’est réparé. » Tatie, une heure plus tard : « J’ai ouvert la fenêtre. Ce n’est pas réparé. J’ai répondu ‹ non ›. Il m’a répondu ‹ c’est en cours de re-réparation ›. »
@@ -909,7 +909,7 @@ _→ « Éléments recevables mais insuffisants pour trancher. » Décision :
 - **WhatsApp · Nico** `wa_exhaust_delayed` Résultat de la réunion extraction : « une étude complémentaire ». J’ai lancé un compte à rebours. Il n’a pas de fin.
 
 ## Jour 12 · vendredi
-_Sommeil 42 · Asso 15 · Risque 17 · Job 77 · Dossier 30 · (caché) hostilité 95, corruption 70_
+_Sommeil 42 · Asso 15 · Risque 17 · Job 77 · Dossier 31 · (caché) hostilité 95, corruption 70_
 
 ### 🍺 Contre-offensive : Fil Tatie · promesse n°11 `tatie_mail_11`
 > « Chère Madame, Clode Kode nous aide désormais à rédiger nos réponses. Nous sommes sincèrement désolés pour la gêne occasionnée et nous nous engageons à… [Réponse générée automatiquement. Je ne peux pas promettre une réparation que je ne peux pas vérifier.] » Tatie : « Même la machine ne le croit plus. »
@@ -1086,17 +1086,27 @@ _Sommeil 27 · Asso 15 · Risque 33 · Job 100 · Dossier 31 · (caché) hostili
 **📰 Terrasses, cafés offerts et coups de fil : la rue des Bouchers fait trembler la mairie**
 > La commission des terrasses a été éclipsée par l’affaire de corruption. Les terrasses ferment à 22h. Les cafés offerts, eux, ont fermé tout court. Notre enquête continue.
 
-> « Terrasses et waterzooi : la police municipale mange-t-elle à l’œil ? » La une d’Anne-Sophie Lepoutre a été reprise partout, jusqu’à une radio nationale qui a prononcé « estaminet » avec l’accent parisien. Une enquête interne est ouverte. Colette Verhaeghe a déclaré qu’elle « ne connaissait ces gens que de loin », depuis sa table habituelle.
+> « Terrasses et waterzooi : la police municipale mange-t-elle à l’œil ? » La une d’Anne-Sophie Lepoutre a été reprise partout, jusqu’à une radio nationale qui a prononcé « estaminet » avec l’accent parisien. L’enquête interne, ouverte depuis des jours dans l’indifférence, s’est soudain trouvé des moyens. Colette Verhaeghe a déclaré qu’elle « ne connaissait ces gens que de loin », depuis sa table habituelle.
 >
-> Les colonnes du carnet de Klaas, « café offert, 0 PV », recopiées à la main sur deux semaines, ont été publiées en encadré. Klaas a acheté dix exemplaires du journal. Il en a annoté neuf.
+> Les lignes du carnet de Klaas, « café offert, 0 PV », recopiées de sa main, ont été publiées en encadré. Klaas a acheté dix exemplaires du journal. Il en a annoté neuf.
 >
-> L’association, elle, est sortie de l’affaire divisée. Hilde n’aime pas qu’on se fasse justice dans les journaux. Seb, si.
+> L’association, elle, est sortie de l’affaire divisée. Hilde n’a pas aimé la manière. Seb a adoré. Jérémie a tout consigné.
 >
 > Le bloc ne vous l’a pas pardonné. Dédé ne vous tape plus dans le dos. Il vous regarde passer, en souriant. C’est pire.
+>
+> Personne n’a demandé comment vous connaissiez si bien les devis jamais signés de l’estaminet. Anne-Sophie Lepoutre non plus. Elle a seulement dit : « Je ne veux pas savoir. » Vous non plus, au fond.
+>
+> Théo a été renvoyé à cause de vous, bien avant que l’affaire sorte. Il n’est pas dans l’article. Il sert maintenant rue de Gand, jusqu’à minuit. Il ne vous en veut pas. Il vous le dit en vous servant, ce qui est pire.
+>
+> L’AG avait voté « l’action directe ». Le journal a écrit « enquête ». Seb dit que c’est pareil, en mieux habillé. Hilde dit que non.
 >
 > La vidéo de la fenêtre circule encore. Elle a été doublée en néerlandais, remixée, puis oubliée. Dans la rue, on vous appelle parfois « le monsieur du deuxième », avec un respect prudent.
 >
 > Le faux post « Bernadette harcelée » est toujours en ligne. Il a 4 000 partages et zéro source. Vous n’y avez jamais répondu. Lui non plus ne vous a jamais répondu.
 >
+> Au n°4, l’affiche « BIENTÔT » a jauni sans jamais rien annoncer. Hippolyte passe devant chaque matin, son plan de 1730 sous le bras, au cas où. Le bar de nuit est allé ouvrir rue Royale. Rue Royale ne vous a pas remercié.
+>
+> Le soir de la parution, la rue a été très calme. Pas apaisée : attentive. Chaque terrasse vous suivait des yeux. Vous avez dormi quand même, fenêtre fermée, ce qui n’était pas exactement le plan.
+>
 
-Drapeaux en fin de partie : ac_violation_confirmed, ag_held, asked_waiter, benali_fined, bombance_bar_project, bombance_blocked, bombance_rumour, boss_noticed, bucket_used, bucket_witnessed, called_police, camera_window, cm_bins, cm_fake_post, cm_festive_saturday, cm_free_drinks, cm_harassment_complaint, cm_regis_nuance, cm_smokers, cm_table_dance, colette_dinner_photo, colette_dinner_seen, commission_done, commission_won, corridor_measured, corruption_proof, exhaust_meeting_delayed, heritage_angle, hilde_tisane, hippolyte_room, inspector_surprise, joined_rounds, knows_trou, met_hilde, met_hippolyte, met_jeremie, met_klaas, met_tatie, met_waiter, night_db, pee_at_door, police_flooded, press_contacted, press_scandal, proj_db_logger, proj_db_report, proj_fake_reviews, proj_klaas_ocr, proj_scraper, proj_whatsapp_bot, proj_wifi_cracker, random_drache, read_emails, read_quotes, read_reservations, regis_courted, roster_known, saturday1_done, saturday2_done, scraper_boasts, seen_complaisance, seen_tipoff, serial_caller, stance_direct, talked_waiter, tatie_fake_leak, tatie_leaked_plan, tatie_mail_1, tatie_mail_10, tatie_mail_11, tatie_mail_12, tatie_mail_2, tatie_mail_3, tatie_mail_4, tatie_mail_5, tatie_mail_6, tatie_mail_7, tatie_mail_8, tatie_mail_9, tatie_wavering, todo_app_rust, traitor_known, traitor_public, traitor_recruited, video_viral, waiter_bribed, waiter_fired, whatsapp_rally, wifi_cracked, won_scandal
+Drapeaux en fin de partie : ac_violation_confirmed, ag_held, asked_waiter, benali_fined, bombance_bar_project, bombance_blocked, bombance_rumour, boss_noticed, bucket_used, bucket_witnessed, called_police, camera_window, cm_bins, cm_fake_post, cm_festive_saturday, cm_free_drinks, cm_harassment_complaint, cm_regis_nuance, cm_smokers, cm_table_dance, colette_dinner_photo, colette_dinner_seen, commission_done, commission_won, corridor_measured, corruption_proof, exhaust_meeting_delayed, fire_brigade_filmed, heritage_angle, hilde_tisane, hippolyte_room, inspector_surprise, joined_rounds, knows_trou, met_hilde, met_hippolyte, met_jeremie, met_klaas, met_tatie, met_waiter, night_db, pee_at_door, police_flooded, press_contacted, press_scandal, proj_db_logger, proj_db_report, proj_fake_reviews, proj_klaas_ocr, proj_scraper, proj_whatsapp_bot, proj_wifi_cracker, random_drache, read_emails, read_quotes, read_reservations, regis_courted, roster_known, saturday1_done, saturday2_done, scraper_boasts, seen_complaisance, seen_tipoff, serial_caller, stance_direct, talked_waiter, tatie_fake_leak, tatie_leaked_plan, tatie_mail_1, tatie_mail_10, tatie_mail_11, tatie_mail_12, tatie_mail_2, tatie_mail_3, tatie_mail_4, tatie_mail_5, tatie_mail_6, tatie_mail_7, tatie_mail_8, tatie_mail_9, tatie_wavering, todo_app_rust, traitor_known, traitor_public, traitor_recruited, video_viral, waiter_bribed, waiter_fired, whatsapp_rally, wifi_cracked, won_scandal

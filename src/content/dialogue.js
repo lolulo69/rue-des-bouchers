@@ -998,7 +998,7 @@ export const DIALOGUE = [
   {
     id: 'dede_kitchen',
     speaker: 'dede',
-    when: { flags: ['kitchen_sabotaged'] },
+    when: { flags: ['kitchen_sabotaged'], notFlags: ['kitchen_sabotage_caught'] },
     lines: [
       "Une carbonnade sucrée comme un gâteau. Une crème brûlée salée comme la mer du Nord. Vingt ans de métier, jamais vu ça.",
       "Je ne sais pas qui. Mais je cherche, mon biloute. Je cherche.",

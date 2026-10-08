@@ -200,3 +200,34 @@ Status changes for the rows above (re-checked on fresh `legal-3` and `diplomat-8
 | Witness line repeated per witness | **fixed**: one narrated line per witness kind and act. |
 | `klaas_complaisance`, `journaliste_first` / `journaliste_solid`, `nico_hello`, `regis_courted`, `pm_bloc_fooled` / `tatie_bloc_fooled` | **fixed**: no clock times; the journalist's first contact only while the dossier is thin; Nico's rules match `wa_welcome`; Régis deflects instead of half-confessing; the bloc's reaction to the fake « manif samedi » comes after the first Saturday, in the past tense. |
 | Still open | Engine: nightly verdict score, custody verdict text, the police call counter, the 20:30 photo dB, the « Théo » UI label, hello-line ordering, the IGPN trigger. Balance: the rows above. `serveur_named` (« Tu m'appelles Théo maintenant ? » days late) is still open for the dialogue owner. |
+
+## 2026-10-08 · pass 3 (endings) · design agent, task `endings-pass`
+
+**Method.** `npm run story -- --ending all` (new `scripts/story-endings.js`) writes two runs per ending into `qa/stories/endings/`, plus one pair per
+custody variant (bucket/video, « carbonnade sucrée », « carbonnade laxative »). For each ending it uses the first method that works:
+1. a **natural** run, where a bot gets there on its own;
+2. **steered choices**, where only the player's choices are steered;
+3. **forced state**, as a last resort, with every forced fact printed in the transcript as « ⚙️ Pilotage (test, hors jeu) ».
+
+`qa/stories/endings/README.md` lists the method used for each. All 20 runs were read end to end (3 parallel readers plus the design agent),
+against four questions: is the ending earned, does the epilogue quote the decisive moments, is the tone right for that ending, and how much do two runs differ?
+
+**How each ending is reached:** natural for legal victory, negotiated peace, scandal, custody (bucket/video), moving out and the return.
+Forced state for fired, turncoat and the two kitchen custody variants: no bot reaches them by itself (→ balance).
+
+| Ending | Finding | Fix | Status |
+|---|---|---|---|
+| all | The epilogues were mostly shared filler. Two runs of the same ending shared 80–100 % of their paragraphs, and the run's decisive moves were missing. | About 60 new conditional parts across the 8 endings, plus a shared `STREET_AFTER` block (La Bombance saved, the uritrottoir annexed by Dédé). | fixed |
+| custody | Both trial variants printed one after the other, and the front page said « Aucun client n’a été blessé » after 14 sick customers. | The sucrée part and headline exclude `laxative_caught`; new `press_end_custody_laxative`; the laxative part rewritten to treat the harm seriously (correctionnel, the association disowns him). | fixed |
+| custody | The charges were never named; « en pleine nuit » didn't fit a custody that starts in the morning; Klaas came to the exit even when Pilou had never met him; the « Rien vu » line sat badly next to the lie to Klaas. | A list of charges, one per flag (camera + stolen power, stink bombs « en réunion », fake reviews, parasols, wifi); Théo and Klaas as witnesses; the updated bloc post; Régis; the association's silence. The opener no longer says « en pleine nuit »; the Klaas exit needs `met_klaas`, otherwise Jérémie and Biloute are there; a `klaas_lied_to` part. | fixed |
+| fired | Identical epilogues; what actually got Pilou fired was absent; « une seule tâche » contradicted the to-do app; « 2,1 millions de mesures » after 5 nights. | Parts for the dB report and the preliminary interview, Bip still running, Delphine at dinner, the LinkedIn post, the envelope photo kept in the phone, and the association's kitty. The Koddex lines are fixed. | fixed |
+| turncoat | It only happens through forcing. Klaas's « 21h10 » clashed with the run; the dossier « dort dans un tiroir » while Jérémie was pleading it at the commission; the commission's outcome was never said. | Klaas's lines without times plus a fourth line; Jérémie pleads without Pilou; « le report Dubeton »; the Waterzooi-gate forgiven by Dédé; the mayor; the « espace jardin »; the hate-wave reply; job ≥ 90. | fixed (reachability: balance) |
+| moving out | The blocked bar, the AC and the lost exhaust meeting were ignored; « deux relevés de décibels » was never true; Hilde brought tisane to the old door after the move; nothing for a dossier between 20 and 39. | Parts for all of these; Hilde « où que vous soyez »; the dossier part now starts at 20; Jérémie carries the boxes. | fixed |
+| the return | « depuis la visite guidée » even when the tour never happened; `bombance_wait` quoted the wrong answer; the twist was buried under police paragraphs. | Both lines fixed; INSTITUTIONS and AFTERMATH moved before the twist; the epilogue now ends with Hippolyte and the plans of 1880, then « À suivre ». | fixed |
+| scandal | The cost wasn't felt; « Une enquête interne est ouverte » was stale; « sur deux semaines » overstated; there was no closer. | Parts for the wifi (« Je ne veux pas savoir »), Théo fired, the direct-action vote; a closer (« Pas apaisée : attentive »). | fixed |
+| legal victory | The front page said the duct was moved when it wasn't; the corridor paragraph overstated; the AC win was unexplained; the dismissed complaints were missing. | `press_end_legal_ac` for when the exhaust meeting wasn't won; heritage + AC part; fire-brigade video; complaints dismissed (with or without the lawyer); Klaas's spreadsheet; hostility ≥ 80. | fixed |
+| negotiated peace | The epilogue implied a total win while the duct still hummed; « Tatie a signé la première » was invented; the refused scandal was never mentioned. | Parts for the charter draft, the night of the fire brigade, the drawer with the proof, « Pilou dort » to the kitchen, Régis the self-appointed mediator; Tatie and Théo fixed. | fixed |
+| events.js | `r_fire_brigade`, the most dramatic scene, set no flag. | `fire_brigade_filmed` / `fire_brigade_helped`, quoted by legal victory and peace. | fixed |
+| dialogue / countermoves / actions | Dédé « cherche » a culprit already caught; Maître Vandamme appeared without being hired; « c’est le Covid ! » (a real-world reference). | `dede_kitchen` gated; Jérémie reads the complaint; « c’est le canal d’avant 1912 ! ». | fixed |
+| harness | Two seeds of the same bot still share many paragraphs: about 70 % for scandal and custody, more for peace and turncoat. The bots make nearly the same decisions; real players won't. | Varying the bots' choices is the balance agent's tool. | open (balance) |
+| engine / balance | No bot reaches fired, turncoat or the kitchen custody variants. Théo works on after he is fired (scandal run 1). Benali takes a café (scandal run 2). | Thresholds and bot strategies belong to the balance agent; Théo after `waiter_fired` and Benali's complaisance belong to the build agent. | open |

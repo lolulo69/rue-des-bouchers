@@ -210,4 +210,6 @@ export const FLAGS = {
   // ── content-story (transcriptions, passe 2) ──────────────────────────
   charter_drafted: 'Brouillon de charte négocié avec le bloc (avant la commission)',
   traitor_public: 'Régis a été dénoncé publiquement sur le groupe WhatsApp',
+  fire_brigade_filmed: 'Pilou a filmé le camion de secours bloqué par les tables',
+  fire_brigade_helped: 'Pilou a aidé à dégager le passage des secours (avec Dédé)',
 };

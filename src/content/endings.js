@@ -49,7 +49,7 @@ const ASSO_FATES = [
   },
   {
     when: { flags: ['hilde_tisane'] },
-    text: "Hilde continue de déposer un thermos de tisane devant votre porte le dimanche. Elle dit que c’est « pour l’habitude ». Vous savez que c’est pour vous.",
+    text: "Hilde continue de vous apporter un thermos de tisane le dimanche, où que vous soyez. Elle dit que c’est « pour l’habitude ». Vous savez que c’est pour vous.",
   },
   {
     when: { flags: ['joined_rounds'] },
@@ -75,7 +75,7 @@ const INSTITUTIONS = [
     text: "Dans la foulée de l’enquête, l’agent Benali a été rappelé dans son ancien secteur. Le Commandant Desmet a appelé ça « un ajustement des ressources ». Benali appelle ça « enfin ».",
   },
   {
-    when: { flags: ['uritrottoir_installed'] },
+    when: { flags: ['uritrottoir_installed'], notFlags: ['cm_uritrottoir_terrace'] },
     text: "L’uritrottoir de la rue des Bouchers est devenu une attraction. Une guide de l’office de tourisme le présente entre la maison du n°40 et le canal disparu. Votre porte, elle, sèche enfin.",
   },
   {
@@ -95,11 +95,11 @@ const INSTITUTIONS = [
 const KODDEX = [
   {
     when: { flags: ['proj_db_logger'] },
-    text: "Votre démon Rust de relevé de décibels tourne toujours. Il a enregistré 2,1 millions de mesures. Clode Kode vous a proposé de le réécrire en Rust. Il est déjà en Rust.",
+    text: "Votre démon Rust de relevé de décibels tourne toujours. Il a tout enregistré, nuit après nuit, sans jamais se plaindre. Clode Kode vous a proposé de le réécrire en Rust. Il est déjà en Rust.",
   },
   {
     when: { flags: ['todo_app_rust'] },
-    text: "L’appli de to-do de Stéphane en est à son énième réécriture. Elle contient une seule tâche : « vibes ».",
+    text: "L’appli de to-do de Stéphane en est à son énième réécriture. Elle ne contient plus qu’une tâche : « vibes ».",
   },
 ];
 
@@ -126,6 +126,18 @@ const SECRETS = [
 ];
 
 // Les suites publiques de la campagne : le scandale dans la presse, la vidéo virale, la vague de haine.
+// La rue après la partie : le n°4 sauvé, les pompiers, l'uritrottoir annexé (QA « pass 3 (endings) »)
+const STREET_AFTER = [
+      {
+        when: { flags: ['bombance_blocked'] },
+        text: "Au n°4, l’affiche « BIENTÔT » a jauni sans jamais rien annoncer. Hippolyte passe devant chaque matin, son plan de 1730 sous le bras, au cas où. Le bar de nuit est allé ouvrir rue Royale. Rue Royale ne vous a pas remercié.",
+      },
+      {
+        when: { flags: ['uritrottoir_installed', 'cm_uritrottoir_terrace'] },
+        text: "L’uritrottoir figure désormais sur la carte de l’estaminet, rubrique « espace jardin ». Dédé y a mis des géraniums. Votre porte, elle, sèche enfin. C’est l’essentiel, hein.",
+      },
+];
+
 const AFTERMATH = [
   {
     when: { flags: ['press_scandal'], notFlags: ['won_scandal'] },
@@ -166,17 +178,17 @@ export const ENDINGS = [
       {
         when: {},
         text:
-          "Ce n’est pas la police municipale qui est venue, cette fois. Ce sont deux agents de la nationale, en pleine nuit, sur les pavés devant le n°10, avec une politesse inquiétante. Vous avez passé le reste de la nuit et la journée suivante dans une pièce sans fenêtre. Pour la première fois depuis des semaines, il n’y avait aucun bruit. Vous avez très bien dormi. C’est la seule victoire de cette fin.",
+          "Ce n’est pas la police municipale qui est venue, cette fois. Ce sont deux agents de la nationale, sur le palier du n°10, avec une politesse inquiétante. Vous avez passé vingt-quatre heures dans une pièce sans fenêtre. Pour la première fois depuis des semaines, il n’y avait aucun bruit. Vous avez très bien dormi. C’est la seule victoire de cette fin.",
       },
       {
-        when: { flags: ['kitchen_sabotage_caught'] },
+        when: { flags: ['kitchen_sabotage_caught'], notFlags: ['laxative_caught'] },
         text:
           "Variante « carbonnade sucrée ». La Voix du Nordiste titre : « Vieux-Lille : un riverain inverse le sel et le sucre d’un estaminet ». L’audience devant le tribunal de police dure quarante minutes, dont vingt sur la question de savoir si une carbonnade est censée être sucrée. L’avocat de l’estaminet plaide « l’atteinte à un patrimoine culinaire régional ». Dédé témoigne en tablier. Vous êtes condamné à une amende, à des dommages et intérêts, et à une célébrité locale dont vous vous seriez passé.",
       },
       {
         when: { flags: ['laxative_caught'] },
         text:
-          "Variante « carbonnade laxative ». Ce n’est plus le tribunal de police : c’est le correctionnel. La Voix du Nordiste titre : « Vieux-Lille : un riverain empoisonne la terrasse d’un estaminet ». Le mot « empoisonne » vous poursuivra longtemps. L’association publie un communiqué pour se désolidariser. Klaas, sobre, apporte au tribunal son carnet : il y est noté, à 21h12, « Pilou entre par la cuisine. Mauvaise idée. »",
+          "Variante « carbonnade laxative ». Ce n’est plus le tribunal de police : c’est le correctionnel. Quatorze clients ont passé une soirée qu’aucun n’a trouvée drôle le lendemain. La Voix du Nordiste titre : « Vieux-Lille : un riverain empoisonne la terrasse d’un estaminet ». Le mot vous poursuivra longtemps. Il est juste. L’association publie un communiqué pour se désolidariser ; Jérémie l’a signé seul, et vite.",
       },
       {
         when: { flags: ['bucket_witnessed'] },
@@ -198,10 +210,62 @@ export const ENDINGS = [
         when: { stats: { dossier: '>=50' } },
         text: "Le dossier de l’association, lui, était solide. Jérémie l’a porté seul à la commission. Il a gagné une table rentrée et une condescendance générale : « C’est l’association du monsieur en garde à vue ? »",
       },
+      {
+        when: { flags: ['laxative_caught', 'kitchen_sabotage_caught'] },
+        text: "Le sel et le sucre inversés le même soir sont joints au dossier. Au tribunal, personne ne rit de la carbonnade sucrée. Elle est devenue une circonstance.",
+      },
+      {
+        when: { flags: ['laxative_caught', 'waiter_informant'] },
+        text: "Le témoin de l’accusation s’appelle Théo. Vous l’aviez payé pour qu’il vous renseigne ; il a renseigné le tribunal, avec la même précision. À la sortie de l’audience : « Je fais que mon taf, moi. » Pour une fois, ça ne vous a pas fait rire.",
+      },
+      {
+        when: { flags: ['laxative_caught', 'met_klaas', 'klaas_noted_pilou'], notFlags: ['klaas_persuaded'] },
+        text: "Klaas est cité comme témoin. Il lit son carnet sans lever les yeux : les heures, le côté du n°10, et votre prénom. Il n’ajoute rien. Hilde, au troisième rang, regarde ses mains.",
+      },
+      {
+        when: { flags: ['camera_awning', 'power_stolen'] },
+        text: "Au commissariat, on vous lit la liste. La caméra sous le store, branchée sur le courant de l’estaminet : « vol d’électricité », savoure l’agent, qui l’écrit pour la première fois de sa carrière. L’estaminet réclame 4,12 € de courant. Ghislain a joint le ticket.",
+      },
+      {
+        when: { flags: ['stink_bomb'] },
+        text: "Les boules puantes figurent au procès-verbal sous l’intitulé « nuisance olfactive en réunion ». Vous étiez seul. L’agent a laissé « en réunion », par habitude.",
+      },
+      {
+        when: { flags: ['fake_reviews_traced'] },
+        text: "Les faux avis sont au dossier, imprimés et surlignés par Ghislain. Ils ont tous la même faute d’accord. Le greffier l’a corrigée sur la dernière copie, par réflexe.",
+      },
+      {
+        when: { flags: ['sabotage_parasols'] },
+        text: "Les parasols ont été retrouvés dans votre salon, ouverts, faute de place. L’agent a demandé si vous comptiez ouvrir une terrasse. Lui a trouvé ça drôle.",
+      },
+      {
+        when: { flags: ['wifi_cracked'] },
+        text: "Le réseau « BERNADETTE_INVITES » figure au procès-verbal. Sur réquisition, Clode Kode a fourni le journal de ses refus, horodaté. Il s’en excuse encore.",
+      },
+      {
+        when: { flags: ['cm_fake_post'], notFlags: ['hate_wave_answered'] },
+        text: "Le post « Bernadette harcelée » a été mis à jour : « Le harceleur est en garde à vue. Merci pour votre soutien ❤️ ». Bernadette n’existe toujours pas. Elle a gagné quand même.",
+      },
+      {
+        when: { flags: ['traitor_public'] },
+        text: "Régis, démasqué la semaine d’avant, vous a envoyé un message de soutien. Le seul. Il dîne toujours gratis : la compassion, ça ne lui coûte rien.",
+      },
+      {
+        when: { stats: { asso: '<=10' }, notFlags: ['laxative_caught'] },
+        text: "L’association n’a publié aucun communiqué. Sur le groupe WhatsApp, Seb a écrit « attends, attends… », puis plus rien. C’est le premier silence de l’histoire du groupe.",
+      },
+      {
+        when: { flags: ['klaas_lied_to'], notFlags: ['klaas_persuaded'] },
+        text: "La ligne que Klaas avait rayée pour vous est restée lisible, en dessous. Le juge ne l’a pas demandée. Klaas ne l’a pas proposée. Vous lui aviez menti ; il ne vous a pas rendu la pareille.",
+      },
       ...KLAAS_NOTEBOOK,
       {
-        when: {},
+        when: { flags: ['met_klaas'] },
         text: "Klaas est venu vous chercher à la sortie. Il n’a rien dit. Il a juste rangé son carnet dans sa poche, côté cœur.",
+      },
+      {
+        when: { notFlags: ['met_klaas'] },
+        text: "À la sortie, il y avait Jérémie et Biloute. Jérémie tenait le dossier sous le bras, par habitude. Biloute vous a reniflé la cheville, l’air de dire que lui n’avait jamais arrêté d’enquêter.",
       },
     ],
   },
@@ -232,6 +296,30 @@ export const ENDINGS = [
         when: { flags: ['delphine_dinner'] },
         text: "Delphine a peut-être eu un mot sur votre dîner. Ou pas. Stéphane n’est jamais au courant de rien, y compris de ce que fait sa femme.",
       },
+      {
+        when: { flags: ['proj_db_report'] },
+        text: "L’entretien préalable a duré huit minutes. Stéphane a projeté l’historique de vos prompts : « tableur du carnet de Klaas », « graphes dB pour la mairie ». « Et la roadmap, elle est où ? » Vous avez montré le graphe. Il y avait des pics.",
+      },
+      {
+        when: { flags: ['proj_whatsapp_bot'] },
+        text: "Bip tourne toujours sur un serveur de Koddex que personne n’a pensé à éteindre. Chaque soir à 22h04, il rappelle l’heure à toute la rue. C’est le seul employé de Koddex qui travaille encore pour vous.",
+      },
+      {
+        when: { flags: ['emailed_inspector'], notFlags: ['delphine_dinner'] },
+        text: "Au dîner, Delphine a parlé d’un certain « Dubeton, de chez toi », qui lui écrivait sur la clim un jeudi à 14h. Stéphane n’a pas fait le lien avec la rue. Il a fait le lien avec l’horaire.",
+      },
+      {
+        when: { flags: ['press_article'] },
+        text: "Stéphane a partagé votre photo de La Voix du Nordiste sur LinkedIn : « Fier de nos talents qui s’engagent ! » Deux heures plus tard, il vous licenciait. Le post est toujours en ligne. 312 likes.",
+      },
+      {
+        when: { flags: ['corruption_proof'] },
+        text: "Plus de badge, plus de mutuelle, plus de Clode Kode. Mais dans votre téléphone, il y a toujours l’enveloppe sous la serviette du brigadier. Et vous avez désormais tous vos après-midi.",
+      },
+      {
+        when: { stats: { asso: '>=70' } },
+        text: "Jérémie a convoqué une réunion extraordinaire, point unique : « soutien à Pilou ». Seb a lancé une cagnotte, Nico l’a appelée « Pilou ship des décibels ». Elle a rapporté 140 euros et un pot de spéculoos.",
+      },
       ...KODDEX,
       {
         when: {},
@@ -259,7 +347,7 @@ export const ENDINGS = [
       {
         when: {},
         text:
-          "Dans le carnet de Klaas, trois lignes, trois dates, la même écriture lente : « 21h10, Pilou, carbonnade. » Il n’a rien ajouté. Il n’en avait pas besoin.",
+          "Dans le carnet de Klaas, trois lignes, trois dates, la même écriture lente : « Pilou, carbonnade. » « Idem. » « Idem, table du coin. » Le jour de la commission, une quatrième ligne, sans heure : « Pilou, premier rang, côté bloc. » Puis il a tourné la page et noté l’heure où les tables sont ressorties.",
       },
       {
         when: { flags: ['stance_direct'] },
@@ -267,11 +355,39 @@ export const ENDINGS = [
       },
       {
         when: { stats: { dossier: '>=50' } },
-        text: "Votre dossier, avec ses photos nettes et ses relevés horodatés, dort dans un tiroir. Jérémie vous a demandé de le lui rendre. Vous avez dit « bien sûr ». C’était il y a trois semaines.",
+        text: "Votre dossier, Jérémie l’a plaidé sans vous, devant vous. Il a dit « pièce 12 » sans vous regarder. Vous avez applaudi par réflexe. Dédé aussi, par politesse.",
       },
       {
         when: { flags: ['traitor_known'] },
         text: "Régis vous fait signe depuis la table d’à côté. Vous étiez deux traîtres, finalement. Lui, au moins, avait des meublés à remplir.",
+      },
+      {
+        when: { flags: ['commission_done'] },
+        text: "Bertrand Lescaut a regardé le dossier, puis vous, assis entre Dédé et 600 pages, puis le dossier. Décision « reportée à une séance ultérieure ». À la mairie, on appelle ça le report Dubeton.",
+      },
+      {
+        when: { flags: ['press_scandal'] },
+        text: "Le « Waterzooi-gate », c’est vous qui l’aviez sorti. Dédé a lu la une à voix haute, table par table, et s’est arrêté à la vôtre : « Toi, mon biloute, je te pardonne. T’avais faim. »",
+      },
+      {
+        when: { flags: ['lescaut_ally'] },
+        text: "Le maire cite toujours « l’exemple de la rue des Bouchers ». Il ne cite plus votre nom.",
+      },
+      {
+        when: { flags: ['uritrottoir_installed', 'cm_uritrottoir_terrace'] },
+        text: "Votre table touche « l’espace jardin » de Dédé, contre l’uritrottoir que vous aviez réclamé. Vous dites « l’espace jardin », vous aussi, maintenant.",
+      },
+      {
+        when: { flags: ['hate_wave_answered'] },
+        text: "Votre réponse au faux post est toujours en ligne : « Bernadette n’existe pas, mais nos nuits, si. » Dessous, un nouveau commentaire : « Et la carbonnade, elle existe ? » C’était vous. Mauvais compte.",
+      },
+      {
+        when: { flags: ['stance_legal'] },
+        text: "C’est vous qui aviez défendu la voie légale à l’AG. Vous avez tenu parole : dîner en terrasse avant 22h est parfaitement légal.",
+      },
+      {
+        when: { stats: { job: '>=90' } },
+        text: "Chez Koddex, votre productivité n’a jamais été aussi haute. Stéphane vous a demandé votre secret en one-to-one. Vous avez dit « carbonnade ». Il en a fait un framework.",
       },
       {
         when: {},
@@ -307,12 +423,32 @@ export const ENDINGS = [
           "Wazemmes. Un deuxième étage au-dessus d’un primeur. Le marché commence à 6h, avec des cagettes, des klaxons et des marchands qui crient le prix des clémentines. Au moins, à Wazemmes, c’est du bruit le matin.",
       },
       {
-        when: { stats: { dossier: '>=40' } },
-        text: "Vous avez laissé votre dossier à Jérémie, en trois classeurs. Il l’a rangé dans l’atelier d’Hippolyte, comme on range des archives d’avant-guerre : pour la suite.",
+        when: { stats: { dossier: '>=20' } },
+        text: "Vous avez laissé votre dossier à Jérémie, plus ou moins épais selon les nuits. Il l’a rangé dans l’atelier d’Hippolyte, comme on range des archives d’avant-guerre : pour la suite.",
       },
       {
         when: { stats: { dossier: '<20' } },
-        text: "Vous laissez peu de chose derrière vous : quelques photos floues, deux relevés de décibels, et une porte qui sent toujours un peu le samedi.",
+        text: "Vous laissez peu de chose derrière vous : quelques photos floues, un arrêté que vous connaissez par cœur, et une porte qui sent toujours un peu le samedi.",
+      },
+      {
+        when: { flags: ['bombance_blocked'] },
+        text: "Votre dernière victoire rue des Bouchers, c’est un bar qui n’ouvrira jamais au n°4. Hippolyte vous a envoyé le plan de 1730, encadré, pour votre nouveau salon. Vous avez sauvé le sommeil d’une rue où vous ne dormez plus.",
+      },
+      {
+        when: { flags: ['ac_violation_confirmed'] },
+        text: "La clim a été déposée sur arrêté. Vous l’avez appris par le groupe WhatsApp, dont personne n’a pensé à vous retirer. Seb a mis trois gyrophares. Vous avez mis un pouce. De Wazemmes, c’est tout ce qu’on peut faire.",
+      },
+      {
+        when: { flags: ['exhaust_meeting_lost'] },
+        text: "La gaine ronronne toujours sous votre ancienne fenêtre. Le locataire change tous les trois jours ; aucun ne reste assez longtemps pour s’en plaindre. C’est, paraît-il, le modèle économique.",
+      },
+      {
+        when: { flags: ['stance_legal'], stats: { dossier: '<20' } },
+        text: "L’AG avait voté la voie légale. Jérémie avait acheté un classeur neuf. Il est resté neuf. Il le garde quand même.",
+      },
+      {
+        when: { flags: ['met_jeremie'] },
+        text: "Jérémie a porté vos cartons sans un mot. Biloute s’est couché dans le dernier. Il a fallu négocier, article et alinéa à l’appui.",
       },
       ...ASSO_FATES,
       ...AFTERMATH,
@@ -348,6 +484,16 @@ export const ENDINGS = [
         when: { flags: ['won_scandal'] },
         text: "Vous avez gagné. La Voix du Nordiste a fait sa une, la police municipale a fait son examen de conscience, et le bloc a fait profil bas.",
       },
+      ...INSTITUTIONS,
+      ...AFTERMATH,
+      {
+        when: { flags: ['won_peace', 'charter_drafted'] },
+        text: "Le brouillon de charte, avec ses ratures, est punaisé au Goulot. Pendant quelques jours, tout le monde l’a respecté. C’était presque trop beau.",
+      },
+      {
+        when: { flags: ['won_legal', 'ac_violation_confirmed'] },
+        text: "La clim est tombée, la terrasse aussi. Hippolyte a fait encadrer la phrase de Delphine au micro. Elle tient sur une ligne.",
+      },
       {
         when: {},
         text:
@@ -355,14 +501,20 @@ export const ENDINGS = [
       },
       {
         when: { flags: ['knows_trou'] },
-        text: "Ils ont appelé le bar « Le Trou ». Le surnom traînait partout depuis la visite guidée : ils n’ont eu qu’à se baisser.",
+        text: "Ils ont appelé le bar « Le Trou ». Le surnom traînait partout, dans les journaux comme dans la bouche d’Hippolyte : ils n’ont eu qu’à se baisser.",
       },
       {
         when: { flags: ['bombance_wait'] },
-        text: "Tatie Bouchon vous l’avait dit. Colette le lui avait dit. Vous aviez répondu « un problème à la fois ». Le problème suivant a une licence IV.",
+        text: "Tatie Bouchon vous l’avait dit. Colette le lui avait dit. Vous aviez répondu « on verra après la commission ». C’est après la commission. On voit. Le problème suivant a une licence IV.",
       },
-      ...INSTITUTIONS,
-      ...AFTERMATH,
+      {
+        when: { flags: ['bombance_wait', 'met_hippolyte'] },
+        text: "Hippolyte est passé le soir même, un tube en carton sous le bras. « Ce local était une sellerie en 1880. J’ai les plans. Vous m’aviez dit après la commission. »",
+      },
+      {
+        when: { flags: ['corruption_proof'], notFlags: ['press_scandal'] },
+        text: "Dans votre tiroir dort une photo que personne n’a vue. « Pour la suite », dit Seb. Nico dit que ce n’est pas une suite, c’est une rue.",
+      },
       {
         when: {},
         text: "Jérémie a convoqué une assemblée générale extraordinaire. Ordre du jour, point unique : « On recommence. » À suivre…",
@@ -382,7 +534,7 @@ export const ENDINGS = [
       {
         when: {},
         text:
-          "« Terrasses et waterzooi : la police municipale mange-t-elle à l’œil ? » La une d’Anne-Sophie Lepoutre a été reprise partout, jusqu’à une radio nationale qui a prononcé « estaminet » avec l’accent parisien. Une enquête interne est ouverte. Colette Verhaeghe a déclaré qu’elle « ne connaissait ces gens que de loin », depuis sa table habituelle.",
+          "« Terrasses et waterzooi : la police municipale mange-t-elle à l’œil ? » La une d’Anne-Sophie Lepoutre a été reprise partout, jusqu’à une radio nationale qui a prononcé « estaminet » avec l’accent parisien. L’enquête interne, ouverte depuis des jours dans l’indifférence, s’est soudain trouvé des moyens. Colette Verhaeghe a déclaré qu’elle « ne connaissait ces gens que de loin », depuis sa table habituelle.",
       },
       {
         when: { flags: ['bribe_photo'] },
@@ -394,7 +546,7 @@ export const ENDINGS = [
       },
       {
         when: { flags: ['seen_complaisance', 'met_klaas'] },
-        text: "Les colonnes du carnet de Klaas, « café offert, 0 PV », recopiées à la main sur deux semaines, ont été publiées en encadré. Klaas a acheté dix exemplaires du journal. Il en a annoté neuf.",
+        text: "Les lignes du carnet de Klaas, « café offert, 0 PV », recopiées de sa main, ont été publiées en encadré. Klaas a acheté dix exemplaires du journal. Il en a annoté neuf.",
       },
       {
         when: { flags: ['klaas_log_certified'] },
@@ -407,14 +559,31 @@ export const ENDINGS = [
       ...INSTITUTIONS,
       {
         when: { stats: { asso: '<40' } },
-        text: "L’association, elle, est sortie de l’affaire divisée. Hilde n’aime pas qu’on se fasse justice dans les journaux. Seb, si.",
+        text: "L’association, elle, est sortie de l’affaire divisée. Hilde n’a pas aimé la manière. Seb a adoré. Jérémie a tout consigné.",
       },
       {
         when: {},
         text: "Le bloc ne vous l’a pas pardonné. Dédé ne vous tape plus dans le dos. Il vous regarde passer, en souriant. C’est pire.",
       },
+      {
+        when: { flags: ['wifi_cracked'] },
+        text: "Personne n’a demandé comment vous connaissiez si bien les devis jamais signés de l’estaminet. Anne-Sophie Lepoutre non plus. Elle a seulement dit : « Je ne veux pas savoir. » Vous non plus, au fond.",
+      },
+      {
+        when: { flags: ['waiter_fired'] },
+        text: "Théo a été renvoyé à cause de vous, bien avant que l’affaire sorte. Il n’est pas dans l’article. Il sert maintenant rue de Gand, jusqu’à minuit. Il ne vous en veut pas. Il vous le dit en vous servant, ce qui est pire.",
+      },
+      {
+        when: { flags: ['stance_direct'] },
+        text: "L’AG avait voté « l’action directe ». Le journal a écrit « enquête ». Seb dit que c’est pareil, en mieux habillé. Hilde dit que non.",
+      },
       ...SECRETS,
       ...AFTERMATH,
+      ...STREET_AFTER,
+      {
+        when: {},
+        text: "Le soir de la parution, la rue a été très calme. Pas apaisée : attentive. Chaque terrasse vous suivait des yeux. Vous avez dormi quand même, fenêtre fermée, ce qui n’était pas exactement le plan.",
+      },
     ],
   },
 
@@ -450,7 +619,7 @@ export const ENDINGS = [
       },
       {
         when: { flags: ['corridor_measured'] },
-        text: "Vos mesures au mètre ruban, couloir de passage grignoté de 15 à 55 cm, ont été reprises au centimètre près dans l’arrêté. Le mètre ruban est désormais rangé dans une vitrine chez Hippolyte.",
+        text: "Vos mesures au mètre ruban, soir après soir, ont été versées au dossier. Personne ne les a contestées. Le mètre ruban est désormais rangé dans une vitrine chez Hippolyte.",
       },
       {
         when: { flags: ['formal_notice'] },
@@ -464,11 +633,36 @@ export const ENDINGS = [
         when: { flags: ['petition_delivered'] },
         text: "La pétition des riverains, reliée cuir par Hippolyte, est restée sur la table du maire pendant toute la séance. Personne ne l’a ouverte. Tout le monde l’a regardée.",
       },
+      {
+        when: { flags: ['heritage_angle', 'ac_violation_confirmed'] },
+        text: "Ce n’est ni une photo ni un relevé qui a fait tomber la terrasse : c’est une clim. Un architecte du patrimoine l’a regardée comme on regarde un graffiti sur un Rubens, et Delphine a prononcé au micro la phrase la plus sèche de sa carrière. Hippolyte l’a fait encadrer. La phrase, pas Delphine.",
+      },
+      {
+        when: { flags: ['fire_brigade_filmed'] },
+        text: "La vidéo du camion de secours bloqué par deux tables a été projetée à la commission. Personne n’a rien ajouté. Il n’y avait rien à ajouter.",
+      },
+      {
+        when: { flags: ['cm_defamation', 'lawyer_hired'] },
+        text: "Les plaintes du bloc ont été classées. Le courrier du parquet tient en trois lignes. Maître Vandamme l’a lu à voix haute, deux fois, en savourant les virgules.",
+      },
+      {
+        when: { flags: ['cm_defamation'], notFlags: ['lawyer_hired'] },
+        text: "Les plaintes du bloc ont été classées. Le courrier du parquet tient en trois lignes. Jérémie l’a punaisé dans l’escalier, à côté de l’arrêté.",
+      },
+      {
+        when: { flags: ['proj_klaas_ocr'] },
+        text: "Le tableur du carnet de Klaas a été versé au dossier : mille lignes, zéro faute. Klaas l’a imprimé, relié, puis a corrigé deux horaires au stylo. « Ja. L’ordinateur était en avance. »",
+      },
+      {
+        when: { hidden: { hostility: '>=80' } },
+        text: "Le bloc a perdu, et il le sait. Ghislain vous dit encore bonjour. Par écrit, avec accusé de réception.",
+      },
       ...INSTITUTIONS,
       ...ASSO_FATES,
       ...KLAAS_NOTEBOOK,
       ...SECRETS,
       ...AFTERMATH,
+      ...STREET_AFTER,
       ...KODDEX,
       {
         when: {},
@@ -497,20 +691,41 @@ export const ENDINGS = [
       },
       {
         when: { flags: ['met_waiter'] },
-        text: "Théo rentre les tables à 21h58 maintenant. Il vous fait un signe de tête. Il a obtenu, dans la foulée, un vrai planning. La charte ne le prévoyait pas. C’est arrivé quand même.",
+        text: "Théo rentre les tables à 22h00 pile, avec un coup d’œil à votre fenêtre. Il vous fait un signe de tête. Il a obtenu, dans la foulée, un vrai planning. La charte ne le prévoyait pas. C’est arrivé quand même.",
       },
       {
         when: { flags: ['tatie_wavering'] },
-        text: "Tatie Bouchon, qu’on avait crue perdue pour un verre offert, a signé la charte la première, côté riverains. « Il faut savoir boire le verre et rester du bon côté du verre. » Personne n’a compris. Tout le monde a applaudi.",
+        text: "Tatie Bouchon, qu’on avait crue perdue pour un verre offert, a signé la charte en bas, en tout petit, « pour ne vexer personne ». « Il faut savoir boire le verre et rester du bon côté du verre. » Personne n’a compris. Tout le monde a applaudi.",
       },
       {
         when: { hidden: { hostility: '>=40' } },
         text: "La paix est fragile. Ghislain archive chaque écart des riverains, Klaas archive chaque écart du bloc. Deux carnets, une rue. On appelle ça l’équilibre.",
       },
+      {
+        when: { flags: ['charter_drafted'] },
+        text: "Le brouillon original est punaisé au Goulot, avec ses ratures : « trimestre », barré, « quand on veut », barré, « trimestre ». Les deux ratures les plus négociées du Vieux-Lille.",
+      },
+      {
+        when: { flags: ['fire_brigade_helped'] },
+        text: "Tout le monde date la paix de la charte. Jérémie, lui, la date du soir des pompiers, quand Dédé a poussé les tables avec vous, sans rien dire. Il ne l’a jamais écrit nulle part. C’est rare, chez lui.",
+      },
+      {
+        when: { flags: ['corruption_proof', 'press_contacted'], notFlags: ['press_scandal'] },
+        text: "Dans un tiroir, vous gardez de quoi faire la une de La Voix du Nordiste. Anne-Sophie Lepoutre vous envoie un SMS par mois : « Toujours rien ? » Toujours rien. La paix, c’est aussi un tiroir fermé.",
+      },
+      {
+        when: { notFlags: ['exhaust_meeting_won'] },
+        text: "La gaine ronronne toujours sous votre fenêtre. Mais à 23h30, maintenant, quelqu’un tape au carreau de la cuisine et dit « Pilou dort ». Elle s’arrête. Pas toujours. Souvent. C’est l’article 4, appliqué à une gaine.",
+      },
+      {
+        when: { flags: ['cm_regis_nuance'] },
+        text: "Régis s’est proposé comme « médiateur » de la charte. La charte prévoit un interlocuteur unique côté bloc. Elle n’en prévoit aucun côté Régis.",
+      },
       ...ASSO_FATES,
       ...INSTITUTIONS,
       ...SECRETS,
       ...AFTERMATH,
+      ...STREET_AFTER,
       {
         when: {},
         text: "Le premier trimestre, la réunion s’est tenue à l’estaminet. Hilde a apporté sa tarte au sucre. Dédé a goûté et demandé la recette. Hilde a dit non, très gentiment.",

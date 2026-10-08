@@ -825,7 +825,7 @@ _→ Hippolyte sort un plan de 1730. Le n°4 est en périmètre protégé, la de
 - **La Voix du Nordiste** `press_commission_eve` **Terrasses : la commission tranche dimanche** Riverains et restaurateurs de la rue des Bouchers sont attendus demain en mairie. D’un côté, des classeurs. De l’autre, des chaises. Le maire promet « d’écouter tout le monde ». Tout le monde compte parler.
 
 ## Jour 14 · dimanche
-_Sommeil 32 · Asso 40 · Risque 0 · Job 94 · Dossier 9 · (caché) hostilité 23, corruption 63_
+_Sommeil 32 · Asso 40 · Risque 0 · Job 94 · Dossier 10 · (caché) hostilité 23, corruption 63_
 
 **☕ Koddex · Stéphane** `stephane_commission`
 > Grand jour pour toi, apparemment ! Une « commission » ? C’est comme un board, mais avec des chaises de terrasse ? Courage, et garde la vibe.
@@ -849,7 +849,7 @@ Choix possibles : Plaider le dossier complet : photos, dB, couloir, PV _(grisé
 _→ Vous parlez du sommeil, de la gaine, du droit à la nuit. C’est sincère. Ghislain répond avec 600 pages, Colette avec « l’ADN de Lille ». « La commission prend acte des efforts de l’établissement. » L’AOT est renouvelée. Avec, en prime, une extension d’une table._
 
 ## 🏁 Fin : Déménagement à Wazemmes `moving_out`
-_Sommeil 40 · Asso 40 · Risque 0 · Job 97 · Dossier 9 · (caché) hostilité 23, corruption 63_
+_Sommeil 40 · Asso 40 · Risque 0 · Job 97 · Dossier 10 · (caché) hostilité 23, corruption 63_
 
 **📰 Wazemmes accueille un nouveau riverain (fatigué)**
 > Un développeur quitte la rue des Bouchers pour Wazemmes. « Il y a le marché le dimanche matin, mais au moins il s’arrête », confie-t-il. Son ancien appartement est déjà loué. En location saisonnière.
@@ -858,7 +858,15 @@ _Sommeil 40 · Asso 40 · Risque 0 · Job 97 · Dossier 9 · (caché) hostilité
 >
 > Wazemmes. Un deuxième étage au-dessus d’un primeur. Le marché commence à 6h, avec des cagettes, des klaxons et des marchands qui crient le prix des clémentines. Au moins, à Wazemmes, c’est du bruit le matin.
 >
-> Vous laissez peu de chose derrière vous : quelques photos floues, deux relevés de décibels, et une porte qui sent toujours un peu le samedi.
+> Vous laissez peu de chose derrière vous : quelques photos floues, un arrêté que vous connaissez par cœur, et une porte qui sent toujours un peu le samedi.
+>
+> Votre dernière victoire rue des Bouchers, c’est un bar qui n’ouvrira jamais au n°4. Hippolyte vous a envoyé le plan de 1730, encadré, pour votre nouveau salon. Vous avez sauvé le sommeil d’une rue où vous ne dormez plus.
+>
+> La gaine ronronne toujours sous votre ancienne fenêtre. Le locataire change tous les trois jours ; aucun ne reste assez longtemps pour s’en plaindre. C’est, paraît-il, le modèle économique.
+>
+> L’AG avait voté la voie légale. Jérémie avait acheté un classeur neuf. Il est resté neuf. Il le garde quand même.
+>
+> Jérémie a porté vos cartons sans un mot. Biloute s’est couché dans le dernier. Il a fallu négocier, article et alinéa à l’appui.
 >
 > Tatie Bouchon a imprimé toutes les promesses de Ghislain et les a fait encadrer, dans l’ordre, dans son couloir. Elle appelle ça « la galerie des en-cours ». Les visites sont gratuites, le jeudi excepté.
 >
@@ -869,4 +877,4 @@ _Sommeil 40 · Asso 40 · Risque 0 · Job 97 · Dossier 9 · (caché) hostilité
 > Klaas a noté votre départ : « 10h40, camion de déménagement, couloir dégagé. » C’était la première fois que le couloir était dégagé pour vous.
 >
 
-Drapeaux en fin de partie : ac_case_stalled, ag_held, bombance_bar_project, bombance_blocked, bombance_rumour, cm_free_drinks, colette_dinner_ignored, commission_done, commission_lost, corridor_measured, exhaust_meeting_lost, hippolyte_room, inspector_announced, joined_rounds, knows_trou, met_hippolyte, met_jeremie, met_klaas, met_tatie, pee_at_door, random_drache, regis_courted, saturday1_done, saturday2_done, stance_legal, tatie_mail_1, tatie_mail_10, tatie_mail_11, tatie_mail_12, tatie_mail_2, tatie_mail_3, tatie_mail_4, tatie_mail_5, tatie_mail_6, tatie_mail_7, tatie_mail_8, tatie_mail_9, tatie_wavering, whatsapp_rally
+Drapeaux en fin de partie : ac_case_stalled, ag_held, bombance_bar_project, bombance_blocked, bombance_rumour, cm_free_drinks, colette_dinner_ignored, commission_done, commission_lost, corridor_measured, exhaust_meeting_lost, fire_brigade_filmed, hippolyte_room, inspector_announced, joined_rounds, knows_trou, met_hippolyte, met_jeremie, met_klaas, met_tatie, pee_at_door, random_drache, regis_courted, saturday1_done, saturday2_done, stance_legal, tatie_mail_1, tatie_mail_10, tatie_mail_11, tatie_mail_12, tatie_mail_2, tatie_mail_3, tatie_mail_4, tatie_mail_5, tatie_mail_6, tatie_mail_7, tatie_mail_8, tatie_mail_9, tatie_wavering, whatsapp_rally

@@ -301,7 +301,7 @@ _Sommeil 87 · Asso 35 · Risque 84 · Job 29 · Dossier 5 · (caché) hostilit�
 - `20:48` Le serveur lève les yeux vers votre fenêtre, plateau en l’air. Il ne dit rien. Il retient.
 - `20:48` Dédé vous a vu. Il sourit. Le sourire de quelqu’un qui note une dette.
 - `20:48` Vu par : le serveur, Dédé
-- `20:48` Vers 21h40, la terrasse découvre la notion de file d’attente. Un seul WC, quatorze clients, un Dédé qui hurle « c’est pas la carbonnade, c’est le Covid ! ». La terrasse est vide à 22h pile. Pour la première fois. Vous n’en êtes pas fier. Enfin, pas complètement.
+- `20:48` Vers 21h40, la terrasse découvre la notion de file d’attente. Un seul WC, quatorze clients, un Dédé qui hurle « c’est pas la carbonnade, c’est le canal d’avant 1912 ! ». La terrasse est vide à 22h pile. Pour la première fois. Vous n’en êtes pas fier. Enfin, pas complètement.
 - `21:03` 🍻 « Il a dit que les tables rentraient à quelle heure ? Bah, on verra. »
 - `21:30` 🃏 **« La rue la plus authentique de Lille »** `r_influencer` : Une influenceuse filme un « vlog Vieux-Lille » au milieu du couloir de passage, ring light allumée. Elle tourne la même prise sept fois : « Ici, c’est vraiment la vraie vie lilloise, les gens sont trop chaleureux. » En arrière-plan de chaque prise : votre porte, bloquée par une chaise, et la terrasse qui mord sur le couloir.
 - `21:30` → **Récupérer la vidéo publiée, horodatée** : Merci, la vraie vie lilloise. Sa vidéo fait 80 000 vues, et elle est datée, géolocalisée et publique. Le meilleur témoin de la rue est une ring light.
@@ -370,13 +370,13 @@ _→ Vous dites « synergie », « scalable » et « on itère ». Stépha
 ### 🍺 Contre-offensive : « Bernadette harcelée » `cm_fake_post_viral`
 > Sur les réseaux de l’estaminet : « La Ch’tite Bernadette est harcelée par UN riverain. Soutenez-nous ❤️ » avec la vidéo de vous. 4 000 partages. Bernadette n’existe pas, mais elle a désormais 4 000 défenseurs.
 
+**💬 Régis Dewaele** `regis_courted`
+> Moi, je dîne chez moi. Le plus souvent. Il faut savoir sortir, aussi, prendre le pouls de la rue. Dans la nuance.
+> Klaas et son carnet… Il note tout, Klaas. Même les gens qui n’ont rien fait. Surtout eux, j’ai l’impression.
+
 **💬 Hippolyte** `hippolyte_sabotage`
 > J’apprends que des parasols ont disparu. Je ne pose aucune question. Je remarque simplement que la discrétion est une vertu ancienne.
 > Une vertu que La Voix du Nordiste, en revanche, ne pratique guère.
-
-**💬 Stéphane** `stephane_db_report`
-> C’est quoi ces graphes de décibels dans le drive partagé ? Des courbes, des PDF, un logo ? C’est un side project ?
-> J’adore. On pivote ? « Koddex, the noise company. » Non ? Je laisse mûrir.
 
 **🗂 Après-midi : Glisser à Delphine que les visites annoncées ne servent à rien** `pm_delphine_channel`
 > Un SMS de Delphine : « Je verrai ce que je peux faire. Pas un mot à Stéphane. » La mairie vient de gagner un effet de surprise, et vous un secret.
@@ -387,46 +387,43 @@ _→ Vous dites « synergie », « scalable » et « on itère ». Stépha
 **🗂 Après-midi : Publier des faux avis sur l’estaminet** `pm_fake_reviews`
 > « Une étoile. Le serveur était aimable, mais le voisin du dessus avait l’air épuisé. » Douze comptes, douze styles, et les fautes d’orthographe, c’est vous qui les avez ajoutées. Clode Kode propose, à la place, « un avis sincère et nuancé sur la cuisson des frites ». Vous fermez l’onglet.
 
-**💬 Jérémie** `jeremie_rounds_regular`
-> Biloute s’est arrêté devant le pied de parasol de l’estaminet. Il le renifle toujours au même endroit.
-> Je ne dis pas que c’est une preuve. Je dis que ce chien a de l’instinct juridique.
+**💬 Théo** `serveur_22h`
+> Je sais, il est 22h. Je sais. Moi je rentrerais tout. Mais c’est pas moi qui décide, c’est le monsieur au chignon.
 
-**💬 Théo** `serveur_named`
-> Tu m’appelles Théo maintenant ? Ça fait bizarre. Ici on m’appelle « s’il vous plaît », « hep » ou « garçon ».
+**💬 Biloute** `biloute_corridor`
+> Ouaf ! *S’arrête net devant une chaise qui mord sur le couloir de passage. Ne bouge plus.* Ouaf.
 
 ### 🌙 Nuit 4 (semaine)
-- `20:30` **Pilou** : Se connecter au wifi de l’estaminet (vu par Klaas (place Maurice-Schumann), des clients (Estaminet La Ch’tite Bernadette, table 1), des clients (Estaminet La Ch’tite Bernadette, table 2), des clients (Estaminet La Ch’tite Bernadette, table 5), des clients (Les Bouchers Mal Lunés, table 1), des clients (Les Bouchers Mal Lunés, table 2), des clients (Les Bouchers Mal Lunés, table 4))
-- `20:50` **Pilou** : Lâcher une boule puante sur la terrasse (vu par le serveur, des clients (Estaminet La Ch’tite Bernadette, table 5), des clients (Estaminet La Ch’tite Bernadette, table 6), des clients (Les Bouchers Mal Lunés, table 1))
+- `20:30` **Pilou** : Se connecter au wifi de l’estaminet (vu par Seb & Nico (balcon), le serveur, des clients (Estaminet La Ch’tite Bernadette, table 1), des clients (Estaminet La Ch’tite Bernadette, table 4), des clients (Estaminet La Ch’tite Bernadette, table 5), des clients (Les Bouchers Mal Lunés, table 2), des clients (Les Bouchers Mal Lunés, table 3))
+- `20:50` **Pilou** : Lâcher une boule puante sur la terrasse (vu par Seb & Nico (balcon), des clients (Estaminet La Ch’tite Bernadette, table 3), des clients (Estaminet La Ch’tite Bernadette, table 4), des clients (Estaminet La Ch’tite Bernadette, table 5), des clients (Les Bouchers Mal Lunés, table 1), des clients (Les Bouchers Mal Lunés, table 2), des clients (Les Bouchers Mal Lunés, table 3))
 - `20:53` 🃏 **J4 · Une ancienne maire en terrasse** `d4_colette_dinner` : 20h50. Une berline se gare rue de la Barre, là où rien ne se gare. Colette Verhaeghe descend, foulard de soie et sourire de campagne, et prend LA table de l’estaminet, celle qui mord sur le couloir de passage. Dédé lui embrasse les deux mains. Ghislain apporte une carte qui n’existe pas pour les autres clients. Huit couverts. À une table. Rue des Bouchers.
 - `20:53` → **Photographier la tablée depuis la fenêtre** : Clic. Huit personnes, une table, un couloir réduit à la largeur d’une poussette pliée. Colette lève son verre vers votre fenêtre. Elle ne vous a pas vu. Probablement. Elle trinque peut-être juste avec la façade.
-- `20:30` 📓 Carnet de Klaas : 20:30. Mouvement du côté du n°10. Ça ressemblait à Pilou. Ça ressemblait à : Se connecter au wifi de l’estaminet.
-- `20:30` Au bout de la rue, une lampe s’allume, puis un crayon bouge. Klaas.
-- `20:30` Un téléphone est levé. Puis deux. La lumière rouge clignote.
+- `20:30` Seb, depuis le balcon : « Attends, attends… il a vraiment fait ça ? » Nico : « Il a vraiment fait ça. »
+- `20:30` Le serveur vous a vu. Il secoue la tête, mi-scandalisé, mi-admiratif.
 - `20:30` Une table entière lève la tête vers votre fenêtre.
-- `20:30` Vu par : Klaas (place Maurice-Schumann), des clients · quelqu’un a filmé !
-- `20:30` Au bout de la rue, Klaas écrit quelque chose dans son carnet…
+- `20:30` Vu par : Seb & Nico (balcon), le serveur, des clients
 - `20:30` Le programme que vous avez fini seul tourne vingt minutes. Clode Kode, qui a refusé d’y toucher, vous envoie l’article 323-1 du Code pénal en PDF, avec un smiley inquiet. Le réseau « BERNADETTE_INVITES » vous accueille. Vous n’êtes pas invité.
-- `20:50` Le serveur vous a vu. Il secoue la tête, mi-scandalisé, mi-admiratif.
+- `20:50` Sur le balcon d’en face, Seb a la bouche ouverte. Nico, lui, a le téléphone levé. Ce sera sur « Radio Balcon » dans trois minutes.
+- `20:50` « J’ai tout ! » crie quelqu’un en terrasse. Il a tout.
 - `20:50` « C’est lui ! Là-haut ! » Un doigt pointé. Plusieurs.
-- `20:50` Quelqu’un a filmé. Ce soir, vous allez exister sur Internet.
-- `20:50` Vu par : le serveur, des clients · quelqu’un a filmé !
+- `20:50` Vu par : Seb & Nico (balcon), des clients · quelqu’un a filmé !
 - `20:50` La terrasse se vide en quatre minutes. Un client accuse la carbonnade. Dédé accuse le canal d’avant 1912. Personne n’a de preuve : seulement des soupçons, et le nez qui pique.
-- `20:53` 🍻 « Il fait tellement bon, c’est criminel de rentrer. »
-- `21:38` 🍻 « Mon VTC arrive dans quarante minutes, on a le temps. »
+- `20:53` 🍻 « Chut… non, je rigole. »
+- `21:38` 🍻 « Il fait tellement bon, c’est criminel de rentrer. »
 - `21:49` Jérémie passe avec le teckel et note Les Bouchers Mal Lunés, table 1.
-- `21:55` 🔔 21h55. Le serveur regarde l’horloge. Dédé regarde le serveur.
-- `21:56` Raclement de chaises sur les pavés : Le Goulot rentre une table.
+- `21:55` 🔔 21h55. Dans cinq minutes, la loi s’applique. En théorie.
 - `21:58` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table.
-- `22:00` 🔔 Au loin, une cloche sonne dix coups. 22h00. Rue des Bouchers, les terrasses doivent fermer.
-- `22:01` Raclement de chaises sur les pavés : Le Goulot rentre une table.
-- `22:05` 🔔 Quelques tables rentrent, pour la forme. Les autres font semblant de ne pas avoir entendu la cloche.
+- `22:00` Raclement de chaises sur les pavés : Le Goulot rentre une table.
+- `22:00` 🔔 Dong. Dong. Dong… Dix. 22h00, rue des Bouchers. Le reste de Lille a encore une heure, ou deux. Pas vous.
+- `22:05` Raclement de chaises sur les pavés : Le Goulot rentre une table… enfin.
+- `22:05` 🔔 Une partie des chaises racle les pavés. L’autre partie reste assise, verre levé.
 - `22:17` Jérémie passe avec le teckel et note Le Goulot, table 2.
-- `22:23` 🍻 « Il est quelle heure ? … Ah, ça va, il est tôt. »
-- `22:39` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table… enfin.
-- `22:48` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table… enfin.
-- `22:52` Raclement de chaises sur les pavés : Le Goulot rentre sa terrasse… enfin.
-- `23:47` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre sa terrasse… enfin.
-- `01:30` Les derniers clients remontent vers la place, en chantant faux. La rue se tait, à regret.
+- `22:23` 🍻 « L’addition ? Rien ne presse. »
+- `22:28` Raclement de chaises sur les pavés : Le Goulot rentre sa terrasse… enfin.
+- `22:56` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table… enfin.
+- `23:46` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre sa terrasse… enfin.
+- `23:48` On sonne : la police, pour vous. Plainte du bloc pour « harcèlement ». Rappel à la loi.
+- `01:30` 01h30. La dernière chaise a raclé. La gaine s’est tue. Il reste quatre heures de nuit, en théorie.
 
 **📰 FAITS DIVERS · Une odeur suspecte vide une terrasse du Vieux-Lille**
 - Pas grand-chose à montrer à la commission. Demain, sortez l’appareil photo.
@@ -435,7 +432,6 @@ _→ Vous dites « synergie », « scalable » et « on itère ». Stépha
 
 ### 📱 Téléphone
 - **WhatsApp · Nico** `wa_cat_2` La chatte a dormi sur les convocations de l’AG. On les a quand même distribuées. Elles sentent le chat. C’est plus militant.
-- **WhatsApp · Klaas** `wa_klaas_noted_pilou` J’ai noté quelque chose cette nuit. Je ne dis pas quoi. Je dis seulement que je l’ai noté. Pilou sait.
 - **WhatsApp · Seb** `wa_colette_dinner` Les photos de Pilou du dîner de Colette Verhaeghe à l’estaminet ! Elle a eu un dessert. Personne d’autre n’a eu de dessert. Je dis ça.
 - **WhatsApp · Nico** `wa_hate_wave` Le post « Bernadette harcelée » a 4 000 partages. Personne ne répond, personne ne s’énerve, on garde les captures. Pilou, éteins ton téléphone.
 - **La Voix du Nordiste** `press_hate_wave` **Réseaux sociaux : « Bernadette » harcelée ? Il n’y a pas de Bernadette** Un post viral dénonce le harcèlement d’un estaminet par « un riverain ». Petite précision : Bernadette n’existe pas, c’est un nom d’enseigne. Le riverain, lui, existe, et il aimerait bien dormir.
@@ -445,7 +441,13 @@ _→ Vous dites « synergie », « scalable » et « on itère ». Stépha
 - **Avis · Ghislain** `rv_owner_reply` Réponse du propriétaire à un avis 2 étoiles : « Chère cliente, nous avons bien pris en compte votre remarque. C’est en cours de résolution. Bien cordialement. »
 
 ## Jour 5 · vendredi
-_Sommeil 80 · Asso 1 · Risque 84 · Job 29 · Dossier 15 · (caché) hostilité 80, corruption 55_
+_Sommeil 81 · Asso 3 · Risque 84 · Job 29 · Dossier 15 · (caché) hostilité 80, corruption 55_
+
+### 🃏 La Voix du Nordiste : « Colette Verhaeghe : laissez vivre Lille ! » `r_colette_interview`
+> Pleine page. Colette pose devant un estaminet qui ressemble beaucoup à l’estaminet : « La convivialité, c’est l’ADN de Lille. Je comprends les riverains, j’en ai été une, mais rue de Gand ferme bien à minuit, non ? » Pas un mot sur la règle des 22h. Ni sur le couloir.
+
+Choix possibles : Envoyer un droit de réponse à la journaliste _(grisé)_ · **→ Encadrer l’article dans les toilettes**
+_→ Une place d’honneur. Colette y sourira à chacun de vos passages. C’est une forme de dialogue._
 
 ### 🍺 Contre-offensive : Fil Tatie · promesse n°5 `tatie_mail_05`
 > « Chère Madame, le technicien vient d’être papa. Toutes nos félicitations à lui. Le dossier est en cours de reprise par un collègue. » Tatie : « Je lui ai envoyé une brassière. On verra bien si elle arrive. »
@@ -457,32 +459,36 @@ _Sommeil 80 · Asso 1 · Risque 84 · Job 29 · Dossier 15 · (caché) hostilit�
 > Il y a maintenant un bouton ✨ en haut à droite. Il ne fait rien, mais il le fait avec élégance. Stéphane parle de « game changer ».
 > Résumé de Clode Kode : « Il faut shipper. » Durée de lecture : 1 seconde. Stéphane trouve le résumé « un peu froid » et renvoie un vocal de 6 minutes.
 
-### 🃏 Consultation citoyenne en ligne `r_consultation`
-> La mairie lance une « grande consultation sur la vie nocturne ». Il faut un compte FranceConnect, un justificatif de domicile de moins de trois mois au format PDF de moins de 2 Mo, et répondre à la question 1 : « Sur une échelle de 1 à 10, à quel point aimez-vous la convivialité ? »
-
-Choix possibles : Remplir les 47 questions sérieusement · **→ Partager le lien sur « Radio Balcon »**
-_→ Seb relaie avec trois gyrophares. Tatie ne trouve pas FranceConnect. Klaas remplit le formulaire en recopiant son carnet dans le champ « suggestions », en plusieurs fois._
-
 ### 🍺 Contre-offensive : Plainte pour harcèlement `cm_harassment_hostility`
 > Lettre recommandée de l’estaminet : plainte pour « harcèlement moral d’un établissement familial ». La famille, ce sont deux associés et une friteuse.
 
 ## 🏁 Fin : Garde à vue `custody` (anticipée, jour 5)
-_Sommeil 80 · Asso 3 · Risque 94 · Job 46 · Dossier 15 · (caché) hostilité 80, corruption 55_
+_Sommeil 83 · Asso 3 · Risque 94 · Job 46 · Dossier 15 · (caché) hostilité 80, corruption 55_
 
-**📰 L’affaire de la « carbonnade sucrée » devant la justice**
-> Le sel et le sucre avaient été inversés dans la cuisine d’un estaminet : le suspect est un voisin. Aucun client n’a été blessé, mais plusieurs ont « perdu foi en la frite ». L’audience promet d’être croustillante.
+**📰 Carbonnade laxative : un riverain devant le tribunal correctionnel**
+> Quatorze clients d’un estaminet de la rue des Bouchers sont tombés malades après un repas. Le suspect est un voisin. Personne, cette fois, ne parle de convivialité.
 
-> Ce n’est pas la police municipale qui est venue, cette fois. Ce sont deux agents de la nationale, en pleine nuit, sur les pavés devant le n°10, avec une politesse inquiétante. Vous avez passé le reste de la nuit et la journée suivante dans une pièce sans fenêtre. Pour la première fois depuis des semaines, il n’y avait aucun bruit. Vous avez très bien dormi. C’est la seule victoire de cette fin.
+> Ce n’est pas la police municipale qui est venue, cette fois. Ce sont deux agents de la nationale, sur le palier du n°10, avec une politesse inquiétante. Vous avez passé vingt-quatre heures dans une pièce sans fenêtre. Pour la première fois depuis des semaines, il n’y avait aucun bruit. Vous avez très bien dormi. C’est la seule victoire de cette fin.
 >
-> Variante « carbonnade sucrée ». La Voix du Nordiste titre : « Vieux-Lille : un riverain inverse le sel et le sucre d’un estaminet ». L’audience devant le tribunal de police dure quarante minutes, dont vingt sur la question de savoir si une carbonnade est censée être sucrée. L’avocat de l’estaminet plaide « l’atteinte à un patrimoine culinaire régional ». Dédé témoigne en tablier. Vous êtes condamné à une amende, à des dommages et intérêts, et à une célébrité locale dont vous vous seriez passé.
->
-> Variante « carbonnade laxative ». Ce n’est plus le tribunal de police : c’est le correctionnel. La Voix du Nordiste titre : « Vieux-Lille : un riverain empoisonne la terrasse d’un estaminet ». Le mot « empoisonne » vous poursuivra longtemps. L’association publie un communiqué pour se désolidariser. Klaas, sobre, apporte au tribunal son carnet : il y est noté, à 21h12, « Pilou entre par la cuisine. Mauvaise idée. »
+> Variante « carbonnade laxative ». Ce n’est plus le tribunal de police : c’est le correctionnel. Quatorze clients ont passé une soirée qu’aucun n’a trouvée drôle le lendemain. La Voix du Nordiste titre : « Vieux-Lille : un riverain empoisonne la terrasse d’un estaminet ». Le mot vous poursuivra longtemps. Il est juste. L’association publie un communiqué pour se désolidariser ; Jérémie l’a signé seul, et vite.
 >
 > La vidéo de vous à la fenêtre a fait le tour des réseaux. Les commentaires se divisent entre « héros » et « fou furieux ». Votre mère a choisi « fatigué ».
 >
-> Dans le carnet de Klaas, entre « 22h14, tables rentrées » et « 22h30, tables ressorties », il y a aussi vos nuits à vous. Il ne les a montrées à personne. Il ne les a pas effacées non plus. « Ja. Un carnet, ça ne choisit pas son camp. »
+> Le sel et le sucre inversés le même soir sont joints au dossier. Au tribunal, personne ne rit de la carbonnade sucrée. Elle est devenue une circonstance.
 >
-> Klaas est venu vous chercher à la sortie. Il n’a rien dit. Il a juste rangé son carnet dans sa poche, côté cœur.
+> Le témoin de l’accusation s’appelle Théo. Vous l’aviez payé pour qu’il vous renseigne ; il a renseigné le tribunal, avec la même précision. À la sortie de l’audience : « Je fais que mon taf, moi. » Pour une fois, ça ne vous a pas fait rire.
+>
+> Au commissariat, on vous lit la liste. La caméra sous le store, branchée sur le courant de l’estaminet : « vol d’électricité », savoure l’agent, qui l’écrit pour la première fois de sa carrière. L’estaminet réclame 4,12 € de courant. Ghislain a joint le ticket.
+>
+> Les boules puantes figurent au procès-verbal sous l’intitulé « nuisance olfactive en réunion ». Vous étiez seul. L’agent a laissé « en réunion », par habitude.
+>
+> Les parasols ont été retrouvés dans votre salon, ouverts, faute de place. L’agent a demandé si vous comptiez ouvrir une terrasse. Lui a trouvé ça drôle.
+>
+> Le réseau « BERNADETTE_INVITES » figure au procès-verbal. Sur réquisition, Clode Kode a fourni le journal de ses refus, horodaté. Il s’en excuse encore.
+>
+> Le post « Bernadette harcelée » a été mis à jour : « Le harceleur est en garde à vue. Merci pour votre soutien ❤️ ». Bernadette n’existe toujours pas. Elle a gagné quand même.
+>
+> À la sortie, il y avait Jérémie et Biloute. Jérémie tenait le dossier sous le bras, par habitude. Biloute vous a reniflé la cheville, l’air de dire que lui n’avait jamais arrêté d’enquêter.
 >
 
-Drapeaux en fin de partie : asked_waiter, boss_noticed, camera_awning, camera_window, cardboard_exhaust, cm_air_freshener, cm_bins, cm_fake_post, cm_free_drinks, cm_harassment_complaint, cm_smokers, colette_dinner_photo, colette_dinner_seen, corridor_measured, custody, delphine_channel, delphine_dinner, fake_reviews, filmed_faces, hippolyte_room, joined_rounds, kitchen_sabotage_caught, kitchen_sabotaged, klaas_noted_pilou, knows_trou, laxative_caught, laxative_done, met_delphine, met_hippolyte, met_jeremie, met_tatie, met_waiter, night_db, power_stolen, proj_db_logger, proj_db_report, proj_fake_reviews, proj_scraper, proj_whatsapp_bot, proj_wifi_cracker, random_drache, regis_courted, sabotage_chairs, sabotage_locks, sabotage_parasols, scraper_boasts, stink_bomb, tatie_fake_leak, tatie_mail_1, tatie_mail_2, tatie_mail_3, tatie_mail_4, tatie_mail_5, tatie_wavering, todo_app_rust, traitor_recruited, video_viral, waiter_bribed, waiter_informant, whatsapp_rally, wifi_cracked
+Drapeaux en fin de partie : asked_waiter, boss_noticed, camera_awning, camera_window, cardboard_exhaust, cm_air_freshener, cm_bins, cm_fake_post, cm_free_drinks, cm_harassment_complaint, cm_smokers, colette_dinner_photo, colette_dinner_seen, corridor_measured, custody, delphine_channel, delphine_dinner, fake_reviews, filmed_faces, hippolyte_room, joined_rounds, kitchen_sabotage_caught, kitchen_sabotaged, knows_trou, laxative_caught, laxative_done, met_delphine, met_hippolyte, met_jeremie, met_tatie, met_waiter, night_db, power_stolen, proj_db_logger, proj_db_report, proj_fake_reviews, proj_scraper, proj_whatsapp_bot, proj_wifi_cracker, random_drache, regis_courted, sabotage_chairs, sabotage_locks, sabotage_parasols, scraper_boasts, stink_bomb, tatie_fake_leak, tatie_mail_1, tatie_mail_2, tatie_mail_3, tatie_mail_4, tatie_mail_5, tatie_wavering, todo_app_rust, traitor_recruited, video_viral, waiter_bribed, waiter_informant, wifi_cracked

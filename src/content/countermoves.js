@@ -293,7 +293,7 @@ export const COUNTERMOVES = [
     title: 'Plainte pour diffamation',
     speaker: 'ghislain',
     when: { phase: 'afternoon', flags: ['press_article'], notFlags: ['cm_defamation'] },
-    text: "Après l’article, le bloc porte plainte pour diffamation. Maître Vandamme lit la plainte, sourit, et dit : « La vérité est une excellente défense. Vous avez gardé les photos horodatées, n’est-ce pas ? »",
+    text: "Après l’article, le bloc porte plainte pour diffamation. Jérémie lit la plainte, sourit, et dit : « La vérité est une excellente défense. Vous avez gardé les photos horodatées, n’est-ce pas ? »",
     effects: { risk: +5, setFlags: ['cm_defamation'] },
     once: true,
   },

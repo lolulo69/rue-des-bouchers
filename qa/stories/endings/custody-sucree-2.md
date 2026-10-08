@@ -354,9 +354,9 @@ _Sommeil 85 · Asso 26 · Risque 84 · Job 44 · Dossier 8 · (caché) hostilit�
 > Moi, je dîne chez moi. Le plus souvent. Il faut savoir sortir, aussi, prendre le pouls de la rue. Dans la nuance.
 > Klaas et son carnet… Il note tout, Klaas. Même les gens qui n’ont rien fait. Surtout eux, j’ai l’impression.
 
-**💬 Dédé** `dede_kitchen`
-> Une carbonnade sucrée comme un gâteau. Une crème brûlée salée comme la mer du Nord. Vingt ans de métier, jamais vu ça.
-> Je ne sais pas qui. Mais je cherche, mon biloute. Je cherche.
+**💬 Le serveur** `serveur_suspicious`
+> Trois chaises qui lâchent dans la même soirée. Dédé a regardé toutes les fenêtres de la rue. Surtout la vôtre.
+> Moi j’ai rien vu. Mais à votre place, je descendrais pas l’escalier en sifflant.
 
 **🗂 Après-midi : Glisser à Delphine que les visites annoncées ne servent à rien** `pm_delphine_channel`
 > Un SMS de Delphine : « Je verrai ce que je peux faire. Pas un mot à Stéphane. » La mairie vient de gagner un effet de surprise, et vous un secret.
@@ -367,40 +367,44 @@ _Sommeil 85 · Asso 26 · Risque 84 · Job 44 · Dossier 8 · (caché) hostilit�
 **🗂 Après-midi : Publier des faux avis sur l’estaminet** `pm_fake_reviews`
 > « Une étoile. Le serveur était aimable, mais le voisin du dessus avait l’air épuisé. » Douze comptes, douze styles, et les fautes d’orthographe, c’est vous qui les avez ajoutées. Clode Kode propose, à la place, « un avis sincère et nuancé sur la cuisson des frites ». Vous fermez l’onglet.
 
-**💬 Régis Dewaele** `regis_22h`
-> Vingt-deux heures, c’est bien. Vingt-deux heures trente, ce serait bien aussi. Je dis ça, je ne dis rien.
+**💬 Biloute** `biloute_22h`
+> *22h00. Les chaises raclent les pavés. Grogne en direction de l’estaminet. Jérémie murmure « bon chien ».*
 
 **💬 Jérémie** `jeremie_rule_22h`
 > Vingt-deux heures, rue des Bouchers. Pas vingt-deux heures quinze, pas « le temps que les clients finissent leur verre ».
 > C’est l’arrêté. Je l’ai imprimé, plastifié, et il est dans la poche de la laisse de Biloute.
 
 ### 🌙 Nuit 4 (semaine)
-- `20:30` **Pilou** : Se connecter au wifi de l’estaminet (vu par des clients (Estaminet La Ch’tite Bernadette, table 2), des clients (Estaminet La Ch’tite Bernadette, table 3), des clients (Estaminet La Ch’tite Bernadette, table 6), des clients (Les Bouchers Mal Lunés, table 1), des clients (Les Bouchers Mal Lunés, table 4))
-- `20:50` **Pilou** : Lâcher une boule puante sur la terrasse (vu par des clients (Estaminet La Ch’tite Bernadette, table 3), des clients (Estaminet La Ch’tite Bernadette, table 5), des clients (Les Bouchers Mal Lunés, table 1), des clients (Les Bouchers Mal Lunés, table 3), des clients (Les Bouchers Mal Lunés, table 4))
+- `20:30` **Pilou** : Se connecter au wifi de l’estaminet (vu par des clients (Estaminet La Ch’tite Bernadette, table 1), des clients (Estaminet La Ch’tite Bernadette, table 2), des clients (Estaminet La Ch’tite Bernadette, table 3), des clients (Estaminet La Ch’tite Bernadette, table 5), des clients (Estaminet La Ch’tite Bernadette, table 6), des clients (Les Bouchers Mal Lunés, table 4))
+- `20:50` **Pilou** : Lâcher une boule puante sur la terrasse (vu par Klaas (jumelles), des clients (Estaminet La Ch’tite Bernadette, table 2), des clients (Les Bouchers Mal Lunés, table 2), des clients (Les Bouchers Mal Lunés, table 3))
 - `20:53` 🃏 **J4 · Une ancienne maire en terrasse** `d4_colette_dinner` : 20h50. Une berline se gare rue de la Barre, là où rien ne se gare. Colette Verhaeghe descend, foulard de soie et sourire de campagne, et prend LA table de l’estaminet, celle qui mord sur le couloir de passage. Dédé lui embrasse les deux mains. Ghislain apporte une carte qui n’existe pas pour les autres clients. Huit couverts. À une table. Rue des Bouchers.
 - `20:53` → **Photographier la tablée depuis la fenêtre** : Clic. Huit personnes, une table, un couloir réduit à la largeur d’une poussette pliée. Colette lève son verre vers votre fenêtre. Elle ne vous a pas vu. Probablement. Elle trinque peut-être juste avec la façade.
-- `20:30` « C’est lui ! Là-haut ! » Un doigt pointé. Plusieurs.
 - `20:30` Quelqu’un a filmé. Ce soir, vous allez exister sur Internet.
+- `20:30` « C’est lui ! Là-haut ! » Un doigt pointé. Plusieurs.
 - `20:30` Vu par : des clients · quelqu’un a filmé !
 - `20:30` Le programme que vous avez fini seul tourne vingt minutes. Clode Kode, qui a refusé d’y toucher, vous envoie l’article 323-1 du Code pénal en PDF, avec un smiley inquiet. Le réseau « BERNADETTE_INVITES » vous accueille. Vous n’êtes pas invité.
-- `20:50` Des clients se retournent, se parlent, se retournent encore.
-- `20:50` Quelqu’un a filmé. Ce soir, vous allez exister sur Internet.
-- `20:50` Vu par : des clients · quelqu’un a filmé !
+- `20:50` 📓 Carnet de Klaas : 20:50. Pilou, Lâcher une boule puante sur la terrasse. Hilde dirait que ce n’est pas bien. Je l’écris, elle le dira.
+- `20:50` Au bout de la rue, une lampe s’allume, puis un crayon bouge. Klaas.
+- `20:50` Une table entière lève la tête vers votre fenêtre.
+- `20:50` Un téléphone est levé. Puis deux. La lumière rouge clignote.
+- `20:50` Vu par : Klaas (jumelles), des clients · quelqu’un a filmé !
+- `20:50` Au bout de la rue, Klaas écrit quelque chose dans son carnet…
 - `20:50` La terrasse se vide en quatre minutes. Un client accuse la carbonnade. Dédé accuse le canal d’avant 1912. Personne n’a de preuve : seulement des soupçons, et le nez qui pique.
-- `20:53` 🍻 « On rajoute une chaise ? Ils diront rien. »
-- `21:38` 🍻 « Tu crois qu’il y a des gens qui habitent au-dessus ? »
-- `21:52` Jérémie passe avec le teckel et note Les Bouchers Mal Lunés, table 3.
-- `21:55` 🔔 21h55. Le serveur regarde l’horloge. Dédé regarde le serveur.
-- `21:58` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table.
-- `22:00` Raclement de chaises sur les pavés : Le Goulot rentre une table.
+- `20:53` 🍻 « Il a dit que les tables rentraient à quelle heure ? Bah, on verra. »
+- `21:38` 🍻 « Il fait tellement bon, c’est criminel de rentrer. »
+- `21:49` Jérémie passe avec le teckel et note Les Bouchers Mal Lunés, table 1.
+- `21:55` 🔔 21h55. Dans cinq minutes, la loi s’applique. En théorie.
+- `21:59` Raclement de chaises sur les pavés : Le Goulot rentre une table.
+- `22:00` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table.
 - `22:00` 🔔 Dix coups de cloche. 22h00. Les chaises vont racler les pavés… ou pas.
 - `22:05` 🔔 Une partie des chaises racle les pavés. L’autre partie reste assise, verre levé.
-- `22:15` Jérémie passe avec le teckel et note Le Goulot, table 1.
-- `22:23` 🍻 « Il fait tellement bon, c’est criminel de rentrer. »
-- `22:59` Raclement de chaises sur les pavés : Le Goulot rentre une table… enfin.
-- `23:23` Raclement de chaises sur les pavés : Le Goulot rentre sa terrasse… enfin.
-- `00:27` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre sa terrasse… enfin.
-- `01:30` Les derniers clients remontent vers la place, en chantant faux. La rue se tait, à regret.
+- `22:20` Jérémie passe avec le teckel et note Le Goulot, table 4.
+- `22:23` 🍻 « Il y a un monsieur à la fenêtre qui nous regarde. »
+- `22:42` On sonne : la police, pour vous. Plainte du bloc pour « harcèlement ». Rappel à la loi.
+- `23:10` Raclement de chaises sur les pavés : Le Goulot rentre sa terrasse… enfin.
+- `00:02` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table… enfin.
+- `00:23` Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre sa terrasse… enfin.
+- `01:30` 01h30. La dernière chaise a raclé. La gaine s’est tue. Il reste quatre heures de nuit, en théorie.
 
 **📰 FAITS DIVERS · Une odeur suspecte vide une terrasse du Vieux-Lille**
 - Pas grand-chose à montrer à la commission. Demain, sortez l’appareil photo.
@@ -409,6 +413,7 @@ _Sommeil 85 · Asso 26 · Risque 84 · Job 44 · Dossier 8 · (caché) hostilit�
 
 ### 📱 Téléphone
 - **WhatsApp · Nico** `wa_cat_2` La chatte a dormi sur les convocations de l’AG. On les a quand même distribuées. Elles sentent le chat. C’est plus militant.
+- **WhatsApp · Klaas** `wa_klaas_noted_pilou` J’ai noté quelque chose cette nuit. Je ne dis pas quoi. Je dis seulement que je l’ai noté. Pilou sait.
 - **WhatsApp · Seb** `wa_sugar_rumour` Attends attends attends. Un client a craché sa carbonnade sur la terrasse en criant « C’EST SUCRÉ ». Je n’ai pas de vidéo. Je ne m’en remettrai jamais.
 - **WhatsApp · Nico** `wa_sugar_nico` Règle 3, Seb.
 - **WhatsApp · Seb** `wa_colette_dinner` Les photos de Pilou du dîner de Colette Verhaeghe à l’estaminet ! Elle a eu un dessert. Personne d’autre n’a eu de dessert. Je dis ça.
@@ -424,13 +429,7 @@ _Sommeil 85 · Asso 26 · Risque 84 · Job 44 · Dossier 8 · (caché) hostilit�
 - **Avis · Ghislain** `rv_owner_reply` Réponse du propriétaire à un avis 2 étoiles : « Chère cliente, nous avons bien pris en compte votre remarque. C’est en cours de résolution. Bien cordialement. »
 
 ## Jour 5 · vendredi
-_Sommeil 82 · Asso 13 · Risque 84 · Job 23 · Dossier 15 · (caché) hostilité 85, corruption 55_
-
-### 🃏 Tatie Bouchon à sa fenêtre `r_tatie_proverb`
-> Vous passez sous la fenêtre du n°19. Tatie Bouchon vous interpelle, un arrosoir à la main : « Vous avez une mine ! Écoutez-moi : si vous voulez quelque chose dans la vie, faut résister et se battre pour. Et le pour, il faut le savoir avant de se battre. »
-
-Choix possibles : **→ « Et vous, Tatie, vous êtes avec nous ? »** · Hocher la tête et filer
-_→ « Moi ? Je suis avec la rue. La rue, c’est vous. Sauf à l’heure du thé. » C’est un oui. Avec astérisque._
+_Sommeil 81 · Asso 11 · Risque 84 · Job 23 · Dossier 15 · (caché) hostilité 80, corruption 55_
 
 ### 🍺 Contre-offensive : Fil Tatie · promesse n°5 `tatie_mail_05`
 > « Chère Madame, le technicien vient d’être papa. Toutes nos félicitations à lui. Le dossier est en cours de reprise par un collègue. » Tatie : « Je lui ai envoyé une brassière. On verra bien si elle arrive. »
@@ -455,18 +454,34 @@ _→ Sur « Radio Balcon », c’est l’explosion. Régis quitte le groupe, r
 > Lettre recommandée de l’estaminet : plainte pour « harcèlement moral d’un établissement familial ». La famille, ce sont deux associés et une friteuse.
 
 ## 🏁 Fin : Garde à vue `custody` (anticipée, jour 5)
-_Sommeil 80 · Asso 10 · Risque 94 · Job 38 · Dossier 15 · (caché) hostilité 90, corruption 55_
+_Sommeil 79 · Asso 6 · Risque 94 · Job 38 · Dossier 15 · (caché) hostilité 85, corruption 55_
 
 **📰 L’affaire de la « carbonnade sucrée » devant la justice**
 > Le sel et le sucre avaient été inversés dans la cuisine d’un estaminet : le suspect est un voisin. Aucun client n’a été blessé, mais plusieurs ont « perdu foi en la frite ». L’audience promet d’être croustillante.
 
-> Ce n’est pas la police municipale qui est venue, cette fois. Ce sont deux agents de la nationale, en pleine nuit, sur les pavés devant le n°10, avec une politesse inquiétante. Vous avez passé le reste de la nuit et la journée suivante dans une pièce sans fenêtre. Pour la première fois depuis des semaines, il n’y avait aucun bruit. Vous avez très bien dormi. C’est la seule victoire de cette fin.
+> Ce n’est pas la police municipale qui est venue, cette fois. Ce sont deux agents de la nationale, sur le palier du n°10, avec une politesse inquiétante. Vous avez passé vingt-quatre heures dans une pièce sans fenêtre. Pour la première fois depuis des semaines, il n’y avait aucun bruit. Vous avez très bien dormi. C’est la seule victoire de cette fin.
 >
 > Variante « carbonnade sucrée ». La Voix du Nordiste titre : « Vieux-Lille : un riverain inverse le sel et le sucre d’un estaminet ». L’audience devant le tribunal de police dure quarante minutes, dont vingt sur la question de savoir si une carbonnade est censée être sucrée. L’avocat de l’estaminet plaide « l’atteinte à un patrimoine culinaire régional ». Dédé témoigne en tablier. Vous êtes condamné à une amende, à des dommages et intérêts, et à une célébrité locale dont vous vous seriez passé.
 >
 > La vidéo de vous à la fenêtre a fait le tour des réseaux. Les commentaires se divisent entre « héros » et « fou furieux ». Votre mère a choisi « fatigué ».
 >
-> Klaas est venu vous chercher à la sortie. Il n’a rien dit. Il a juste rangé son carnet dans sa poche, côté cœur.
+> Au commissariat, on vous lit la liste. La caméra sous le store, branchée sur le courant de l’estaminet : « vol d’électricité », savoure l’agent, qui l’écrit pour la première fois de sa carrière. L’estaminet réclame 4,12 € de courant. Ghislain a joint le ticket.
+>
+> Les boules puantes figurent au procès-verbal sous l’intitulé « nuisance olfactive en réunion ». Vous étiez seul. L’agent a laissé « en réunion », par habitude.
+>
+> Les parasols ont été retrouvés dans votre salon, ouverts, faute de place. L’agent a demandé si vous comptiez ouvrir une terrasse. Lui a trouvé ça drôle.
+>
+> Le réseau « BERNADETTE_INVITES » figure au procès-verbal. Sur réquisition, Clode Kode a fourni le journal de ses refus, horodaté. Il s’en excuse encore.
+>
+> Le post « Bernadette harcelée » a été mis à jour : « Le harceleur est en garde à vue. Merci pour votre soutien ❤️ ». Bernadette n’existe toujours pas. Elle a gagné quand même.
+>
+> Régis, démasqué la semaine d’avant, vous a envoyé un message de soutien. Le seul. Il dîne toujours gratis : la compassion, ça ne lui coûte rien.
+>
+> L’association n’a publié aucun communiqué. Sur le groupe WhatsApp, Seb a écrit « attends, attends… », puis plus rien. C’est le premier silence de l’histoire du groupe.
+>
+> Dans le carnet de Klaas, entre « 22h14, tables rentrées » et « 22h30, tables ressorties », il y a aussi vos nuits à vous. Il ne les a montrées à personne. Il ne les a pas effacées non plus. « Ja. Un carnet, ça ne choisit pas son camp. »
+>
+> À la sortie, il y avait Jérémie et Biloute. Jérémie tenait le dossier sous le bras, par habitude. Biloute vous a reniflé la cheville, l’air de dire que lui n’avait jamais arrêté d’enquêter.
 >
 
-Drapeaux en fin de partie : boss_noticed, camera_awning, camera_window, cardboard_exhaust, cm_air_freshener, cm_bins, cm_fake_post, cm_free_drinks, cm_harassment_complaint, cm_smokers, colette_dinner_photo, colette_dinner_seen, custody, delphine_channel, delphine_dinner, fake_reviews, filmed_faces, hippolyte_room, joined_rounds, kitchen_sabotage_caught, kitchen_sabotaged, knows_trou, met_delphine, met_hippolyte, met_jeremie, met_tatie, night_db, power_stolen, proj_db_logger, proj_db_report, proj_fake_reviews, proj_scraper, proj_whatsapp_bot, proj_wifi_cracker, random_drache, regis_courted, sabotage_chairs, sabotage_locks, sabotage_parasols, scraper_boasts, stink_bomb, tatie_fake_leak, tatie_mail_1, tatie_mail_2, tatie_mail_3, tatie_mail_4, tatie_mail_5, todo_app_rust, traitor_known, traitor_public, traitor_recruited, video_viral, wifi_cracked
+Drapeaux en fin de partie : boss_noticed, camera_awning, camera_window, cardboard_exhaust, cm_air_freshener, cm_bins, cm_fake_post, cm_free_drinks, cm_harassment_complaint, cm_smokers, colette_dinner_photo, colette_dinner_seen, corridor_measured, custody, delphine_channel, delphine_dinner, fake_reviews, filmed_faces, hippolyte_room, joined_rounds, kitchen_sabotage_caught, kitchen_sabotaged, klaas_noted_pilou, knows_trou, met_delphine, met_hippolyte, met_jeremie, met_tatie, night_db, power_stolen, proj_db_logger, proj_db_report, proj_fake_reviews, proj_scraper, proj_whatsapp_bot, proj_wifi_cracker, random_drache, regis_courted, sabotage_chairs, sabotage_locks, sabotage_parasols, scraper_boasts, stink_bomb, tatie_fake_leak, tatie_mail_1, tatie_mail_2, tatie_mail_3, tatie_mail_4, tatie_mail_5, tatie_wavering, todo_app_rust, traitor_known, traitor_public, traitor_recruited, video_viral, wifi_cracked

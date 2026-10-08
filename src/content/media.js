@@ -565,11 +565,19 @@ export const MEDIA = {
     // ── Les « unes » des fins (une par fin) ─────────────────────────────────
     {
       id: 'press_end_legal',
-      when: { flags: ['won_legal'] },
+      when: { flags: ['won_legal', 'exhaust_meeting_won'] },
       ending: 'legal_victory',
       author: 'journaliste',
       headline: 'Rue des Bouchers : la commission donne raison aux riverains',
       text: "Autorisation de terrasse suspendue, gaine d’extraction déplacée : le dossier de l’Association a convaincu. « Horodaté, mesuré, recevable », résume son président, ému. Un restaurateur va « faire appel à la rue de Gand ».",
+    },
+    {
+      id: 'press_end_legal_ac',
+      when: { flags: ['won_legal'], notFlags: ['exhaust_meeting_won'] },
+      ending: 'legal_victory',
+      author: 'journaliste',
+      headline: 'Rue des Bouchers : la commission donne raison aux riverains',
+      text: "Autorisation de terrasse suspendue : le dossier de l’Association a convaincu. La gaine d’extraction, elle, attend toujours son étude. « Une victoire, pas une fin », résume son président, ému. Un restaurateur va « faire appel à la rue de Gand ».",
     },
     {
       id: 'press_end_peace',
@@ -597,11 +605,19 @@ export const MEDIA = {
     },
     {
       id: 'press_end_custody_sugar',
-      when: { flags: ['custody', 'kitchen_sabotage_caught'] },
+      when: { flags: ['custody', 'kitchen_sabotage_caught'], notFlags: ['laxative_caught'] },
       ending: 'custody',
       author: 'journaliste',
       headline: 'L’affaire de la « carbonnade sucrée » devant la justice',
       text: "Le sel et le sucre avaient été inversés dans la cuisine d’un estaminet : le suspect est un voisin. Aucun client n’a été blessé, mais plusieurs ont « perdu foi en la frite ». L’audience promet d’être croustillante.",
+    },
+    {
+      id: 'press_end_custody_laxative',
+      when: { flags: ['custody', 'laxative_caught'] },
+      ending: 'custody',
+      author: 'journaliste',
+      headline: 'Carbonnade laxative : un riverain devant le tribunal correctionnel',
+      text: "Quatorze clients d’un estaminet de la rue des Bouchers sont tombés malades après un repas. Le suspect est un voisin. Personne, cette fois, ne parle de convivialité.",
     },
     {
       id: 'press_end_moving',
