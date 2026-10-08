@@ -16,10 +16,13 @@ import { h, clear, portrait, nameOf, typewrite, effectChips, STAT_LABELS, setPor
 import { WEEKDAYS, WEEKDAYS_SHORT, PHASE_LABELS, LEGALITY, explain, afternoonMenu, upcomingEvent, eventDays, witnessName } from './rules.js';
 import { phoneView, pullFeed, unreadItems, messageNode } from './phone.js';
 import { createVignette } from './vignette.js';
+import { homography, toMatrix3d, quadSize } from './project.js';
 import { carnetView, helpView, aboutView, carnetNews } from './codex.js';
+// Indice manette d'une carte « Nouveau » : « RB » → glyphe de la manette en cours (RB/R1…)
+const padHint = (t) => t.replace(/\b(LB|RB|LT|RT|A|B|X|Y)\b/g, (b) => padGlyph(b));
 import { openMenu, isMenuOpen } from './menu.js';
 import { applySettings } from './settings.js';
-import { startPad, onInputMode } from '../input/index.js';
+import { startPad, onInputMode, inputMode, padGlyph } from '../input/index.js';
 import { startHints, keyHint } from '../input/hints.js';
 export { openMenu } from './menu.js';
 
@@ -119,13 +122,17 @@ export function mount(engine = {}, opts = {}) {
   }
 
   // ── vignette selon l'écran ─────────────────────────────────────────
+  // Bureau ou télétravail (§12b D) : le moteur le dit (c.workPlace()), sinon bureau
+  const workPlace = () => (typeof c?.workPlace === 'function' ? c.workPlace() : null);
+  const deskScene = () => (workPlace() === 'home' ? 'home' : 'koddex');
   function sceneFor() {
     if (!c) return null;
-    if (shown() === 'koddex') return 'koddex';
+    if (shown() === 'koddex') return deskScene();
     if (c.step === 'ended') return 'ending';
     if (c.state.day === 14 && c.state.phase !== 'morning') return 'mairie';
-    if (c.state.phase === 'morning') return 'koddex';
-    if (c.step === 'actions' || c.state.phase === 'afternoon') return 'atelier';
+    if (c.state.phase === 'morning') return deskScene();
+    // L'après-midi : la rue de jour ; une réunion à l'atelier, une démarche à la mairie (le temps du résultat)
+    if (c.step === 'actions' || c.state.phase === 'afternoon') return view.result?.scene ?? 'street';
     return null;
   }
 
@@ -181,10 +188,29 @@ export function mount(engine = {}, opts = {}) {
     }
     layer.append(wrap);
     root.scrollTop = 0;
+    placeMonitor();
     focusPrimary();
   }
+  // v1.1 : le terminal Koddex posé sur le moniteur de la scène 3D (homographie CSS, recalée à chaque image).
+  // Repli : la mise en page 2D si pas de scène de jour, qualité « Bas », ou écran trop petit pour être lisible.
+  const MON_W = 760;
+  const MON_H = 475;
+  function placeMonitor() {
+    const mon = layer.querySelector('.ui-monitor');
+    const fit = () => {
+      const q = mon?.isConnected ? vignette.screenQuad() : null;
+      const sz = q && quadSize(q);
+      const ok = q && sz.w >= 420 && sz.h >= 240;
+      root.classList.toggle('on-monitor', !!ok);
+      if (!mon) return;
+      const H = ok && homography(MON_W, MON_H, q);
+      mon.style.transform = H ? toMatrix3d(H) : '';
+    };
+    vignette.onFrame(mon ? fit : null);
+    fit();
+  }
   // Accessibilité : si le focus s'est perdu (l'élément a disparu au rendu), on le pose sur l'action principale.
-  const PRIMARY = ['[data-testid=result-next]', '[data-testid=intro-next]', '[data-testid=card-choice]:not([disabled])', '[data-testid=koddex-done]',
+  const PRIMARY = ['[data-testid=result-next]', '[data-testid=intro-next]', '[data-testid=commute-next]', '[data-testid=card-choice]:not([disabled])', '[data-testid=koddex-done]',
     '[data-testid=koddex-option]:not([disabled])', '[data-testid=night-go]', '[data-testid=recap-next]', '[data-testid=end-continue]', '[data-testid=end-new]',
     '[data-testid=title-continue]', '[data-testid=title-new]', '[data-testid=action]:not([disabled])', '[data-testid=phone-close]', '[data-testid=carnet-close]',
     '[data-testid=help-close]', '[data-testid=about-close]'];
@@ -284,7 +310,8 @@ export function mount(engine = {}, opts = {}) {
       `${label} ${Math.round(S.stats[k])}`, h('i', h('b', { style: { width: `${S.stats[k]}%` } }))));
     return h('header.ui-header', { dataset: { testid: 'day-header', day: S.day, step: shown() } },
       h('div.ui-header-top',
-        h('h1.ui-day', `Jour ${S.day}/14`, h('small', `${WEEKDAYS[c.weekday()]}${c.isSaturday() ? ' · sans voitures' : ''}`)),
+        h('h1.ui-day', `Jour ${S.day}/14`, h('small', `${WEEKDAYS[c.weekday()]}${c.isSaturday() ? ' · sans voitures' : ''}`),
+          workPlace() && S.phase === 'morning' ? h('small.ui-workplace', { dataset: { testid: 'workplace', place: workPlace() } }, workPlace() === 'home' ? ' · 🏠 Télétravail' : ' · 🏢 Bureau') : null),
         h('div.ui-row',
           h('div.ui-phase', ['morning', 'afternoon', 'night'].map((p) => h(`span${p === S.phase ? '.on' : ''}`, PHASE_LABELS[p]))),
           h('button.ui-btn.ghost.ui-icon', { onclick: () => (phone.open ? closePhone() : openPhone()), dataset: { testid: 'phone-open', unread }, 'aria-label': `Téléphone (${keyHint('T')})`, title: `Téléphone (${keyHint('T')})` },
@@ -307,6 +334,8 @@ export function mount(engine = {}, opts = {}) {
     if (!card) return h('div.ui-card', h('p', '…'));
     const d = card.data ?? card;
     const speaker = d.speaker;
+    // « Nouveau » : une carte info du moteur avec une charge `unlock` (ou un futur type 'unlock')
+    if (card.unlock || card.type === 'unlock') return unlockCard(card, card.unlock ?? card.data ?? card);
     const kicker = { event: typeof d.day === 'number' ? 'Événement' : 'Imprévu', dialogue: 'Conversation', countermove: 'Le bloc contre-attaque', info: 'Nouvelles' }[card.type];
     const body = h(`div.ui-card.ui-card-${card.type}`, { dataset: { testid: 'card', type: card.type, id: card.id } }, h('span.ui-kicker', kicker));
     let merged = 0;
@@ -340,6 +369,17 @@ export function mount(engine = {}, opts = {}) {
     body.append(choices);
     return body;
   }
+  // « Nouveau : … » (src/sim/unlocks.js) : l'outil débloqué et comment s'en servir, au clavier ou à la manette
+  function unlockCard(card, u) {
+    const [kbd, pad] = String(u.hint ?? '').split(/\s*\/\s*/);
+    const hint = inputMode().mode === 'pad' ? (pad ? padHint(pad) : kbd) : kbd;
+    return h('div.ui-card.ui-card-unlock', { dataset: { testid: 'card', type: 'unlock', id: card.id } },
+      h('span.ui-kicker', '✨ Nouveau'),
+      h('h2', u.title ?? 'Nouvel outil'),
+      u.text ? h('p.ui-lead', u.text) : null,
+      hint ? h('p.ui-unlock-hint', { dataset: { testid: 'unlock-hint' } }, 'Touche : ', h('kbd', hint)) : null,
+      h('button.ui-action.ui-choice', { dataset: { testid: 'card-choice', i: 0 }, onclick: () => choose(card, 0) }, h('span.lbl', 'Compris')));
+  }
   function choose(card, i, merged = 0) {
     const before = statsSnap();
     const d = card.data ?? card;
@@ -369,6 +409,8 @@ export function mount(engine = {}, opts = {}) {
       if (o.gag) for (const l of o.gag.lines ?? []) view.k.log.push(termLine(o.gag.speaker, l));
     }
     const k = view.k;
+    // Jour de bureau : le trajet en vélo électrique, une petite scène qu'on peut passer (§12b D)
+    if (workPlace() === 'office' && meta.commuteDay !== S.day && !k.picks.length && !k.done) return commuteCard();
     const term = h('div.ui-term-body');
     const termBox = h('div.ui-term', { dataset: { testid: 'terminal' }, onclick: () => { skipAll = true; typing?.skip?.(); } },
       h('div.ui-term-bar', h('i'), h('i'), h('i'), h('span', 'clode-kode — koddex/todo-app (main)')), term);
@@ -396,7 +438,18 @@ export function mount(engine = {}, opts = {}) {
       if (line.fresh) { freshLines.push([node, line.text]); line.fresh = false; } else node.textContent = line.text;
     }
     queueMicrotask(() => typeAll(freshLines, term, menu));
-    return [k.tuto, termBox, menu];
+    return [k.tuto, h('div.ui-monitor', { dataset: { testid: 'monitor' } }, termBox, menu)];
+  }
+  function commuteCard() {
+    const beat = typeof c.commuteBeat === 'function' ? c.commuteBeat() : null;
+    const go = () => { meta.commuteDay = c.state.day; saveMeta(); render(); };
+    return h('div.ui-card.ui-commute', { dataset: { testid: 'commute' } },
+      h('span.ui-kicker', '🚲 Le trajet'),
+      h('h2', beat?.title ?? 'En vélo électrique jusqu’à Koddex'),
+      h('p.ui-lead', beat?.text ?? 'Les pavés de la rue des Bouchers secouent la batterie, Biloute aboie au passage, et la rue de la Barre descend toute seule. Dix minutes plus tard : le badge, l’ascenseur, l’open space.'),
+      h('div.ui-row',
+        h('button.ui-btn', { onclick: go, dataset: { testid: 'commute-next' } }, 'Arriver au bureau'),
+        h('button.ui-btn.light', { onclick: go, dataset: { testid: 'commute-skip' } }, 'Passer')));
   }
   function promptCard({ id, item, label, tag, hint, legality }) {
     return h(`button.ui-prompt.${legality}`, { dataset: { testid: 'koddex-option', id, work: id === 'work' ? item.id : undefined }, onclick: () => pick(id, item) },
@@ -475,15 +528,20 @@ export function mount(engine = {}, opts = {}) {
         }, h('span.lbl', a.label), h('span.cost', '⏱'.repeat(cost), ` ${cost} créneau${cost > 1 ? 'x' : ''}`),
         available ? hintOf(a) : h('span.why', '🔒 ', why.join(' · ')))));
     });
-    return [
+    // v1.1 : le carnet de l'après-midi, posé sur la rue de jour (panneau à droite sur grand écran)
+    return h('div.ui-notebook-panel', { dataset: { testid: 'notebook' } },
+      h('div.ui-notebook-head', h('b', '📒 Carnet de l’après-midi'), h('span', `${WEEKDAYS[c.weekday()]} · jour ${S.day}`)),
       tuto,
       h('div.ui-slots', { dataset: { testid: 'slots', left: S.timeLeft } }, 'Temps libre cet après-midi : ',
         Array.from({ length: Math.max(S.timeLeft, 0) }, () => h('i')), S.timeLeft ? null : ' plus rien'),
       ...groups,
       h('button.ui-btn.center', { dataset: { testid: 'action-end' }, onclick: () => { c.endAfternoon(); afterEngine(); view = {}; render(); } },
-        S.timeLeft ? 'Laisser tomber et attendre le soir' : 'Le soir tombe… (vers la nuit)'),
-    ];
+        S.timeLeft ? 'Laisser tomber et attendre le soir' : 'Le soir tombe… (vers la nuit)'));
   }
+  // Où se passe une action de l'après-midi (scène 3D du résultat) : l'atelier d'Hippolyte ou la mairie
+  const ATELIER = /asso_meeting|hippolyte|heritage|recruit|banners|petition_start/;
+  const MAIRIE = /mairie|lescaut|aot|uritrottoir|petition_deliver|inspector|ars|hygiene|inquiry/;
+  const sceneOfAction = (id) => (ATELIER.test(id) ? 'atelier' : MAIRIE.test(id) ? 'mairie' : null);
   // Indice d'effets (sans tout dévoiler) : ce que l'action fait bouger, et le risque d'être vu
   function hintOf(a) {
     const e = a.effects ?? {};
@@ -500,7 +558,7 @@ export function mount(engine = {}, opts = {}) {
     const seenNode = seen?.length
       ? h('p', { dataset: { testid: 'seen' } }, '👁 Vu par : ', seen.map((s) => `${witnessName(s.id)}${s.ally ? ' (allié)' : ''}`).join(', '))
       : (a.legality !== 'legal' ? h('p', '👁 Personne ne semble avoir vu quoi que ce soit.') : null);
-    view = { tutoShown: true, result: { title: a.label, text: result, deltas: deltas(before), extra: h('div', seenNode, first ? tutorial('first_afternoon_action') : null) } };
+    view = { tutoShown: true, result: { title: a.label, text: result, deltas: deltas(before), scene: sceneOfAction(a.id), extra: h('div', seenNode, first ? tutorial('first_afternoon_action') : null) } };
     render();
   }
 
@@ -525,9 +583,12 @@ export function mount(engine = {}, opts = {}) {
         render();
       }
     };
-    return h('div.ui-card.ui-night', { dataset: { testid: 'night' } },
-      h('span.ui-kicker', `Nuit ${c.state.day}`),
-      h('h2', sat ? 'Samedi soir, sans voitures. La rue est à eux.' : '20h30. Les terrasses se remplissent.'),
+    // v1.1 : le rebondissement de la nuit (c.tonightTwist()), en carte d'ouverture
+    const tw = typeof c.tonightTwist === 'function' ? c.tonightTwist() : null;
+    return h('div.ui-card.ui-night', { dataset: { testid: 'night', twist: tw?.id } },
+      h('span.ui-kicker', tw ? `Nuit ${c.state.day} · ce soir` : `Nuit ${c.state.day}`),
+      tw ? h('h2', { dataset: { testid: 'twist-title' } }, tw.title) : h('h2', sat ? 'Samedi soir, sans voitures. La rue est à eux.' : '20h30. Les terrasses se remplissent.'),
+      tw ? h('p.ui-lead', { dataset: { testid: 'twist-intro' } }, tw.intro) : null,
       h('p', 'Photos, décibels, appels : tout ce qui se passe ce soir pèsera à la commission. Les nuits ne se rattrapent pas.'),
       go);
   }

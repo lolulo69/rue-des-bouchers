@@ -293,3 +293,46 @@ html[data-input=pad] :focus { outline: 3px solid #24406b !important; outline-off
 #ui-pad-hold b { display: block; height: 100%; width: 0; background: #e5483a; }
 :is(#ui-root, #dayui, #ui-menu) .ui-menu-sub { margin: 6px 0 0; font-size: 15px; color: var(--ui-ink); text-transform: none; letter-spacing: 0; }
 :is(#ui-root, #dayui, #ui-menu) .ui-field em { font-style: normal; color: var(--ui-mute); font-weight: 700; }
+
+/* ── v1.1 : scènes de jour en 3D (art.day) ── */
+/* En scène 3D, le décor reste visible : voile léger, en-tête réduit à une ligne */
+:is(#ui-root, #dayui, #ui-menu)[data-stage=day3d] .ui-layer { background: linear-gradient(180deg, #2a1c1a99 0%, #2a1c1a00 22%); }
+:is(#ui-root, #dayui, #ui-menu)[data-stage=day3d] .ui-header { padding: 8px 12px; gap: 6px; background: #2a1714d0; }
+:is(#ui-root, #dayui, #ui-menu)[data-stage=day3d] .ui-header .ui-cal { display: none; }
+:is(#ui-root, #dayui, #ui-menu)[data-stage=day3d] .ui-day { font-size: 22px; }
+:is(#ui-root, #dayui, #ui-menu)[data-stage=day3d] .ui-stats { grid-template-columns: repeat(5, 1fr); gap: 4px; }
+:is(#ui-root, #dayui, #ui-menu)[data-stage=day3d] .ui-stat { padding: 3px 8px; font-size: 12px; }
+:is(#ui-root, #dayui, #ui-menu)[data-stage=day3d] .ui-stat i { display: none; }
+:is(#ui-root, #dayui, #ui-menu) .ui-workplace { color: #ffd2a8; }
+
+/* Le terminal sur le moniteur : élément net, déformé par matrix3d (project.js), sinon mise en page normale */
+:is(#ui-root, #dayui, #ui-menu).on-monitor .ui-monitor {
+  position: fixed; left: 0; top: 0; width: 760px; height: 475px; transform-origin: 0 0; z-index: 2;
+  overflow: auto; display: grid; gap: 10px; align-content: start; padding: 10px; background: #14181c; border-radius: 6px;
+  box-shadow: 0 0 40px #7fe0ff40; backface-visibility: hidden;
+}
+:is(#ui-root, #dayui, #ui-menu).on-monitor .ui-monitor .ui-term { box-shadow: none; border: 0; border-radius: 4px; }
+:is(#ui-root, #dayui, #ui-menu).on-monitor .ui-monitor .ui-prompts { color: #c4f5d2; }
+:is(#ui-root, #dayui, #ui-menu).on-monitor .ui-monitor .ui-prompt-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+:is(#ui-root, #dayui, #ui-menu).on-monitor .ui-monitor .ui-btn { text-align: center; }
+
+/* Le carnet de l'après-midi : du papier posé sur la rue (à droite sur grand écran) */
+:is(#ui-root, #dayui, #ui-menu) .ui-notebook-panel { display: grid; gap: 10px; }
+:is(#ui-root, #dayui, #ui-menu)[data-stage=day3d] .ui-notebook-panel {
+  background: #fbf4e4; border-radius: 6px 22px 22px 6px; padding: 16px 16px 16px 26px; box-shadow: var(--ui-shadow); border-left: 10px solid #6b4a2f;
+  background-image: repeating-linear-gradient(#fbf4e4 0 31px, #e9dcc0 31px 32px);
+}
+:is(#ui-root, #dayui, #ui-menu)[data-stage=day3d] .ui-notebook-panel .ui-slots,
+:is(#ui-root, #dayui, #ui-menu)[data-stage=day3d] .ui-notebook-panel .ui-group > h3 { color: var(--ui-ink); }
+:is(#ui-root, #dayui, #ui-menu) .ui-notebook-head { display: none; justify-content: space-between; align-items: baseline; gap: 8px; color: var(--ui-ink); }
+:is(#ui-root, #dayui, #ui-menu) .ui-notebook-head span { color: var(--ui-mute); font-size: 14px; }
+:is(#ui-root, #dayui, #ui-menu)[data-stage=day3d] .ui-notebook-head { display: flex; font-size: 18px; }
+@media (min-width: 1000px) {
+  :is(#ui-root, #dayui, #ui-menu)[data-stage=day3d][data-step=actions] .ui-wrap { max-width: none; margin: 0; padding-right: 16px; grid-template-columns: 1fr minmax(420px, 520px); }
+  :is(#ui-root, #dayui, #ui-menu)[data-stage=day3d][data-step=actions] .ui-wrap > * { grid-column: 2; }
+}
+
+/* Trajet du matin, cartes « Nouveau » */
+:is(#ui-root, #dayui, #ui-menu) .ui-commute { border-color: #cfe9bd; }
+:is(#ui-root, #dayui, #ui-menu) .ui-card-unlock { border-color: var(--ui-gold); background: linear-gradient(160deg, #fff6e6 60%, #fde8b4); }
+:is(#ui-root, #dayui, #ui-menu) .ui-unlock-hint kbd { background: var(--ui-ink); color: #fff3e0; border-radius: 8px; padding: 2px 10px; font-weight: 900; font-family: inherit; }
