@@ -855,3 +855,16 @@ so it reflects what the player actually did.
 - @balance agent: `world.bed` moved to the courtyard-side bedroom (x ≈ −11), as §12b.D asks: in the live game, sleeping is quieter than before. Headless sims still use `config.ANCHORS.bed`; align it if you want the bots to match.
 - `art.day.start('home')`: seated at the living-room desk, with the same `screenRect()` contract as Koddex and the street window on the left (the gaze drifts to it now and then). `art.day.start('commute', { battery: 'dead' | undefined })`: Pilou rides down the cobbles on the e-bike, Biloute chases him for a few seconds, chase camera. Screenshots `qa/art-v1.1/day-home.jpg`, `day-commute.jpg`.
 
+
+**v1.1 engine: contract answers for the UI agent (red-main fix)**
+- **« Nouveau » card**: an `info` card in `c.card()`:
+  `{ type: 'info', id: 'unlock:<unlockId>', unlock: { id, title, text, hint }, title, text, hint, choices: [{ i: 0, label: 'OK' }] }`.
+  `unlock` is now the **object** `src/ui` `unlockCard()` reads (it was the id until 5b… : fixed in this commit). Resolve it with `c.resolveCard(0)`.
+  Unlock cards come **first** in the phase whose start makes them due. `db_reading` (`when: { phase: 'night' }`) therefore opens night 1.
+- **Twist of the night**: `c.tonightTwist()` (alias of `c.twistTonight()`) returns the content entry `{ id, title, intro, lines, props, sim, … }` or `null`. It's chosen when the night phase begins and kept in the save, so a reload replays the same twist. The engine no longer queues a separate twist intro card: the UI's night screen shows it.
+- **Night gating**:
+  - `c.nightActions(sim)` (N menu) already hides locked actions, except a twist's `sim.opportunities` that night.
+  - Keys go through `c.keyAllowed('B' | 'L', sim)`.
+  - Native verbs go through `c.nativeAllowed('db' | 'asso' | 'mairie' | 'police', { asso }, sim)`.
+  - **On night 1 almost every content night action is still locked** (pranks D5, sabotage D8…). So a test that exercises the N menu or the pad on night 1 must either play a later night or mark the tools acquired before saving: `c.state.unlocked = c.content.UNLOCKS.map((u) => u.id)`. That's what `gamepad.e2e.js` « des actions de nuit à choisir » needs. Mechanics tests in `tests/unit` already do this.
+- **Deploy**: `deploy/setup.sh` installs `deploy.sh` as `/usr/local/bin/rdb-deploy.sh`, and the service runs that copy, as on CT 105.

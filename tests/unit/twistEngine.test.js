@@ -43,11 +43,10 @@ describe('twists de nuit : choix', () => {
     expect(pickTwist(tw.TWISTS, { day: 6, weekday: 'sat', flags: new Set(), stats: {}, hidden: {} }, tw.TWISTS.map((t) => t.id).filter((id) => id !== 'fx_van'), rng).id).toBe('fx_van');
   });
 
-  it('la carte d\'intro du twist ouvre la nuit, et le choix survit à un rechargement', () => {
-    const c = drive(createCampaign({ seed: 3, content }), CAMPAIGN_BOTS.passive(), (x) => x.state.phase === 'night' && x.step === 'cards');
-    const card = c.card();
-    expect(card.type).toBe('info');
-    expect(card.twist).toBe(c.state.tonightTwist.id);
+  it('le twist est choisi à l\'entrée de la nuit (c.tonightTwist() pour l\'interface), et le choix survit à un rechargement', () => {
+    const c = drive(createCampaign({ seed: 3, content }), CAMPAIGN_BOTS.passive(), (x) => x.state.phase === 'night');
+    expect(c.tonightTwist().id).toBe(c.state.tonightTwist.id);
+    expect(c.tonightTwist().intro).toBeTruthy();
     const again = createCampaign({ content, save: JSON.parse(JSON.stringify(c.save())) });
     expect(again.twistTonight().id).toBe(c.twistTonight().id);
   });
@@ -159,6 +158,7 @@ describe('outils débloqués (unlocks)', () => {
     }
     expect(c.availableActions().map((a) => a.id)).toContain('petition');
     expect(cards.filter((id) => id === 'unlock:u_petition')).toHaveLength(1);
+    expect(c.state.journal.some((e) => e.type === 'unlock' && e.id === 'u_petition')).toBe(true);
     drive(c, CAMPAIGN_BOTS.passive(), () => false);
     expect(c.state.journal.filter((e) => e.type === 'unlock' && e.id === 'u_petition')).toHaveLength(1);
   });

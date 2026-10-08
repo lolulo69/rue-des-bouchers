@@ -341,14 +341,14 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     // Outils débloqués (v1.1) : une carte « Nouveau » la première fois, en tête de la phase
     const fresh = U.due(c.ctx(), S.unlocked);
     for (const u of fresh) { S.unlocked.push(u.id); c.note('unlock', { id: u.id }); }
-    const unlockCards = fresh.map((u) => ({ type: 'info', id: `unlock:${u.id}`, unlock: u.id, title: u.card?.title ?? 'Nouveau', text: u.card?.text ?? '', hint: u.card?.hint ?? null }));
-    // Le twist de la nuit (v1.1) : choisi à l'entrée de la nuit, annoncé par sa carte d'intro
-    let twistCard = [];
-    if (phase === 'night') {
-      const t = c.twistTonight();
-      if (t?.intro) twistCard = [{ type: 'info', id: `twist:${t.id}`, twist: t.id, title: t.title ?? 'Ce soir', text: t.intro }];
-    }
-    S.cards = [...unlockCards, ...S.cards.filter((x) => x.type === 'info'), ...twistCard, ...buildCards()];
+    // Carte « Nouveau » : la charge `unlock` est celle que l'interface affiche (src/ui unlockCard)
+    const unlockCards = fresh.map((u) => {
+      const card = { id: u.id, title: u.card?.title ?? 'Nouveau', text: u.card?.text ?? '', hint: u.card?.hint ?? null };
+      return { type: 'info', id: `unlock:${u.id}`, unlock: card, title: card.title, text: card.text, hint: card.hint };
+    });
+    // Le twist de la nuit (v1.1) : choisi à l'entrée de la nuit ; l'interface l'annonce sur l'écran de nuit (c.tonightTwist())
+    if (phase === 'night') c.twistTonight();
+    S.cards = [...unlockCards, ...S.cards.filter((x) => x.type === 'info'), ...buildCards()];
     S.step = 'cards';
     if (!S.cards.length) afterCards();
   }
@@ -449,6 +449,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     }
     return S.tonightTwist.id ? TWISTS[S.tonightTwist.id] ?? null : null;
   };
+  c.tonightTwist = () => c.twistTonight(); // nom utilisé par src/ui
   const opportunities = (sim) => sim?.twist?.sim?.opportunities ?? [];
   c.actionAllowed = (id, sim) => U.action(id, S.unlocked, opportunities(sim));
   c.keyAllowed = (key, sim) => {
