@@ -34,3 +34,15 @@ test('promesse rejetée non attrapée : même écran', async ({ page }) => {
   await expect(page.locator('#fatal')).toBeVisible();
   await expect(page.locator('#fatal-detail')).toContainText('promesse de test');
 });
+
+test('Échap pendant la nuit : le menu de pause / réglages de l\'interface s\'ouvre, « Reprendre » le ferme', async ({ page }) => {
+  await page.goto('/?nolock=1&seed=2');
+  await page.click('#start');
+  await page.keyboard.press('Escape');
+  await expect(page.locator('[data-testid=menu]')).toBeVisible();
+  await page.click('[data-testid=menu-resume]');
+  await expect(page.locator('[data-testid=menu]')).toBeHidden();
+  // le jeu reprend : le temps avance de nouveau
+  const t = await page.evaluate(() => { const before = window.__rdb.sim.state.min; window.__rdb.step(10); return window.__rdb.sim.state.min - before; });
+  expect(t).toBeGreaterThan(0);
+});

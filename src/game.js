@@ -385,6 +385,8 @@ async function openNightMenu() {
   overlay = 'menu';
   open({
     context: 'night',
+    campaign,
+    quitLabel: campaign ? 'Quitter la nuit (elle recommencera)' : 'Quitter vers le titre',
     onResume: () => { menuOpen = false; overlay = null; lock(); },
     onQuit: () => { menuOpen = false; overlay = null; location.href = location.pathname; },
   });
