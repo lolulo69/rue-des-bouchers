@@ -124,7 +124,7 @@ export const UNLOCKS = [
     when: { day: [9, 14] },
     card: {
       title: 'Nouveau : la caméra sous le store',
-      text: "Cachée sous le store de l’estaminet, elle verrait tout, même les cafés offerts. Une preuve illégale : bonne pour la presse, pas pour la commission.",
+      text: "Cachée sous le store de l’estaminet, elle verrait tout ce qui se passe sous le store. Une preuve illégale : bonne pour la presse, pas pour la commission.",
       hint: 'N / Y, devant l’estaminet',
     },
   },

@@ -120,7 +120,7 @@ export const WORKDAYS = {
       once: true,
       lines: [
         "À la machine à café, une collègue baisse la voix : « Il paraît que la femme de Stéphane bosse sur une histoire de clim posée sans autorisation, dans le Vieux-Lille. »",
-        "Un autre : « Une clim ? Dans le Vieux-Lille ? En août ? Elle va se faire des amis. » Vous buvez votre café très lentement.",
+        "Un autre : « Une clim ? Dans le Vieux-Lille ? En plein été ? Elle va se faire des amis. » Vous buvez votre café très lentement.",
       ],
     },
     {
