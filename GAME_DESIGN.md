@@ -553,3 +553,14 @@ so it reflects what the player actually did.
   - Campaign invariants (`campaignInvariants.js`): days and phases in order, fixed events on their day, early endings gated, Risk only from a witnessed act or story, evidence → real source, one night per day. Not checked: "a closed shop stays closed" (no shops modelled).
   - `E2E_PORT` for running Playwright when several worktrees share the machine.
 - **§13**: ticked A4, C2 (evidence), C4 (police), E4 (illegal evidence), I5 (CI + deploy). The automated side (T) of A1, A2, A5, C3 is done too, but the Q checks are still pending.
+
+**Campaign features (campaign-features) — what changed in the day-side engine (for the build agent)**
+- **Koddex**: the work items' own `requires` / `when` / `job` / `effects` and the gags' `when` were already honoured by `c.koddexOptions()` / `c.koddex()`; they are now covered by `tests/unit/campaignFeatures.test.js`. One existing rule matters for UIs and bots: a side project picked again after it is unlocked counts as real work (+`workJob`).
+- **Side projects** (knobs in `config.js` `CAMPAIGN`):
+  - `proj_db_logger`: `c.createNight()` wraps `sim.tick`. After 22:00, every `dbLogger.every` (30) game minutes, if the noise at Pilou's window is ≥ `EVIDENCE.dbThreshold`, a passive evidence piece is added: `{ type: 'db', kind: 'db', auto: true, quality: 0.7, value: dbValue × 0.5, text: 'Démon Rust : … dB à …' }`. It is legal and counts like the manual reading. main.js gets it for free (it calls `sim.tick`).
+  - `proj_whatsapp_bot`: the mobilisation actions (`whatsappBot.actions`: rally, petition, banners, recruit) cost one slot less (minimum 1) and give +2 Asso. Use **`c.actionCost(a)`** for the slot cost the UI shows (it replaces `a.cost.time`); `c.availableActions()` and `c.doAction()` already use it.
+  - `proj_scraper`: the evidence comes from content (`side_scraper_run`). The Job costs are the content's `job` per project.
+- **Fired**: the skipped Koddex mornings and `unemployedBonusTime` were already there. `continueAfterEnding()` now has a test covering it.
+- **D7 vote**: the `d7_general_meeting` choices set exactly one `stance_*` flag (tested).
+- **Phone**: `c.readMedia()` now counts reads in `S.counts.media`. `runCampaign({ …, narrative })` takes the narrative module, and the headless bot reads the whole day's feed at the recap, before `nextDay()`, so message effects apply in simulated campaigns. `scripts/sim.js` passes it for real content (not `--fixture`). Balance note: message effects (small Asso, flags) now apply in `npm run sim`.
+- **Coverage**: `tests/unit/coverage.test.js` now also covers DIALOGUE and MEDIA (ending-screen messages count when shown). Today 324/448 ids are reached: media 98/120, dialogue 131/183.

@@ -1,4 +1,4 @@
-// Couverture du contenu (§13.F/G) : chaque ACTION, EVENT, COUNTERMOVE et ENDING doit être atteint par au moins une
+// Couverture du contenu (§13.F/G) : chaque ACTION, EVENT, COUNTERMOVE, ENDING, réplique (DIALOGUE) et message (MEDIA) doit être atteint par au moins une
 // campagne seedée jouée par les 6 bots (même mesure que « Jamais atteint » de `npm run sim`).
 // Un id encore jamais atteint est un test.todo (listé en sortie) : c'est la cible de l'agent d'équilibrage.
 // COVERAGE_RUNS=n pour plus de graines (défaut 12 par bot).
@@ -6,24 +6,28 @@ import { describe, it, expect } from 'vitest';
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { normalizeContent, runCampaign, CAMPAIGN_BOTS } from '../../src/sim/index.js';
+import * as narrative from '../../src/sim/narrative.js';
 
 const DIR = join(import.meta.dirname, '..', '..', 'src', 'content');
 const K = normalizeContent(await Promise.all(readdirSync(DIR).filter((f) => f.endsWith('.js')).map((f) => import(join(DIR, f)))));
 const RUNS = Number(process.env.COVERAGE_RUNS ?? 12);
 
-const used = { actions: new Map(), events: new Map(), countermoves: new Map(), endings: new Map() };
+const used = { actions: new Map(), events: new Map(), countermoves: new Map(), endings: new Map(), dialogue: new Map(), media: new Map() };
 for (const name of Object.keys(CAMPAIGN_BOTS)) {
   for (let seed = 1; seed <= RUNS; seed++) {
-    const { c } = runCampaign({ seed, content: K, bot: CAMPAIGN_BOTS[name]() });
+    const { c } = runCampaign({ seed, content: K, bot: CAMPAIGN_BOTS[name](), narrative });
     const S = c.state;
-    for (const k of ['actions', 'events', 'countermoves']) {
+    for (const k of ['actions', 'events', 'countermoves', 'dialogue', 'media']) {
       for (const id of Object.keys(S.counts[k] ?? {})) if (!used[k].has(id)) used[k].set(id, `${name}#${seed}`);
     }
     if (S.ending?.id && !used.endings.has(S.ending.id)) used.endings.set(S.ending.id, `${name}#${seed}`);
+    // Les messages d'écran de fin (une du journal, messages de fin) comptent comme atteints quand la fin est montrée
+    for (const m of [S.endingMedia?.front, ...Object.values(S.endingMedia?.feed ?? {}).flat()].filter(Boolean)) if (!used.media.has(m.id)) used.media.set(m.id, `${name}#${seed}`);
   }
 }
 
-const KINDS = { actions: K.ACTIONS, events: K.EVENTS, countermoves: K.COUNTERMOVES, endings: K.ENDINGS };
+const MEDIA = [...K.MEDIA.whatsapp, ...K.MEDIA.press, ...K.MEDIA.social];
+const KINDS = { actions: K.ACTIONS, events: K.EVENTS, countermoves: K.COUNTERMOVES, endings: K.ENDINGS, dialogue: K.DIALOGUE, media: MEDIA };
 const unreached = Object.fromEntries(Object.entries(KINDS).map(([k, list]) => [k, list.map((x) => x.id).filter((id) => !used[k].has(id))]));
 const total = Object.values(KINDS).reduce((s, l) => s + l.length, 0);
 const missing = Object.values(unreached).reduce((s, l) => s + l.length, 0);
