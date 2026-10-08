@@ -163,9 +163,8 @@ Every illegal act checks for **witnesses** in line of sight + hearing:
 ### Illegal (stealth)
 - **Bucket of water** from the window (classic).
 - **Taping cardboard over the exhaust** (it smokes out the kitchen → health inspection... or a fire! very dangerous).
-- **Stink bomb** / tainting the food. Darkest option: a **laxative in the carbonnade** (ruined service, catastrophic reviews,
-  but it counts as **deliberately poisoning customers** if caught → prison ending). We keep it to laxatives, no lethal poison:
-  that would break the satirical tone.
+- **Stink bomb** / tainting the food. Kitchen sabotage: **« saboter la cuisine »**: swap the salt and the sugar (ruined service, catastrophic reviews,
+  vandalism and trespass if caught → trial ending). Nothing that harms health: that would break the satirical tone.
 - **Fake reviews** / fake TripAdvisor accounts.
 - **Sabotage**: unscrew chairs, steal the parasols, glue the terrace locks.
 - **Bribe the waiter** to rat out the owners.
@@ -200,7 +199,7 @@ recruiting a resident (the traitor) · a fake post "Ch'tite Bernadette is being 
 1. **Legal victory**: terrace permit (AOT) suspended or withdrawn for Bernadette, exhaust moved. Requires a strong legal dossier and low Risk.
 2. **Negotiated peace**: a good-neighbour charter signed by the bloc, 22:00 respected. Requires high Association and a "dialogue" stance.
 3. **Scandal**: corruption exposed in La Voix du Nordiste, Lemaire transferred, Martine embarrassed. Strong but the bloc hates you.
-4. **Custody / trial**: caught red-handed. Variant: the "laxatives" trial in the newspaper.
+4. **Custody / trial**: caught red-handed. Variant: the « carbonnade sucrée » trial in the newspaper.
 5. **Moving out**: Sleep at 0 → Pilou moves to Wazemmes. ("At least at the Wazemmes market, it's noise in the morning.")
 6. **Fired**: Job at 0. Twist: it unlocks the full-time fight for the remaining days (hard mode).
 7. **Turncoat (secret)**: Pilou becomes a regular at Bernadette's, eats the carbonnade, and Klaas writes it down.
@@ -226,7 +225,7 @@ Tunable rules live in `src/config.js`.
 | **v0.2: core tension** | Sim logic split out of rendering + tests. Witnesses and line-of-sight stealth (Klaas, Seb & Nico + cat, waiter, customers filming). Police patrols with personalities, tip-off, "c'est encore vous", complaisance logging. Terrace zone + passage corridor evidence. Saturday variant (crowd, standing drinkers, peeing). |
 | **v0.3: art pass** | Cute low-poly restyle: characters (Pilou, the association, Dédé & Ghislain, the waiter, police, customers), stepped gables, the cat, the dachshund, animations, ambient audio (WebAudio: crowd murmur, chairs on cobbles, the exhaust hum). |
 | **v0.4: campaign** | The 14-day calendar, day phase (Koddex / Clode Kode prompts, afternoon association actions), save in localStorage, scripted events (Martine's dinner, general meeting, inspector, exhaust meeting, commission), bloc counter-moves, dialogue system with the association members. |
-| **v0.5: dirty tricks** | Hidden cameras + electricity/wifi hijack, cardboard on the exhaust, stink bomb, laxatives, fake reviews, sabotage, bribing the waiter, photographing the bribe. Risk thresholds → complaint, custody, trial. |
+| **v0.5: dirty tricks** | Hidden cameras + electricity/wifi hijack, cardboard on the exhaust, stink bomb, kitchen sabotage (salt/sugar), fake reviews, sabotage, bribing the waiter, photographing the bribe. Risk thresholds → complaint, custody, trial. |
 | **v1.0: endings + polish** | The 8 endings, balancing via simulated runs, French copy pass, performance, a full QA run in Chrome. |
 
 ## 13. v1.0 acceptance checklist
@@ -261,11 +260,11 @@ Proof: **T** = automated test (vitest / Playwright / campaign simulator, runs in
 ### E. Actions (every one implemented, with a cost, an effect and a consequence)
 - [ ] Legal: every item of section 6 "Legal". **T**
 - [ ] Grey: every item of section 6 "Grey". **T**
-- [ ] Illegal: bucket, cardboard on the exhaust, stink bomb, laxatives, fake reviews, sabotage (chairs, parasols, locks), bribing the waiter, hidden cameras (window = grey, awning = illegal), power from Bernadette's electricity, cracking their wifi (+ reading reservations, emails, quotes), sneaking in to photograph the bribe. **T**
+- [ ] Illegal: bucket, cardboard on the exhaust, stink bomb, kitchen sabotage (salt/sugar), fake reviews, sabotage (chairs, parasols, locks), bribing the waiter, hidden cameras (window = grey, awning = illegal), power from Bernadette's electricity, cracking their wifi (+ reading reservations, emails, quotes), sneaking in to photograph the bribe. **T**
 - [ ] Illegally obtained evidence is unusable in court but usable for the press / internal police investigation. **T**
 
 ### F. Endings: all 8 reachable
-- [ ] 1 Legal victory · 2 Negotiated peace · 3 Scandal · 4 Custody/trial (incl. the laxatives variant) · 5 Moving out to Wazemmes · 6 Fired (+ continue twist) · 7 Turncoat (secret) · 8 The return (La Bombance). **T Q**
+- [ ] 1 Legal victory · 2 Negotiated peace · 3 Scandal · 4 Custody/trial (incl. the « carbonnade sucrée » variant) · 5 Moving out to Wazemmes · 6 Fired (+ continue twist) · 7 Turncoat (secret) · 8 The return (La Bombance). **T Q**
 - [ ] Each ending has its own end screen with an epilogue that **references what the player actually did** (key evidence, actions, who betrayed whom). **T Q**
 - [ ] The campaign simulator reaches **every ending** with at least one scripted strategy, and each ending occurs in ≥ 2% of 1000 runs of its target strategy. **T**
 
