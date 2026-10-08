@@ -1,0 +1,6 @@
+# rue-des-bouchers port forward (CT 105 - rue-des-bouchers): LAN 192.168.1.163:8090 -> 10.10.10.132:8090
+iface vmbr1 inet static
+	post-up   iptables -t nat -A PREROUTING -i vmbr0 -p tcp --dport 8090 -j DNAT --to-destination 10.10.10.132:8090
+	post-up   iptables -A FORWARD -i vmbr0 -o vmbr1 -p tcp --dport 8090 -d 10.10.10.132 -j ACCEPT
+	post-down iptables -t nat -D PREROUTING -i vmbr0 -p tcp --dport 8090 -j DNAT --to-destination 10.10.10.132:8090
+	post-down iptables -D FORWARD -i vmbr0 -o vmbr1 -p tcp --dport 8090 -d 10.10.10.132 -j ACCEPT
