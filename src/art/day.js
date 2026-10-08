@@ -7,7 +7,7 @@
 // Un renderer et un canvas à part, plein écran derrière l'UI, 60 images/s au plus, en pause quand l'onglet est caché.
 import * as THREE from 'three';
 import { attachRigs } from './rig.js';
-import { CAST, humanoid, setState, clodeBot } from './characters.js';
+import { CAST, humanoid, setState, clodeBot, bike as makeBike } from './characters.js';
 import { canvasTexture, panelTex } from './textures.js';
 import { scenes as vignettes, M, kit as makeKit, codeTex, roofsTex } from './scenes.js';
 import { QUALITY_PRESETS } from './quality.js';
@@ -81,13 +81,18 @@ function koddexScene() {
 
 // ---------- La rue de jour : terrasses qu'on installe, livraison, Klaas et Tatie aux fenêtres, Biloute en promenade ----------
 let dayStreet = null;
-async function streetScene() {
+// La rue de jour est construite une fois et partagée par 'street', 'home' et 'commute'
+async function dayWorld() {
   if (!dayStreet) {
     const { buildWorld } = await import('../world.js'); // import tardif : pas de cycle avec world.js
     const scene = new THREE.Scene();
     const world = buildWorld(scene, { role: 'day' });
     dayStreet = { scene, world };
   }
+  return dayStreet;
+}
+async function streetScene() {
+  await dayWorld();
   const { scene, world } = dayStreet;
   // lumière du jour
   scene.background = canvasTexture(16, 256, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#7fb6e8'); gr.addColorStop(1, '#e6eef2'); g.fillStyle = gr; g.fillRect(0, 0, w, h); });
@@ -139,12 +144,64 @@ async function streetScene() {
   };
 }
 
+// ---------- Télétravail : assis au bureau du séjour, LA fenêtre sur la rue à gauche ----------
+async function homeScene(opts = {}) {
+  const base = await streetScene(opts); // la rue de jour vit dehors (livraisons, terrasses qu'on installe…)
+  const { world } = dayStreet;
+  const seat = world.homeSeat, screen = world.homeScreen;
+  const camera = new THREE.PerspectiveCamera(60, 16 / 9, 0.03, 160);
+  const eye = new THREE.Vector3(seat.x - 0.05, seat.y + 1.16, seat.z - 0.05);
+  const look = screen.position.clone().setY(screen.position.y - 0.04);
+  return {
+    scene: base.scene, camera, screen,
+    update(dt, t) {
+      base.update(dt, t); // anime la rue (et sa caméra, qu'on n'utilise pas)
+      // de temps en temps, le regard file vers la fenêtre (distractions de la rue)
+      const glance = Math.max(0, Math.sin(t * 0.21) - 0.75) * 4;
+      camera.position.set(eye.x + Math.sin(t * 0.3) * 0.01, eye.y + Math.sin(t * 1.1) * 0.005, eye.z);
+      camera.lookAt(look.x, look.y + glance * 0.1, look.z - glance * 1.4);
+    },
+    dispose: base.dispose,
+  };
+}
+
+// ---------- Trajet du matin (jour de bureau) : Pilou à vélo électrique sur les pavés, Biloute le poursuit un peu ----------
+async function commuteScene(opts = {}) {
+  const base = await streetScene(opts);
+  const { world, scene } = dayStreet;
+  const pilou = CAST.pilou({ anim: 'ride', expr: opts.battery === 'dead' ? 'sad' : 'happy', talk: 0 });
+  const ebike = makeBike(0x2b9d8f);
+  pilou.add(ebike); scene.add(pilou);
+  const dog = world.cast.dog, j = world.cast.jeremie;
+  const start = world.streetDoor.z + 1, speed = opts.battery === 'dead' ? 2.2 : 5.5;
+  const camera = new THREE.PerspectiveCamera(55, 16 / 9, 0.05, 200);
+  return {
+    scene, camera, screen: null,
+    update(dt, t) {
+      base.update(dt, t);
+      const z = start - ((t * speed) % 70);
+      pilou.position.set(0.5 + Math.sin(t * 2.4) * 0.05, 0, z); pilou.rotation.y = Math.PI;
+      pilou.position.y = Math.abs(Math.sin(t * 22)) * 0.012; // les pavés
+      pilou.updateMatrixWorld();
+      // Biloute court derrière les premières secondes
+      const chase = Math.min(1, t / 3);
+      dog.position.set(0.1, 0, z + 1.4 + chase * 6 * (t > 3 ? (t - 3) : 0)); dog.rotation.y = Math.PI;
+      j.position.set(-1.8, 0, world.streetDoor.z); j.rotation.y = Math.PI * 0.8;
+      camera.position.set(1.6, 2.3, z + 4.5);
+      camera.lookAt(0.3, 1.1, z - 3);
+    },
+    dispose() { scene.remove(pilou); base.dispose?.(); },
+  };
+}
+
 // Vignettes existantes (atelier, mairie) branchées dans la même boucle
 const fromVignette = (make) => () => { const v = make(); return { scene: v.scene, camera: v.camera, screen: null, update: (dt) => v.update(dt), dispose: v.dispose }; };
 
 export const DAY_SCENES = {
   koddex: koddexScene,
+  home: homeScene,
   street: streetScene,
+  commute: commuteScene,
   atelier: fromVignette(vignettes.atelier),
   mairie: fromVignette(vignettes.mairie),
 };
@@ -209,7 +266,7 @@ export function createDay() {
       renderer.setPixelRatio(Math.min(q.maxPixelRatio, devicePixelRatio || 1) * q.pixelRatio);
       canvas.style.display = '';
       name = next; t = 0; last = 0;
-      current = await DAY_SCENES[next]();
+      current = await DAY_SCENES[next](opts);
       size();
       if (!raf) raf = requestAnimationFrame(frame);
       return true;

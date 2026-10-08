@@ -12,6 +12,7 @@ import { makeKit, house, GROUND, FLOOR, winY } from './art/buildings.js';
 import { cobbleTex, slabTex, seeded, puffTex } from './art/textures.js';
 import { audio } from './audio/index.js';
 import { attachArt } from './art/index.js';
+import { buildApartment } from './art/apartment.js';
 
 const W = STREET.halfWidth;
 const HALF = STREET.length / 2;
@@ -288,37 +289,9 @@ export function buildWorld(scene, opts = {}) {
   const steam = makeSteam(exhaust.clone());
   city.add(steam.points);
 
-  // ---------- Appartement de Pilou (pièce visible de l'intérieur) ----------
-  const apt = { x0: -9.2, x1: -W - 0.3, z0: bz - 3, z1: bz + 3, floor: F, ceil: F + 2.8 };
-  const roomMat = mat(0xe6d6b8, { roughness: 1 });
-  const floorMat = mat(0x8a5f3a, { roughness: 0.8 });
-  const rw = apt.x1 - apt.x0 + 0.2, rh = apt.ceil - apt.floor, rd = apt.z1 - apt.z0, cx = (apt.x0 + apt.x1) / 2 + 0.1, cy = (apt.floor + apt.ceil) / 2;
-  const abox = (w, h, d, x, y, z, m) => kit.add(new THREE.BoxGeometry(w, h, d), m, x, y, z);
-  for (const [w, h, d, x, y, z, m] of [
-    [rw, 0.1, rd, cx, apt.floor - 0.05, bz, floorMat],
-    [rw, 0.1, rd, cx, apt.ceil + 0.05, bz, roomMat],
-    [0.1, rh, rd, apt.x0 - 0.05, cy, bz, roomMat],
-    [rw, rh, 0.1, cx, cy, apt.z0 - 0.05, roomMat],
-    [rw, rh, 0.1, cx, cy, apt.z1 + 0.05, roomMat],
-  ]) abox(w, h, d, x, y, z, m);
-  const aptLight = new THREE.PointLight(0xffd9a0, 6, 8, 1.5);
-  aptLight.position.set(-7, F + 2.3, bz);
-  city.add(aptLight);
-  const bed = new THREE.Vector3(-8.2, F, bz - 1.6);
-  abox(1.6, 0.35, 2.1, bed.x, F + 0.25, bed.z, mat(0x6b4a2b));
-  abox(1.5, 0.18, 2.0, bed.x, F + 0.5, bed.z + 0.05, mat(0x5b7fb0)); // couette
-  abox(1.3, 0.14, 0.4, bed.x, F + 0.62, bed.z - 0.75, mat(0xffffff));
-  abox(2.4, 0.02, 1.6, -6.4, F + 0.01, bz + 0.2, mat(0xc4614f)); // tapis
-  // bureau de dev : écran de Clode Kode allumé
-  abox(0.7, 0.05, 1.3, -8.7, F + 0.75, bz + 1.0, mat(0x9a6b42));
-  for (const dz of [-0.55, 0.55]) abox(0.05, 0.75, 0.05, -8.7, F + 0.37, bz + 1.0 + dz, mat(0x3a3a3a));
-  abox(0.04, 0.42, 0.7, -8.95, F + 1.05, bz + 1.0, mat(0x111111, { emissive: 0x7fb0ff, emissiveIntensity: 0.6 }));
-  abox(0.05, 0.6, 0.6, apt.x0 + 0.03, F + 1.6, bz - 0.4, mat(0x2b4d7a, { emissive: 0x2b4d7a, emissiveIntensity: 0.2 })); // affiche
-  const plant = new THREE.Mesh(new THREE.IcosahedronGeometry(0.32, 0), mats.leaf);
-  plant.position.set(-4.0, F + 0.6, bz + 2.5); city.add(plant);
-  abox(0.3, 0.3, 0.3, -4.0, F + 0.15, bz + 2.5, mat(0xc4714f));
-  const aptDoor = new THREE.Vector3(apt.x0 + 0.6, F, bz + 1.8);
-  abox(0.08, 2.1, 1, apt.x0 + 0.05, F + 1.05, bz + 1.8, mat(0x6b4423));
+  // ---------- Appartement de Pilou (§12b.D) : séjour côté rue avec LA fenêtre, couloir, chambres côté cour ----------
+  const flat = buildApartment(city, scene, { F, bz, W });
+  const { apt, bed, aptDoor } = flat;
 
   // ---------- Enseignes et stores des restos de config.js ----------
   for (const r of RESTAURANTS) {
@@ -537,6 +510,11 @@ export function buildWorld(scene, opts = {}) {
     setCatVisible(v) { cast.cat.visible = v; },
     groundMaterials,
     streetLights,
+    // Appartement : collision des cloisons (à appeler sur la position de Pilou chez lui), bureau de télétravail
+    aptCollide: flat.collide,
+    homeScreen: flat.homeScreen,
+    homeSeat: flat.homeSeat,
+    aptRooms: flat.rooms,
     emissiveMaterials,
     windowSpots: kit.windows,
     standingCrowd: (o) => standingCrowd(scene, o),
