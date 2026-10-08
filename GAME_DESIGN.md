@@ -583,3 +583,18 @@ so it reflects what the player actually did.
 - **Bots** (campaignBots.js): scoring counts the real gain (config scale, headroom: asso at 100 doesn't climb), only new flags score, and the win flags are weighted in the order of the endings. Night content goes through `availableNightActions` (window, scene), and illegal acts only happen when none of *their own* witnesses (`witnessed.by`) can see the spot. Stealthy sleeps 23:15–00:50, makes one police call and asks the waiter. Reckless asks the waiter. Mixed naps when tired. The diplomat rations calls and, if peace becomes impossible (day ≥ 8, hostility ≥ 80), switches sides (carbonnades, passive nights). New **slacker** bot (all prompts on side projects + `work_nap`) for the fired ending.
 - **Simulator** (`scripts/sim.js`): `--set A.b=1,C.d=2` (config overrides without editing, quote-free for ssh), `--detail` (commission choices, p10/50/90 dossier / asso / hostility, key flags, actions per campaign), `--ablate [bot]` (§13.H "no dominant action": removes each action the bot used, one at a time, and prints the win-rate shift; `--strict` fails at ≥ 25 points).
 - **For the content agent**: `r_aot_pdf` can never fire. Its `when` needs `aot_requested` without `legal_view`, but `pm_aot_request` sets both. Still unused by every bot: `night_saboter_cuisine`, `night_laxatif_carbonnade` (kitchen open before 23:00 + an informant waiter; in the sim the bribe → debrief → sabotage chain hasn't completed yet), `night_backroom_photo` (needs a patrol on site + informant waiter), `pm_bloc_fooled`, and the counter-moves that follow them (`cm_sugar_blame`, `cm_waiter_suspected`, `cm_camera_found_paranoia`).
+
+**v0.6 (build-v0.6)**
+- **D3 fixed**: counter-moves honour `when.phase` (afternoon by default), so morning ones (Tatie's emails, cm_bins…) fire now. Cap of 2 per phase. The §13.D3 `it.todo` are real tests.
+- **A1 (design decision)**: the campaign ends right after the D14 commission, won or lost (`CAMPAIGN.finalFlag: 'commission_done'`), with `early: false`. There is no night 14: 13 nights + the commission. Epilogue and « the return » are resolved there.
+- **Free night**: `?day=` accepts all 7 weekdays (`tue`, `dimanche`…; unknown → Monday). Label and police roster follow the day; Saturday plays the no-cars variant.
+- **Bug**: the HUD (prompt, clock, bars) could freeze for a whole night when the first frame's delta was NaN. Fixed in main.js.
+- **U6** was already done (665dd2d): no title screen at a campaign night's start.
+- **Q session to run in Chrome (§13 A and C, automated side done)**:
+  - A1: play days 1→3 (morning/afternoon/night/recap). On D14, the commission ends the campaign straight away: no night, no "Jour 15" button.
+  - A2: reload mid-afternoon and mid-night. "Continuer" resumes the same day; a night restarts from its beginning.
+  - A3: time a real night (~10 min) and a day phase, for the 2h30–4h estimate.
+  - A5: D4 (Colette's dinner, night card), D6/D13 (Saturday crowd), D7 vote, D9, D11, D14 appear on their day.
+  - C3: at the window after 22:00, the "👁 Témoins possibles" line changes when Klaas picks up his binoculars (police in the street, chairs) and when the cat goes in. Try a bucket with the dachshund nearby (21:30–22:30): it barks.
+  - C5: the mayor's office reports from the phone (inspector visits are content-driven).
+  - C6: `?day=sat`: standing drinkers, people peeing in doorways (incl. Pilou's door), louder.
