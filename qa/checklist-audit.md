@@ -15,7 +15,7 @@ Chrome session, L is Lucas) and gets `T: <file>` appended. Nothing in the app co
 | C5 | Mayor's office: reports, announced vs surprise inspector visit | **✅ ticked** | `checklist.test.js` §13.C5 (night report → evidence, afternoon report; D9: surprise only via `delphine_channel` / `heritage_angle`, announced path stalls the case) | — |
 | D1 | Koddex: 3 prompts, work vs side projects, Job, gags | **T done**, Q pending | `koddex.test.js`, `campaignFeatures.test.js` (work gating, side projects incl. dB logger / WhatsApp bot, Job costs, gags' `when`) | Q: design agent |
 | D2 | Afternoon actions (meeting, mairie, emails, press, lawyer, petition, ARS, recruiting, uritrottoir, dinner) | **✅ ticked** | `checklist.test.js` §13.D2 (each one played by the engine from a state that allows it) | — |
-| D3 | All §8 counter-moves can trigger | **❌ open** (10/12 proven) | `checklist.test.js` §13.D3: 10 counter-moves proven by the engine; 2 `it.todo` | **Bug** (engine/content): `buildCards()` only reveals counter-moves in the **afternoon**, but `tatie_mail_01…12`, `cm_bins`, `cm_bins_again` (and any `when.phase: 'morning'` entry) are morning ones, so they **never trigger**. This is also why they are unreachable in `coverage.test.js`. Fix: build agent (honour `when.phase` for counter-moves, like dialogue), or countermoves writer (move them to the afternoon). The todos turn into tests once fixed. |
+| D3 | All §8 counter-moves can trigger | **✅ ticked** (12/12 proven) | `checklist.test.js` §13.D3: all 12 §8 counter-moves fire from a state that allows them, morning ones included (fix 2b200da; re-run on main by the content agent) | — |
 | E1 | Legal actions of §6 | **✅ ticked** | `checklist.test.js` §13.E (cost, effect, consequence; afternoon ones played); night ones: `nightActions.test.js`, `rules.test.js`, `police.test.js`, `campaign.test.js` « relevé dB » | — |
 | E2 | Grey actions of §6 | **✅ ticked** | same; a grey act's consequence = effects if seen, Risk, or content that reacts to its flag | — |
 | E3 | Illegal actions of §6 | **✅ ticked** | same (incl. wifi → reading reservations / emails / quotes, back-room photo; the laxative variant is also in content) | — |
@@ -30,6 +30,7 @@ Chrome session, L is Lucas) and gets `T: <file>` appended. Nothing in the app co
 
 ## Notes for Q / L (observed while writing the tests, not ticked)
 - Coverage by the 6 bots (`coverage.test.js`, 12 seeds): 324/448 content ids. The morning counter-moves (D3 bug) account for 14 of them.
+- Coverage after the morning fix (`coverage.test.js`, 7 bots × 12 seeds): 367/450 content ids. The bots never reach 4 counter-moves, all follow-ups outside the §8 list: `cm_regis_leak_petition`, `cm_camera_found_paranoia`, `cm_waiter_suspected`, `cm_sugar_blame`. They aren't needed for D3, but worth a Q glance or a bot tweak.
 - **Load time**: 6.4–6.7 s locally (Mac mini at load 10–20) versus 147 ms in CI: the local figure was machine contention.
 
 ## CI status of the new tests

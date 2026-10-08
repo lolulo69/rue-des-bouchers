@@ -257,7 +257,7 @@ Proof: **T** = automated test (vitest / Playwright / campaign simulator, runs in
 ### D. Day systems
 - [x] Koddex: 3 Clode Kode prompts a day, work vs side projects (dB logger, WhatsApp bot, review scraper, wifi cracker, fake reviews), Job meter, boss gags. **T Q** — T: tests/unit/koddex.test.js, campaignFeatures.test.js (Q pending) — Q: qa/screens/q/D1-koddex.jpg (design agent, 2026-10-08)
 - [x] Afternoon actions: meeting, mayor's office, emails, press (La Voix du Nordiste), lawyer (formal notice), petition, health agency (ARS) / environmental health about the exhaust, recruiting residents, asking for a uritrottoir, dinner at Stéphane's with Delphine. **T** — tests/unit/checklist.test.js §13.D2
-- [ ] The restaurants' counter-moves (all of section 8) can trigger, depending on state. **T** — tests/unit/checklist.test.js §13.D3: 10/12 proven; the morning ones (Tatie's emails, bins) never trigger, see qa/checklist-audit.md
+- [x] The restaurants' counter-moves (all of section 8) can trigger, depending on state. **T** — tests/unit/checklist.test.js §13.D3: 12/12 proven (morning counter-moves fixed in 2b200da), see qa/checklist-audit.md
 
 ### E. Actions (every one implemented, with a cost, an effect and a consequence)
 - [x] Legal: every item of section 6 "Legal". **T** — tests/unit/checklist.test.js §13.E, nightActions.test.js
