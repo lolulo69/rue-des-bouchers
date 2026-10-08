@@ -200,7 +200,9 @@ export function createDirector(scene, world, { onFrame, audio, fx, props }) {
   function envelope(giver = 'dede', receiver = 'lemaire', { at = null } = {}) {
     const g = get(giver);
     const rv = receiver?.isObject3D ? receiver : spawn(receiver);
-    if (at) { const s = toV(at); g.position.copy(s); rv.position.set(s.x + (s.x < 0 ? 0.9 : -0.9), 0, s.z + 0.2); }
+    if (at) g.position.copy(toV(at));
+    // le receveur se place à 0,9 m du donneur, côté rue, s'il est loin
+    if (at || rv.position.distanceTo(g.position) > 2.5) rv.position.set(g.position.x + (g.position.x < 0 ? 0.9 : -0.9), 0, g.position.z + 0.2);
     g.rotation.y = headingTo(g.position, rv.position); rv.rotation.y = headingTo(rv.position, g.position);
     g.updateMatrixWorld(); rv.updateMatrixWorld();
     remember(g); remember(rv);
@@ -215,7 +217,7 @@ export function createDirector(scene, world, { onFrame, audio, fx, props }) {
   // Laxatifs : n clients d'une table se lèvent et filent aux toilettes de l'estaminet, mains sur le ventre.
   // Comique, pas dégoûtant : petits pas pressés, goutte de sueur, file d'attente, panneau « OCCUPÉ ».
   function rush(table, n = 3, { door = A.bernadetteDoor, returnAfter = 40 } = {}) {
-    const seated = table.people.filter((p) => p.visible && !rigOf(p).hidden).slice(0, n);
+    const seated = table.people.filter((p) => p.visible && !rigOf(p).hidden && rigOf(p).anim !== 'fallen').slice(0, n);
     const d = toV(door);
     const out = d.x < 0 ? 1 : -1;
     const sign = props.place('occupied', d);

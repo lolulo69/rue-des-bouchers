@@ -138,6 +138,8 @@ const mainHooks = [];
 // Appelé à chaque frame (dt, t, camera) juste avant le rendu de la scène principale : animations du décor, audio.
 export const onFrame = (fn) => mainHooks.push(fn);
 export const stats = { proxies: 0, drawn: 0, far: 0 };
+// Horloge des animations de l'art (temps réel). Remplaçable pour la QA : timeSource.now = () => tempsVirtuelMs
+export const timeSource = { now: () => performance.now() };
 
 /**
  * Branche le rendu instancié sur une scène. main: true = la rue (reçoit les onFrame globaux).
@@ -154,11 +156,11 @@ export function attachRigs(scene, { main = false, lod = true } = {}) {
     return pl;
   };
   const hooks = main ? mainHooks : [];
-  let last = performance.now();
+  let last = timeSource.now();
   const prev = scene.onBeforeRender;
   scene.onBeforeRender = function (renderer, sc, camera, target) {
     prev.call(this, renderer, sc, camera, target);
-    const nowMs = performance.now();
+    const nowMs = timeSource.now();
     const dt = Math.min(0.1, (nowMs - last) / 1000);
     last = nowMs;
     const t = nowMs / 1000;

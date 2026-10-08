@@ -5,6 +5,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { buildWorld } from '../world.js';
 import { art } from './index.js';
 import { audio } from '../audio/index.js';
+import { timeSource } from './rig.js';
 
 const canvas = document.getElementById('view');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -17,7 +18,7 @@ scene.add(new THREE.HemisphereLight(0x9fb4ff, 0x3a2a20, 0.6));
 const camera = new THREE.PerspectiveCamera(60, 1, 0.05, 400);
 const controls = new OrbitControls(camera, canvas);
 const world = buildWorld(scene);
-window.__gallery = { world, art, scene, camera };
+window.__gallery = { world, art, scene, camera, controls };
 const A = world.anchors;
 let vignette = null;
 
@@ -111,11 +112,21 @@ section('Sons (audio.play / loop)', [
 ]);
 
 const clock = new THREE.Clock();
-function frame() {
-  const dt = Math.min(0.1, clock.getDelta());
+// step(n) : n frames de 1/30 s sans requestAnimationFrame (onglet en arrière-plan, QA automatisée)
+let manualDt = null;
+let virt = null;
+window.__gallery.step = (n = 1) => {
+  virt ??= performance.now();
+  timeSource.now = () => virt;
+  manualDt = 1 / 30;
+  for (let i = 0; i < n; i++) { virt += 1000 / 30; render(); }
+  manualDt = null;
+};
+function render() {
+  const dt = manualDt ?? Math.min(0.1, clock.getDelta());
   world.steam.update(dt);
   if (vignette) { vignette.update(dt); renderer.render(vignette.scene, vignette.camera); }
   else { controls.update(); renderer.render(scene, camera); }
-  requestAnimationFrame(frame);
 }
+function frame() { render(); requestAnimationFrame(frame); }
 frame();
