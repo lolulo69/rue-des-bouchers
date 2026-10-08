@@ -135,7 +135,8 @@ test.describe('campagne (interface de jour)', () => {
     await expect(ending).toBeVisible();
     await expect(ending).toHaveAttribute('data-id', end.id);
     await expect(ending).toContainText(end.title);
-    await expect(ending).toContainText('La Voix du Nordiste');
+    // UI v0.7 : la une est un article à part (ending-paper), à côté de la carte d'épilogue
+    await expect(page.locator('[data-testid=ending-paper]')).toContainText('La Voix du Nordiste');
     await expect(page.locator('.ui-epilogue p').first()).toBeVisible();
     await expect(page.locator(`[data-testid=endings] [data-ending="${end.id}"]`)).not.toHaveClass(/locked/);
     // Les fins secrètes ne sont pas listées tant qu'elles n'ont pas été atteintes
