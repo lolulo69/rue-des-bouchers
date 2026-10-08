@@ -428,6 +428,24 @@ export const MEDIA = {
       author: 'hilde',
       text: "On m’a dit pour Pilou. J’ai fait une soupe. Est-ce qu’on peut apporter de la soupe en garde à vue ? Klaas, ne note pas ça.",
     },
+    {
+      id: 'wa_twist_van',
+      when: { flags: ['twist_van_corridor'] },
+      author: 'nico',
+      text: "Pour le dossier : samedi, une camionnette de fûts garée deux heures dans le couloir, un jour « sans voitures ». J’ai la plaque, l’heure et une poussette qui fait demi-tour. Seb a fait un montage avec de la musique. Je l’ai supprimé.",
+    },
+    {
+      id: 'wa_twist_regis_party',
+      when: { flags: ['twist_regis_party'] },
+      author: 'seb',
+      text: "Attends, attends : le bruit d’hier soir, c’était le 27. Le meublé de Régis. Dix-neuf étudiants, deux enceintes. Régis dit que c’était « un groupe calme ». Il a mis « calme » entre guillemets dans son annonce, j’ai vérifié.",
+    },
+    {
+      id: 'wa_twist_fete_voisins',
+      when: { flags: ['twist_fete_voisins'] },
+      author: 'jeremie',
+      text: "Merci à tous pour la fête des voisins. Rangée à 22h00 pile, comme prévu. Photo jointe de la place à 22h01, et de la terrasse de l’estaminet à 22h01. Je ne commente pas. Je joins.",
+    },
   ],
 
   // ════════════════════════════════════════════════════════════════════════
@@ -650,6 +668,27 @@ export const MEDIA = {
       author: 'journaliste',
       headline: 'La Bombance rouvre : la rue des Bouchers retient son souffle',
       text: "À peine la commission passée, un bar de nuit ouvre ses portes au n°4. Son gérant promet « de la musique douce ». La première nuit, la musique douce s’entendait depuis la place Maurice-Schumann.",
+    },
+    {
+      id: 'press_twist_match',
+      when: { flags: ['twist_match_night'] },
+      author: 'journaliste',
+      headline: "Écran géant rue des Bouchers : 150 supporters et une rue saturée",
+      text: "Pour la victoire de Lille, un estaminet du Vieux-Lille avait tourné un écran géant vers la rue. Ambiance « de folie », selon les supporters. « De folie », confirment les riverains.",
+    },
+    {
+      id: 'press_twist_fire',
+      when: { flags: ['twist_fire_inspection'] },
+      author: 'journaliste',
+      headline: "Vieux-Lille : les pompiers mesurent les couloirs de passage",
+      text: "Lors d’un exercice nocturne, les sapeurs-pompiers ont relevé un passage de 1,40 m rue des Bouchers, pour 3 m exigés. Un restaurateur évoque « un malentendu sur le mobilier ».",
+    },
+    {
+      id: 'press_twist_tv',
+      when: { flags: ['twist_tv_crew'] },
+      author: 'journaliste',
+      headline: "« Les pépites du Vieux-Lille » : un estaminet à l’honneur",
+      text: "Le reportage diffusé hier montre une terrasse impeccable. Plusieurs riverains ont fait parvenir à la rédaction des photos prises le même soir, une demi-heure plus tard. La rédaction remercie les riverains.",
     },
   ],
 
@@ -902,6 +941,14 @@ export const MEDIA = {
       kind: 'review',
       stars: 4,
       text: "Je dois l’admettre : la carbonnade est très bonne. -1 étoile pour la gaine d’extraction. Je sais de quoi je parle.",
+    },
+    {
+      id: 'so_twist_influencer',
+      when: { flags: ['twist_influencer'] },
+      author: 'reviewer',
+      handle: 'Lou.lillestyle',
+      kind: 'post',
+      text: "La vraie nuit lilloise ✨ Ambiance, guirlandes, gens trop chaleureux 🥰 (et un monsieur qui m’a fait coucou du deuxième étage, trop mignon) #VieuxLille #Authentique",
     },
   ],
 };

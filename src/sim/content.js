@@ -1,6 +1,6 @@
 // Chargement du contenu narratif (src/content/*.js, §14). Le moteur ne fait que normaliser :
 // accepte un objet { FLAGS, CHARACTERS, DIALOGUE, EVENTS, ACTIONS, COUNTERMOVES, KODDEX, ENDINGS } ou une liste de modules.
-const KEYS = ['FLAGS', 'CHARACTERS', 'DIALOGUE', 'EVENTS', 'ACTIONS', 'COUNTERMOVES', 'KODDEX', 'ENDINGS', 'MEDIA', 'INTRO_CARDS', 'TUTORIAL', 'PROMPTS_PER_MORNING', 'WHATSAPP_GROUP', 'PLACES'];
+const KEYS = ['FLAGS', 'CHARACTERS', 'DIALOGUE', 'EVENTS', 'ACTIONS', 'COUNTERMOVES', 'KODDEX', 'ENDINGS', 'MEDIA', 'INTRO_CARDS', 'TUTORIAL', 'PROMPTS_PER_MORNING', 'WHATSAPP_GROUP', 'PLACES', 'TWISTS', 'UNLOCKS'];
 // night.js : textes de la nuit (aboiements, cloche, carnet de Klaas…), regroupés sous NIGHT
 const NIGHT_KEYS = ['BARKS', 'BELL', 'KLAAS_NOTEBOOK', 'NIGHT_END', 'POLICE_LINES', 'RECAP_HEADLINES', 'WAITER_LINES', 'WITNESS_LINES'];
 
@@ -28,6 +28,8 @@ export function normalizeContent(modules) {
     PROMPTS_PER_MORNING: merged.PROMPTS_PER_MORNING,
     WHATSAPP_GROUP: merged.WHATSAPP_GROUP,
     PLACES: merged.PLACES,
+    TWISTS: merged.TWISTS ?? [], // v1.1 (§12b) : rebondissements de nuit
+    UNLOCKS: merged.UNLOCKS ?? [], // v1.1 (§12b) : outils débloqués
   };
 }
 

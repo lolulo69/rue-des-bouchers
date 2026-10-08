@@ -41,7 +41,9 @@ export function lintContent(K, { cfg = CONFIG, realNames = [], incomplete = fals
   const koddexWork = K.KODDEX.work.filter((w) => typeof w === 'object');
   const koddexGags = K.KODDEX.gags.filter((g) => typeof g === 'object');
   const media = Object.values(K.MEDIA ?? {}).flat();
-  const all = [...K.DIALOGUE, ...K.EVENTS, ...K.ACTIONS, ...K.COUNTERMOVES, ...K.ENDINGS, ...K.KODDEX.sideProjects, ...koddexWork, ...koddexGags, ...media, ...(K.TUTORIAL ?? [])];
+  const all = [...K.DIALOGUE, ...K.EVENTS, ...K.ACTIONS, ...K.COUNTERMOVES, ...K.ENDINGS, ...K.KODDEX.sideProjects, ...koddexWork, ...koddexGags, ...media, ...(K.TUTORIAL ?? []),
+    // v1.1 : rebondissements (conditions + conséquences `after`) et outils débloqués
+    ...(K.TWISTS ?? []).map((t) => ({ id: t.id, when: t.when, effects: t.after })), ...(K.UNLOCKS ?? []).map((u) => ({ id: u.id, when: u.when }))];
   for (const x of all) {
     for (const e of effectsOf(x)) for (const f of e.setFlags ?? []) settable.add(f);
     if (x.unlocks) settable.add(x.unlocks);
@@ -114,6 +116,7 @@ export function lintContent(K, { cfg = CONFIG, realNames = [], incomplete = fals
     }
   }
   for (const t of K.TUTORIAL ?? []) { uniq('tutorial', t); check(`tutoriel ${t.id}`, t); }
+  for (const t of K.TWISTS ?? []) { uniq('twist', t); check(`twist ${t.id}`, { id: t.id, when: t.when, effects: t.after }); }
   for (const e of K.ENDINGS) {
     uniq('ending', e); check(`ending ${e.id}`, e);
     if (!cfg.CAMPAIGN.endings.includes(e.id)) warnings.push(`ending ${e.id} : id non canonique (${cfg.CAMPAIGN.endings.join(', ')})`);

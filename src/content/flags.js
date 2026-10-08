@@ -215,4 +215,27 @@ export const FLAGS = {
 
   // ── content-workdays (workdays.js, §12b.D) ──────────────────────────────
   ebike_battery_died: 'La batterie du vélo électrique a lâché en plein trajet (une fois)',
+  // ── content-twists (twists.js, conséquences `after`) ──────────────────
+  twist_colette_dinner: 'Rebondissement J4 : Colette a dîné à l’estaminet',
+  twist_van_corridor: 'Rebondissement : camionnette dans le couloir un samedi piéton',
+  twist_inspector_seen: 'Rebondissement J9 : l’inspectrice est repassée incognito',
+  twist_model_street: 'Rebondissement J9 : la rue modèle (visite annoncée)',
+  twist_exhaust_silent: 'Rebondissement J10 : la gaine éteinte la veille de la réunion',
+  twist_match_night: 'Rebondissement J13 : le match sur écran géant',
+  twist_birthday: 'Rebondissement : anniversaire à la table 4',
+  twist_influencer: 'Rebondissement : l’influenceuse et sa ring light',
+  twist_hen_party: 'Rebondissement : EVJF au mégaphone',
+  twist_drache: 'Rebondissement : drache annoncée',
+  twist_heatwave: 'Rebondissement : nuit de canicule',
+  twist_guide_tour: 'Rebondissement : la visite guidée nocturne',
+  twist_regis_party: 'Rebondissement : soirée étudiante au 27',
+  twist_busker: 'Rebondissement : l’accordéoniste',
+  twist_power_cut: 'Rebondissement : panne de courant',
+  twist_waiter_holidays: 'Rebondissement : la dernière nuit du serveur avant ses vacances',
+  twist_fete_voisins: 'Rebondissement : la fête des voisins de l’association',
+  twist_fire_inspection: 'Rebondissement : contrôle du couloir par les pompiers',
+  twist_lescaut_walk: 'Rebondissement : le maire a fait sa ronde',
+  twist_lost_dog: 'Rebondissement : Biloute a disparu',
+  twist_tv_crew: 'Rebondissement : le reportage télé',
+  twist_street_sweeper: 'Rebondissement : la balayeuse de 23h30',
 };
