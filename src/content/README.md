@@ -13,6 +13,7 @@ This file records the writing decisions so that every text stays consistent. Rea
 | `actions.js` | `ACTIONS` | Every legal / grey / illegal action of §6 |
 | `countermoves.js` | `COUNTERMOVES` | The bloc's counter-moves (§8) + Tatie's email thread |
 | `koddex.js` | `KODDEX` | Morning prompts, side projects, gags |
+| `media.js` | `MEDIA` | The phone feed: WhatsApp group, La Voix du Nordiste, the bloc's posts + online reviews |
 | `endings.js` | `ENDINGS` | The 8 endings + modular epilogues |
 
 ## Tone

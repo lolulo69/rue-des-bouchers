@@ -344,6 +344,7 @@ so it reflects what the player actually did.
 **Content-side additions (content-v0.4, all optional and backward-compatible; details in Build notes):**
 - `characters.js` exports `CHARACTERS` as an **object keyed by speaker id** (`{ name, fullName?, title?, group, home, bio, voice }`), plus `WHATSAPP_GROUP` (the group's display name, one constant) and `PLACES` (the street's businesses, fictional names).
 - ACTIONS: `witnessed: { exposure, by, effects }`, `sim`, `once`, `result`, `cost.minutes` (night). EVENTS: `when` (random events), `once`, `speaker`. COUNTERMOVES: `title`, `speaker`, `once`. ENDINGS: `whenAny`, `continue`.
+- **media.js** (content-media): the phone feed read between phases. `export const MEDIA = { whatsapp: [...], press: [...], social: [...] }`, entries `{ id, when, author, text, effects?, setFlags? }`. Each entry shows **once**, the first time its `when` matches. `author` = a `CHARACTERS` id, a `PLACES` id (a business's account) or `'reviewer'` (anonymous customer, with `handle`). Optional: `photo` (caption), `headline` (press), `kind` ('post' | 'review' | 'petition'), `stars` (1–5), and `ending: '<ending id>'` = shown only on that ending's end screen (one press front page per ending). The WhatsApp group name always comes from `WHATSAPP_GROUP`.
 
 ## 15. Still open
 - Nothing blocking. New lore welcome anytime.
