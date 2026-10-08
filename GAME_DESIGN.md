@@ -274,7 +274,7 @@ Proof: **T** = automated test (vitest / Playwright / campaign simulator, runs in
 ### G. Scenario coherence (automated invariants + story review)
 - [x] Invariants checked on every simulated night and campaign: the police only arrive after a call or a scheduled event; nobody is in two places; a cleared table doesn't come back without a tip-off/return event; evidence refers to real events (time, place, table); Risk only rises from witnessed acts; a closed shop stays closed until its event; Klaas's notebook only logs what he could see. **T** — tests/unit/invariants.test.js, campaign.test.js, checklist.test.js §13.G1
 - [x] Dialogue/event text only references facts the player has unlocked (no spoilers, no "as you know…" about something unseen). Flags are checked by a content linter. **T** — tests/unit/content-lint.test.js, checklist.test.js §13.G2
-- [ ] Story bible review: names, places, timeline and character traits are consistent across all text (design agent review, logged in `qa/coherence.md`). **Q**
+- [x] Story bible review: names, places, timeline and character traits are consistent across all text (design agent review, logged in `qa/coherence.md`). **Q** — Q: qa/coherence.md passes 1, 1b, 2 (transcripts), 3 (endings); design agent read qa/stories/legal-3.md and endings/negotiated_peace.md, fixed the Régis contradiction (3e8d187), 2026-10-08
 - [x] No real restaurant name anywhere (grep test against the section 0 list). **T** _(v0.2: tests/unit/names.test.js)_
 
 ### H. Balance (simulated + playtested, adjusted continuously)
