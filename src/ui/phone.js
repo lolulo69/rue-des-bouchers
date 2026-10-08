@@ -5,7 +5,11 @@ import { h, portrait, nameOf } from './dom.js';
 import { WHATSAPP_GROUP } from '../content/characters.js';
 
 const MEDIA_MODULES = import.meta.glob('../content/media.js', { eager: true });
-const MEDIA = Object.values(MEDIA_MODULES)[0]?.MEDIA ?? [];
+const RAW_MEDIA = Object.values(MEDIA_MODULES)[0]?.MEDIA ?? [];
+// media.js exporte { whatsapp: [...], press: [...], social: [...] } (§14) : on aplatit en entrées avec `channel`.
+// Les entrées `ending` ne s'affichent que sur l'écran de fin.
+const MEDIA = Array.isArray(RAW_MEDIA) ? RAW_MEDIA : Object.entries(RAW_MEDIA)
+  .flatMap(([channel, list]) => list.filter((m) => !m.ending).map((m) => ({ ...m, channel, title: m.title ?? m.headline })));
 
 const TABS = [
   { id: 'whatsapp', label: '💬 ' + WHATSAPP_GROUP },
