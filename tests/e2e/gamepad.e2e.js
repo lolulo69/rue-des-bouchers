@@ -83,3 +83,77 @@ test('manette PlayStation : glyphes ✕ ○ □ △ (id DualSense)', async ({ pa
   await page.keyboard.press('Escape');
   await expect(page.locator('html')).toHaveAttribute('data-input', 'kbd');
 });
+
+// Nuit de campagne (?mode=night) jouée à la manette : glyphes de l'invite du HUD, menu des actions de nuit à la croix,
+// seau à maintenir (barre de confirmation), le tout avec la fausse manette.
+test('manette dans la nuit 3D : invite Ⓐ, actions de nuit à la croix, seau à maintenir', async ({ page }) => {
+  test.setTimeout(480_000);
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  await injectPad(page);
+  // Une campagne amenée jusqu'à la nuit 1, sauvegardée, puis la page de nuit
+  await page.goto('/?nolock=1&seed=5');
+  await page.evaluate(() => localStorage.clear());
+  await page.reload();
+  await page.click('#campaign');
+  await page.click('[data-testid=title-new]');
+  await page.click('[data-testid=intro-skip]');
+  await page.evaluate(() => {
+    const c = window.__rdb.campaign;
+    for (let i = 0; i < 200 && c.step !== 'night'; i++) {
+      if (c.step === 'cards') c.resolveCard(c.card().choices.find((x) => x.available)?.i ?? 0);
+      else if (c.step === 'koddex') c.koddex(['work', 'work', 'work']);
+      else if (c.step === 'actions') c.endAfternoon();
+    }
+    localStorage.setItem(window.__rdb.saveKey, JSON.stringify(c.save()));
+  });
+  await page.goto('/?nolock=1&mode=night&seed=5');
+  await page.locator('#hud').waitFor({ state: 'visible' });
+  await tap(page, 'A'); // la manette devient l'entrée active
+  await expect(page.locator('html')).toHaveAttribute('data-input', 'pad');
+
+  // 1. Devant la porte : l'invite du HUD montre Ⓐ, plus [E]
+  await page.evaluate(() => {
+    const { player, sim, step } = window.__rdb;
+    const d = sim.cfg.ANCHORS.streetDoor;
+    player.loc = 'street';
+    player.pos.set(d.x + 0.6, 0, d.z);
+    step(3);
+  });
+  await expect(page.locator('#prompt')).toContainText('[Ⓐ]', { timeout: 20_000 });
+  await expect(page.locator('#prompt')).not.toContainText('[E]');
+
+  // 2. Ⓨ ouvre les actions de nuit ; la croix déplace le focus dans la liste ; Ⓑ referme
+  await tap(page, 'Y');
+  await expect(page.locator('#nightmenu')).toBeVisible();
+  const n = await page.locator('#nightmenu button:visible').count();
+  expect(n, 'des actions de nuit à choisir').toBeGreaterThan(1);
+  await tap(page, 'DOWN');
+  const first = await page.evaluate(() => document.activeElement?.textContent);
+  expect(await page.evaluate(() => document.getElementById('nightmenu').contains(document.activeElement))).toBe(true);
+  await tap(page, 'DOWN');
+  expect(await page.evaluate(() => document.activeElement?.textContent)).not.toBe(first);
+  await tap(page, 'B');
+  await expect(page.locator('#nightmenu')).toBeHidden();
+
+  // 3. À la fenêtre : RT bref = rien ; RT maintenu = barre de confirmation, puis le seau
+  await page.evaluate(() => {
+    const { player, world, sim, step } = window.__rdb;
+    const w = sim.cfg.ANCHORS.pilouWindow;
+    player.loc = 'apt';
+    player.pos.set(world.apt.x1 - 0.5, world.apt.floor, w.z);
+    player.yaw = -Math.PI / 2;
+    step(2);
+  });
+  const buckets = () => page.evaluate(() => window.__rdb.sim.state.bucketUses);
+  const b0 = await buckets();
+  await tap(page, 'RT');
+  expect(await buckets(), 'un appui bref ne vide pas le seau').toBe(b0);
+  await page.evaluate((i) => { window.__pad.buttons[i] = { pressed: true, touched: true, value: 1 }; }, IDX.RT);
+  await expect(page.locator('#ui-pad-hold')).toBeVisible({ timeout: 20_000 });
+  await expect(page.locator('#ui-pad-hold')).toContainText('RT');
+  await expect.poll(buckets, { timeout: 60_000 }).toBe(b0 + 1);
+  await page.evaluate((i) => { window.__pad.buttons[i] = { pressed: false, touched: false, value: 0 }; }, IDX.RT);
+  await expect(page.locator('#ui-pad-hold')).toHaveCount(0, { timeout: 20_000 });
+  expect(errors).toEqual([]);
+});

@@ -370,7 +370,7 @@ export function mount(engine = {}, opts = {}) {
     }
     const k = view.k;
     const term = h('div.ui-term-body');
-    const termBox = h('div.ui-term', { dataset: { testid: 'terminal' }, onclick: () => typing?.skip?.() },
+    const termBox = h('div.ui-term', { dataset: { testid: 'terminal' }, onclick: () => { skipAll = true; typing?.skip?.(); } },
       h('div.ui-term-bar', h('i'), h('i'), h('i'), h('span', 'clode-kode — koddex/todo-app (main)')), term);
     const menu = h('div.ui-col', { dataset: { testid: 'koddex-menu' } });
     if (!k.done) {
@@ -413,14 +413,18 @@ export function mount(engine = {}, opts = {}) {
     const start = (c.state.day * 7) % ok.length;
     return [...ok.slice(start), ...ok.slice(0, start)];
   }
+  let skipAll = false;
   async function typeAll(list, term, menu) {
     if (!list.length) return;
+    skipAll = false;
     menu.querySelectorAll('button').forEach((b) => { b.disabled = true; });
     for (const [node, text] of list) {
+      if (skipAll) { node.textContent = text; continue; }
       typing = typewrite(node, text, { cps: 90 });
       await typing;
       term.scrollTop = term.scrollHeight;
     }
+    term.scrollTop = term.scrollHeight;
     typing = null;
     menu.querySelectorAll('button').forEach((b) => { b.disabled = false; });
     focusPrimary();
@@ -629,6 +633,8 @@ export function mount(engine = {}, opts = {}) {
     if (!visible || isMenuOpen() || e.target?.closest?.('input, textarea, select') || e.ctrlKey || e.metaKey || e.altKey) return;
     if (e.code === 'Escape') { e.preventDefault(); if (phone.open || panel) { phone.open = false; closePanel(); } else showMenu(); return; }
     if (!c) return;
+    // Entrée / Espace pendant la machine à écrire de Koddex : tout afficher d'un coup
+    if (typing && (e.code === 'Enter' || e.code === 'Space' || e.code === 'NumpadEnter')) { e.preventDefault(); skipAll = true; typing.skip(); return; }
     // 1–9 : choisir la n-ième réponse d'une carte
     if (/^Digit[1-9]$/.test(e.code) && shown() === 'cards' && !view.result && !phone.open && !panel) {
       const b = layer.querySelectorAll('[data-testid=card-choice]:not([disabled])')[Number(e.code.slice(5)) - 1];
@@ -652,6 +658,11 @@ export function mount(engine = {}, opts = {}) {
   startPad();
   startHints();
   const offMode = onInputMode(() => { if (visible) render(); });
+  // BUG-005 : le jeu 3D annule Tab globalement (dossier de nuit). Tant que l'interface de jour est à l'écran, Tab
+  // appartient à la navigation au clavier : on arrête l'événement avant le gestionnaire du jeu, sans l'annuler.
+  // (Le menu pause gère lui-même Tab, piège de focus compris.)
+  const keepTab = (e) => { if (e.code === 'Tab' && visible && !isMenuOpen() && !root.classList.contains('ui-hidden')) e.stopImmediatePropagation(); };
+  window.addEventListener('keydown', keepTab, true);
   const onResize = () => vignette.resize();
   window.addEventListener('resize', onResize);
 
@@ -660,6 +671,7 @@ export function mount(engine = {}, opts = {}) {
   function show() { visible = true; root.classList.remove('ui-hidden', 'hidden'); vignette.resume(); render(); }
   function destroy() {
     offMode();
+    window.removeEventListener('keydown', keepTab, true);
     window.removeEventListener('keydown', onKey);
     window.removeEventListener('resize', onResize);
     vignette.dispose();

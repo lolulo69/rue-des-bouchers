@@ -10,6 +10,7 @@
 import { NIGHT_MAP } from './gamepad.js';
 import { setNightHandler, sendKey, inputMode, padGlyph } from './index.js';
 import { currentSettings } from '../ui/settings.js';
+import { startHints } from './hints.js';
 
 export const HOLD_SECONDS = 1.2;
 const LOOK_SPEED = 2.6; // rad/s au stick plein, sensibilité 1
@@ -88,6 +89,7 @@ function openPauseMenu(page) {
 }
 
 export function bindNight({ player, getOverlay = () => null } = {}) {
+  startHints(); // glyphes de manette dans l'invite du HUD et les blocs de touches
   const h = createNightHandler({
     player,
     dispatch: (code, type) => sendKey(code, code === 'Tab' ? 'Tab' : code.replace(/^Key/, '').toLowerCase(), type),

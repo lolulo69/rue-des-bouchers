@@ -70,8 +70,8 @@ test('recharger en pleine nuit : on reprend cette nuit-là à son début (ou au 
   }
 });
 
-// BUG-005 (qa/bugs.md) : main.js annule Tab partout (preventDefault global pour le dossier de nuit) → navigation clavier impossible le jour.
-(process.env.QA_RUN_FIXME ? test : test.fixme)('BUG-005 · une journée au clavier seul (Tab / Entrée) : Koddex puis après-midi', async ({ page }) => {
+// BUG-005 (qa/bugs.md), corrigé : le jeu annulait Tab partout (dossier de nuit) ; l'interface de jour garde Tab pour la navigation.
+test('BUG-005 · une journée au clavier seul (Tab / Entrée) : Koddex puis après-midi', async ({ page }) => {
   await newCampaign(page);
   expect((await driveTo(page, 'koddex')).step).toBe('koddex');
   const focusOn = async (testid, max = 60) => {
