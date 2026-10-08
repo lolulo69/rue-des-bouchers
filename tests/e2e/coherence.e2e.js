@@ -2,11 +2,9 @@ import { test, expect } from '@playwright/test';
 import { startNight, tickTo, hhmm } from './helpers.js';
 
 // Cohérence rendu ↔ simulation (§13.G « personne à deux endroits », §13.C témoins : le teckel).
-// Bugs connus : test.fixme + qa/bugs.md. Retirer le fixme quand c'est corrigé.
+// Bugs connus : test.fixme + qa/bugs.md. Retirer le fixme quand c'est corrigé (le test garde alors la régression).
 
-const FIX = process.env.QA_RUN_FIXME ? test : test.fixme;
-
-FIX('BUG-001 · le teckel en 3D suit la ronde de la simulation (21h30–22h30)', async ({ page }) => {
+test('BUG-001 (corrigé) · le teckel en 3D suit la ronde de la simulation (21h30–22h30)', async ({ page }) => {
   await startNight(page, 'seed=7');
   const at = async (min) => {
     await tickTo(page, min);
