@@ -32,3 +32,13 @@ kbd { background: #ffffff1a; border: 1px solid #ffffff33; border-radius: 4px; pa
 .note { font-size: 12px; opacity: .5; }
 #dossier-list { text-align: left; max-width: 640px; max-height: 60vh; overflow: auto; line-height: 1.6; }
 #end-body { max-width: 620px; line-height: 1.6; text-align: left; }
+#flash { position: absolute; inset: 0; background: #fff; opacity: 0; }
+#flash.on { animation: flash .35s ease-out; }
+@keyframes flash { 0% { opacity: .7 } 100% { opacity: 0 } }
+#pause { background: #0d0d1299; cursor: pointer; font-size: 20px; }
+#end { overflow: auto; justify-content: flex-start; padding-top: 40px; }
+#end h3 { margin: 16px 0 4px; color: #e9c46a; font-size: 16px; }
+#end ul { margin: 0; padding-left: 20px; }
+.verdict { font-size: 18px; }
+.bad { color: #ff8a75; }
+#dossier-list .q { opacity: .6; font-size: 13px; }

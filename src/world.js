@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { RESTAURANTS, RULES, STREET } from './config.js';
 
 const W = STREET.halfWidth;
@@ -47,7 +48,9 @@ function signTex(text, bg, fg = '#f6e7c1') {
   return canvasTexture(1024, 160, (g, w, h) => {
     g.fillStyle = bg; g.fillRect(0, 0, w, h);
     g.strokeStyle = fg; g.lineWidth = 6; g.strokeRect(10, 10, w - 20, h - 20);
-    g.fillStyle = fg; g.font = 'italic bold 84px Georgia, serif';
+    g.fillStyle = fg;
+    let size = 84;
+    do g.font = `italic bold ${size}px Georgia, serif`; while (g.measureText(text).width > w - 60 && (size -= 4) > 30);
     g.textAlign = 'center'; g.textBaseline = 'middle';
     g.fillText(text, w / 2, h / 2 + 4);
   });
@@ -55,10 +58,14 @@ function signTex(text, bg, fg = '#f6e7c1') {
 
 const box = (w, h, d, mat) => new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
 
+let winMats;
 function addWindows(group, side, z0, z1, height, skip) {
-  const lit = new THREE.MeshStandardMaterial({ color: 0x332211, emissive: 0xffb45c, emissiveIntensity: 0.9 });
-  const dark = new THREE.MeshStandardMaterial({ color: 0x1a1d24, roughness: 0.2, metalness: 0.4 });
-  const stone = new THREE.MeshStandardMaterial({ color: 0xe8dfcf, roughness: 0.9 });
+  winMats ??= {
+    lit: new THREE.MeshStandardMaterial({ color: 0x332211, emissive: 0xffb45c, emissiveIntensity: 0.9 }),
+    dark: new THREE.MeshStandardMaterial({ color: 0x1a1d24, roughness: 0.2, metalness: 0.4 }),
+    stone: new THREE.MeshStandardMaterial({ color: 0xe8dfcf, roughness: 0.9 }),
+  };
+  const { lit, dark, stone } = winMats;
   for (let y = 4.4; y < height - 1.5; y += 3.2) {
     for (let z = z0 + 1.4; z < z1 - 1; z += 2.4) {
       if (skip && skip(y, z)) continue;
@@ -71,47 +78,66 @@ function addWindows(group, side, z0, z1, height, skip) {
   }
 }
 
-function person(color) {
+// Géométries et matériaux partagés pour tout ce qui bouge (gens, tables) : moins de mémoire GPU.
+const SHARED = {
+  body: new THREE.CapsuleGeometry(0.2, 0.45, 3, 8),
+  head: new THREE.SphereGeometry(0.14, 10, 8),
+  chair: new THREE.BoxGeometry(0.4, 0.45, 0.4),
+  top: new THREE.CylinderGeometry(0.5, 0.5, 0.05, 16),
+  leg: new THREE.CylinderGeometry(0.04, 0.04, 0.75, 6),
+  hit: new THREE.CylinderGeometry(1.2, 1.2, 1.6, 8),
+};
+const matCache = new Map();
+export function mat(color, opts = {}) {
+  const key = color + JSON.stringify(opts);
+  if (!matCache.has(key)) matCache.set(key, new THREE.MeshStandardMaterial({ color, ...opts }));
+  return matCache.get(key);
+}
+const SKIN = [0xf1c27d, 0xe0ac69, 0xc68642, 0x8d5524, 0xffdbac];
+
+export function person(color) {
   const g = new THREE.Group();
-  const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.2, 0.45, 4, 8), new THREE.MeshStandardMaterial({ color }));
+  const body = new THREE.Mesh(SHARED.body, mat(color));
   body.position.y = 0.75;
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.14, 12, 10), new THREE.MeshStandardMaterial({ color: pick([0xf1c27d, 0xe0ac69, 0xc68642, 0x8d5524, 0xffdbac]) }));
+  const head = new THREE.Mesh(SHARED.head, mat(pick(SKIN)));
   head.position.y = 1.2;
   g.add(body, head);
   g.userData.phase = Math.random() * 10;
   return g;
 }
 
+const HIT_MAT = new THREE.MeshBasicMaterial({ visible: false });
+
 function buildTable(rest, x, z, idx, scene) {
   const group = new THREE.Group();
   group.position.set(x, 0, z);
-  const wood = new THREE.MeshStandardMaterial({ color: 0x5b3a1e, roughness: 0.7 });
-  const metal = new THREE.MeshStandardMaterial({ color: 0x222222, metalness: 0.6, roughness: 0.4 });
-  const top = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.05, 20), wood);
+  const wood = mat(0x5b3a1e, { roughness: 0.7 });
+  const metal = mat(0x222222, { metalness: 0.6, roughness: 0.4 });
+  const top = new THREE.Mesh(SHARED.top, wood);
   top.position.y = 0.75;
-  const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.75, 8), metal);
+  const leg = new THREE.Mesh(SHARED.leg, metal);
   leg.position.y = 0.375;
   group.add(top, leg);
 
   // Nombre de convives : parfois au-dessus de la limite
-  const over = Math.random() < 0.4;
+  const over = Math.random() < RULES.overLimitChance;
   const count = over ? RULES.maxPeoplePerTable + 1 + Math.floor(Math.random() * 3) : 2 + Math.floor(Math.random() * (RULES.maxPeoplePerTable - 1));
   const people = [];
   for (let i = 0; i < count; i++) {
     const a = (i / count) * Math.PI * 2;
-    const chair = box(0.4, 0.45, 0.4, metal);
+    const chair = new THREE.Mesh(SHARED.chair, metal);
     chair.position.set(Math.cos(a) * 0.85, 0.225, Math.sin(a) * 0.85);
     const p = person(pick([0x264653, 0x2a9d8f, 0xe9c46a, 0xf4a261, 0xe76f51, 0x6d597a, 0x355070, 0xb5838d, 0x3d405b]));
     p.position.set(Math.cos(a) * 0.85, 0.05, Math.sin(a) * 0.85);
     group.add(chair, p);
     people.push(p);
   }
-  const hit = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, 1.6, 8), new THREE.MeshBasicMaterial({ visible: false }));
+  const hit = new THREE.Mesh(SHARED.hit, HIT_MAT);
   hit.position.y = 0.8;
   group.add(hit);
 
   scene.add(group);
-  const table = { id: `${rest.id}-${idx + 1}`, label: `${rest.name}, table ${idx + 1}`, rest, group, hit, people, count, out: true, clearAt: null, evidence: new Set() };
+  const table = { id: `${rest.id}-${idx + 1}`, label: `${rest.name}, table ${idx + 1}`, rest, group, hit, people, count, out: true, clearAt: null, clearedAt: null, clearedBy: null, evidence: new Set() };
   hit.userData.table = table;
   return table;
 }
@@ -144,7 +170,7 @@ export function buildWorld(scene) {
       addWindows(city, side, z0, z1, height);
       // Rez-de-chaussée : vitrine
       const shop = box(0.06, 2.4, (z1 - z0) - 1, new THREE.MeshStandardMaterial({ color: 0x15171c, emissive: 0x403020, emissiveIntensity: Math.random() < 0.5 ? 0.6 : 0 }));
-      shop.position.set(side * (W + 0.03), 1.5, (z0 + z1) / 2);
+      shop.position.set(side * (W - 0.02), 1.5, (z0 + z1) / 2);
       city.add(shop);
     }
   }
@@ -155,12 +181,9 @@ export function buildWorld(scene) {
     city.add(b);
   }
 
-  // --- Immeuble de Pilou, au-dessus de La Ch'tite Brigitte (côté gauche, z -6..8) ---
+  // --- Immeuble de Pilou, au-dessus de La Ch'tite Bernadette (côté gauche, z -6..8) ---
   const pz0 = -6, pz1 = 8, ph = 13;
   const facadeMat = brickMat(0xffffff);
-  const back = box(6, ph, pz1 - pz0, facadeMat);
-  back.position.set(-(W + 3.2 + 0.4), ph / 2, (pz0 + pz1) / 2);
-  back.scale.x = 0.0001; // remplacé par les murs ci-dessous; gardé pour la silhouette au loin
   // Façade en plusieurs morceaux pour laisser une vraie ouverture de fenêtre (z -1..1, y 4.2..6)
   const fx = -(W + 0.15);
   const facadePieces = [
@@ -186,10 +209,21 @@ export function buildWorld(scene) {
 
   // Appartement de Pilou (pièce visible de l'intérieur)
   const apt = { x0: -9.2, x1: -W - 0.3, z0: -3, z1: 3, floor: 4.2, ceil: 7 };
-  const roomMat = new THREE.MeshStandardMaterial({ color: 0xd8cbb3, side: THREE.BackSide, roughness: 1 });
-  const room = box(apt.x1 - apt.x0, apt.ceil - apt.floor, apt.z1 - apt.z0, roomMat);
-  room.position.set((apt.x0 + apt.x1) / 2, (apt.floor + apt.ceil) / 2, 0);
-  city.add(room);
+  // Murs intérieurs en panneaux (pas de mur côté rue : c'est la façade percée de la fenêtre qui ferme la pièce)
+  const roomMat = new THREE.MeshStandardMaterial({ color: 0xd8cbb3, roughness: 1 });
+  const floorMat = new THREE.MeshStandardMaterial({ color: 0x7a5534, roughness: 0.8 });
+  const rw = apt.x1 - apt.x0 + 0.2, rh = apt.ceil - apt.floor, rd = apt.z1 - apt.z0, cx = (apt.x0 + apt.x1) / 2 + 0.1, cy = (apt.floor + apt.ceil) / 2;
+  for (const [w, h, d, x, y, z, m] of [
+    [rw, 0.1, rd, cx, apt.floor - 0.05, 0, floorMat],
+    [rw, 0.1, rd, cx, apt.ceil + 0.05, 0, roomMat],
+    [0.1, rh, rd, apt.x0 - 0.05, cy, 0, roomMat],
+    [rw, rh, 0.1, cx, cy, apt.z0 - 0.05, roomMat],
+    [rw, rh, 0.1, cx, cy, apt.z1 + 0.05, roomMat],
+  ]) {
+    const m2 = box(w, h, d, m);
+    m2.position.set(x, y, z);
+    city.add(m2);
+  }
   const aptLight = new THREE.PointLight(0xffd9a0, 6, 8, 1.5);
   aptLight.position.set(-7, 6.5, 0);
   city.add(aptLight);
@@ -201,13 +235,14 @@ export function buildWorld(scene) {
   aptDoor.position.set(apt.x0 + 0.05, apt.floor + 1.05, 1.8);
   city.add(bed, pillow, aptDoor);
 
-  // La Ch'tite Brigitte : devanture, store, enseigne
+  // La Ch'tite Bernadette : devanture, store, enseigne
   const front = box(0.08, 2.8, 9.4, new THREE.MeshStandardMaterial({ color: 0x2a1a10, emissive: 0xffa24a, emissiveIntensity: 0.55 }));
   front.position.set(-(W + 0.02 - 0.01), 1.5, -1.2);
   const awning = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.08, 10), new THREE.MeshStandardMaterial({ color: 0x8a2b2b }));
   awning.position.set(-(W - 0.65), 3.25, -1.2);
   awning.rotation.z = -0.25;
-  const sign = new THREE.Mesh(new THREE.PlaneGeometry(6, 0.95), new THREE.MeshStandardMaterial({ map: signTex("La Ch'tite Brigitte", '#5a1414'), emissive: 0xffffff, emissiveMap: signTex("La Ch'tite Brigitte", '#5a1414'), emissiveIntensity: 0.5 }));
+  const bTex = signTex("Estaminet La Ch'tite Bernadette", '#5a1414');
+  const sign = new THREE.Mesh(new THREE.PlaneGeometry(6, 0.95), new THREE.MeshStandardMaterial({ map: bTex, emissive: 0xffffff, emissiveMap: bTex, emissiveIntensity: 0.5 }));
   sign.position.set(-(W - 0.04), 3.75, -1.2);
   sign.rotation.y = Math.PI / 2;
   city.add(front, awning, sign);
@@ -229,7 +264,7 @@ export function buildWorld(scene) {
   city.add(steam.points);
 
   // Enseignes des autres restos
-  for (const r of RESTAURANTS.filter((r) => r.id !== 'brigitte')) {
+  for (const r of RESTAURANTS.filter((r) => r.id !== 'bernadette')) {
     const t = signTex(r.name, '#' + new THREE.Color(r.color).multiplyScalar(0.6).getHexString());
     const s = new THREE.Mesh(new THREE.PlaneGeometry(5, 0.8), new THREE.MeshStandardMaterial({ map: t, emissive: 0xffffff, emissiveMap: t, emissiveIntensity: 0.4 }));
     s.position.set(r.side * (W - 0.04), 3.4, (r.z0 + r.z1) / 2);
@@ -237,15 +272,16 @@ export function buildWorld(scene) {
     city.add(s);
   }
 
-  // Lanternes murales
+  // Lanternes murales. Seules quelques-unes portent une vraie PointLight (iGPU) ; les autres sont émissives.
+  const LIT_LAMPS = [-15, -5, 5, 15];
   const lampMat = new THREE.MeshStandardMaterial({ color: 0xffe2a8, emissive: 0xffc46b, emissiveIntensity: 2 });
   let li = 0;
-  for (let z = -40; z <= 40; z += 10) {
+  for (let z = -35; z <= 35; z += 10) {
     const side = li++ % 2 ? 1 : -1;
     const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.18, 10, 8), lampMat);
     lamp.position.set(side * (W - 0.35), 4.6, z);
     city.add(lamp);
-    if (Math.abs(z) <= 30) {
+    if (LIT_LAMPS.includes(z)) {
       const pl = new THREE.PointLight(0xffc46b, 14, 16, 1.6);
       pl.position.copy(lamp.position);
       city.add(pl);
@@ -262,14 +298,16 @@ export function buildWorld(scene) {
     }
   }
 
-  // Le serveur de Brigitte, devant la porte
+  // Le serveur de Bernadette, devant la porte
   const waiter = person(0x111111);
   const apron = box(0.3, 0.5, 0.42, new THREE.MeshStandardMaterial({ color: 0xffffff }));
   apron.position.set(0.12, 0.65, 0);
   waiter.add(apron);
-  waiter.position.set(-(W - 0.5), 0, -6.8);
+  waiter.position.set(-(W - 2.5), 0, -6.8);
   waiter.scale.setScalar(1.15);
   scene.add(waiter);
+
+  mergeStatic(city);
 
   return {
     tables,
@@ -280,7 +318,25 @@ export function buildWorld(scene) {
     streetDoor: new THREE.Vector3(-(W - 0.6), 0, 5.8),
     aptDoor: new THREE.Vector3(apt.x0 + 0.6, apt.floor, 1.8),
     bed: new THREE.Vector3(-8.2, apt.floor, -1.6),
+    exhaust: new THREE.Vector3(-(W - 0.3), 4.1, 1.0),
   };
+}
+
+// Fusionne toutes les meshes statiques du décor par matériau : quelques dizaines de draw calls au lieu de ~1000.
+function mergeStatic(group) {
+  group.updateMatrixWorld(true);
+  const byMat = new Map();
+  for (const o of [...group.children]) {
+    if (!o.isMesh) continue;
+    const g = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone();
+    g.applyMatrix4(o.matrixWorld);
+    for (const k of Object.keys(g.attributes)) if (!['position', 'normal', 'uv'].includes(k)) g.deleteAttribute(k);
+    if (!byMat.has(o.material)) byMat.set(o.material, []);
+    byMat.get(o.material).push(g);
+    group.remove(o);
+    o.geometry.dispose();
+  }
+  for (const [m, geos] of byMat) group.add(new THREE.Mesh(mergeGeometries(geos), m));
 }
 
 function makeSteam(origin) {
@@ -290,7 +346,14 @@ function makeSteam(origin) {
   const life = new Float32Array(N);
   for (let i = 0; i < N; i++) life[i] = Math.random();
   geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  const mat = new THREE.PointsMaterial({ color: 0xcfcfcf, size: 0.35, transparent: true, opacity: 0.35, depthWrite: false });
+  // Sprite rond et flou (sinon les points sont des carrés)
+  const puff = canvasTexture(64, 64, (g, w, h) => {
+    const grad = g.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2);
+    grad.addColorStop(0, 'rgba(255,255,255,1)');
+    grad.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = grad; g.fillRect(0, 0, w, h);
+  });
+  const mat = new THREE.PointsMaterial({ color: 0xcfcfcf, size: 0.6, map: puff, transparent: true, opacity: 0.35, depthWrite: false });
   const points = new THREE.Points(geo, mat);
   return {
     points,

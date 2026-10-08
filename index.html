@@ -11,7 +11,7 @@
 
   <div id="hud" class="hidden">
     <div id="clock">20:30</div>
-    <div id="day">Vendredi</div>
+    <div id="day">Lundi · nuit 1</div>
     <div class="bars">
       <div class="bar"><span>Bruit</span><i><b id="bar-noise"></b></i><em id="val-noise">0 dB</em></div>
       <div class="bar"><span>Sommeil</span><i><b id="bar-sleep"></b></i></div>
@@ -23,16 +23,19 @@
     <div id="prompt"></div>
     <div id="log"></div>
     <div id="crosshair">+</div>
+    <div id="flash"></div>
   </div>
+
+  <div id="pause" class="screen hidden"><p>Pause. Cliquez pour reprendre.</p></div>
 
   <div id="title" class="screen">
     <h1>Rue des Bouchers</h1>
-    <p class="sub">Vieux-Lille. Pierre-Louis « Pilou » Dubois habite juste au-dessus de <b>La Ch'tite Brigitte</b>.<br/>
-      La hotte du resto souffle sous sa fenêtre. Les terrasses doivent rentrer à <b>22h</b>. En théorie.</p>
+    <p class="sub">Vieux-Lille. Pierre-Louis « Pilou » Dubois habite juste au-dessus de l'<b>Estaminet La Ch'tite Bernadette</b>.<br/>
+      La hotte du resto souffle sous sa fenêtre. Les terrasses doivent rentrer à <b>22h</b>, 6 personnes max par table. En théorie.</p>
     <div class="keys">
-      <div><kbd>ZQSD</kbd>/<kbd>WASD</kbd> se déplacer · <kbd>Souris</kbd> regarder</div>
-      <div><kbd>E</kbd> interagir · <kbd>P</kbd> photo (preuve) · <kbd>T</kbd> téléphone</div>
-      <div><kbd>F</kbd> seau d'eau (depuis la fenêtre — illégal) · <kbd>Tab</kbd> dossier</div>
+      <div><kbd>ZQSD</kbd>/<kbd>WASD</kbd> se déplacer · <kbd>Maj</kbd> courir · <kbd>Souris</kbd> regarder</div>
+      <div><kbd>E</kbd> portes, serveur, lit · <kbd>P</kbd> photo (preuve) · <kbd>T</kbd> téléphone</div>
+      <div><kbd>F</kbd> seau d'eau (depuis la fenêtre, illégal) · <kbd>Tab</kbd> dossier</div>
     </div>
     <button id="start">Commencer la soirée</button>
     <p class="note">Prototype v0.1 — le gameplay est en cours de conception.</p>
@@ -44,16 +47,18 @@
     <button data-call="asso">💬 Groupe WhatsApp de l'asso</button>
     <button data-call="mairie">✉️ Signalement à la mairie</button>
     <button data-call="close">Raccrocher</button>
+    <p id="phone-status" class="note"></p>
   </div>
 
   <div id="dossier" class="screen hidden">
     <h2>Dossier — Association de la rue des Bouchers</h2>
+    <p id="dossier-score"></p>
     <ul id="dossier-list"></ul>
     <p class="note">Tab pour fermer</p>
   </div>
 
   <div id="end" class="screen hidden">
-    <h2>Fin de la nuit</h2>
+    <h2 id="end-title">Fin de la nuit</h2>
     <div id="end-body"></div>
     <button onclick="location.reload()">Rejouer</button>
   </div>
