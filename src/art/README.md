@@ -1,7 +1,7 @@
 # src/art: art API (for the build agent)
 
 Everything visual and audio is exposed as functions. **No change to `main.js` is required**: the build agent wires the calls.
-The debug page is `http://localhost:5173/src/art/gallery.html` (dev server only). Every button there is an example call.
+The debug page is `http://localhost:5173/src/art/gallery/` (dev server only). Every button there is an example call.
 `?perf=1` on the game or the gallery shows FPS, draw calls, triangles and characters drawn / far.
 
 ```js

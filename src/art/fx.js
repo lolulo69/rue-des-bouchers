@@ -115,6 +115,7 @@ export function createFx(scene, world, { onFrame, audio, react }) {
   const v = new THREE.Vector3(), p = new THREE.Vector3(), c = new THREE.Color();
 
   function puddle(x, z, r = 1.2, seconds = 90) {
+    if (typeof x === 'object' && x) { const v = toV(x); x = v.x; z = v.z; } // puddle(pos) accepté aussi
     const m = new THREE.MeshStandardMaterial({ color: 0x0a0d14, roughness: 0.08, metalness: 0.6, transparent: true, opacity: 0.6, alphaMap: wetMap, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 });
     const mesh = new THREE.Mesh(new THREE.CircleGeometry(r, 20), m);
     mesh.rotation.x = -Math.PI / 2; mesh.rotation.z = Math.random() * 6;
@@ -152,7 +153,7 @@ export function createFx(scene, world, { onFrame, audio, react }) {
   drops.onGround = (x, z) => {
     if (splashHits++ % 3 === 0) for (let k = 0; k < 2; k++) smoke.spawn(p.set(x, 0.05, z), v.set((Math.random() - 0.5) * 1.5, 0.6 + Math.random(), (Math.random() - 0.5) * 1.5), 0.35, 0.06, 0.14, 0.7, c.set(0xbfe3ff));
   };
-  function splash(from, { towardX = null, radius = 1.6, wetSeconds = 90 } = {}) {
+  function splash(from = world.window.pos.clone().setX(world.window.pos.x + 0.3), { towardX = null, radius = 1.6, wetSeconds = 90 } = {}) {
     const o = toV(from);
     const tx = towardX ?? (o.x < 0 ? 1.2 : -1.2);
     for (let i = 0; i < 260; i++) {
@@ -172,14 +173,14 @@ export function createFx(scene, world, { onFrame, audio, react }) {
   }
 
   // Fumée générique (continue) : renvoie { stop() }
-  function smokeAt(at, { rate = 14, life = 4, color = 0x8a8a8a, rise = 0.6, spread = 0.25, size = [0.4, 1.6], alpha = 0.55, duration = 0, dir = null } = {}) {
+  function smokeAt(at, { rate = 14, life = 4, color = 0x8a8a8a, rise = 0.6, spread = 0.25, size = [0.4, 1.6], alpha = 0.55, duration = 30, dir = null } = {}) {
     const o = toV(at).clone(), col = new THREE.Color(color), d = dir ? toV(dir) : null;
     return emitter(rate, () => smoke.spawn(p.set(o.x + (Math.random() - 0.5) * spread, o.y, o.z + (Math.random() - 0.5) * spread),
       v.set((d?.x ?? 0) + (Math.random() - 0.5) * 0.3, rise + (d?.y ?? 0) + Math.random() * 0.2, (d?.z ?? 0) + (Math.random() - 0.5) * 0.3), life * (0.7 + Math.random() * 0.6), size[0], size[1], alpha, col), duration);
   }
 
   // Boule puante : nuage vert-jaune qui stagne + lignes ondulées, les clients autour font la grimace
-  function stink(at, { seconds = 25, radius = 3 } = {}) {
+  function stink(at = world.anchors.bernadetteDoor.clone().setX(world.anchors.bernadetteDoor.x + 1.5), { seconds = 25, radius = 3 } = {}) {
     const o = toV(at);
     const a = smokeAt(o.clone().setY(0.3), { rate: 10, life: 6, color: 0x9fbf3a, rise: 0.12, spread: radius, size: [0.8, 2.6], alpha: 0.35, duration: seconds });
     const b = emitter(3, () => lines.spawn(p.set(o.x + (Math.random() - 0.5) * radius * 1.5, 0.8 + Math.random(), o.z + (Math.random() - 0.5) * radius * 1.5), v.set(0, 0.35, 0), 2.2, 0.35, 0.5, 0.9, c.set(0xc8e05a)), seconds);
@@ -190,16 +191,16 @@ export function createFx(scene, world, { onFrame, audio, react }) {
 
   // Hotte bouchée au carton : la vapeur s'arrête, la fumée ressort par la porte et les fenêtres de la cuisine
   let blocked = null;
-  function exhaustBlocked(on, { door = world.anchors.bernadetteDoor } = {}) {
-    if (!on) { blocked?.forEach((e) => e.stop()); blocked = null; world.steam.blocked = false; return; }
+  function exhaustBlocked(on = true, { door = world.anchors.bernadetteDoor } = {}) {
+    if (on === false) { blocked?.forEach((e) => e.stop()); blocked = null; world.steam.blocked = false; return; }
     if (blocked) return;
     world.steam.blocked = true;
     const d = door.clone();
     const out = d.x < 0 ? 1 : -1;
     blocked = [
-      smokeAt(d.clone().setY(2.2), { rate: 16, life: 5, color: 0x7a7a7e, rise: 0.35, spread: 0.6, size: [0.5, 2.2], alpha: 0.6, dir: { x: out * 0.6, y: 0, z: 0 } }),
-      smokeAt(d.clone().setY(2.6).setZ(d.z + 2.5), { rate: 8, life: 5, color: 0x8a8a8e, rise: 0.4, spread: 1.4, size: [0.4, 1.8], alpha: 0.45, dir: { x: out * 0.4, y: 0, z: 0 } }),
-      smokeAt(world.exhaust.clone(), { rate: 2, life: 2, color: 0x9a9a9a, rise: 0.2, spread: 0.2, size: [0.2, 0.5], alpha: 0.4 }), // fuite autour du carton
+      smokeAt(d.clone().setY(2.2), { duration: 0, rate: 16, life: 5, color: 0x7a7a7e, rise: 0.35, spread: 0.6, size: [0.5, 2.2], alpha: 0.6, dir: { x: out * 0.6, y: 0, z: 0 } }),
+      smokeAt(d.clone().setY(2.6).setZ(d.z + 2.5), { duration: 0, rate: 8, life: 5, color: 0x8a8a8e, rise: 0.4, spread: 1.4, size: [0.4, 1.8], alpha: 0.45, dir: { x: out * 0.4, y: 0, z: 0 } }),
+      smokeAt(world.exhaust.clone(), { duration: 0, rate: 2, life: 2, color: 0x9a9a9a, rise: 0.2, spread: 0.2, size: [0.2, 0.5], alpha: 0.4 }), // fuite autour du carton
     ];
     react?.(d, 5, 'sick', 20, 'fan');
   }

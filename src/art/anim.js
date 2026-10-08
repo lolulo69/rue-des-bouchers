@@ -148,12 +148,21 @@ export function createDirector(scene, world, { onFrame, audio, fx, props }) {
     type: (p) => setState(p, { anim: 'type', held: null }),
     coffee: (p) => setState(p, { anim: 'idle', held: 'coffee', talk: 0.8, expr: 'happy' }),
     round: () => round(true),
+    walk: (p, o) => (p === cast.jeremie ? round(true, o) : o.path ? walk(p, o.path, o) : setState(p, { anim: 'idle' })),
+    give: (p, o) => {
+      setState(p, { anim: 'give', held: o.held ?? 'envelope', expr: o.expr ?? 'suspicious' });
+      after(o.seconds ?? 3, () => { if (rigOf(p).anim === 'give') stop(p, { place: false }); });
+    },
+    eat: (p, o) => {
+      setState(p, { anim: 'idle', held: 'fork', expr: 'happy' });
+      if (o.seconds) after(o.seconds, () => stop(p, { place: false }));
+    },
     patrol: (p, o) => patrol(p, o),
   };
   function play(who, state, opts = {}) {
     const p = get(who);
     remember(p);
-    p.visible = true;
+    if (p !== cast.pilou) p.visible = true; // Pilou = vue subjective : on ne le montre pas dans la rue
     const f = presets[state];
     if (f) f(p, opts); else setState(p, { anim: state, ...opts });
     if (opts.expr) rigOf(p).expr = opts.expr;
@@ -171,6 +180,17 @@ export function createDirector(scene, world, { onFrame, audio, fx, props }) {
     if (place) { p.position.copy(d.pos); p.rotation.y = d.rot; p.updateMatrixWorld(); }
     return p;
   }
+
+  // Tables visées : une table, une liste, un id de resto, ou rien (= les tables dehors de l'estaminet)
+  function pickTables(arg) {
+    if (arg?.group) return [arg];
+    if (Array.isArray(arg)) return arg.filter((t) => t?.group);
+    const rest = typeof arg === 'string' ? arg : 'bernadette';
+    const ts = world.tables.filter((t) => (t.rest?.id ?? t.restId) === rest);
+    const out = ts.filter((t) => t.group.visible);
+    return out.length ? out : ts;
+  }
+  const pickOne = (arg) => { const ts = pickTables(arg).filter((t) => t.people.some((p) => p.visible && !rigOf(p).hidden)); return ts[Math.floor(Math.random() * ts.length)]; };
 
   // ---------- Séquences ----------
   // La ronde de 22h : Jérémie et Biloute descendent la rue jusqu'aux Mal Lunés, remontent jusqu'à La Bombance, rentrent.
@@ -216,7 +236,10 @@ export function createDirector(scene, world, { onFrame, audio, fx, props }) {
 
   // Laxatifs : n clients d'une table se lèvent et filent aux toilettes de l'estaminet, mains sur le ventre.
   // Comique, pas dégoûtant : petits pas pressés, goutte de sueur, file d'attente, panneau « OCCUPÉ ».
-  function rush(table, n = 3, { door = A.bernadetteDoor, returnAfter = 40 } = {}) {
+  function rush(tableArg, n = 3, { door = A.bernadetteDoor, returnAfter = 40 } = {}) {
+    const table = pickOne(tableArg);
+    if (!table) return [];
+    if (typeof n !== 'number') n = 3;
     const seated = table.people.filter((p) => p.visible && !rigOf(p).hidden && rigOf(p).anim !== 'fallen').slice(0, n);
     const d = toV(door);
     const out = d.x < 0 ? 1 : -1;
@@ -240,7 +263,10 @@ export function createDirector(scene, world, { onFrame, audio, fx, props }) {
   }
 
   // Chaise dévissée qui s'effondre sous son client
-  function collapse(table, seat = 0, { recover = 0 } = {}) {
+  function collapse(tableArg, seat = null, { recover = 0 } = {}) {
+    const table = pickOne(tableArg);
+    if (!table) return;
+    if (typeof seat !== 'number') seat = table.people.findIndex((q) => q.visible && !rigOf(q).hidden && rigOf(q).anim !== 'fallen');
     const ch = table.chairs?.[seat], p = table.people[seat];
     if (!ch || !p) return;
     rigOf(ch).flags.collapsed = true;
@@ -252,13 +278,14 @@ export function createDirector(scene, world, { onFrame, audio, fx, props }) {
   }
 
   // Parasols volés (ou rendus) : par resto ou liste de tables
-  function parasols(tablesOrRest, present) {
-    const list = typeof tablesOrRest === 'string' ? world.tables.filter((t) => (t.rest?.id ?? t.restId) === tablesOrRest || t.id.startsWith(tablesOrRest)) : tablesOrRest;
-    for (const t of list) if (t.top) rigOf(t.top).flags.parasol = present;
+  function parasols(tablesOrRest, present = false) {
+    for (const t of pickTables(tablesOrRest)) if (t.top) rigOf(t.top).flags.parasol = present;
   }
 
   // La foule filme : une part des clients lève le téléphone (écran allumé)
-  function film(on = true, { tables = world.tables, share = 0.5 } = {}) {
+  function film(on = true, opts = {}) {
+    if (typeof on !== 'boolean') { opts = { tables: pickTables(on) }; on = true; } // film(table | tables | restId)
+    const { tables = world.tables, share = 0.5 } = opts;
     for (const t of tables) for (const p of t.people) {
       const r = rigOf(p);
       if (on && Math.random() < share) { r.st.preFilm ??= { anim: r.anim, held: r.held }; setState(p, { anim: 'film', held: 'film' }); }

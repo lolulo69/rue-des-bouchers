@@ -173,10 +173,12 @@ export function createProps(scene, world, { onFrame }) {
       return finish('occupied', g, (dt, t2) => { g.rotation.z = Math.sin(t2 * 3) * 0.05; });
     },
   };
+  // 'line' via place() : de opts.from (défaut : sous le store) jusqu'à `at`
+  builders.line = (at, o) => line(o.from ?? 'awningSocket', at, o);
   // points par défaut (si `at` est omis)
   const defaults = {
     gadget: 'pilouSill', cardboard: 'exhaust', uritrottoir: 'uritrottoirSpot', banner: 'balconyRail', petition: 'petitionSpot',
-    'police-coffee': 'coffeeSpot', 'chain-lock': 'chainSpot', stool: 'awningCleanSpot', occupied: 'bernadetteDoor',
+    'police-coffee': 'coffeeSpot', 'chain-lock': 'chainSpot', stool: 'awningCleanSpot', occupied: 'bernadetteDoor', line: 'pilouSill',
   };
 
   // Fil fin générique de A à B, avec un léger ballant (réutilisable pour tout : câble, laisse, corde à linge...)

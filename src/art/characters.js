@@ -89,6 +89,8 @@ function heldItems(addW, k, o) {
   addW('film', 'ball', 'handR', [0.045, 0.095, 0.03], 0.012, 0xff3030, null, true, true);
   addW('envelope', 'box', 'handR', [0, 0.04, 0.05], [0.2, 0.13, 0.015], 0xf6f0dc, [-0.3, 0, 0]);
   addW('envelope', 'box', 'handR', [0, 0.065, 0.06], [0.2, 0.012, 0.02], 0xd9c79a, [-0.3, 0, 0]);
+  addW('fork', 'cyl', 'handR', [0, 0.06, 0.04], [0.012, 0.16, 0.012], 0xc0c4ca, [0.3, 0, 0]);
+  addW('fork', 'ball', 'handR', [0, 0.14, 0.07], [0.03, 0.025, 0.03], 0x8a4a22);
   addW('key', 'cyl', 'handR', [0, 0.03, 0.07], [0.02, 0.1, 0.02], 0xe8c45a, [Math.PI / 2, 0, 0]);
   addW('clipboard', 'box', 'handL', [0, 0.02, 0.06], [0.2, 0.015, 0.26], 0x8a5a35, [0.3, 0, 0]);
   addW('clipboard', 'box', 'handL', [0, 0.03, 0.06], [0.17, 0.012, 0.21], 0xf6f2ea, [0.3, 0, 0]);
@@ -243,7 +245,7 @@ function animHuman(rig, t, dt, proxy) {
 
   // Boire / fumer : la main droite monte à la bouche
   const held = rig.held;
-  if (!still && (held === 'beer' || held === 'wine' || held === 'mug' || held === 'coffee' || held === 'cig')) {
+  if (!still && (held === 'beer' || held === 'wine' || held === 'mug' || held === 'coffee' || held === 'cig' || held === 'fork')) {
     const P = held === 'cig' ? 6 : rig.drinkPeriod;
     const u = (ph + rig.seed * 20) % P;
     const s = u < 0.8 ? smooth(u / 0.8) : u < 2.0 ? 1 : u < 2.8 ? 1 - smooth((u - 2.0) / 0.8) : 0;

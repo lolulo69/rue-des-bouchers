@@ -1,11 +1,11 @@
-// Galerie de debug (dev uniquement : http://localhost:5173/src/art/gallery.html, ajouter ?perf=1 pour le HUD).
+// Galerie de debug (dev uniquement : http://localhost:5173/src/art/gallery/, ajouter ?perf=1 pour le HUD).
 // Montre tous les accessoires, effets, états des personnages, portraits, vignettes de jour et sons.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { buildWorld } from '../world.js';
-import { art } from './index.js';
-import { audio } from '../audio/index.js';
-import { timeSource } from './rig.js';
+import { buildWorld } from '../../world.js';
+import { art } from '../index.js';
+import { audio } from '../../audio/index.js';
+import { timeSource } from '../rig.js';
 
 const canvas = document.getElementById('view');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });

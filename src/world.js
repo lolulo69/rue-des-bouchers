@@ -488,6 +488,8 @@ export function buildWorld(scene, opts = {}) {
     balconyRail: P(W - 0.83, anchors.balcony.y + 0.55, bz + 0.4), // devant la rambarde de Seb & Nico
     smokeSpot: P(-(W - 0.5), 0, bz + 4.4),                  // pause clope du serveur, sous le store
     awningCleanSpot: P(-(W - 0.55), 0, bz - 2),             // escabeau de Ghislain sous le store
+    awning: P(-(W - 0.3), 2.45, bz - 3.5),                  // sous le bord du store (petit objet discret)
+    awningSocket: P(-(W - 0.04), 2.2, bz + 4.3),            // sur la façade, sous le store
     chainSpot: P(-(W - 0.6), 0, P0 + 0.6),                  // pile de chaises cadenassée la nuit
     coffeeSpot: P(-(W - 1.4), 0, P0 - 2.6),                 // table des policiers, devant l'estaminet
     petitionSpot: P(-(W - 0.7), 0, bz + 10.5),              // table de pétition, devant chez Pilou et Jérémie
