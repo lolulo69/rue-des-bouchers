@@ -214,3 +214,18 @@
 @media (prefers-reduced-motion: reduce) {
   :is(#ui-root, #dayui) *, :is(#ui-root, #dayui) *::before, :is(#ui-root, #dayui) *::after { animation: none !important; transition: none !important; }
 }
+
+/* ── Carnet / Aide / À propos (U10) ── */
+:is(#ui-root, #dayui) .ui-codex { background: #fbf4e4; border-radius: 26px; padding: 16px; box-shadow: var(--ui-shadow); border: 9px solid #6b4a2f; display: grid; gap: 10px;
+  background-image: repeating-linear-gradient(#fbf4e4 0 27px, #e9dcc0 27px 28px); }
+:is(#ui-root, #dayui) .ui-codex-head h2 { margin: 0; color: var(--ui-ink); }
+:is(#ui-root, #dayui) .ui-codex-head p { margin: 4px 0 0; color: var(--ui-mute); font-size: 15px; }
+:is(#ui-root, #dayui) .ui-codex-list { display: grid; gap: 10px; max-height: 58vh; overflow: auto; }
+:is(#ui-root, #dayui) .ui-codex-card { background: #fffdf7; border-radius: 16px; padding: 12px 14px; display: grid; gap: 6px; border: 1px solid #ecdcbc; color: var(--ui-ink); }
+:is(#ui-root, #dayui) .ui-codex-card h3 { margin: 0; font-size: 17px; color: var(--ui-ink); text-transform: none; letter-spacing: 0; }
+:is(#ui-root, #dayui) .ui-codex-card p { margin: 0; }
+:is(#ui-root, #dayui) .ui-codex-pos { font-size: 14px; font-weight: 800; color: var(--ui-brick); }
+:is(#ui-root, #dayui) .ui-codex-quote { font-style: italic; color: var(--ui-mute); }
+:is(#ui-root, #dayui) .ui-new { margin-left: 8px; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .06em; padding: 2px 7px; border-radius: 99px; background: var(--ui-gold); color: #3a2622; vertical-align: middle; }
+:is(#ui-root, #dayui) .ui-title-links { justify-content: center; }
+:is(#ui-root, #dayui) .ui-title-links .ui-btn { padding: 8px 14px; font-size: 15px; }

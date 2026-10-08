@@ -16,6 +16,7 @@ import { h, clear, portrait, nameOf, typewrite, effectChips, STAT_LABELS, setPor
 import { WEEKDAYS, WEEKDAYS_SHORT, PHASE_LABELS, LEGALITY, explain, afternoonMenu, upcomingEvent, eventDays, witnessName } from './rules.js';
 import { phoneView, pullFeed, unreadItems, messageNode } from './phone.js';
 import { createVignette } from './vignette.js';
+import { carnetView, helpView, aboutView, carnetNews } from './codex.js';
 
 export const SAVE_KEY = 'rdb.save.v1';
 export const UI_KEY = 'rdb.ui.v1';           // préférences d'affichage de l'UI (non-lus, répliques entendues, avant-nuit)
@@ -52,6 +53,8 @@ export function mount(engine = {}, opts = {}) {
   let meta = loadMeta();
   let view = {};
   let phone = { open: false, tab: 'whatsapp' };
+  let panel = null; // 'carnet' | 'help' | 'about' (U10)
+  let carnetTab = 'characters';
   let typing = null;
   let visible = false;
 
@@ -140,7 +143,11 @@ export function mount(engine = {}, opts = {}) {
     clear(layer);
     settleDialogues();
     root.dataset.step = c ? shown() : 'title';
-    if (!c) { vignette.set(null); return layer.append(titleScreen()); }
+    if (!c) {
+      vignette.set(null);
+      if (panel === 'help' || panel === 'about') return layer.append(h('div.ui-wrap', panelView()));
+      return layer.append(titleScreen());
+    }
     if (fresh() && !meta.introSeen && introCards().length) { vignette.set('koddex'); return layer.append(introScreen()); }
     // Nouveaux messages : relevés une fois par phase (le moteur applique leurs effets)
     const at = `${c.state.day}:${c.state.phase}`;
@@ -157,6 +164,9 @@ export function mount(engine = {}, opts = {}) {
     if (phone.open) {
       wrap.append(phoneView(c, meta, { tab: phone.tab, onTab: (t) => { phone.tab = t; render(); }, onClose: closePhone }));
       saveMeta();
+    } else if (panel) {
+      wrap.append(panelView());
+      saveMeta();
     } else {
       const notif = notification();
       if (notif) wrap.append(notif);
@@ -166,7 +176,14 @@ export function mount(engine = {}, opts = {}) {
     root.scrollTop = 0;
   }
   const introCards = () => (typeof c?.introCards === 'function' ? c.introCards() : narrative.introCards()) ?? [];
-  function openPhone(tab) { phone = { open: true, tab: tab ?? phone.tab }; view.notif = null; render(); }
+  function openPhone(tab) { panel = null; phone = { open: true, tab: tab ?? phone.tab }; view.notif = null; render(); }
+  function openPanel(name) { phone.open = false; panel = name; render(); }
+  function closePanel() { panel = null; render(); }
+  function panelView() {
+    if (panel === 'carnet' && c) return carnetView(c, meta, { tab: carnetTab, onTab: (t) => { carnetTab = t; render(); }, onClose: closePanel });
+    if (panel === 'help') return helpView({ onClose: closePanel });
+    return aboutView({ onClose: closePanel });
+  }
   function closePhone() { phone.open = false; render(); }
 
   function screen() {
@@ -211,6 +228,9 @@ export function mount(engine = {}, opts = {}) {
       newCampaign();
     };
     col.append(newBtn);
+    col.append(h('div.ui-row.ui-title-links',
+      h('button.ui-btn.ghost', { onclick: () => openPanel('help'), dataset: { testid: 'title-help' } }, '❓ Comment jouer'),
+      h('button.ui-btn.ghost', { onclick: () => openPanel('about'), dataset: { testid: 'title-about' } }, 'À propos')));
     return h('div.ui-title', h('div',
       h('h1', 'Rue des Bouchers'),
       h('p.sub', "Vieux-Lille. Quatorze jours avant la commission des terrasses. Pilou habite au-dessus de l’estaminet, la gaine souffle sous sa fenêtre, et les terrasses doivent rentrer à 22h. En théorie."),
@@ -250,6 +270,9 @@ export function mount(engine = {}, opts = {}) {
           h('div.ui-phase', ['morning', 'afternoon', 'night'].map((p) => h(`span${p === S.phase ? '.on' : ''}`, PHASE_LABELS[p]))),
           h('button.ui-btn.ghost.ui-icon', { onclick: () => (phone.open ? closePhone() : openPhone()), dataset: { testid: 'phone-open', unread }, 'aria-label': 'Téléphone (T)', title: 'Téléphone (T)' },
             '📱', unread ? h('span.ui-badge', unread) : null),
+          h('button.ui-btn.ghost.ui-icon', { onclick: () => (panel === 'carnet' ? closePanel() : openPanel('carnet')), dataset: { testid: 'carnet-open' }, 'aria-label': 'Carnet (C)', title: 'Carnet (C)' },
+            '📓', carnetNews(c, meta) ? h('span.ui-badge', carnetNews(c, meta)) : null),
+          h('button.ui-btn.ghost.ui-icon', { onclick: () => (panel === 'help' ? closePanel() : openPanel('help')), dataset: { testid: 'help-open' }, 'aria-label': 'Comment jouer', title: 'Comment jouer' }, '❓'),
           opts.onQuit ? h('button.ui-btn.ghost.ui-icon', { onclick: opts.onQuit, 'aria-label': 'Menu', title: 'Menu' }, '☰') : null)),
       h('div.ui-cal', Array.from({ length: 14 }, (_, k) => h(`i${k + 1 < S.day ? '.done' : ''}${k + 1 === S.day ? '.now' : ''}${evDays.has(k + 1) ? '.ev' : ''}`, { title: `Jour ${k + 1}` }))),
       up ? h('div.ui-upcoming', up.day === S.day ? 'Aujourd’hui : ' : `Jour ${up.day} (${WEEKDAYS_SHORT[c.weekday(up.day)]}) : `, h('b', up.title)) : null,
@@ -555,9 +578,11 @@ export function mount(engine = {}, opts = {}) {
 
   // ── clavier : T ouvre le téléphone, Échap le ferme ──────────────────
   function onKey(e) {
-    if (!visible || !c || e.target?.closest?.('input, textarea, select')) return;
+    if (!visible || e.target?.closest?.('input, textarea, select') || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.code === 'Escape' && (phone.open || panel)) { phone.open = false; closePanel(); return; }
+    if (!c) return;
     if (e.code === 'KeyT') { e.preventDefault(); if (phone.open) closePhone(); else openPhone(); }
-    else if (e.code === 'Escape' && phone.open) closePhone();
+    else if (e.code === 'KeyC') { e.preventDefault(); if (panel === 'carnet') closePanel(); else openPanel('carnet'); }
   }
   window.addEventListener('keydown', onKey);
   const onResize = () => vignette.resize();
@@ -576,7 +601,7 @@ export function mount(engine = {}, opts = {}) {
   const publicApi = {
     root,
     get campaign() { return c; },
-    render, show, hide, destroy, newCampaign, continueCampaign, openPhone, closePhone,
+    render, show, hide, destroy, newCampaign, continueCampaign, openPhone, closePhone, openPanel, closePanel,
     afterNight() { afterEngine(); show(); },
   };
   // autoContinue : reprendre la sauvegarde directement (retour de la nuit 3D, main.js)

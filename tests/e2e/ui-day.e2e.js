@@ -46,6 +46,7 @@ async function advance(page, seen) {
 }
 
 test('jours 1 à 3 joués dans l’interface : Koddex, après-midi, nuit, bilan, sauvegarde', async ({ page }) => {
+  test.setTimeout(480_000); // trois journées au clic : long sous SwiftShader sur une machine chargée
   const errors = watchErrors(page);
   await page.goto('/ui.html?fresh=1&fast=1&seed=7');
   await expect(page.getByRole('heading', { name: 'Rue des Bouchers' })).toBeVisible();
@@ -162,5 +163,33 @@ test('dans le jeu : « Campagne » monte l’interface des journées (src/ui)', 
   await expect(page.locator('[data-testid=card]')).toBeVisible();
   await page.waitForTimeout(2500);
   await page.screenshot({ path: 'test-results/ui-game-day1.png' });
+  expect(errors).toEqual([]);
+});
+
+test('Carnet (C), Aide et À propos (U10)', async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.goto('/ui.html?fresh=1&fast=1&seed=9');
+  await page.click('[data-testid=title-help]');
+  await expect(page.locator('[data-testid=help] article')).toHaveCount(10);
+  await page.click('[data-testid=help-close]');
+  await page.click('[data-testid=title-about]');
+  await expect(page.locator('[data-testid=about]')).toContainText('fiction');
+  await page.keyboard.press('Escape');
+  await page.click('[data-testid=title-new]');
+  await page.click('[data-testid=intro-skip]');
+  await expect(page.locator('[data-testid=carnet-open] .ui-badge')).toBeVisible();
+  await page.keyboard.press('KeyC');
+  await expect(page.locator('[data-testid=carnet]')).toBeVisible();
+  await expect(page.locator('[data-testid=carnet] [data-codex=c_pilou]')).toBeVisible();
+  await expect(page.locator('[data-testid=carnet] [data-codex=c_pilou] .ui-new')).toBeVisible();
+  await page.click('[data-testid=carnet] [data-tab=rules]');
+  await expect(page.locator('[data-testid=carnet] .ui-codex-card').first()).toBeVisible();
+  await page.waitForTimeout(600);
+  await page.screenshot({ path: 'test-results/ui-carnet.png', fullPage: true });
+  await page.keyboard.press('KeyC');
+  await expect(page.locator('[data-testid=carnet]')).toHaveCount(0);
+  // rouvert : les fiches déjà lues ne sont plus « nouveau »
+  await page.click('[data-testid=carnet-open]');
+  await expect(page.locator('[data-testid=carnet] [data-codex=c_pilou] .ui-new')).toHaveCount(0);
   expect(errors).toEqual([]);
 });
