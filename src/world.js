@@ -108,7 +108,7 @@ export function person(color) {
 
 const HIT_MAT = new THREE.MeshBasicMaterial({ visible: false });
 
-function buildTable(rest, x, z, idx, scene) {
+function buildTable(rest, x, z, idx, scene, fixedCount) {
   const group = new THREE.Group();
   group.position.set(x, 0, z);
   const wood = mat(0x5b3a1e, { roughness: 0.7 });
@@ -121,7 +121,7 @@ function buildTable(rest, x, z, idx, scene) {
 
   // Nombre de convives : parfois au-dessus de la limite
   const over = Math.random() < RULES.overLimitChance;
-  const count = over ? RULES.maxPeoplePerTable + 1 + Math.floor(Math.random() * 3) : 2 + Math.floor(Math.random() * (RULES.maxPeoplePerTable - 1));
+  const count = fixedCount ?? (over ? RULES.maxPeoplePerTable + 1 + Math.floor(Math.random() * 3) : 2 + Math.floor(Math.random() * (RULES.maxPeoplePerTable - 1)));
   const people = [];
   for (let i = 0; i < count; i++) {
     const a = (i / count) * Math.PI * 2;
@@ -142,7 +142,8 @@ function buildTable(rest, x, z, idx, scene) {
   return table;
 }
 
-export function buildWorld(scene) {
+// opts.tables : disposition des terrasses tirée par la simulation (src/sim/layout.js) : { id, restId, x, z, count }
+export function buildWorld(scene, opts = {}) {
   const city = new THREE.Group();
   scene.add(city);
 
@@ -238,8 +239,9 @@ export function buildWorld(scene) {
   // La Ch'tite Bernadette : devanture, store, enseigne
   const front = box(0.08, 2.8, 9.4, new THREE.MeshStandardMaterial({ color: 0x2a1a10, emissive: 0xffa24a, emissiveIntensity: 0.55 }));
   front.position.set(-(W + 0.02 - 0.01), 1.5, -1.2);
-  const awning = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.08, 10), new THREE.MeshStandardMaterial({ color: 0x8a2b2b }));
-  awning.position.set(-(W - 0.65), 3.25, -1.2);
+  // Store peu profond : depuis la fenêtre de Pilou, on doit voir les tables en dessous (QA v0.2)
+  const awning = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.08, 10), new THREE.MeshStandardMaterial({ color: 0x8a2b2b }));
+  awning.position.set(-(W - 0.25), 3.3, -1.2);
   awning.rotation.z = -0.25;
   const bTex = signTex("Estaminet La Ch'tite Bernadette", '#5a1414');
   const sign = new THREE.Mesh(new THREE.PlaneGeometry(6, 0.95), new THREE.MeshStandardMaterial({ map: bTex, emissive: 0xffffff, emissiveMap: bTex, emissiveIntensity: 0.5 }));
@@ -290,7 +292,13 @@ export function buildWorld(scene) {
 
   // Terrasses
   const tables = [];
-  for (const r of RESTAURANTS) {
+  if (opts.tables) {
+    for (const l of opts.tables) {
+      const r = RESTAURANTS.find((x) => x.id === l.restId);
+      tables.push(buildTable(r, l.x, l.z, Number(l.id.split('-').pop()) - 1, scene, l.count));
+    }
+  }
+  else for (const r of RESTAURANTS) {
     const x = r.side * (W - 1.25);
     const step = (r.z1 - r.z0) / r.tables;
     for (let i = 0; i < r.tables; i++) {
