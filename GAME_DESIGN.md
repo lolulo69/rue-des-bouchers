@@ -231,6 +231,43 @@ Tunable rules live in `src/config.js`.
 | **v0.5: dirty tricks** | Hidden cameras + electricity/wifi hijack, cardboard on the exhaust, stink bomb, kitchen sabotage (salt/sugar), fake reviews, sabotage, bribing the waiter, photographing the bribe. Risk thresholds → complaint, custody, trial. |
 | **v1.0: endings + polish** | The 8 endings, balancing via simulated runs, French copy pass, performance, a full QA run in Chrome. |
 
+## 12b. v1.1 « no two nights alike » (Lucas, 2026-10-09)
+Goal: a 3-hour campaign must not feel repetitive. Three changes, decided before Lucas's first playtest.
+
+**A. A twist every night (night modifiers).** Each of the 14 nights has its own situation layered on the normal night
+(fixed for the calendar nights, drawn from a pool for the others, never the same twice in a campaign). Each twist changes the
+sim (more people, a table over the limit, a new witness, an obstacle, a new evidence opportunity, a risk) and has its own
+lines, props and a short intro card at the start of the night. Pool (≥ 16), for example: a birthday at table 4 (11 people,
+candles, singing at 23:40); an influencer filming the terrace with a ring light (a witness with a phone, and a viral-video
+opportunity for both sides); a football match on a screen outside (noise peaks on goals); a hen party (« EVJF ») with a
+megaphone; a delivery van blocking the corridor on a car-free Saturday; the drache (rain: terraces empty early, but under the
+awning…); a heatwave night (windows open, noise ×1.3, everyone stays out); the tourist guide's evening tour; Colette dining
+at the estaminet (D4); the inspector's discreet visit (D9); a student party upstairs at Régis's Airbnb; a busker under
+Pilou's window; a power cut (darkness = stealth bonus, the exhaust stops); the waiter's last night before holidays; the
+« Fête des voisins » the association organises (counter-programming); a fire-brigade inspection of the corridor; the
+council's night walk (Lescaut walking the street at 23:00, if lescaut_meeting). Twists can chain into consequences
+(flags) the next days, through media and dialogue.
+
+**B. Tools that unlock over time.** The player starts with: watch, photo, the police call, asking the waiter, the bucket
+(it's always there, it's the temptation). New tools arrive on a schedule *or* through story beats, each with a short
+« Nouveau » card that teaches it: dB reading (D1 night), the 22:00 round with Jérémie (when invited, ~D2), the legal-zone
+view L (after the AOT plan), the WhatsApp group (D2), the dB logger / scraper / bot (Koddex side projects), the window
+camera (~D4), the night action menu items appear only once their story requirement is met (waiter informant, wifi,
+backroom…). Rule: at least one new verb every 2 nights until D10. Nothing a bot or the balance targets rely on may be
+removed: unlocks only gate *when*, and the balance agent re-checks §13.H after.
+
+**C. The day in 3D.** The day phases stop being menus over a blurred backdrop:
+- Morning: first-person, seated at Pilou's desk at Koddex (two screens, Clode Kode glow, plants, Stéphane passing by, a
+  window). The Koddex terminal UI is drawn ON the in-world monitor (crisp HTML aligned to the screen by projection, so it
+  stays readable), the rest of the office is alive (idle animations, colleagues).
+- Afternoon: the street BY DAY (deliveries, terraces being set up, Klaas at his window, Tatie at hers, Biloute's walk),
+  with the action cards as an in-world notebook/phone overlay; meetings happen in Hippolyte's workshop scene, the mayor's
+  office in the town-hall scene. Day lighting.
+- Gameplay unchanged: same choices, same cards; only the staging. Readability and the gamepad/keyboard flow must stay
+  intact; « Bas » graphics quality may fall back to the 2D vignettes.
+
+Checklist additions (v1.1) are in §13.J.
+
 ## 13. v1.0 acceptance checklist
 v1.0 ships only when **every** box is ticked. Nothing is dropped silently: anything cut or simplified is listed under "Deviations" with Lucas's OK.
 Proof: **T** = automated test (vitest / Playwright / campaign simulator, runs in CI) · **Q** = design agent's QA session in Chrome (screenshots in `qa/`) · **L** = Lucas playtest.
@@ -298,6 +335,12 @@ The campaign simulator plays 1000 seeded campaigns per strategy bot. Targets:
 - [ ] Gamepad on PC (Lucas, 2026-10-08): Xbox/PlayStation controllers via the Gamepad API: move/look in the 3D night, every night action, and full navigation of the day screens and menus; on-screen button hints switch to the pad when it's used. **T Q L**
 - [ ] 60 fps on a laptop iGPU (perf test logs the frame time). Loads in < 5 s. Bundle < 3 MB. **T Q** — T: tests/e2e/checklist-perf.e2e.js (bundle 1.1 MB, title 147 ms in CI, frame time logged; 60 fps = Q) _(art: busiest Saturday view 150 draw calls / ≤130k triangles, 3.2 ms/frame on a real GPU (Apple, Chrome); SwiftShader CI fps is indicative only. Still needs one laptop-iGPU check (Q).)_
 - [x] CI green (unit + e2e + campaign simulator smoke). Deploy auto from main. **T** _(v0.4: .github/workflows/ci.yml runs vitest, `npm run sim -- --runs 20`, Playwright; CT 105 deploys main every 2 min)_
+
+### J. v1.1 « no two nights alike »
+- [ ] ≥ 16 night twists, every night of a campaign has one, never the same twice in a campaign; each changes the sim and has an intro card, lines and props. **T Q**
+- [ ] Tools unlock over time with a « Nouveau » card; ≥ 1 new verb every 2 nights until D10; §13.H still met after (balance re-run). **T**
+- [ ] Morning at Koddex in 3D (seated, terminal on the in-world monitor, readable); afternoon in the daytime street / workshop / town hall in 3D; keyboard + gamepad flow intact. **T Q**
+- [ ] Story transcripts refreshed: two runs of the same style differ night by night (twists), and the night recap mentions the twist. **Q**
 
 ### Release tasks (done by the design agent when v1.0 lands)
 - [ ] Set `WHATSAPP_GROUP` in `src/content/characters.js` to **« La Gaystapo »** (Lucas's choice: the real group's own name).
