@@ -235,44 +235,44 @@ v1.0 ships only when **every** box is ticked. Nothing is dropped silently: anyth
 Proof: **T** = automated test (vitest / Playwright / campaign simulator, runs in CI) · **Q** = design agent's QA session in Chrome (screenshots in `qa/`) · **L** = Lucas playtest.
 
 ### A. Campaign and length
-- [ ] 14-day calendar Monday → Sunday of week 2, each day = Koddex morning → afternoon → night (3D). **T Q**
-- [ ] Save/continue (localStorage), a new campaign, and one save slot minimum. Reload mid-campaign resumes the same day and state. **T Q**
+- [ ] 14-day calendar Monday → Sunday of week 2, each day = Koddex morning → afternoon → night (3D). **T Q** — T: tests/unit/checklist.test.js §13.A1, campaign.test.js (Q pending; see qa/checklist-audit.md for the D14 lost-commission early end)
+- [ ] Save/continue (localStorage), a new campaign, and one save slot minimum. Reload mid-campaign resumes the same day and state. **T Q** — T: tests/unit/checklist.test.js §13.A2, campaign.test.js, tests/e2e/campaign.e2e.js (Q pending)
 - [ ] **Duration**: a full campaign takes **2h30 to 4h** for a human (14 nights × ~10 min + day phases). Nights can't be skipped without consequence ("go to bed" = you lose what happens). **Q L**
 - [x] Early endings (custody, fired, moving out) can't trigger before **night 5**. The "real" endings are decided at the **Day 14 commission**. **T** _(v0.4: campaign.test.js « fins », campaign invariant « fin anticipée avant la nuit 5 »)_
-- [ ] Fixed events happen on their day: Saturdays 6 & 13, Colette's dinner (D4), the general meeting (D7), the inspector (D9), the exhaust meeting (D11), the commission (D14). **T Q**
+- [ ] Fixed events happen on their day: Saturdays 6 & 13, Colette's dinner (D4), the general meeting (D7), the inspector (D9), the exhaust meeting (D11), the commission (D14). **T Q** — T: tests/unit/checklist.test.js §13.A5 (Q pending)
 
 ### B. Characters (all present, recognisable, with a role and dialogue)
 - [ ] Pilou · Jérémie + dachshund · Klaas (Santa look, notebook) · Hilde · Tatie Bouchon (+ the "it's being fixed" email thread) · Seb & Nico + the cat · Hippolyte (carriage building). **Q** _(art side done: 3D model + portrait with 7 expressions for each, `qa/art-v0.5/portraits-1.jpg`; role/dialogue = content + wiring)_
 - [ ] Dédé · Ghislain (bun) · the waiter · Brigadier Lemaire · Agent Benali · the police chief · inspector Delphine Vermeersch · Stéphane (Koddex boss) · Colette Verhaeghe · mayor Bertrand Lescaut. **Q** _(art side done: models + portraits for all, incl. Lemaire/Benali/chef variants, Stéphane, Colette, Lescaut)_
-- [ ] Each association member has at least **8 lines** of contextual dialogue (reacting to the current state) and at least 1 action or event tied to them. **T** (content count) **Q**
+- [ ] Each association member has at least **8 lines** of contextual dialogue (reacting to the current state) and at least 1 action or event tied to them. **T** (content count) **Q** — T: tests/unit/checklist.test.js §13.B3 (Q pending)
 
 ### C. Night systems
 - [x] 22:00 rule (street-specific, 2026), 6 per table, zones + corridor, cobbles (chair clatter). **T** _(v0.2: tests/unit/rules.test.js)_
 - [x] Evidence: photo, dB reading, headcount, corridor encroachment, timestamps. Quality + legality per piece. **T** _(v0.4: rules.test.js, campaign.test.js « preuves »)_
-- [ ] Witnesses / line of sight: Klaas (asleep ~01:00), Seb & Nico (cat = home), the waiter, customers filming, the dachshund. Darkness, time and disguise modifiers. **T Q**
+- [ ] Witnesses / line of sight: Klaas (asleep ~01:00), Seb & Nico (cat = home), the waiter, customers filming, the dachshund. Darkness, time and disguise modifiers. **T Q** — T: tests/unit/witness.test.js, campaign.test.js (Q pending)
 - [x] Police: 3 patrols with personalities, hidden roster (Klaas can deduce it), tip-off, coffee/complaisance logged, "c'est encore vous", calling as the Association, the police coming for Pilou, the bribe caught on camera → internal investigation. **T** _(v0.4: police.test.js, campaign.test.js « chaîne IGPN » / « la police vient pour Pilou » ; the roster shows on the phone once `roster_known`)_
-- [ ] Mayor's office: reports, inspector visits (announced = tip-off via Colette, surprise = via Delphine/Hippolyte). **T**
+- [x] Mayor's office: reports, inspector visits (announced = tip-off via Colette, surprise = via Delphine/Hippolyte). **T** — tests/unit/checklist.test.js §13.C5
 - [ ] Saturday: no vehicles, crowd, standing drinkers, peeing in doorways. **Q**
 
 ### D. Day systems
-- [ ] Koddex: 3 Clode Kode prompts a day, work vs side projects (dB logger, WhatsApp bot, review scraper, wifi cracker, fake reviews), Job meter, boss gags. **T Q**
-- [ ] Afternoon actions: meeting, mayor's office, emails, press (La Voix du Nordiste), lawyer (formal notice), petition, health agency (ARS) / environmental health about the exhaust, recruiting residents, asking for a uritrottoir, dinner at Stéphane's with Delphine. **T**
-- [ ] The restaurants' counter-moves (all of section 8) can trigger, depending on state. **T**
+- [ ] Koddex: 3 Clode Kode prompts a day, work vs side projects (dB logger, WhatsApp bot, review scraper, wifi cracker, fake reviews), Job meter, boss gags. **T Q** — T: tests/unit/koddex.test.js, campaignFeatures.test.js (Q pending)
+- [x] Afternoon actions: meeting, mayor's office, emails, press (La Voix du Nordiste), lawyer (formal notice), petition, health agency (ARS) / environmental health about the exhaust, recruiting residents, asking for a uritrottoir, dinner at Stéphane's with Delphine. **T** — tests/unit/checklist.test.js §13.D2
+- [ ] The restaurants' counter-moves (all of section 8) can trigger, depending on state. **T** — tests/unit/checklist.test.js §13.D3: 10/12 proven; the morning ones (Tatie's emails, bins) never trigger, see qa/checklist-audit.md
 
 ### E. Actions (every one implemented, with a cost, an effect and a consequence)
-- [ ] Legal: every item of section 6 "Legal". **T**
-- [ ] Grey: every item of section 6 "Grey". **T**
-- [ ] Illegal: bucket, cardboard on the exhaust, stink bomb, kitchen sabotage (salt/sugar), fake reviews, sabotage (chairs, parasols, locks), bribing the waiter, hidden cameras (window = grey, awning = illegal), power from Bernadette's electricity, cracking their wifi (+ reading reservations, emails, quotes), sneaking in to photograph the bribe. **T**
+- [x] Legal: every item of section 6 "Legal". **T** — tests/unit/checklist.test.js §13.E, nightActions.test.js
+- [x] Grey: every item of section 6 "Grey". **T** — tests/unit/checklist.test.js §13.E, nightActions.test.js
+- [x] Illegal: bucket, cardboard on the exhaust, stink bomb, kitchen sabotage (salt/sugar), fake reviews, sabotage (chairs, parasols, locks), bribing the waiter, hidden cameras (window = grey, awning = illegal), power from Bernadette's electricity, cracking their wifi (+ reading reservations, emails, quotes), sneaking in to photograph the bribe. **T** — tests/unit/checklist.test.js §13.E, nightActions.test.js
 - [x] Illegally obtained evidence is unusable in court but usable for the press / internal police investigation. **T** _(v0.4: campaign.test.js « caméra cachée » : out of the dossier, counted in `pressFile()`, opens the IGPN case)_
 
 ### F. Endings: all 8 reachable
-- [ ] 1 Legal victory · 2 Negotiated peace · 3 Scandal · 4 Custody/trial (incl. the « carbonnade sucrée » and « carbonnade laxative » variants) · 5 Moving out to Wazemmes · 6 Fired (+ continue twist) · 7 Turncoat (secret) · 8 The return (La Bombance). **T Q**
-- [ ] Each ending has its own end screen with an epilogue that **references what the player actually did** (key evidence, actions, who betrayed whom). **T Q**
-- [ ] The campaign simulator reaches **every ending** with at least one scripted strategy, and each ending occurs in ≥ 2% of 1000 runs of its target strategy. **T**
+- [ ] 1 Legal victory · 2 Negotiated peace · 3 Scandal · 4 Custody/trial (incl. the « carbonnade sucrée » and « carbonnade laxative » variants) · 5 Moving out to Wazemmes · 6 Fired (+ continue twist) · 7 Turncoat (secret) · 8 The return (La Bombance). **T Q** — T (engine): tests/unit/checklist.test.js §13.F1 (bots: F3; Q pending)
+- [ ] Each ending has its own end screen with an epilogue that **references what the player actually did** (key evidence, actions, who betrayed whom). **T Q** — T: tests/unit/checklist.test.js §13.F2 (Q pending)
+- [ ] The campaign simulator reaches **every ending** with at least one scripted strategy, and each ending occurs in ≥ 2% of 1000 runs of its target strategy. **T** — balance agent: qa/balance.md, coverage.test.js
 
 ### G. Scenario coherence (automated invariants + story review)
-- [ ] Invariants checked on every simulated night and campaign: the police only arrive after a call or a scheduled event; nobody is in two places; a cleared table doesn't come back without a tip-off/return event; evidence refers to real events (time, place, table); Risk only rises from witnessed acts; a closed shop stays closed until its event; Klaas's notebook only logs what he could see. **T**
-- [ ] Dialogue/event text only references facts the player has unlocked (no spoilers, no "as you know…" about something unseen). Flags are checked by a content linter. **T**
+- [x] Invariants checked on every simulated night and campaign: the police only arrive after a call or a scheduled event; nobody is in two places; a cleared table doesn't come back without a tip-off/return event; evidence refers to real events (time, place, table); Risk only rises from witnessed acts; a closed shop stays closed until its event; Klaas's notebook only logs what he could see. **T** — tests/unit/invariants.test.js, campaign.test.js, checklist.test.js §13.G1
+- [x] Dialogue/event text only references facts the player has unlocked (no spoilers, no "as you know…" about something unseen). Flags are checked by a content linter. **T** — tests/unit/content-lint.test.js, checklist.test.js §13.G2
 - [ ] Story bible review: names, places, timeline and character traits are consistent across all text (design agent review, logged in `qa/coherence.md`). **Q**
 - [x] No real restaurant name anywhere (grep test against the section 0 list). **T** _(v0.2: tests/unit/names.test.js)_
 
@@ -286,15 +286,15 @@ The campaign simulator plays 1000 seeded campaigns per strategy bot. Targets:
 | Illegal only, stealthy (dark, after 01:00, no witnesses) | ≤ 40% custody. Scandal reachable. Association low |
 | Mixed, smart | best average score. Every ending except "passive" ones reachable |
 | Diplomat (association + dialogue) | negotiated peace ≥ 40% |
-- [ ] Targets met, numbers logged in `qa/balance.md` at each milestone with the knobs changed. **T**
-- [ ] No dominant action: removing any single action shifts the mixed bot's win rate by < 25 points. **T**
+- [ ] Targets met, numbers logged in `qa/balance.md` at each milestone with the knobs changed. **T** — balance agent: qa/balance.md
+- [ ] No dominant action: removing any single action shifts the mixed bot's win rate by < 25 points. **T** — balance agent (no test yet)
 - [ ] Human feel: Lucas's playtest notes addressed. **L**
 
 ### I. Presentation and tech
 - [x] Cute low-poly cast and street (stepped gables, carriage door, La Bombance, the cat, the dachshund). **Q** _(art v0.3–v0.5: QA in Chrome, screenshots in `qa/art-v0.5/`)_
 - [x] Audio: crowd, chairs on cobbles, exhaust hum, 22:00 bell, mute (M). **Q** _(art v0.3; v0.5 adds sfx + day/hall loops)_
 - [ ] French only, satirical tone, Ch'ti touches. Copy proofread. **Q L**
-- [ ] 60 fps on a laptop iGPU (perf test logs the frame time). Loads in < 5 s. Bundle < 3 MB. **T Q**
+- [ ] 60 fps on a laptop iGPU (perf test logs the frame time). Loads in < 5 s. Bundle < 3 MB. **T Q** — T: tests/e2e/checklist-perf.e2e.js (bundle 1.1 MB, title 147 ms in CI, frame time logged; 60 fps = Q)
 - [x] CI green (unit + e2e + campaign simulator smoke). Deploy auto from main. **T** _(v0.4: .github/workflows/ci.yml runs vitest, `npm run sim -- --runs 20`, Playwright; CT 105 deploys main every 2 min)_
 
 ### Release tasks (done by the design agent when v1.0 lands)
