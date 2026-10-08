@@ -30,3 +30,20 @@ Perf: 0.3–1.3 ms per simulated night, so 1000 14-day campaigns × 6 bots ≈ 1
 4. **Stealthy bucket has no measurable effect** (sleep the same as passive, risk ~5). Expected at this stage: the stealth toolbox comes in v0.5.
    Make sure the stealthy bot has *impact* then (target: scandal reachable, custody ≤40%).
 5. **The police act 35–50% of the time**: fine as a starting point; corruption must drag it down early and IGPN exposure must lift it.
+
+## 2026-10-08 · first campaign-level run · commit 3d31dd7 (v0.4 engine + full content)
+`npm run sim -- --runs 300` (300 campaigns × 6 bots, 201 s). Invariants: ✅ no violation.
+
+| bot | outcome | §13.H target | verdict |
+|---|---|---|---|
+| passive | 100% moving out | ≥ 90% defeat | ✅ |
+| legal careful | **100% legal victory**, dossier 100, asso 100 | legal victory 35–60%, never custody | ❌ far too easy |
+| illegal reckless | 100% custody (median night 5) | ≥ 70% custody | ✅ (maybe too deterministic) |
+| illegal stealthy | 79% moving out, 9% custody, 5% legal, 6% the return | ≤ 40% custody, scandal reachable | ⚠️ custody OK, **scandal 0%**, sleep collapses to 3 |
+| mixed smart | **95% turncoat** | best average score | ❌ the secret ending dominates |
+| diplomat | 58% the return, 42% legal victory | negotiated peace ≥ 40% | ❌ **peace 0%** |
+
+Never reached: endings **fired, scandal, negotiated_peace**. 9/64 actions (the whole mayor/Lescaut chain, internal police investigation (IGPN) report, Lemaire transfer, lawyer + formal notice, Tatie's emails, the uritrottoir follow-up), 2/27 events, 19/42 counter-moves (**all 12 Tatie emails**, the bins, the Colette call…), and 34/120 dialogue lines (the sim may not surface dialogue: check).
+
+Diagnosis to confirm: dossier/asso still saturate (see the night baseline findings 1–2); "the return" should be an epilogue variant of a win, not an outcome that competes with it; the turncoat condition is too loose for a *secret* ending; the peace/scandal conditions are unreachable; the Tatie email triggers never match.
+→ Assigned to the balance agent.
