@@ -41,7 +41,7 @@ export function initialState(seed, cfg = CONFIG) {
     witnessMemories: [],
     police: { fatigue: 0, serialComplainer: false, benaliTransferred: false, lemaireTransferred: false },
     igpn: null,
-    seen: { events: [], dialogue: [], countermoves: [], actions: [] },
+    seen: { events: [], dialogue: [], countermoves: [], actions: [], tutorial: [], media: [] },
     counts: { actions: {}, events: {}, dialogue: {}, countermoves: {}, koddex: {} },
     cards: [],
     lastCard: null,
@@ -56,13 +56,17 @@ export function initialState(seed, cfg = CONFIG) {
   };
 }
 
-export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null } = {}) {
+// narrative (facultatif) : le module src/sim/narrative.js (tutoriel, fil du téléphone, manchettes, scène du J14, unes de fin).
+// Sans lui (tests, simulateur), ces textes sont simplement absents.
+export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, narrative = null } = {}) {
   const K = normalizeContent(content ?? {});
   const C = cfg.CAMPAIGN;
   const S = save ? structuredClone(save) : initialState(seed, cfg);
   if (S.version !== SAVE_VERSION) throw new Error(`sauvegarde v${S.version} incompatible (attendu v${SAVE_VERSION})`);
   const rng = createRng(1);
   rng.setState(S.rng);
+  S.seen.tutorial ??= [];
+  S.seen.media ??= [];
   // Ensemble des drapeaux, mis en cache (les conditions sont évaluées très souvent) ; invalidé à chaque modification
   let flagSet = null;
   const flags = () => (flagSet ??= new Set(S.flags));
@@ -208,7 +212,27 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null } 
     const choices = card.type === 'event' && src.choices?.length
       ? src.choices.map((ch, i) => ({ i, label: ch.label, available: c.check(ch.requires, false) }))
       : [{ i: 0, label: 'OK', available: true }];
-    return { ...card, data: src, choices };
+    const scene = card.type === 'event' && src.scene && narrative ? narrative.commissionScene(S, src) : undefined;
+    return { ...card, data: src, choices, scene };
+  };
+
+  // ---------- narration (si narrative.js est fourni) ----------
+  c.introCards = () => narrative?.introCards() ?? [];
+  // Tutoriel : le moteur mémorise ce qui a été montré (S.seen.tutorial). Renvoie { id, text } ou null.
+  c.tutorial = (trigger) => {
+    const t = narrative?.tutorialPrompt(trigger, { ...S, seenTutorial: S.seen.tutorial });
+    if (t) S.seen.tutorial.push(t.id);
+    return t ?? null;
+  };
+  // Fil du téléphone du jour (non lus). c.readMedia(feed, id) : marque lu et applique ses effets.
+  c.mediaFeed = () => narrative?.mediaFeed(S, S.day, { seen: S.seen.media }) ?? { whatsapp: [], press: [], social: [] };
+  c.readMedia = (feed, id) => {
+    const m = (K.MEDIA?.[feed] ?? []).find((x) => x.id === id);
+    if (!m || S.seen.media.includes(id)) return false;
+    S.seen.media.push(id);
+    c.note('media', { feed, id });
+    apply({ ...m.effects, setFlags: [...(m.effects?.setFlags ?? []), ...(m.setFlags ?? [])] }, 'story', id);
+    return true;
   };
 
   c.resolveCard = (i = 0) => {
@@ -376,7 +400,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null } 
 
   // ---------- nuit ----------
   function enemyMemories() { return S.witnessMemories.filter((m) => !m.ally && S.day - m.day <= 7).length; }
-  c.createNight = () => {
+  c.createNight = ({ narrator } = {}) => {
     if (S.step !== 'night') throw new Error(`nuit hors de la nuit (${S.step})`);
     const reversal = S.hidden.hostility >= C.reversal.minHostility && rng.chance(C.reversal.chance);
     const sim = createSim({
@@ -390,6 +414,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null } 
         benaliTransferred: S.police.benaliTransferred, lemaireTransferred: S.police.lemaireTransferred,
         flags: S.flags, earlyEndings: c.gateOpen(), reversal, enemyMemories: enemyMemories(),
       },
+      narrator,
     });
     sim.campaignDay = S.day;
     sim.contentActions = [];
@@ -524,6 +549,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null } 
     const summary = sim.summary();
     S.nights.push({ day: S.day, reason: N.endReason, sleep: Math.round(N.sleep), risk: Math.round(N.risk), evidence: N.evidence.length, gained: Math.round(gained * 10) / 10, police: summary.police.length, witnesses: N.witnessMemories.length });
     S.lastNight = summary;
+    S.lastHeadline = narrative ? narrative.recapHeadline(summary, sim.state) : null;
     c.note('night-end', { reason: N.endReason, evidence: N.evidence.length });
     if (c.isSaturday()) setFlag(S.day === 6 ? 'saturday1_done' : 'saturday2_done');
     if (N.endReason === 'custody' && c.gateOpen()) { setFlag('custody'); S.pendingEnding = S.pendingEnding ?? 'custody'; }
@@ -576,6 +602,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null } 
     S.resumeStep = S.step;
     S.ending = { id: e.id, title: e.title, early: how === 'early', day: S.day, canContinue: !!e.continue && !c.has('unemployed'), continueLabel: e.continue?.label };
     S.epilogue = (e.epilogue ?? []).filter((p) => c.check(p.when, false)).map((p) => fill(p.text));
+    S.endingMedia = narrative ? { front: narrative.mediaEnding(e.id, S), feed: narrative.mediaEndingFeed(e.id, S) } : null;
     S.counts.endings = { [e.id]: 1 };
     c.note('ending', { id: e.id, early: how === 'early' });
     S.step = 'ended';

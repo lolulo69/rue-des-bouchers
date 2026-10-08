@@ -13,6 +13,8 @@ export const ENGINE_SET_FLAGS = [
 ];
 
 const conds = (x) => [x.when, x.requires, ...(x.whenAny ?? [])].filter(Boolean);
+// Répliques de scène (J14 : event.scene = [{ speaker, when, text }]) : conditions et locuteurs vérifiés aussi
+const sceneConds = (x) => (x.scene ?? []).map((p) => p.when).filter(Boolean);
 const effectsOf = (x) => [x.effects, x.witnessed?.effects, x.continue?.effects, ...(x.choices ?? []).map((c) => c.effects)].filter(Boolean);
 
 // Tous les textes affichés d'une entrée (pour la recherche de noms réels)
@@ -52,6 +54,8 @@ export function lintContent(K, { cfg = CONFIG, realNames = [], incomplete = fals
     for (const c of conds(x)) used.push(...(c.flags ?? []), ...(c.notFlags ?? []));
     for (const ch of x.choices ?? []) if (ch.requires) used.push(...(ch.requires.flags ?? []), ...(ch.requires.notFlags ?? []));
     for (const p of x.epilogue ?? []) if (p.when) used.push(...(p.when.flags ?? []), ...(p.when.notFlags ?? []));
+    for (const w of sceneConds(x)) used.push(...(w.flags ?? []), ...(w.notFlags ?? []));
+    for (const p of x.scene ?? []) if (p.speaker && !speakers.has(p.speaker)) errors.push(`${where} : réplique de scène, locuteur "${p.speaker}" absent`);
     for (const e of effectsOf(x)) used.push(...(e.setFlags ?? []), ...(e.clearFlags ?? []));
     if (x.unlocks) used.push(x.unlocks);
     for (const f of used) if (!declared.has(f)) errors.push(`${where} : drapeau "${f}" non déclaré`);

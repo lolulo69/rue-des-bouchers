@@ -1,4 +1,6 @@
 // Police municipale : patrouilles à personnalité, roster caché, tuyau, "c'est encore vous", complaisance.
+import { fmt as fmtMin } from './time.js';
+
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
 export function patrolOnDuty(sim) {
@@ -17,7 +19,7 @@ export function callPolice(sim, { asso = false } = {}) {
   const { POLICE } = sim.cfg;
   const S = sim.state;
   if (S.police) {
-    sim.log('Police : « Une patrouille est déjà en route, monsieur. »');
+    sim.log(sim.say('police', { outcome: 'busy', patrolId: S.police.patrolId, entry: S.police }, 'Police : « Une patrouille est déjà en route, monsieur. »'));
     return { ok: false, reason: 'busy' };
   }
   S.calls++;
@@ -30,7 +32,7 @@ export function callPolice(sim, { asso = false } = {}) {
     S.serialComplainer = true;
     sim.note('call', { callId, asso, ignored: true });
     S.policeLog.push({ callId, calledAt: S.min, asso, outcome: 'ignored' });
-    sim.log('Police : « Ah, c\'est encore vous… On note, monsieur. » Personne ne viendra.', 'bad');
+    sim.log(sim.say('police', { outcome: 'ignored', entry: S.policeLog.at(-1) }, 'Police : « Ah, c\'est encore vous… On note, monsieur. » Personne ne viendra.'), 'bad');
     return { ok: false, reason: 'ignored' };
   }
   const patrolId = patrolOnDuty(sim);
@@ -51,9 +53,9 @@ export function callPolice(sim, { asso = false } = {}) {
     tipoffAt: sim.rng.chance(tipoffP) ? Math.max(S.min, arriveAt - patrol.tipoffLead) : null,
     tipped: [],
   };
-  sim.log(asso
+  sim.log(sim.say('police', { outcome: 'call', patrolId, entry: S.police, asso }, asso
     ? 'Police : « Ah, pour l\'Association… On fait au plus vite. » (Le bloc saura qui a appelé.)'
-    : `Police municipale : « On envoie quelqu'un. » (appel n°${S.calls})`);
+    : `Police municipale : « On envoie quelqu'un. » (appel n°${S.calls})`));
   return { ok: true, police: S.police };
 }
 
@@ -84,7 +86,7 @@ function resolve(sim, P) {
   S.policeLog.push(entry);
   if (!inf.length) {
     entry.outcome = P.tipped.length ? 'tipoff' : 'nothing';
-    sim.log(`${P.patrolName} devant ${rest.name} : « Tout est en ordre ici, monsieur. »${P.tipped.length ? ' Comme par hasard.' : ''}`);
+    sim.log(sim.say('police', { outcome: entry.outcome, patrolId: P.patrolId, entry }, `${P.patrolName} devant ${rest.name} : « Tout est en ordre ici, monsieur. »${P.tipped.length ? ' Comme par hasard.' : ''}`));
     return entry;
   }
   const p = clamp(
@@ -105,7 +107,7 @@ function resolve(sim, P) {
     rest.compliance = Math.max(rest.compliance, POLICE.complianceAfterAct);
     for (const t of S.tables) if (t.restId === rest.id && t.out && t.clearAt > sim.close) t.clearAt = Math.max(S.min + 1, sim.close);
     entry.detail = [cleared && `${cleared} table(s) rentrée(s)`, trimmed && `${trimmed} ramenée(s) à ${RULES.maxPeoplePerTable}`, moved && `${moved} recalée(s) hors du passage`].filter(Boolean).join(', ');
-    sim.log(`PV pour ${rest.name} (${P.patrolName}) : ${entry.detail}.`, 'good');
+    sim.log(sim.say('police', { outcome: 'act', patrolId: P.patrolId, entry }, `PV pour ${rest.name} (${P.patrolName}) : ${entry.detail}.`), 'good');
     if (P.patrolId === 'benali' && ++S.benaliActs >= POLICE.patrols.benali.transferAfterActs && !S.benaliTransferred) {
       S.benaliTransferred = true;
       sim.log('Rumeur : l\'agent Benali serait muté. « Trop zélé. »', 'bad');
@@ -116,12 +118,12 @@ function resolve(sim, P) {
     const pos = sim.restCenter(rest);
     const byKlaas = sim.klaasCanSee(pos);
     if (byKlaas || !S.sleeping) {
-      if (byKlaas) sim.note('klaas-note', { about: 'complaisance', pos });
+      if (byKlaas) { sim.note('klaas-note', { about: 'complaisance', pos }); sim.klaasNote({ about: 'complaisance', time: fmtMin(S.min), rest: rest.name, patrol: P.patrolName }, pos); }
       sim.addEvidence({
         type: 'complaisance', restId: rest.id, callId: P.callId, quality: 1, value: EVIDENCE.complaisanceValue, byKlaas, pos,
         text: `${P.patrolName} chez ${rest.name} : café offert, 0 PV (${inf.length} infraction(s) visibles)${byKlaas ? ' · noté par Klaas' : ''}`,
       });
-      sim.log(`${P.patrolName} prend un café chez ${rest.name}… 0 PV. Noté dans le dossier (complaisance).`, 'bad');
+      sim.log(sim.say('police', { outcome: 'complaisance', patrolId: P.patrolId, entry }, `${P.patrolName} prend un café chez ${rest.name}… 0 PV. Noté dans le dossier (complaisance).`), 'bad');
     } else {
       sim.log(`${P.patrolName} prend un café chez ${rest.name}… et personne n'était là pour le noter.`, 'bad');
     }
@@ -157,7 +159,7 @@ export function updatePolice(sim) {
   if (P.phase === 'pending' && S.min >= P.enterAt) {
     P.phase = 'walking';
     sim.klaasAlert(); // une patrouille dans la rue : Klaas prend ses jumelles
-    sim.log('Une patrouille entre dans la rue.');
+    sim.log(sim.say('police', { outcome: 'arrive', patrolId: P.patrolId, entry: P }, 'Une patrouille entre dans la rue.'));
   }
   if (P.phase === 'walking' && S.min >= P.arriveAt) {
     resolve(sim, P);

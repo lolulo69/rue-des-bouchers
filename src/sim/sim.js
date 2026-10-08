@@ -16,7 +16,9 @@ const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 // carry : ce que la campagne apporte à la nuit (stats, police, drapeaux…). Sans carry : une soirée isolée (v0.2).
 //   { asso, risk, hostility, corruption, calls, serialComplainer, benaliTransferred, lemaireTransferred,
 //     flags: [], earlyEndings: bool, reversal: bool, enemyMemories: n }
-export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry = {} } = {}) {
+// narrator(kind, sim, args) → texte ou null : la narration (src/sim/narrative.js) injectée par main.js. Sans narrateur
+// (tests, simulateur), les textes par défaut ci-dessous. Elle doit utiliser son propre RNG pour ne rien changer à la nuit.
+export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry = {}, narrator = null } = {}) {
   const rng = createRng(seed);
   const dayCfg = cfg.DAYS[day] ?? cfg.DAYS.mon;
   const { RULES, NOISE, SLEEP, EVIDENCE, WAITER, WITNESS, BUCKET, RISK, ASSO, ANCHORS, ZONES, STREET, DOG, DISGUISE, POLICE, CAMPAIGN } = cfg;
@@ -112,7 +114,19 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
     },
 
     // ---------- sorties ----------
-    log(text, cls = '') { sim.events.push({ type: 'log', min: S.min, text, cls }); },
+    log(text, cls = '') { if (text) sim.events.push({ type: 'log', min: S.min, text, cls }); },
+    // Texte narratif (narrator) ou texte par défaut
+    say(kind, args, fallback) {
+      if (!narrator) return fallback;
+      try { return narrator(kind, sim, args) ?? fallback; } catch { return fallback; }
+    },
+    // Une entrée du carnet de Klaas, s'il peut voir `pos` (narrateur seulement)
+    klaasNote(event, pos) {
+      if (!narrator || !sim.klaasAwake()) return;
+      const det = klaasDetection(sim, dist3(ANCHORS.klaasWindow, pos));
+      const text = sim.say('klaas', { event, detection: det }, null);
+      if (text) sim.log(text);
+    },
     note(type, data = {}) { S.journal.push({ t: S.min, type, ...data }); },
     drainEvents() { const e = sim.events; sim.events = []; return e; },
 
@@ -162,6 +176,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
       S.ended = true;
       S.endReason = reason;
       sim.note('end', { reason });
+      sim.log(sim.say('end', { reason }, null));
       sim.events.push({ type: 'end', reason });
     },
 
@@ -212,6 +227,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
     summary: () => buildSummary(sim),
   };
 
+  const tipCtx = (tip) => ({ time: fmt(tip.tippedAt), tipTime: fmt(tip.tippedAt), arriveTime: fmt(tip.arrivedAt), returnTime: fmt(tip.returned ?? tip.returnAt), rest: sim.rest(tip.restId).name, n: tip.tableIds.length });
   function returnTable(t) {
     const tip = S.tipoffs.findLast((x) => x.tableIds.includes(t.id));
     t.hiddenUntil = null;
@@ -229,6 +245,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
       const pos = sim.restCenter(r);
       if (sim.klaasCanSee(pos)) {
         sim.note('klaas-note', { about: 'tipoff', pos });
+        sim.klaasNote({ about: 'tipoff', ...tipCtx(tip) }, pos);
         sim.addEvidence({
           type: 'tipoff', restId: r.id, tipoffId: tip.id, quality: 1, value: EVIDENCE.tipoffValue, byKlaas: true, pos,
           text: `Carnet de Klaas : ${r.name} rentre ses tables à ${fmt(tip.tippedAt)}, police à ${fmt(tip.arrivedAt)}, tout ressort à ${fmt(S.min)}`,
@@ -340,22 +357,21 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
 
   function askWaiter() {
     const r = sim.rest('bernadette');
-    if (S.min < close) { sim.log(`Le serveur : « Il est pas encore ${RULES.terraceCloseHour}h, monsieur. On rentre à ${RULES.terraceCloseHour}h. »`); return { ok: false, reason: 'early' }; }
-    if (!sim.waiterOnDuty()) { sim.log('Le serveur est parti. Il ne reste que Dédé, qui fait semblant de ne pas te voir.'); return { ok: false, reason: 'offduty' }; }
-    if (S.min < S.waiterReadyAt) { sim.log('Le serveur : « Je vous ai dit, je vais voir avec le patron… »'); return { ok: false, reason: 'cooldown' }; }
+    const said = (result, text, cls = '') => { sim.log(sim.say('waiter', { result }, text), cls); return result; };
+    if (S.min < close) return said({ ok: false, reason: 'early' }, `Le serveur : « Il est pas encore ${RULES.terraceCloseHour}h, monsieur. On rentre à ${RULES.terraceCloseHour}h. »`);
+    if (!sim.waiterOnDuty()) return said({ ok: false, reason: 'offduty' }, 'Le serveur est parti. Il ne reste que Dédé, qui fait semblant de ne pas te voir.');
+    if (S.min < S.waiterReadyAt) return said({ ok: false, reason: 'cooldown' }, 'Le serveur : « Je vous ai dit, je vais voir avec le patron… »');
     const out = S.tables.filter((t) => t.restId === r.id && t.out);
-    if (!out.length) { sim.log('Le serveur : « C\'est déjà rentré, monsieur. Bonne nuit ! »'); return { ok: false, reason: 'none' }; }
+    if (!out.length) return said({ ok: false, reason: 'none' }, 'Le serveur : « C\'est déjà rentré, monsieur. Bonne nuit ! »');
     const p = clamp(WAITER.base + WAITER.complianceWeight * r.compliance + WAITER.assoWeight * (S.asso / 100) - WAITER.hostilityWeight * (S.hostility / 100), 0.05, 0.95);
     const ok = rng.chance(p);
     S.waiterReadyAt = S.min + WAITER.cooldownMinutes;
     S.waiterAsks.push({ time: S.min, ok });
     if (ok) {
       out.forEach((t, i) => { t.clearAt = S.min + 1 + i * 1.5; t.pendingBy = 'waiter'; });
-      sim.log('Le serveur soupire : « OK, OK… je rentre tout. » (demande légale et polie)', 'good');
-    } else {
-      sim.log(S.blocKnows ? 'Le serveur, gêné : « Le patron sait que c\'est vous qui appelez la police… »' : 'Le serveur revient : « Le patron dit que les clients finissent leur verre. »', 'bad');
+      return said({ ok }, 'Le serveur soupire : « OK, OK… je rentre tout. » (demande légale et polie)', 'good');
     }
-    return { ok };
+    return said({ ok }, S.blocKnows ? 'Le serveur, gêné : « Le patron sait que c\'est vous qui appelez la police… »' : 'Le serveur revient : « Le patron dit que les clients finissent leur verre. »', 'bad');
   }
 
   function bucket() {
@@ -381,13 +397,14 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
     for (const w of seen) {
       S.witnessMemories.push({ time: S.min, who: w.id, kind: w.kind, ally: !!w.ally, name: w.name, act: label, filmed: w.filmed });
       sim.note('witness', { act: label, who: w.id, kind: w.kind, pos: w.pos, filmed: w.filmed });
-      if (w.kind === 'klaas') sim.note('klaas-note', { about: label, pos });
+      if (w.kind === 'klaas') { sim.note('klaas-note', { about: label, pos }); sim.klaasNote({ about: 'pilou', act: label, time: fmt(S.min) }, pos); }
     }
     return seen;
   };
   // Conséquences d'un acte vu : Risque × poids des témoins (plafonné), Asso si un allié a vu ou si ça a été filmé.
   sim.punish = (seen, act, baseRisk, assoPenalty = 0) => {
-    if (!seen.length) { sim.log('Personne n\'a rien vu… a priori.', 'good'); return 0; }
+    if (!seen.length) { sim.log(sim.say('witness', {}, 'Personne n\'a rien vu… a priori.'), 'good'); return 0; }
+    if (narrator) for (const w of seen) sim.log(sim.say('witness', { witness: w }, null), 'bad');
     const filmed = seen.some((w) => w.filmed);
     const weight = Math.min(WITNESS.riskCap, seen.reduce((s, w) => s + w.weight + (w.filmed ? WITNESS.customers.filmWeight : 0), 0));
     const names = [...new Set(seen.map((w) => (w.kind === 'customers' ? 'des clients' : w.name)))];

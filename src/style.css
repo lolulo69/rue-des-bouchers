@@ -59,3 +59,5 @@ kbd { background: #ffffff1a; border: 1px solid #ffffff33; border-radius: 4px; pa
 .fb-speaker { font-weight: 700; color: #e9c46a; margin: 0; }
 .fb-term { background: #050805; color: #8ac926; font-family: ui-monospace, monospace; padding: 10px 14px; border-radius: 8px; }
 .fb-notice { color: #8ac926; }
+#log div.tuto { border-color: #4cc9f0; }
+#log div.bark { border-color: #ffffff44; font-style: italic; opacity: .85; }

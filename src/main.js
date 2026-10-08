@@ -5,6 +5,8 @@ import { buildWorld, person, mat } from './world.js';
 import { RULES, SKY, STREET, NOISE, EVIDENCE, INTERACT, ZONES, POLICE } from './config.js';
 import { createSim, makeConfig, fmt, createCampaign, contentFromGlob, SAVE_VERSION } from './sim/index.js';
 import { mountFallbackUI } from './dayFallback.js';
+import * as narrative from './sim/narrative.js';
+import { createRng } from './sim/rng.js';
 
 const $ = (id) => document.getElementById(id);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -22,13 +24,26 @@ const content = contentFromGlob(import.meta.glob('./content/*.js', { eager: true
 const UI = Object.values(import.meta.glob('./ui/index.js', { eager: true }))[0];
 const loadSave = () => { try { return JSON.parse(localStorage.getItem(SAVE_KEY)); } catch { return null; } };
 const storeSave = (c) => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(c.save())); } catch { /* stockage indisponible */ } };
-const openCampaign = (save) => { try { return createCampaign({ content, cfg, save }); } catch { return null; } };
+const openCampaign = (save) => { try { return createCampaign({ content, cfg, save, narrative }); } catch { return null; } };
+
+// Narration de la nuit (src/sim/narrative.js), avec son propre RNG : le texte ne change jamais l'issue de la nuit.
+const narrRng = createRng((SEED ^ 0x5bd1e995) >>> 0);
+function narrator(kind, s, a) {
+  switch (kind) {
+    case 'police': return narrative.policeLine(a.outcome, a.patrolId, { ...narrative.nightCtx.police(s, a.entry ?? {}), asso: !!a.asso }, narrRng);
+    case 'waiter': return narrative.pickNightLine('waiter', s, narrRng, { result: a.result, metWaiter: !!campaign?.has('met_waiter') });
+    case 'witness': return narrative.pickNightLine('witness', s, narrRng, a.witness ? { witness: a.witness } : {});
+    case 'end': return narrative.pickNightLine('end', s, narrRng, { reason: a.reason });
+    case 'klaas': { const e = narrative.klaasEntry(a.event, a.detection, narrRng); return e ? `📓 Carnet de Klaas : ${e.text}` : null; }
+    default: return null;
+  }
+}
 let campaign = null;
 {
   const saved = loadSave();
   if (params.get('mode') === 'night' && saved?.step === 'night') campaign = openCampaign(saved);
 }
-const sim = campaign ? campaign.createNight() : createSim({ seed: SEED, day: params.get('day') || 'mon', cfg });
+const sim = campaign ? campaign.createNight({ narrator }) : createSim({ seed: SEED, day: params.get('day') || 'mon', cfg, narrator });
 const S = sim.state;
 const CLOSE = sim.close;
 const W = STREET.halfWidth;
@@ -244,6 +259,33 @@ function log(msg, cls = '', min = S.min) {
   while (box.children.length > 5) box.firstChild.remove();
   setTimeout(() => el.remove(), 8000);
 }
+// Tutoriel (campagne) : chaque déclencheur ne s'affiche qu'une fois (mémorisé dans la sauvegarde)
+const tutoDone = new Set();
+function tuto(trigger) {
+  if (!campaign || tutoDone.has(trigger)) return;
+  tutoDone.add(trigger);
+  const t = campaign.tutorial(trigger);
+  if (t) log(`💡 ${t.text}`, 'tuto');
+}
+// Cloche de 22h (21:55, 22:00, 22:05) et bribes de terrasse quand Pilou est près des tables
+const bell = { before: false, strike: false, after: false, outAt22: null };
+let nextBark = 20;
+function ambientLines(dt) {
+  const m = S.min;
+  if (!bell.before && m >= CLOSE - 5) { bell.before = true; log(narrative.pickNightLine('bell:before', sim, narrRng)); }
+  if (!bell.strike && m >= CLOSE) { bell.strike = true; bell.outAt22 = S.tables.filter((t) => t.out).length; log(narrative.pickNightLine('bell:strike', sim, narrRng)); tuto('bell_22'); }
+  if (!bell.after && m >= CLOSE + 5) { bell.after = true; log(narrative.pickNightLine('bell:after', sim, narrRng, { outAt22: bell.outAt22 })); }
+  nextBark -= dt;
+  if (nextBark <= 0) {
+    nextBark = 20 + narrRng.next() * 20;
+    const near = S.tables.some((t) => t.out && Math.hypot(t.x - player.pos.x, t.z - player.pos.z) < (player.loc === 'apt' ? 10 : 6));
+    if (near) log(narrative.pickNightLine('bark', sim, narrRng), 'bark');
+  }
+  if (S.tipoffs.length) tuto('first_tipoff');
+  if (S.policeLog.some((p) => p.outcome === 'complaisance')) tuto('first_complaisance');
+  if (S.witnessMemories.length) tuto('first_witness');
+}
+
 function flash() {
   const f = $('flash');
   f.classList.remove('on'); void f.offsetWidth; f.classList.add('on');
@@ -264,6 +306,9 @@ function updateHud() {
   const it = interaction();
   if (S.sleeping) hints.push('Pilou essaie de dormir…  [E] se relever');
   else if (it) hints.push(`[E] ${it.label}`);
+  if (it?.label === 'Monter chez Pilou') tuto('near_door');
+  if (it?.label?.startsWith('Essayer de dormir')) tuto('bed');
+  if (nearWindow()) { tuto('at_window'); if (S.min >= CLOSE) tuto('near_bucket'); }
   if (nearWindow() && !S.sleeping) hints.push('[P] photo · [F] seau d\'eau (illégal)');
   $('prompt').textContent = hints.join('   ');
   // À la fenêtre : qui pourrait me voir ?
@@ -294,7 +339,10 @@ function photo() {
     ...officers.filter((o) => o.visible).map((o) => o.userData.hit),
   ];
   const hit = raycaster.intersectObjects(hits, false)[0];
-  sim.act({ type: 'photo', target: hit?.object.userData.target, distance: hit?.distance, fromWindow: player.loc === 'apt', noiseDb });
+  const target = hit?.object.userData.target;
+  const r = sim.act({ type: 'photo', target, distance: hit?.distance, fromWindow: player.loc === 'apt', noiseDb });
+  if (r.ok) { tuto('first_photo'); if (r.found.some((f) => f.quality < 0.6)) tuto('first_photo_blurry'); }
+  else if (target?.kind === 'table' && sim.encroachment(sim.table(target.id)) > 0) tuto('corridor_needs_measure');
 }
 
 // ---------- Interactions (la même portée sert à l'invite et à l'action) ----------
@@ -303,7 +351,7 @@ const nearWindow = () => player.loc === 'apt' && player.pos.x > apt.x1 - 1.6 && 
 function interaction() {
   if (player.loc === 'street') {
     if (flat(player.pos, ANCHORS.streetDoor) < INTERACT.door) return { label: 'Monter chez Pilou', act: () => teleport('apt') };
-    if (sim.waiterOnDuty() && flat(player.pos, sim.waiterPos()) < INTERACT.waiter) return { label: 'Demander au serveur de rentrer les tables', act: () => sim.act({ type: 'waiter' }) };
+    if (sim.waiterOnDuty() && flat(player.pos, sim.waiterPos()) < INTERACT.waiter) return { label: 'Demander au serveur de rentrer les tables', act: () => { tuto('first_waiter'); sim.act({ type: 'waiter' }); } };
   } else {
     if (flat(player.pos, world.aptDoor) < INTERACT.aptDoor) return { label: 'Descendre dans la rue', act: () => teleport('street') };
     if (flat(player.pos, world.bed) < INTERACT.bed) return { label: S.sleeping ? 'Se relever' : 'Essayer de dormir (accélère la nuit)', act: toggleSleep };
@@ -329,6 +377,8 @@ function openOverlay(name) {
   $(name).classList.remove('hidden');
   if (name === 'dossier') renderDossier();
   if (name === 'nightmenu') renderNightMenu();
+  if (name === 'phone') tuto('first_phone');
+  if (name === 'dossier') tuto('first_dossier');
   if (name === 'phone') {
     const P = S.police;
     $('phone-status').textContent = P ? `Patrouille ${P.phase === 'pending' ? 'en route' : 'sur place'} (appel de ${fmt(P.calledAt)})` : `${S.calls} appel(s) à la police ce soir`;
@@ -355,6 +405,7 @@ for (const b of document.querySelectorAll('#phone button')) {
   b.addEventListener('click', () => {
     const c = b.dataset.call;
     closeOverlay();
+    if (c === 'police' || c === 'police-asso') tuto('first_police_call');
     if (c === 'police') sim.act({ type: 'police' });
     else if (c === 'police-asso') sim.act({ type: 'police', asso: true });
     else if (c === 'asso') sim.act({ type: 'asso' });
@@ -373,6 +424,7 @@ function startNight() {
   started = true;
   timer.update();
   log(`${nightLabel().split(' (')[0]}, le soir. Les terrasses doivent rentrer à ${RULES.terraceCloseHour}h. En théorie.`);
+  tuto('night_start');
   lock();
 }
 $('start').addEventListener('click', startNight);
@@ -400,7 +452,7 @@ function showDay() {
   dayUI.show();
 }
 function newCampaign() {
-  campaign = createCampaign({ seed: SEED, content, cfg });
+  campaign = createCampaign({ seed: SEED, content, cfg, narrative });
   storeSave(campaign);
   dayUI?.destroy?.();
   dayUI = null;
@@ -442,7 +494,7 @@ addEventListener('keydown', (e) => {
   if (overlay || e.repeat) return keys.add(e.code);
   keys.add(e.code);
   if (e.code === 'KeyE') interaction()?.act();
-  else if (e.code === 'KeyL') ghost.visible = !ghost.visible;
+  else if (e.code === 'KeyL') { ghost.visible = !ghost.visible; tuto('legal_view_toggle'); }
   else if (S.sleeping) return;
   else if (e.code === 'KeyP') photo();
   else if (e.code === 'KeyB') sim.act({ type: 'db', noiseDb, fromWindow: player.loc === 'apt' });
@@ -591,6 +643,7 @@ function update(dt) {
   $('pause').classList.toggle('hidden', !started || S.ended || !!overlay || locked || NOLOCK);
   if (!running) return;
   move(dt);
+  ambientLines(dt);
   sim.tick(dt * RULES.gameMinutesPerSecond * (S.sleeping ? RULES.sleepTimeMultiplier : 1));
   camPos.set(player.pos.x, player.pos.y + 1.65, player.pos.z);
   noiseDb = sim.noiseAt(camPos, player.loc === 'apt');
