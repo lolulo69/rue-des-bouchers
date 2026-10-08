@@ -277,7 +277,7 @@ export const ENDINGS = [
     id: 'fired',
     title: 'Licencié',
     priority: 90,
-    when: { day: [5, 14], stats: { job: '<=0' }, notFlags: ['unemployed'] },
+    when: { day: [5, 14], stats: { job: '<=10' }, notFlags: ['unemployed'] }, // « trop bas » (§4) : le minimum d'un matin de Koddex est d'environ +4 par prompt
     continue: {
       label: 'Continuer le combat à plein temps',
       effects: { setFlags: ['unemployed'], sleep: +10 },

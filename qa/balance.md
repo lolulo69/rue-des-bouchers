@@ -140,3 +140,41 @@ Independent re-run after the balance agent's pass 1b. Invariants ✅.
 
 Never reached on this commit: the ending **fired**; actions night_saboter_cuisine, night_laxatif_carbonnade, night_backroom_photo, pm_bloc_fooled; event r_aot_pdf; 4 counter-moves; 23 dialogue lines.
 → Back to the balance agent (fired regression, bots exercising the kitchen sabotages / backroom photo, asso saturation) and the content side (r_aot_pdf).
+
+## 2026-10-08 · balance pass 2 (balance agent) · fired regression, the waiter chain, asso saturation
+`npm run sim -- --runs 1000 --detail` on CT 106, 1000 campaigns × 7 bots (112 s). Invariants ✅. Every action is now used by at least one bot (68/68).
+
+| bot | custody | fired | legal_victory | moving_out | negotiated_peace | scandal | the_return | turncoat | score | sommeil | asso | risque | job | dossier | garde à vue (nuit méd.) | cibles §13.H |
+| passif | · | · | · | 100% | · | · | · | · | 0 | 42 | 40 | 0 | 97 | 12 | – | ✅ ≥ 90 % déménagement / défaite |
+| légal prudent | · | · | 49% | 5% | · | 46% | · | · | 81 | 60 | 78 | 0 | 99 | 50 | – | ✅ victoire légale 35–60 %<br>✅ jamais de garde à vue |
+| illégal imprudent | 100% | · | · | · | · | · | · | · | -20 | 78 | 1 | 95 | 37 | 14 | 5 | ✅ ≥ 70 % garde à vue / procès |
+| illégal discret | 20% | · | · | 47% | · | 25% | 8% | · | 19 | 14 | 14 | 44 | 83 | 25 | 6 | ✅ ≤ 40 % garde à vue<br>✅ scandale atteignable |
+| mixte malin | · | · | 86% | 3% | · | 11% | · | · | 93 | 30 | 77 | 0 | 85 | 55 | – | ✅ meilleur score moyen |
+| diplomate | · | · | · | 15% | 27% | 3% | 41% | 14% | 65 | 68 | 75 | 0 | 100 | 34 | – | ✅ paix négociée ≥ 40 % |
+| tire-au-flanc | · | 41% | 15% | 12% | · | 31% | · | · | 41 | 75 | 73 | 1 | 49 | 40 | – | ✅ licenciement atteignable (≥ 2 %, §13.F) |
+
+### 1 · Fired regression (slacker 0 % → 41 %)
+Cause: since 3b36eac each Koddex item can be picked at most once per morning, and work items rotate on the 4-day `repeatCooldownDays`. A slacker gets one nap (−3) a morning; its other prompts are real work at ≥ +4 each. Once the side projects run out (by day 3), its job climbs back.
+- Slacker bot: one nap a morning + the **least productive** work items (`lazyWork`).
+- `CAMPAIGN.jobDecayPerDay` 6 → 7 (with the lazy slacker: 6 → 0 % fired, 7 → 42 %). Other bots' outcomes are unchanged; their job ends 85–100.
+- Ending `fired`: `job <= 0` → `job <= 10` ("too low", §4). The least a Koddex morning can give is ≈ +4 per prompt, so 0 is only reachable if the day-5 decay lands exactly on it.
+- **CI guard**: `tests/unit/balance.test.js` pins ≥ 2 % fired for the slacker over 30 fixed seeds.
+
+### 2 · The waiter chain (kitchen sabotage, laxative, backroom photo), with their real risks
+Stealthy got the waiter fired in 100 % of runs: customers at the terrace saw the bribe every time, and the bot only looked at Klaas / Seb & Nico.
+- Witness check (`unseen`): none of the act's own witnesses in view, **and at most one table of customers**. Once the waiter is an informant, he no longer counts as a witness *for the bot's decision*; the real witness roll still includes him.
+- When the check passes, the bot weighs the witness penalty × 0.3 (only Dédé / Ghislain / the patrol remain, and it can't see them coming).
+- Stealthy wakes at 00:30 (the waiter leaves at 00:45). It calls the police again once it has an informant, so a patrol is on site for the backroom photo. It wants the kitchen sabotage (25), the laxative (15) and the backroom photo (30), and stops illegal acts at risk 40 (was 60).
+- Reckless talks to the waiter before its other night acts.
+- Result: stealthy waiter informant 52 %, kitchen sabotage 52 %, backroom photo 42 %, custody **20 %** (≤ 40 ✅; 40 % with maxRisk 60). The laxative is reached by reckless (6 %).
+
+### 3 · Asso saturation (legal / mixed 96 → 78)
+- New `ASSO.diminishFrom` = 50: above it, every campaign asso gain (content and night) is worth ×(100 − asso) / (100 − 50). Engine-forced changes are not affected.
+- `CAMPAIGN.assoDecayPerDay` 4 → 5.
+- diminishFrom 60 → asso 86; 50 + decay 5 → **78** (p10/90 76/80). Outcomes didn't move (legal 49 %, mixed 86 %).
+- Side effect: the diplomat's turncoat rose from 6 % to 14 %. A diplomat who gives up now falls under asso 60 more often. It's still deliberate (3 carbonnades + the habitué choice), but if 14 % feels too common, raise the give-up hostility (bot, 70) or lower the ending's `asso < 60`.
+
+### Mixed bot
+`tatie_fake_leak` weight 3 → 5: the fake leak scored exactly 0, so `pm_bloc_fooled` was never reached.
+
+No dominant action (`--ablate mixed`, 1000 runs, base 97 %): `pm_klaas_roster` −13, `pm_klaas_notebook` −12, `pm_heritage` / `pm_press_contact` −4, the rest ≤ 3. Max 13 < 25 ✅.

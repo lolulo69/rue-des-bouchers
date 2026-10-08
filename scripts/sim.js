@@ -120,7 +120,7 @@ console.log(table);
 console.log('\nJamais atteint :');
 for (const [k, ids] of Object.entries(unreached)) console.log(`  ${k} (${ids.length}/${(k === 'actions' ? K.ACTIONS : k === 'events' ? K.EVENTS : k === 'endings' ? K.ENDINGS : k === 'countermoves' ? K.COUNTERMOVES : K.DIALOGUE).length}) : ${ids.slice(0, 25).join(', ')}${ids.length > 25 ? '…' : ''}`);
 if (DETAIL) {
-  const KEY_FLAGS = ['stance_legal', 'stance_dialogue', 'stance_direct', 'corruption_proof', 'press_contacted', 'carbonnade_1', 'carbonnade_3', 'bombance_bar_project', 'bombance_blocked', 'unemployed', 'custody', 'inquiry_open', 'lemaire_transferred'];
+  const KEY_FLAGS = ['stance_legal', 'stance_dialogue', 'stance_direct', 'corruption_proof', 'press_contacted', 'carbonnade_1', 'carbonnade_3', 'bombance_bar_project', 'bombance_blocked', 'unemployed', 'custody', 'inquiry_open', 'lemaire_transferred', 'asked_waiter', 'waiter_bribed', 'waiter_fired', 'waiter_informant', 'seen_complaisance', 'kitchen_sabotaged', 'laxative_done', 'backroom_sneak'];
   console.log('\nDétail (commission : choix → %, hostilité / corruption moyennes, drapeaux en fin de partie) :');
   for (const name of BOTS) {
     const r = results[name];

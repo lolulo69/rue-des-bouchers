@@ -680,3 +680,8 @@ so it reflects what the player actually did.
 - **Échap** in the 3D night (or losing the pointer lock) opens `src/ui` `openMenu()`, with « Reprendre » re-capturing the mouse. Without the UI menu, the plain pause overlay.
 - **Audio cues** (`audio.play`): shutter on a photo, splash on the bucket, police radio on the call and when the patrol enters the street (the director adds the one on arrival), WhatsApp ping when photos are shared.
 - **Q checks**: `qa/q-kit.md`, section « build » (b1–b10).
+**Balance pass 2 (balance agent)**
+- `campaign.js`: new knob `ASSO.diminishFrom` (default 100 = off). Above it, every campaign asso gain from content (`apply`, cause ≠ `'engine'`) and from the night (the `finishNight` delta) is worth ×(100 − asso) / (100 − diminishFrom). In-night asso is not affected (the HUD sees raw night values; the campaign keeps the diminished delta).
+- Ending `fired`: `job <= 10` (was `<= 0`). Since 3b36eac a Koddex morning can't go below ≈ +4 per prompt, so 0 was out of reach. `CAMPAIGN.jobDecayPerDay` is now 7.
+- `tests/unit/balance.test.js` (new, balance agent): pins the fired path (slacker bot, 30 seeds).
+

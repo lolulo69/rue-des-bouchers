@@ -32,7 +32,7 @@ const flagWeights = (prefix) => ({
   carbonnade_1: -20, carbonnade_2: -30, carbonnade_3: -60, commission_lost: -20, ...prefix,
 });
 
-function make({ name, weights: w, legality, sideProjects = 1, jobFloor = 35, naps = () => 0, nightPolicy, nightContent, maxRisk = 100, continueFired = false, alsoLegal = [] }) {
+function make({ name, weights: w, legality, sideProjects = 1, jobFloor = 35, naps = () => 0, lazyWork = false, nightPolicy, nightContent, maxRisk = 100, continueFired = false, alsoLegal = [] }) {
   const W = (c) => (typeof w === 'function' ? w(c) : w);
   const allowed = (a, c) => (legality.includes(a.legality ?? 'legal') || alsoLegal.includes(a.id)) && (a.legality === 'legal' || c.state.stats.risk < maxRisk);
   return {
@@ -47,6 +47,11 @@ function make({ name, weights: w, legality, sideProjects = 1, jobFloor = 35, nap
       // La sieste pendant que Clode Kode « réfléchit » (work_nap) : du Sommeil contre du Job
       const nap = o.work.find((x) => x.id === 'work_nap');
       for (let i = picks.length - 1, n = nap ? naps(c) : 0; i >= 0 && n > 0; i--) if (picks[i] === 'work') { picks[i] = nap.id; n--; }
+      // Le tire-au-flanc prend le travail le moins productif (chaque item une fois par matin)
+      if (lazyWork) {
+        const lazy = o.work.filter((x) => x.id !== 'work_nap').sort((a, b) => (a.job ?? c.cfg.CAMPAIGN.workJob) - (b.job ?? c.cfg.CAMPAIGN.workJob)).map((x) => x.id);
+        for (let i = 0; i < picks.length; i++) if (picks[i] === 'work' && lazy.length) picks[i] = lazy.shift();
+      }
       return picks;
     },
     afternoon(c, actions) {
@@ -66,9 +71,11 @@ function make({ name, weights: w, legality, sideProjects = 1, jobFloor = 35, nap
         .sort((x, y) => y.s - x.s)[0].i;
     },
     night(c, sim) {
-      const nightScore = (a, camp) => {
+      // Si aucun des témoins de l'acte n'est en vue, il ne reste que l'aléa Dédé / Ghislain / patrouille : risque × 0.3
+      const nightScore = (a, camp, s) => {
         const weights = W(camp);
-        const sc = score(a.effects, weights, a.witnessed, camp);
+        const w = a.witnessed && s && a.legality !== 'legal' && unseen(s, a, camp) ? { ...a.witnessed, exposure: (a.witnessed.exposure ?? 0.4) * 0.3 } : a.witnessed;
+        const sc = score(a.effects, weights, w, camp);
         return a.legality === 'legal' ? sc : sc / (1 + (camp.state.counts.actions[a.id] ?? 0)) - 1;
       };
       const base = nightPolicy(c);
@@ -81,7 +88,7 @@ function make({ name, weights: w, legality, sideProjects = 1, jobFloor = 35, nap
           if (!nightContent || s.state.sleeping) return [];
           const ACT = Object.fromEntries(camp.content.ACTIONS.map((a) => [a.id, a]));
           return availableNightActions(s, camp).filter((x) => x.available).map((x) => [ACT[x.id], x])
-            .filter(([a, x]) => allowed(a, camp) && nightScore(a, camp) > 0 && nightContent(s, a, camp, x)).map(([a]) => a.id);
+            .filter(([a, x]) => allowed(a, camp) && nightScore(a, camp, s) > 0 && nightContent(s, a, camp, x)).map(([a]) => a.id);
         },
       };
     },
@@ -112,12 +119,13 @@ function legalNight({ asso = false, bedAt = 24.25 * 60, maxCalls = Infinity, tir
   };
 }
 // Illégal et discret : debout pour un seul appel à la police en début de soirée (de quoi provoquer la complaisance,
-// filmée par la caméra du store ou photographiée en douce), au lit de 23:15 à 00:50, puis le seau quand il n'y a plus
+// filmée par la caméra du store ou photographiée en douce), au lit de 23:15 à 00:30, puis le seau quand il n'y a plus
 // de témoin (Klaas dort à 01:00, le serveur est parti, le chat est rentré).
 function stealthyNight() {
   return (c) => {
     const bucket = POLICIES.stealthy();
-    const needComplaisance = !c.has('seen_complaisance');
+    // Une patrouille sur place : d'abord pour voir la complaisance, puis (serveur retourné) pour la photo de l'arrière-salle
+    const needComplaisance = !c.has('seen_complaisance') || (c.has('waiter_informant') && !c.has('backroom_sneak'));
     const needWaiter = !c.has('asked_waiter');
     let called = false;
     let asked = false;
@@ -125,8 +133,8 @@ function stealthyNight() {
       decide(sim) {
         const st = sim.state;
         const m = st.min;
-        if (m >= 23.25 * 60 && m < 24.83 * 60) return st.sleeping ? [] : [{ type: 'sleep', on: true }];
-        if (m >= 24.83 * 60 && st.sleeping) return [{ type: 'sleep', on: false }];
+        if (m >= 23.25 * 60 && m < 24.5 * 60) return st.sleeping ? [] : [{ type: 'sleep', on: true }];
+        if (m >= 24.5 * 60 && st.sleeping) return [{ type: 'sleep', on: false }]; // 00:30, avant que le serveur parte (00:45)
         if (needComplaisance && !called && m >= 22.25 * 60 && !st.police && sim.restaurants.some((r) => sim.infractions(r.id).length)) {
           called = true;
           return [{ type: 'police' }];
@@ -163,10 +171,12 @@ const diplomatGaveUp = (c) => c.has('carbonnade_1') || (c.state.day >= 8 && c.st
 // Aucun des témoins que l'acte redoute (`witnessed.by`) ne peut voir l'endroit, sauf des clients
 // (le serveur ne « témoigne » pas du pot-de-vin qu'il reçoit ; Dédé / Ghislain restent un aléa qu'on ne voit pas venir)
 const SIM_KIND = { klaas: 'klaas', seb_nico: 'seb_nico', waiter: 'waiter', customers: 'customers', biloute: 'jeremie', jeremie: 'jeremie' };
-function unseen(sim, a) {
+function unseen(sim, a, c) {
   const kinds = new Set((a.witnessed?.by ?? Object.keys(SIM_KIND)).map((w) => SIM_KIND[w]).filter(Boolean));
+  if (c?.has('waiter_informant')) kinds.delete('waiter'); // le serveur retourné est complice (le vrai tirage, lui, le garde)
   const pos = LOCATIONS[(NIGHT_ACTION_SPECS[a.id] ?? { at: 'street' }).at].pos(sim);
-  return !sim.potentialWitnesses(pos).some((w) => kinds.has(w.kind) && w.kind !== 'customers');
+  const seen = sim.potentialWitnesses(pos).filter((w) => kinds.has(w.kind));
+  return !seen.some((w) => w.kind !== 'customers') && seen.length <= 1; // au plus une tablée de clients en vue
 }
 
 export const CAMPAIGN_BOTS = {
@@ -182,19 +192,20 @@ export const CAMPAIGN_BOTS = {
   reckless: () => make({
     name: 'illégal imprudent', legality: ['illegal', 'grey'], sideProjects: 3,
     weights: { dossier: 1, risk: 0, hostility: 0.5, illegalEvidence: 3, anyFlag: 2, flags: flagWeights({ stance_direct: 20, waiter_bribed: 10, waiter_informant: 10 }), caution: 0 },
-    nightPolicy: recklessNight(), nightContent: () => true,
+    // d'abord parler au serveur (pour le soudoyer les nuits suivantes), ensuite le reste
+    nightPolicy: recklessNight(), nightContent: (sim, a, camp) => camp.has('asked_waiter') || sim.state.min >= 23 * 60,
   }),
   stealthy: () => make({
-    name: 'illégal discret', legality: ['illegal', 'grey'], sideProjects: 2, maxRisk: 60,
-    weights: { dossier: 1, risk: -2, hostility: 0.3, illegalEvidence: 3, anyFlag: 2, flags: flagWeights({ stance_direct: 15, disguise_hood: 20, disguise_vest: 20, waiter_bribed: 15, waiter_informant: 15, proj_wifi_cracker: 15, wifi_cracked: 15 }), caution: 2 },
-    nightPolicy: stealthyNight(), nightContent: (sim, a) => unseen(sim, a),
+    name: 'illégal discret', legality: ['illegal', 'grey'], sideProjects: 2, maxRisk: 40,
+    weights: { dossier: 1, risk: -2, hostility: 0.3, illegalEvidence: 3, anyFlag: 2, flags: flagWeights({ stance_direct: 15, disguise_hood: 20, disguise_vest: 20, waiter_bribed: 15, waiter_informant: 15, proj_wifi_cracker: 15, wifi_cracked: 15, kitchen_sabotaged: 25, laxative_done: 15, backroom_sneak: 30 }), caution: 2 },
+    nightPolicy: stealthyNight(), nightContent: (sim, a, camp) => unseen(sim, a, camp),
     alsoLegal: ['pm_press_contact', 'pm_waiter_testimony'], // marchepieds légaux du plan illégal (la presse pour le scandale, le serveur retourné)
   }),
   mixed: () => make({
     name: 'mixte malin', legality: ['legal', 'grey', 'illegal'], sideProjects: 1, maxRisk: 40,
-    weights: { dossier: 5, asso: 1.5, sleep: 0.5, risk: -3, hostility: -0.2, job: 0.3, legalEvidence: 8, illegalEvidence: 2, flags: flagWeights({ stance_legal: 20, tatie_fake_leak: 3, bloc_fooled: 5 }), caution: 2 },
+    weights: { dossier: 5, asso: 1.5, sleep: 0.5, risk: -3, hostility: -0.2, job: 0.3, legalEvidence: 8, illegalEvidence: 2, flags: flagWeights({ stance_legal: 20, tatie_fake_leak: 5, bloc_fooled: 5 }), caution: 2 },
     naps: (c) => (c.state.stats.sleep < 35 && c.state.stats.job > 45 ? 1 : 0),
-    nightPolicy: legalNight({ asso: true }), nightContent: (sim, a, camp, x) => a.legality === 'legal' || (camp.state.stats.risk < 30 && unseen(sim, a)),
+    nightPolicy: legalNight({ asso: true }), nightContent: (sim, a, camp, x) => a.legality === 'legal' || (camp.state.stats.risk < 30 && unseen(sim, a, camp)),
     continueFired: true,
   }),
   diplomat: () => make({
@@ -206,7 +217,7 @@ export const CAMPAIGN_BOTS = {
   }),
   // Tire-au-flanc : tout Koddex part en side projects, le boulot attend. Ne prend pas le rebond « au chômage ».
   slacker: () => make({
-    name: 'tire-au-flanc', legality: ['legal'], sideProjects: 3, jobFloor: -Infinity, naps: () => 3,
+    name: 'tire-au-flanc', legality: ['legal'], sideProjects: 3, jobFloor: -Infinity, naps: () => 1, lazyWork: true,
     weights: { dossier: 3, asso: 1.5, sleep: 0.5, risk: -5, legalEvidence: 6, flags: flagWeights({ stance_legal: 20 }) },
     nightPolicy: legalNight({ bedAt: 23.5 * 60 }), nightContent: () => true,
   }),

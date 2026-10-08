@@ -222,6 +222,7 @@ export const ASSO = {
   shareGainPerPiece: 3,
   shareDecay: 0.7,               // rendements décroissants : chaque pièce partagée le même soir vaut ×0.7 de la précédente
   nightGainCap: 4,               // gain d'Asso max par nuit (QA balance #1)
+  diminishFrom: 50,              // campagne : au-dessus, chaque gain d'Asso vaut ×(100 − asso) / (100 − diminishFrom)
   spamPenalty: 3,
 };
 
@@ -262,7 +263,7 @@ export const CAMPAIGN = {
   riskDecayPerDay: 5,            // le Risque persiste et ne baisse que lentement (QA balance #3)
   sleepNeutral: 60,              // une nuit qui finit au-dessus repose Pilou, en dessous elle l'use
   sleepCarry: 0.5,
-  jobDecayPerDay: 6,
+  jobDecayPerDay: 7,
   workJob: 5,                    // un prompt de vrai travail
   sideProjectDiscovery: 0.5,     // le risque d'un side project ne compte que si Stéphane / Clode Kode le remarque
   prompts: 3,
@@ -278,7 +279,7 @@ export const CAMPAIGN = {
   contentEvidenceValue: 3,       // effet { evidence } du contenu : valeur × qualité
   contentDossierScale: 0.3,       // gains de Dossier écrits par le contenu (`dossier: +N`) × ce facteur
   contentAssoScale: 0.5,         // gains d'Asso écrits par le contenu (`asso: +N`) × ce facteur
-  assoDecayPerDay: 4,            // l'Asso redescend chaque matin vers son niveau de départ si on ne la nourrit pas
+  assoDecayPerDay: 5,            // l'Asso redescend chaque matin vers son niveau de départ si on ne la nourrit pas
   dossierTarget: 100,            // ~8–10 bonnes nuits (QA balance #2)
   maxCountermovesPerDay: 2,
   maxDialoguesPerPhase: 2,

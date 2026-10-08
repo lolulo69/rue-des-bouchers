@@ -117,7 +117,8 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
       if (typeof effects[k] !== 'number') continue;
       // Les gains écrits par le contenu sont relatifs : la config fixe l'échelle (équilibrage, qa/balance.md)
       const scale = effects[k] > 0 && cause !== 'engine' ? (k === 'dossier' ? C.contentDossierScale : k === 'asso' ? C.contentAssoScale : 1) ?? 1 : 1;
-      deltas[k] = setStat(k, S.stats[k] + effects[k] * scale);
+      const v = effects[k] * scale;
+      deltas[k] = setStat(k, S.stats[k] + (k === 'asso' && cause !== 'engine' ? assoGain(v) : v));
     }
     for (const k of HIDDEN_KEYS) {
       if (typeof effects[k] !== 'number') continue;
@@ -150,6 +151,12 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     // Le Risque franchit le seuil de garde à vue (à partir de la nuit 5) : le moteur pose le drapeau `custody`
     if (k === 'risk' && c.gateOpen() && S.stats.risk >= cfg.RISK.custody) setFlag('custody');
     return S.stats[k] - before;
+  }
+  // Rendements décroissants de l'Asso : au-dessus de ASSO.diminishFrom, un gain vaut ×(100 − asso) / (100 − diminishFrom)
+  function assoGain(v) {
+    const from = cfg.ASSO.diminishFrom ?? 100;
+    if (v <= 0 || S.stats.asso <= from) return v;
+    return v * Math.max(0, (100 - S.stats.asso) / (100 - from));
   }
   function setFlag(f) { if (!S.flags.includes(f)) { S.flags.push(f); flagSet = null; } }
   function addEvidence(e) {
@@ -542,7 +549,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     S.nightCount++;
     const sleepDelta = (N.sleep - C.sleepNeutral) * C.sleepCarry;
     setStat('sleep', S.stats.sleep + sleepDelta);
-    setStat('asso', N.asso);
+    setStat('asso', S.stats.asso + assoGain(N.asso - S.stats.asso));
     const riskBefore = S.stats.risk;
     setStat('risk', N.risk);
     if (S.stats.risk > riskBefore) c.note('effects', { cause: 'witnessed', source: 'nuit', deltas: { risk: S.stats.risk - riskBefore }, nightRisk: N.journal.filter((e) => e.type === 'risk').length });
