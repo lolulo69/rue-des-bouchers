@@ -296,6 +296,10 @@ The campaign simulator plays 1000 seeded campaigns per strategy bot. Targets:
 - [ ] 60 fps on a laptop iGPU (perf test logs the frame time). Loads in < 5 s. Bundle < 3 MB. **T Q**
 - [ ] CI green (unit + e2e + campaign simulator smoke). Deploy auto from main. **T**
 
+### Release tasks (done by the design agent when v1.0 lands)
+- [ ] Set `WHATSAPP_GROUP` in `src/content/characters.js` to **« La Gaystapo »** (Lucas's choice: the real group's own name).
+  Only the label changes; the writing around Seb & Nico stays role-based.
+
 ### Deviations
 _(none yet)_
 
