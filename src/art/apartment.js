@@ -11,7 +11,7 @@ const M = (() => {
   return (color, o = {}) => { const k = color + JSON.stringify(o); if (!c.has(k)) c.set(k, new THREE.MeshStandardMaterial({ color, roughness: 0.85, ...o })); return c.get(k); };
 })();
 // Pièces du fond : un peu d'auto-éclairage (une seule vraie lumière, dans le séjour)
-const S = (color, o = {}) => M(color, { emissive: color, emissiveIntensity: 0.18, ...o });
+const S = (color, o = {}) => M(color, { emissive: color, emissiveIntensity: 0.38, ...o });
 
 const zelligeTex = () => canvasTexture(128, 128, (g, w, h) => {
   g.fillStyle = '#cfe2d4'; g.fillRect(0, 0, w, h);
@@ -100,10 +100,13 @@ export function buildApartment(city, scene, { F, bz, W }) {
   add(new THREE.SphereGeometry(0.16, 10, 8), M(0xffe2a8, { emissive: 0xffc46b, emissiveIntensity: 1.5 }), -6.7, F + 1.6, zb - 0.3);
   // ---- couloir (bleu marine) : bibliothèque de 3,6 m, vélo électrique, porte d'entrée ----
   const bookCols = [0xc0392b, 0x2b4d7a, 0xe9c46a, 0x5a9a52, 0xf2ede4, 0x6d597a, 0xd98c5f];
-  box(3.6, 2.4, 0.32, navy, -9.3, F + 1.2, zb - 0.16);
-  for (let r = 0; r < 5; r++) for (let i = 0; i < 18; i++) {
-    const h = 0.22 + Math.random() * 0.08;
-    box(0.04 + Math.random() * 0.03, h, 0.22, S(bookCols[(i + r * 3) % bookCols.length]), -11.0 + i * 0.19 + r * 0.02, F + 0.3 + r * 0.46 + h / 2 - 0.15, zb - 0.2);
+  // bibliothèque ouverte : fond et étagères bleu marine, livres devant
+  box(3.6, 2.4, 0.03, navy, -9.3, F + 1.2, zb - 0.02);
+  for (let r = 0; r <= 5; r++) box(3.6, 0.03, 0.3, navy, -9.3, F + 0.12 + r * 0.46, zb - 0.16);
+  for (const x of [-11.1, -9.3, -7.5]) box(0.03, 2.4, 0.3, navy, x, F + 1.2, zb - 0.16);
+  for (let r = 0; r < 5; r++) for (let i = 0; i < 17; i++) {
+    const h = 0.24 + Math.random() * 0.12;
+    box(0.06 + Math.random() * 0.04, h, 0.22, S(bookCols[(i + r * 3) % bookCols.length]), -10.95 + i * 0.205, F + 0.135 + r * 0.46 + h / 2, zb - 0.15);
   }
   // le vélo électrique, garé le long du mur
   const bike = new THREE.Group(); bike.position.set(-12.4, F, zb - 0.25); city.add(bike);
@@ -117,16 +120,16 @@ export function buildApartment(city, scene, { F, bz, W }) {
   box(0.95, 2.1, 0.06, navy, -14.3, F + 1.05, zb + 0.0);
   const aptDoor = new THREE.Vector3(-14.3, F, zb - 0.6);
   // cloisons côté cour avec leurs portes (trous dans la collision)
-  const door = (x0, x1) => { box(x1 - x0, 2.1, 0.04, navy, x0 + (x1 - x0) * 0.25, F + 1.05, zc + 0.08); }; // porte coulissante à moitié rentrée
+  const door = (x0, x1) => { box(x0 - x1, 2.1, 0.04, navy, x0 + (x0 - x1) * 0.35, F + 1.05, zc + 0.08); }; // porte coulissante presque rentrée (glissée devant le mur)
   wallZ(zc, -7.0, -7.9, white); door(-7.9, -8.8); wallZ(zc, -8.8, -10.3, white); door(-10.3, -11.2); wallZ(zc, -11.2, -13.3, white); door(-13.3, -14.2); wallZ(zc, -14.2, xb, white);
   // ---- salle de bain (zellige vert) : baignoire à paroi vitrée, vasque en pierre sur bois, miroir rétroéclairé, robinets dorés ----
   wallX(-9.5, za, zc, white);
   const zel = new THREE.MeshStandardMaterial({ map: zelligeTex(), roughness: 0.25, metalness: 0.1, emissive: 0x2f4a3a, emissiveIntensity: 0.15 });
   box(2.4, 1.6, 0.04, zel, -8.25, F + 0.8, za + 0.03); box(0.04, 1.6, 4.7, zel, -7.07, F + 0.8, (za + zc) / 2);
   box(1.6, 0.55, 0.75, S(0xf2f2ee), -8.3, F + 0.28, za + 0.4); box(0.8, 1.2, 0.02, M(0xd8f0f0, { transparent: true, opacity: 0.35, roughness: 0.05 }), -7.9, F + 1.15, za + 0.78);
-  box(0.6, 0.06, 0.4, M(0x8a5a35), -8.6, F + 0.82, zc - 0.3); add(new THREE.CylinderGeometry(0.17, 0.14, 0.1, 14), M(0xd8d4cc), -8.6, F + 0.9, zc - 0.3);
-  box(0.6, 0.75, 0.03, M(0xdfe6ea, { metalness: 0.9, roughness: 0.05, emissive: 0xfff2d8, emissiveIntensity: 0.25 }), -8.6, F + 1.5, zc - 0.07);
-  add(new THREE.CylinderGeometry(0.012, 0.012, 0.16, 6), M(0xd4a62a, { metalness: 0.9, roughness: 0.2 }), -8.6, F + 1.0, zc - 0.14);
+  box(0.4, 0.06, 0.6, M(0x8a5a35), -9.28, F + 0.82, zc - 1.0); add(new THREE.CylinderGeometry(0.17, 0.14, 0.1, 14), M(0xd8d4cc), -9.26, F + 0.9, zc - 1.0);
+  box(0.03, 0.75, 0.6, M(0xdfe6ea, { metalness: 0.9, roughness: 0.05, emissive: 0xfff2d8, emissiveIntensity: 0.25 }), -9.46, F + 1.5, zc - 1.0);
+  add(new THREE.CylinderGeometry(0.012, 0.012, 0.16, 6), M(0xd4a62a, { metalness: 0.9, roughness: 0.2 }), -9.4, F + 1.0, zc - 1.0);
   // ---- chambre de Pilou (côté cour, mur vert sombre) : lit double, placard coulissant ----
   wallX(-12.5, za, zc, green);
   box(1.6, 0.35, 2.05, M(0x6b4a2b), -11.0, F + 0.25, za + 1.1); box(1.5, 0.18, 1.95, S(0xe8e2d0), -11.0, F + 0.5, za + 1.15);
@@ -153,6 +156,8 @@ export function buildApartment(city, scene, { F, bz, W }) {
   box(1.4, 0.06, 2.2, M(0x9a6b42), xb - 0.7, F - 0.03, za + 1.5);
   box(1.4, 1.1, 0.12, brick, xb - 0.7, F + 0.55, za + 0.4); box(1.4, 1.1, 0.12, brick, xb - 0.7, F + 0.55, za + 2.6); box(0.12, 1.1, 2.2, brick, xb - 1.4, F + 0.55, za + 1.5);
   box(0.35, 0.42, 1.1, M(0x8a5a35), xb - 1.15, F + 0.21, za + 1.5); // le banc
+  // plafonniers (émissifs) du couloir et des chambres
+  for (const [x, z] of [[-8.5, (zc + zb) / 2], [-12.5, (zc + zb) / 2], [-11.0, bz - 0.8], [-14.0, bz - 0.8], [-8.3, bz - 0.8]]) add(new THREE.SphereGeometry(0.12, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2), M(0xfff2d8, { emissive: 0xffe2b0, emissiveIntensity: 1.4, side: THREE.DoubleSide }), x, F + H - 0.02, z).rotation.x = Math.PI;
   // ---- lumière : une vraie lampe dans le séjour (le reste est légèrement auto-éclairé) ----
   const light = new THREE.PointLight(0xffd9a0, 7, 9, 1.4); light.position.set(-5.2, F + 2.4, bz - 0.4); city.add(light);
   const panel = panelTex([['WC', 60]], '#1f2a44', '#f2ede4');
