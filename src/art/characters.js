@@ -558,6 +558,8 @@ export const CAST = {
       addW('tray', 'cyl', 'handL', [0.07, 0.09, 0.04], [0.07, 0.12, 0.07], 0xf0a830);
       addW('tray', 'cyl', 'handL', [-0.07, 0.09, -0.03], [0.07, 0.12, 0.07], 0xf0a830);
     } }),
+  // Le remplaçant de Théo (après son renvoi) : même tablier et même plateau, autre tête (roux, lunettes, queue de cheval)
+  nouveau: (o = {}) => CAST.serveur({ skin: 0xfbe0c8, hair: 'ponytail', hairColor: 0xb5562a, glasses: 0x2a2a2a, height: 1.08, girth: 0.92, talk: 0.25, ...o }),
   // Police municipale : Lemaire (rond, moustache, bonhomme), Benali (jeune, carnet), le chef (galons dorés)
   lemaire: (o = {}) => police({ skin: 0xf3cdb0, hair: 'short', hairColor: 0x6b5b4b, mustache: 0x5a4a3a, height: 0.98, girth: 1.35, headR: 0.28, talk: 0.6, ...o }),
   benali: (o = {}) => police({ hair: 'short', hairColor: 0x1f1a17, skin: 0xc98e5f, height: 1.12, girth: 0.9, headR: 0.25, held: 'notebook', ...o }),
@@ -581,7 +583,7 @@ export const CAST = {
 CAST.waiter = CAST.serveur;
 CAST.dog = CAST.biloute;
 CAST.cat = CAST.gaufre;
-export const CAST_IDS = ['pilou', 'jeremie', 'biloute', 'klaas', 'hilde', 'tatie', 'seb', 'nico', 'gaufre', 'hippolyte', 'regis', 'dede', 'ghislain', 'serveur', 'lemaire', 'benali', 'chef', 'delphine', 'colette', 'lescaut', 'journaliste', 'avocat', 'stephane', 'clode'];
+export const CAST_IDS = ['pilou', 'jeremie', 'biloute', 'klaas', 'hilde', 'tatie', 'seb', 'nico', 'gaufre', 'hippolyte', 'regis', 'dede', 'ghislain', 'serveur', 'nouveau', 'lemaire', 'benali', 'chef', 'delphine', 'colette', 'lescaut', 'journaliste', 'avocat', 'stephane', 'clode'];
 
 // Ancienne API : person(color) = un passant debout. La couleur de l'uniforme de police donne un agent.
 export function person(color) {

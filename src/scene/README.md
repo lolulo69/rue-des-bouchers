@@ -11,7 +11,7 @@
 
 What it drives (the sim stays the source of truth; the director only shows it):
 - **Terraces**: out / cleared, number of guests, recentring out of the corridor, guests' heads.
-- **Waiter**: `sim.waiterPos()`, which includes his **cigarette breaks** (`src/sim/schedule.js`: the witnesses see him there too).
+- **Waiter**: Théo, or his replacement (`CAST.nouveau`: red ponytail, glasses, same apron) when `sim.waiterId === 'nouveau'` (Théo fired); `sim.waiterPos()`, which includes his **cigarette breaks** (`src/sim/schedule.js`: the witnesses see him there too).
 - **Ghislain**: on his stepladder while `sim.ghislainCleaning()`.
 - **Klaas**: binoculars while `sim.klaasWatching()`, notebook otherwise; Klaas and Hilde go to bed with `klaasAwake()`.
 - **Balcony**: the cat, Seb and Nico follow `catPresent()`.

@@ -7,7 +7,7 @@
 //   director.toggleLegalView()                vue « zones légales » (touche L)
 // La simulation reste la seule source de vérité : le metteur en scène ne fait que la montrer.
 import * as THREE from 'three';
-import { customer, setState, bike as makeBike } from '../art/characters.js';
+import { CAST, customer, setState, bike as makeBike } from '../art/characters.js';
 import { FILM_MINUTES, PATROL_CAST } from './schedule.js';
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -58,6 +58,16 @@ export function createDirector({ scene, world, art, audio }) {
 
   function build(sim) {
     built = true;
+    // Théo renvoyé (sim.waiterId = 'nouveau') : un autre serveur prend sa place dès la nuit suivante
+    if (sim.waiterId === 'nouveau' && world.waiter.userData.waiterId !== 'nouveau') {
+      const old = world.waiter;
+      const neo = CAST.nouveau();
+      neo.position.copy(old.position); neo.rotation.y = old.rotation.y; neo.scale.copy(old.scale);
+      neo.userData.waiterId = 'nouveau';
+      old.parent?.remove(old);
+      scene.add(neo);
+      world.waiter = cast.waiter = cast.serveur = neo;
+    }
     for (const g of sim.state.standing ?? []) {
       const view = world.standingCrowd({ x: g.x, z: g.z, n: g.size, barrel: false });
       view.group.visible = false;
