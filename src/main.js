@@ -4,7 +4,6 @@ import * as THREE from 'three';
 import { buildWorld, person, mat } from './world.js';
 import { RULES, SKY, STREET, NOISE, EVIDENCE, INTERACT, ZONES, POLICE } from './config.js';
 import { createSim, makeConfig, fmt, createCampaign, contentFromGlob, SAVE_VERSION } from './sim/index.js';
-import { mountFallbackUI } from './dayFallback.js';
 import * as narrative from './sim/narrative.js';
 import { createRng } from './sim/rng.js';
 
@@ -21,7 +20,6 @@ const ANCHORS = cfg.ANCHORS; // même objet que celui de la simulation (recalé 
 // Chaque nuit démarre d'une sauvegarde et d'un rechargement (?mode=night) : nouvelle disposition, nouveau décor.
 const SAVE_KEY = `rdb.save.v${SAVE_VERSION}`;
 const content = contentFromGlob(import.meta.glob('./content/*.js', { eager: true }));
-const UI = Object.values(import.meta.glob('./ui/index.js', { eager: true }))[0];
 const loadSave = () => { try { return JSON.parse(localStorage.getItem(SAVE_KEY)); } catch { return null; } };
 const storeSave = (c) => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(c.save())); } catch { /* stockage indisponible */ } };
 const openCampaign = (save) => { try { return createCampaign({ content, cfg, save, narrative }); } catch { return null; } };
@@ -429,46 +427,35 @@ function startNight() {
 }
 $('start').addEventListener('click', startNight);
 
-// Écran titre : campagne (nouvelle / continuer) ou nuit libre ; en mode nuit de campagne, juste « Commencer la nuit »
+// Écran titre : « Campagne » ouvre l'interface de jour (src/ui, agent UI : nouvelle partie / continuer / intro) ;
+// « Nuit libre » joue une soirée isolée. En mode nuit de campagne, juste « Commencer la nuit ».
+// L'interface reçoit le moteur avec notre config (ancres recalées sur le décor) et la narration.
+const engine = { content, createCampaign: (o) => createCampaign({ ...o, cfg, narrative }) };
 let dayUI = null;
-function showDay() {
+function goNight(c) {
+  // La nuit se joue après un rechargement : nouvelle disposition des terrasses, nouveau décor
+  localStorage.setItem(SAVE_KEY, JSON.stringify(c.save()));
+  const q = new URLSearchParams(location.search);
+  q.set('mode', 'night');
+  location.search = q.toString();
+  return new Promise(() => {}); // la page se recharge
+}
+// Chargée à la demande (import dynamique) : ui.html partage ce module, et un import statique ferait atterrir
+// le code du jeu 3D dans le chunk commun (il s'exécuterait sur ui.html, sans canvas).
+async function showDay({ resume = false } = {}) {
   $('title').classList.add('hidden');
   $('hud').classList.add('hidden');
   document.exitPointerLock?.();
-  const opts = {
-    campaign, root: $('dayui'), content,
-    onSave: () => storeSave(campaign),
-    onNight: () => {
-      storeSave(campaign);
-      const q = new URLSearchParams(location.search);
-      q.set('mode', 'night');
-      location.search = q.toString();
-    },
-    onQuit: () => { dayUI?.hide(); $('title').classList.remove('hidden'); },
-    onNew: () => newCampaign(),
-  };
-  window.__rdb.goNight = opts.onNight;
-  dayUI ??= (UI?.mountDayUI ?? mountFallbackUI)(opts);
+  const UI = await import('./ui/index.js');
+  dayUI ??= UI.mount(engine, { onNight: goNight, seed: SEED, autoContinue: resume });
   dayUI.show();
-}
-function newCampaign() {
-  campaign = createCampaign({ seed: SEED, content, cfg, narrative });
-  storeSave(campaign);
-  dayUI?.destroy?.();
-  dayUI = null;
-  showDay();
 }
 if (campaign) {
   $('title-sub').textContent = `${nightLabel()}. La nuit tombe sur la rue des Bouchers.`;
   $('start').textContent = 'Commencer la nuit';
-  $('campaign-buttons').classList.add('hidden');
+  $('campaign').classList.add('hidden');
 } else {
-  const saved = loadSave();
-  const resumable = saved && saved.step !== 'ended' && openCampaign(saved);
-  $('continue').classList.toggle('hidden', !resumable);
-  if (resumable) $('continue').textContent = `Continuer (jour ${saved.day})`;
-  $('continue').addEventListener('click', () => { campaign = openCampaign(loadSave()); if (campaign) showDay(); });
-  $('new-campaign').addEventListener('click', newCampaign);
+  $('campaign').addEventListener('click', () => showDay());
   $('start').textContent = 'Nuit libre (une soirée isolée)';
 }
 canvas.addEventListener('click', () => { if (started && !overlay) lock(); });
@@ -590,7 +577,7 @@ function endCampaignNight() {
   const q = new URLSearchParams(location.search);
   q.delete('mode');
   history.replaceState(null, '', `${location.pathname}${q.size ? `?${q}` : ''}`);
-  showDay();
+  showDay({ resume: true }); // l'interface reprend la sauvegarde : le bilan de la nuit
 }
 
 // Actions de nuit du contenu (N) : boule puante, carton sur la hotte… selon l'endroit où se trouve Pilou
@@ -687,8 +674,9 @@ function tick(dt) {
 // aimAt(tableId) place Pilou dans la rue à 2,5 m de la table, en la regardant ; key(code) simule une touche.
 window.__rdb = {
   sim, player, world, seed: SEED,
-  get campaign() { return campaign; },
-  newCampaign,
+  get campaign() { return dayUI?.campaign ?? campaign; },
+  get ui() { return dayUI; },
+  goNight: () => goNight(dayUI.campaign),
   saveKey: SAVE_KEY,
   step(n = 1, dt = 1 / 30) { for (let i = 0; i < n; i++) tick(dt); return S.min; },
   aimAt(tableId) {
