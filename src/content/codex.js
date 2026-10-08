@@ -386,7 +386,7 @@ export const CODEX = {
     {
       id: 'h_touches',
       title: 'Les touches, la nuit',
-      text: "ZQSD ou WASD pour bouger, Maj pour courir, la souris pour regarder. E : portes, serveur, lit. P : photo. B : relevé en décibels. T : téléphone. N : actions de nuit. Tab : dossier. L : zones légales. F : le seau d’eau.",
+      text: "ZQSD ou WASD pour bouger, Maj pour courir, la souris pour regarder. E : portes, serveur, lit. P : photo. B : relevé en décibels. T : téléphone. N : actions de nuit. Tab : dossier. L : zones légales. F : le seau d’eau. M : couper le son.",
     },
     {
       id: 'h_preuves',

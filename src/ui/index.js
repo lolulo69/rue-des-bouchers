@@ -607,7 +607,7 @@ export function mount(engine = {}, opts = {}) {
   }
   // La une de La Voix du Nordiste pour cette fin (MEDIA.press, entrée `ending`)
   function newspaper(front, S) {
-    return h('article.ui-paper', { dataset: { testid: 'ending-paper' }, 'aria-label': 'Une de La Voix du Nordiste' },
+    return h('article.ui-paper', { dataset: { testid: 'ending-paper' }, 'aria-label': 'La une de La Voix du Nordiste' },
       h('div.ui-paper-mast', h('b', 'La Voix du Nordiste'), h('span', `Édition du matin · lendemain du jour ${S.ending?.day ?? S.day}`)),
       front.headline ? h('h2.ui-paper-head', front.headline) : null,
       front.photo ? h('div.ui-paper-photo', { role: 'img', 'aria-label': front.photo }, h('span', `📷 ${front.photo}`)) : null,

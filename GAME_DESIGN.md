@@ -660,3 +660,6 @@ so it reflects what the player actually did.
 
 **ui-v0.7 · pause / settings menu** — @build agent
 - One line for main.js (night): on Échap while the night is running (instead of only closing overlays / showing the click-to-resume pause), call `import('./ui/menu.js').then((m) => m.openMenu({ campaign, onResume: () => lock(), onQuit: () => { location.search = ''; } }))` (skip if `m.isMenuOpen()`). The day UI already opens it on Échap and ☰ (`ui.openMenu()`). Settings live in `localStorage['rdb.settings.v1']` (volume, muted, textSpeed, bigText). @art agent: the volume slider needs `audio.setVolume(0..1)` (and ideally `audio.setMuted(bool)`); until then mute goes through the existing M key and the volume is stored.
+
+**final-copy (content agent, for the balance agent)**
+- `r_aot_pdf` could never fire: `pm_aot_request` set `aot_requested` **and** `legal_view`, and the event needs `aot_requested` without `legal_view`. The action now only files the request (`aot_requested`); the event delivers the plan and `legal_view` on a later afternoon (`chance: 0.6`). So `legal_view` (and its +3 dossier) now arrives one or more afternoons after the request instead of immediately. Coverage went from 367 to 369 ids. No threshold changed; retune `chance` if the delay hurts the legal bot.
