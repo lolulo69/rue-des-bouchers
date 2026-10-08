@@ -6,6 +6,7 @@ import { createDirector } from './scene/director.js';
 import { RULES, SKY, STREET, NOISE, EVIDENCE, INTERACT, ZONES, POLICE } from './config.js';
 import { createSim, makeConfig, fmt, createCampaign, contentFromGlob, checkSave } from './sim/index.js';
 import * as narrative from './sim/narrative.js';
+import { audio } from './audio/index.js';
 import { createRng } from './sim/rng.js';
 import { WHATSAPP_GROUP } from './content/characters.js';
 
@@ -207,9 +208,13 @@ function updateHud() {
 // ---------- Photo ----------
 const raycaster = new THREE.Raycaster();
 const CENTER = new THREE.Vector2(0, 0);
+// Bruitages ponctuels (moteur audio de l'agent art) : jamais bloquants
+const cue = (name, opts) => { try { audio?.play?.(name, opts); } catch { /* audio indisponible */ } };
+
 function photo() {
   if (player.loc === 'apt' && !nearWindow()) return log('Depuis l’appartement, il faut être à la fenêtre.');
   flash();
+  cue('shutter');
   syncCamera();
   scene.updateMatrixWorld();
   raycaster.setFromCamera(CENTER, camera);
@@ -271,7 +276,7 @@ function openOverlay(name) {
   document.exitPointerLock?.();
 }
 function closeOverlay() {
-  if (!overlay) return;
+  if (!overlay || overlay === 'menu') return; // le menu de l'interface se ferme lui-même (onResume)
   $(overlay).classList.add('hidden');
   overlay = null;
   lock();
@@ -291,10 +296,10 @@ for (const b of document.querySelectorAll('#phone button')) {
   b.addEventListener('click', () => {
     const c = b.dataset.call;
     closeOverlay();
-    if (c === 'police' || c === 'police-asso') tuto('first_police_call');
+    if (c === 'police' || c === 'police-asso') { tuto('first_police_call'); cue('radio'); }
     if (c === 'police') sim.act({ type: 'police' });
     else if (c === 'police-asso') sim.act({ type: 'police', asso: true });
-    else if (c === 'asso') sim.act({ type: 'asso' });
+    else if (c === 'asso') { if (sim.act({ type: 'asso' })?.ok) cue('whatsapp'); }
     else if (c === 'mairie') sim.act({ type: 'mairie' });
     drainSim();
   });
@@ -363,7 +368,28 @@ if (campaign) {
 }
 canvas.addEventListener('click', () => { if (started && !overlay) lock(); });
 $('pause').addEventListener('click', () => lock());
-document.addEventListener('pointerlockchange', () => { locked = document.pointerLockElement === canvas; });
+document.addEventListener('pointerlockchange', () => {
+  const was = locked;
+  locked = document.pointerLockElement === canvas;
+  // Échap pendant la nuit (le navigateur rend la souris) : menu de pause / réglages de l'interface s'il existe
+  if (was && !locked && started && !S.ended && !overlay) openNightMenu();
+});
+// Menu de l'interface (agent UI : ui.openMenu / openMenu exporté par src/ui). À défaut : l'overlay de pause actuel.
+let menuOpen = false;
+async function openNightMenu() {
+  if (menuOpen) return;
+  const UI = await import('./ui/index.js').catch(() => null);
+  const open = UI?.openMenu ?? dayUI?.openMenu;
+  if (typeof open !== 'function') return; // l'overlay #pause s'affiche déjà (update)
+  menuOpen = true;
+  overlay = 'menu';
+  open({
+    context: 'night',
+    onResume: () => { menuOpen = false; overlay = null; lock(); },
+    onQuit: () => { menuOpen = false; overlay = null; location.href = location.pathname; },
+  });
+}
+window.__rdbNightMenu = openNightMenu; // tests
 let dragging = false;
 canvas.addEventListener('mousedown', () => { dragging = true; });
 addEventListener('mouseup', () => { dragging = false; });
@@ -377,7 +403,7 @@ addEventListener('keydown', (e) => {
   // e.code = position physique : Z/Q/S/D sur AZERTY = W/A/S/D sur QWERTY.
   if (e.code === 'Tab') e.preventDefault();
   if (!started || S.ended) return;
-  if (e.code === 'Escape') return closeOverlay();
+  if (e.code === 'Escape') return overlay ? closeOverlay() : (NOLOCK ? openNightMenu() : undefined);
   if (e.code === 'Tab') return overlay === 'dossier' ? closeOverlay() : !overlay && openOverlay('dossier');
   if (e.code === 'KeyT') return overlay === 'phone' ? closeOverlay() : !overlay && openOverlay('phone');
   if (e.code === 'KeyN' && campaign) return overlay === 'nightmenu' ? closeOverlay() : !overlay && openOverlay('nightmenu');
@@ -431,6 +457,7 @@ function move(dt) {
 function drainSim() {
   for (const e of sim.drainEvents()) {
     director.onEvent(e); // éclaboussure, crochets art des actions de nuit…
+    if (e.type === 'splash') cue('splash');
     if (e.type === 'log') log(e.text, e.cls, e.min);
     else if (e.type === 'end') (campaign ? endCampaignNight : showEnd)();
   }
@@ -516,6 +543,7 @@ function showEnd() {
 
 // ---------- Boucle ----------
 let hudTimer = 0;
+let lastPolicePhase = null;
 const camPos = new THREE.Vector3();
 function update(dt) {
   const running = started && !S.ended && !overlay && (locked || NOLOCK);
@@ -523,6 +551,9 @@ function update(dt) {
   if (!running) return;
   move(dt);
   ambientLines(dt);
+  const phase = S.police?.phase ?? null;
+  if (phase === 'walking' && lastPolicePhase !== 'walking') cue('radio', { pos: { x: ANCHORS.policeSpawn.x, y: 1.5, z: ANCHORS.policeSpawn.z } });
+  lastPolicePhase = phase;
   sim.tick(dt * RULES.gameMinutesPerSecond * (S.sleeping ? RULES.sleepTimeMultiplier : 1));
   camPos.set(player.pos.x, player.pos.y + 1.65, player.pos.z);
   noiseDb = sim.noiseAt(camPos, player.loc === 'apt');
@@ -534,9 +565,7 @@ function syncCamera() {
   camera.updateMatrixWorld();
 }
 
-let firstFrame = true;
 function frame(ts) {
-  if (firstFrame) { firstFrame = false; window.__rdbLoaded?.(); } // l'écran de chargement s'efface après la 1re image
   timer.update(ts);
   const d = timer.getDelta();
   tick(Number.isFinite(d) ? Math.min(Math.max(d, 0), 0.1) : 0); // 1re frame : delta parfois NaN
@@ -579,4 +608,7 @@ window.__rdb = {
   },
 };
 updateSky();
+// Première image rendue tout de suite (sans attendre requestAnimationFrame, parfois tardif), puis l'écran de chargement s'efface
+tick(0);
+window.__rdbLoaded?.();
 requestAnimationFrame(frame);

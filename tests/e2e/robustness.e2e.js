@@ -21,7 +21,7 @@ test('erreur globale : écran en français, rapport copiable, rechargement', asy
   const clip = await page.evaluate(() => navigator.clipboard.readText().catch(() => ''));
   if (clip) {
     expect(clip).toContain('boum de test');
-    expect(clip).toContain('Sauvegarde :');
+    expect(clip).toMatch(/Sauvegarde\s:/);
   }
   await Promise.all([page.waitForEvent('load'), page.click('#fatal-reload')]);
   await expect(page.locator('#fatal')).toBeHidden();
