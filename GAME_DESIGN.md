@@ -212,7 +212,7 @@ recruiting a resident (the traitor) · a fake post "Ch'tite Bernadette is being 
   warm lantern light at night, bouncy idle animations. Readable silhouettes: Klaas = Santa (white beard, red cardigan),
   Ghislain = huge bun, Dédé = short and round, the dachshund, the cat on the balcony. Flemish brick façades with stepped gables.
 - Models are **procedural three.js geometry** (no external assets needed) unless a CC0 low-poly pack fits.
-  Performance budget: 60 fps on a laptop iGPU. _(art: busiest Saturday view 150 draw calls / ≤130k triangles, 3.2 ms/frame on a real GPU (Apple, Chrome); SwiftShader CI fps is indicative only. Still needs one laptop-iGPU check (Q).)_
+  Performance budget: 60 fps on a laptop iGPU.
 - **French only** for all in-game text. Ch'ti touches in dialogue ("hein", "biloute", "drache", "estaminet"), sparingly.
 
 ## 11. Prototype v0.1 (shipped)
@@ -294,7 +294,7 @@ The campaign simulator plays 1000 seeded campaigns per strategy bot. Targets:
 - [x] Cute low-poly cast and street (stepped gables, carriage door, La Bombance, the cat, the dachshund). **Q** _(art v0.3–v0.5: QA in Chrome, screenshots in `qa/art-v0.5/`)_
 - [x] Audio: crowd, chairs on cobbles, exhaust hum, 22:00 bell, mute (M). **Q** _(art v0.3; v0.5 adds sfx + day/hall loops)_
 - [ ] French only, satirical tone, Ch'ti touches. Copy proofread. **Q L**
-- [ ] 60 fps on a laptop iGPU (perf test logs the frame time). Loads in < 5 s. Bundle < 3 MB. **T Q** — T: tests/e2e/checklist-perf.e2e.js (bundle 1.1 MB, title 147 ms in CI, frame time logged; 60 fps = Q)
+- [ ] 60 fps on a laptop iGPU (perf test logs the frame time). Loads in < 5 s. Bundle < 3 MB. **T Q** — T: tests/e2e/checklist-perf.e2e.js (bundle 1.1 MB, title 147 ms in CI, frame time logged; 60 fps = Q) _(art: busiest Saturday view 150 draw calls / ≤130k triangles, 3.2 ms/frame on a real GPU (Apple, Chrome); SwiftShader CI fps is indicative only. Still needs one laptop-iGPU check (Q).)_
 - [x] CI green (unit + e2e + campaign simulator smoke). Deploy auto from main. **T** _(v0.4: .github/workflows/ci.yml runs vitest, `npm run sim -- --runs 20`, Playwright; CT 105 deploys main every 2 min)_
 
 ### Release tasks (done by the design agent when v1.0 lands)
