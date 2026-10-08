@@ -195,7 +195,7 @@ export const TWISTS = [
       opportunities: ['night_db', 'night_photo'],
     },
     lines: {
-      barks: ['« ALLEZ LILLE ! »', '« Arbitre, au trou ! Le Trou ! C’est le nom de la rue ! »', '« On reste pour la troisième mi-temps ! »'],
+      barks: ['« ALLEZ LILLE ! »', '« Arbitre, va dormir rue de Gand ! »', '« On reste pour la troisième mi-temps ! »'],
       klaas: ['21h12 : but. 94 décibels à la place. Je n’ai pas compté les têtes. Il n’y a que des têtes.'],
       recap: ['Lille a gagné. La rue des Bouchers, elle, a perdu la nuit.'],
     },
@@ -312,7 +312,7 @@ export const TWISTS = [
     intro: "L’office de tourisme lance sa « balade nocturne du Vieux-Lille ». Point d’orgue à 22h15 : la rue des Bouchers, « autrefois surnommée le Trou ». Le guide a un micro-cravate et une voix qui porte.",
     sim: {
       witnesses: [{ id: 'guide', at: 'street', filming: false }],
-      events: [{ at: H(22, 15), text: "« Mesdames et messieurs, voici le Trou. Un canal coulait ici jusqu’en 1912. » Trente touristes regardent les pavés, puis les terrasses, puis votre fenêtre." }],
+      events: [{ at: H(22, 15), text: "« Mesdames et messieurs, voici le Trou. Un canal coulait ici jusqu’en 1920. » Trente touristes regardent les pavés, puis les terrasses, puis votre fenêtre." }],
       opportunities: ['night_photo'],
     },
     lines: {
@@ -390,7 +390,7 @@ export const TWISTS = [
   },
   {
     id: 'waiter_last_night',
-    title: 'La dernière nuit de Théo',
+    title: 'La dernière nuit du serveur',
     pool: true,
     when: { day: [6, 13] },
     intro: "Demain, le serveur part en vacances : dix jours, ses premiers depuis deux ans. Ce soir, il sert en chantant, rentre les tables à l’heure « parce qu’il a un train », et dit au revoir à tout le monde. Même à vous.",
@@ -438,13 +438,13 @@ export const TWISTS = [
     intro: "Ce soir, une équipe de pompiers fait un « exercice de passage » dans les rues piétonnes du Vieux-Lille. Avec un mètre ruban. Ils passeront rue des Bouchers vers 22h20. Les terrasses ne sont pas au courant.",
     sim: {
       witnesses: [{ id: 'firefighters', at: 'street', filming: false }],
-      events: [{ at: H(22, 20), text: "Le camion s’engage, s’arrête, recule. Un pompier mesure le couloir : « 1,40 m. Il en faut 3. » Dédé découvre ce que veut dire « procès-verbal »." }],
+      events: [{ at: H(22, 20), text: "Le camion s’engage, s’arrête, recule. Un pompier mesure le couloir : « 1,40 m. Il en faut 2. » Dédé découvre ce que veut dire « procès-verbal »." }],
       opportunities: ['night_photo', 'night_police'],
     },
     lines: {
       barks: ['« C’est un exercice ? » « Pour eux, oui. Pour la terrasse, non. »', '« Ils sont mignons, les pompiers. » « Ils mesurent ta chaise. »'],
       klaas: ['22h20 : les pompiers mesurent. 1,40 m. Ils ont un meilleur mètre que Pilou. Je le note pour Pilou.'],
-      recap: ["Les pompiers ont mesuré le couloir de passage : 1,40 m sur 3 exigés. Leur rapport ira plus vite que nos e-mails."],
+      recap: ["Les pompiers ont mesuré le couloir de passage : 1,40 m sur 2 exigés. Leur rapport ira plus vite que nos e-mails."],
     },
     props: ['fire_truck', 'tape_measure'],
     after: { setFlags: ['twist_fire_inspection'], media: ['press_twist_fire'] },

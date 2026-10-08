@@ -772,7 +772,7 @@ export const MEDIA = {
       when: { flags: ['twist_fire_inspection'] },
       author: 'journaliste',
       headline: "Vieux-Lille : les pompiers mesurent les couloirs de passage",
-      text: "Lors d’un exercice nocturne, les sapeurs-pompiers ont relevé un passage de 1,40 m rue des Bouchers, pour 3 m exigés. Un restaurateur évoque « un malentendu sur le mobilier ».",
+      text: "Lors d’un exercice nocturne, les sapeurs-pompiers ont relevé un passage de 1,40 m rue des Bouchers, pour 2 m exigés. Un restaurateur évoque « un malentendu sur le mobilier ».",
     },
     {
       id: 'press_twist_tv',
