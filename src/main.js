@@ -59,6 +59,8 @@ addEventListener('unhandledrejection', (e) => showFatal(e.reason));
 window.__rdbFatal = showFatal; // pour les tests
 
 // ---------- Écran de chargement ----------
+// Nuit de campagne (?mode=night) : pas d'écran titre du tout (QA U6), même pendant le chargement
+if (new URLSearchParams(location.search).get('mode') === 'night') $('title')?.classList.add('hidden');
 let shown = 0;
 function progress(p, label) {
   shown = Math.max(shown, p);
