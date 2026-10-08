@@ -183,16 +183,16 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
       cards.push({ type: 'event', id: e.id });
       random++;
     }
-    if (ph === 'afternoon') {
-      // Contre-offensives du bloc révélées l'après-midi (§3)
-      let n = 0;
-      for (const m of K.COUNTERMOVES) {
-        if (n >= C.maxCountermovesPerDay) break;
-        if (m.once !== false && S.seen.countermoves.includes(m.id)) continue;
-        if (!c.check(m.when)) continue;
-        cards.push({ type: 'countermove', id: m.id });
-        n++;
-      }
+    // Contre-offensives du bloc : l'après-midi par défaut (§3), ou la phase de leur `when` (les e-mails de Tatie
+    // arrivent le matin). Plafond par phase.
+    let cm = 0;
+    for (const m of K.COUNTERMOVES) {
+      if (cm >= C.maxCountermovesPerDay) break;
+      if (![m.when?.phase ?? 'afternoon'].flat().includes(ph)) continue;
+      if (m.once !== false && S.seen.countermoves.includes(m.id)) continue;
+      if (!c.check(m.when)) continue;
+      cards.push({ type: 'countermove', id: m.id });
+      cm++;
     }
     // Dialogues (par défaut l'après-midi, ou la phase de leur `when`) : on tire au sort parmi les éligibles, en
     // privilégiant les plus précis (plus de conditions) et les jamais vus, sinon les premiers du fichier monopolisent.

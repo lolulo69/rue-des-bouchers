@@ -176,19 +176,22 @@ const SECTION8 = {
   'plainte pour harcèlement': 'cm_harassment_complaint', 'plainte pour diffamation': 'cm_defamation', 'appel à Colette': 'cm_colette_call',
   'samedi « festif »': 'cm_festive_saturday', 'recrutement d\'un riverain': 'traitor_recruited', 'faux post « Bernadette harcelée »': 'cm_fake_post',
 };
-// Contre-offensives que le moteur ne peut pas déclencher aujourd'hui (voir qa/checklist-audit.md) :
-// buildCards() ne révèle les contre-offensives que l'après-midi, or ces entrées ont `when.phase: 'morning'`.
-const CM_KNOWN_BROKEN = new Set(K.COUNTERMOVES.filter((m) => [m.when?.phase].flat().includes('morning')).map((m) => m.id));
+
 describe('§13.D3 · les contre-offensives du §8 se déclenchent selon l\'état', () => {
   for (const [label, flag] of Object.entries(SECTION8)) {
     const m = K.COUNTERMOVES.find((x) => x.effects?.setFlags?.includes(flag));
     if (!m) { it.todo(`${label} : aucune contre-offensive ne pose ${flag}`); continue; }
-    if (CM_KNOWN_BROKEN.has(m.id)) { it.todo(`${label} (${m.id}) : when.phase 'morning' jamais évalué par buildCards() (contre-offensives = après-midi)`); continue; }
-    it(`${label} → ${m.id}`, () => {
+    // Les contre-offensives du matin (e-mails de Tatie…) sont tirées au début du matin, les autres au début de l'après-midi
+    const morning = [m.when?.phase].flat().includes('morning');
+    it(`${label} → ${m.id}${morning ? ' (matin)' : ''}`, () => {
       const lo = m.when?.day ? [m.when.day].flat()[0] : 1;
-      const c = drive(fresh(9), (x) => x.step === 'koddex' && x.state.day >= Math.max(2, lo));
-      satisfy(c, { ...m.when, notFlags: [] });
-      c.koddex(['work', 'work', 'work']); // l'après-midi commence : les cartes sont tirées ici
+      let c;
+      if (morning && lo <= 1 && !m.when?.flags?.length && !m.when?.stats && !m.when?.hidden) c = fresh(9); // dès le 1er matin
+      else {
+        c = drive(fresh(9), (x) => (morning ? x.step === 'recap' && x.state.day >= Math.max(1, lo - 1) : x.step === 'koddex' && x.state.day >= Math.max(2, lo)));
+        satisfy(c, { ...m.when, phase: undefined, notFlags: [] });
+        if (morning) c.nextDay(); else c.koddex(['work', 'work', 'work']); // les cartes de la phase sont tirées ici
+      }
       const queued = [];
       while (c.step === 'cards') { const card = c.card(); queued.push(card.id); const ok = card.choices.findIndex((x) => x.available); c.resolveCard(Math.max(0, ok)); }
       expect(queued, m.id).toContain(m.id);
