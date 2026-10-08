@@ -13,11 +13,22 @@ When a bug is fixed, remove the `fixme` (the test then guards against regression
 - **Actual**: the screen jumps straight to the afternoon (or the next card) on the 3rd click: the player never sees the side project's `result` text, the Job change, or the Stéphane warning. `koddex-done` is unreachable.
 - **Owner guess**: build agent (src/ui): keep `view.k.done` on screen while `view.k.day === c.state.day`, e.g. `if (view.k?.done && !view.k.left) return koddexScreen()` before the `c.step` switch.
 
+### BUG-003 · The D14 commission scene (the speeches) is never shown
+- **Test**: `tests/e2e/fullrun.e2e.js` › « BUG-003 · la scène de la commission (J14) est affichée avant les plaidoiries » (reads the full run's log; run `npm run test:fullrun` first).
+- **Files**: `src/ui/index.js` › `cardScreen()` renders `d.title`, `d.text` and the choices, but never `card.scene`. The engine fills it (`src/sim/campaign.js:216`, `narrative.commissionScene`) because main.js passes `narrative`.
+- **Steps**: play a campaign to day 14 (afternoon) through the UI (« légal prudent » full run, seed 101).
+- **Expected**: before the pitches, the scene plays: the mayor opens, Jérémie argues from the dossier's strengths, Ghislain, Delphine and Colette answer, each line chosen from what the player did (`events.js` › `d14_commission.scene`).
+- **Actual**: the engine prepared **10** speeches for this run; **0** appear on screen. The player goes straight from the intro paragraph to the choice buttons, so the commission, the climax of §3, is a menu.
+- **Owner guess**: build agent (src/ui): render `card.scene` as a sequence of `ui-dialogue` bubbles (portrait + name + text), one « Suivant » per speech or all at once, before the choices.
+
 ## Notes (not bugs, for the design agent)
 - **`?day=` only knows `mon` and `sat`** in the standalone night (`DAYS` in `src/config.js`); any other value silently plays Monday. Fine while the campaign passes the weekday itself, but a QA URL like `?day=tue` misleads (it still shows « Lundi »). The police roster is per weekday, so test tip-offs on Monday after 23:00 (Lemaire's shift).
 - **Window view**: standing at the window, the sill and Bernadette's awning hide the tables right below. Leaning out (forward to the window frame) shows them (`qa/screens/03b-window-lean.jpg`), and a photo of the nearest Bernadette table from the window works. The raycast ignores the awning, so the photo works even when the table looks hidden. Worth a look in the art pass.
 - **Campaign UI** landed (aaa8b88): `tests/e2e/campaign-flow.e2e.js` drives it through the real UI (`data-testid` hooks) and plays nights headless through `c.createNight()` for the 14-day end-screen test.
 - **Perf locally** is meaningless at the moment (the Mac mini is overloaded, SwiftShader: 0.3 fps, 133 draw calls, 186k triangles in the Saturday street view). CI's `npm run test:perf` is the reference; the 60 fps budget is a warning there unless `PERF_STRICT=1`.
+
+- **To verify (possible BUG-004)**: in the full runs, 3 event results per 14-day campaign are never shown. The chosen option has a `result`, but the step moves on (same mechanism as BUG-002: `render()` dispatches on `c.step`). See `log.lostResults` in `test-results/fullrun/*.json`.
+- **Duration (§13.A)**: see `qa/duration.md`. Both full campaigns land at ~3h05 (target 2h30–4h); the custody run stops at day 5 (1h16), as expected for an early ending.
 
 ## Fixed
 - **BUG-001** · the 3D dachshund and Jérémie didn't follow the sim's evening round. Fixed by the scene director (`src/scene/director.js`, 41c649e/3016a52), which places them on `sim.dogPos()`. The test in `tests/e2e/coherence.e2e.js` is now a regular regression test.
