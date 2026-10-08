@@ -59,8 +59,11 @@ export function portrait(id, expression = 'neutral', size = '') {
 
 // Effet machine à écrire. Retourne une promesse ; `skip()` termine immédiatement.
 // La vitesse est globale (UI_SPEED) pour que les tests puissent l'accélérer.
-export function typewrite(node, text, { cps = 60, caret = true } = {}) {
-  const speed = globalThis.__rdbUiSpeed ?? 1;
+// Vitesse : réglage du joueur (globalThis.__rdbUiCps, settings.js ; 0 = instantané), sauf forçage des tests (__rdbUiSpeed).
+export function typewrite(node, text, { cps: cpsDefault = 60, caret = true } = {}) {
+  const setting = globalThis.__rdbUiCps;
+  const speed = globalThis.__rdbUiSpeed ?? (setting === 0 ? 0 : 1);
+  const cps = setting || cpsDefault;
   let i = 0; let done; let timer;
   const p = new Promise((res) => { done = res; });
   const finish = () => { clearTimeout(timer); node.textContent = text; node.classList.remove('ui-caret'); done(); };

@@ -193,3 +193,123 @@ test('Carnet (C), Aide et À propos (U10)', async ({ page }) => {
   await expect(page.locator('[data-testid=carnet] [data-codex=c_pilou] .ui-new')).toHaveCount(0);
   expect(errors).toEqual([]);
 });
+
+test('menu (Échap) : réglages persistés, aide, carnet, quitter vers le titre', async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.goto('/ui.html?fresh=1&fast=1&seed=12');
+  await page.evaluate(() => localStorage.removeItem('rdb.settings.v1'));
+  await page.click('[data-testid=title-new]');
+  await page.click('[data-testid=intro-skip]');
+  await page.keyboard.press('Escape');
+  const menu = page.locator('[data-testid=menu]');
+  await expect(menu).toBeVisible();
+  await expect(page.locator('[data-testid=menu-resume]')).toBeFocused();
+  await page.click('[data-testid=menu-bigtext]');
+  await expect(page.locator('html')).toHaveClass(/rdb-big-text/);
+  await page.click('[data-speed=instant]');
+  await expect(page.locator('[data-speed=instant]')).toHaveAttribute('aria-checked', 'true');
+  await page.click('[data-testid=menu-mute]');
+  await expect(page.locator('[data-testid=menu-mute]')).toHaveAttribute('aria-checked', 'true');
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('rdb.settings.v1')));
+  expect(saved).toMatchObject({ bigText: true, textSpeed: 'instant', muted: true });
+  await page.click('[data-testid=menu-carnet]');
+  await expect(page.locator('#ui-menu [data-testid=carnet]')).toBeVisible();
+  await page.keyboard.press('Escape'); // retour au menu
+  await page.click('[data-testid=menu-help]');
+  await expect(page.locator('#ui-menu [data-testid=help]')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await page.keyboard.press('Escape'); // ferme le menu
+  await expect(menu).toHaveCount(0);
+  await page.click('[data-testid=menu-open]');
+  await page.click('[data-testid=menu-quit]');
+  await page.click('[data-testid=menu-quit]');
+  await expect(page.locator('[data-testid=title-continue]')).toBeVisible();
+  // les réglages survivent au rechargement
+  await page.reload();
+  await expect(page.locator('html')).toHaveClass(/rdb-big-text/);
+  await page.evaluate(() => localStorage.removeItem('rdb.settings.v1'));
+  expect(errors).toEqual([]);
+});
+
+test('clavier seul : de l’écran titre au matin, focus visible', async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.goto('/ui.html?fresh=1&fast=1&seed=4');
+  // L'action principale est focalisée d'office : Entrée suffit pour commencer
+  await expect(page.locator('[data-testid=title-new]')).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('[data-testid=intro-next]')).toBeFocused();
+  for (let i = 0; i < 8 && await page.locator('[data-testid=intro]').count(); i++) await page.keyboard.press('Enter');
+  // Cartes : touches 1–9 ou Entrée sur le choix focalisé, jusqu'au terminal Koddex
+  for (let i = 0; i < 20 && (await step(page)) !== 'koddex'; i++) {
+    const focused = await page.evaluate(() => document.activeElement?.dataset?.testid ?? document.activeElement?.tagName);
+    expect(focused, 'le focus a été perdu').not.toBe('BODY');
+    if (await page.locator('[data-testid=card-choice]').count() && !(await page.locator('[data-testid=result-next]').count())) await page.keyboard.press('Digit1');
+    else await page.keyboard.press('Enter');
+  }
+  await expect(page.locator('[data-testid=terminal]')).toBeVisible();
+  await expect(page.locator('[data-testid=koddex-option]').first()).toBeFocused();
+  const ring = await page.evaluate(() => getComputedStyle(document.activeElement).outlineStyle);
+  expect(ring).toBe('solid');
+  await page.keyboard.press('Enter');
+  await expect(page.locator('.ui-prompts i.used')).toHaveCount(1);
+  expect(errors).toEqual([]);
+});
+
+test('écran de fin : une du journal, épilogue, galerie de 8 fins avec la secrète en « ??? », persistance', async ({ page }) => {
+  test.setTimeout(480_000);
+  const errors = watchErrors(page);
+  await page.goto('/ui.html?fresh=1&fast=1&seed=21');
+  await page.evaluate(() => localStorage.removeItem('rdb.endings.v1'));
+  await page.click('[data-testid=title-new]');
+  await page.click('[data-testid=intro-skip]');
+  await page.evaluate(async () => {
+    const ui = window.__rdbUi; const c = ui.campaign;
+    for (let i = 0; i < 5000 && !c.ended; i++) {
+      if (c.step === 'cards') { const card = c.card(); c.resolveCard(card.choices.find((x) => x.available)?.i ?? 0); }
+      else if (c.step === 'koddex') c.koddex(['work', 'work', 'work']);
+      else if (c.step === 'actions') { const a = c.availableActions().find((x) => x.legality === 'legal'); if (a && c.state.timeLeft) c.doAction(a.id); else c.endAfternoon(); }
+      else if (c.step === 'night') { const sim = c.createNight(); while (!sim.state.ended) { sim.tick(2); sim.events.length = 0; } c.finishNight(sim); }
+      else if (c.step === 'recap') c.nextDay();
+    }
+    ui.render();
+  });
+  await expect(page.locator('#ui-root')).toHaveAttribute('data-step', 'ended');
+  await expect(page.locator('[data-testid=ending-hero] .ui-big')).not.toBeEmpty();
+  await expect(page.locator('[data-testid=ending] .ui-epilogue p').first()).toBeVisible();
+  const slots = page.locator('[data-testid=endings] > div');
+  await expect(slots).toHaveCount(8);
+  const id = await page.locator('[data-testid=ending]').getAttribute('data-id');
+  if (id !== 'turncoat') await expect(page.locator('[data-testid=endings] [data-slot=secret]')).toHaveText('???');
+  await expect(page.locator(`[data-testid=endings] [data-ending="${id}"]`)).not.toHaveClass(/locked/);
+  if (await page.locator('[data-testid=ending-paper]').count()) await expect(page.locator('[data-testid=ending-paper] .ui-paper-mast')).toContainText('La Voix du Nordiste');
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: 'test-results/ui-ending.png', fullPage: true });
+  // Nouvelle campagne : la galerie reste sur l'écran titre
+  await page.click('[data-testid=end-new]');
+  await expect(page.locator(`[data-testid=endings] [data-ending="${id}"]`)).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test('fin anticipée : la garde à vue au jour 5 affiche son vrai jour, pas la commission', async ({ page }) => {
+  test.setTimeout(300_000);
+  await page.goto('/ui.html?fresh=1&fast=1&seed=31');
+  await page.click('[data-testid=title-new]');
+  await page.click('[data-testid=intro-skip]');
+  await page.evaluate(() => {
+    const ui = window.__rdbUi; const c = ui.campaign;
+    for (let i = 0; i < 3000 && !c.ended && !(c.state.day === 5 && c.step === 'koddex'); i++) {
+      if (c.step === 'cards') { const card = c.card(); c.resolveCard(card.choices.find((x) => x.available)?.i ?? 0); }
+      else if (c.step === 'koddex') c.koddex(['work', 'work', 'work']);
+      else if (c.step === 'actions') c.endAfternoon();
+      else if (c.step === 'night') { const sim = c.createNight(); while (!sim.state.ended) { sim.tick(2); sim.events.length = 0; } c.finishNight(sim); }
+      else if (c.step === 'recap') c.nextDay();
+    }
+    c.apply({ ending: 'custody' }, 'engine', 'test');
+    c.koddex(['work', 'work', 'work']); // le moteur vérifie les fins anticipées après chaque appel
+    ui.render();
+  });
+  await expect(page.locator('#ui-root')).toHaveAttribute('data-step', 'ended');
+  await expect(page.locator('[data-testid=ending]')).toHaveAttribute('data-id', 'custody');
+  await expect(page.locator('[data-testid=ending-kicker]')).toContainText('Jour 5 · Fin anticipée');
+  await expect(page.locator('[data-testid=ending-kicker]')).not.toContainText('Commission');
+});

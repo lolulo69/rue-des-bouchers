@@ -34,18 +34,21 @@ export function createVignette(host) {
   function stop() { cancelAnimationFrame(raf); raf = 0; last = 0; }
 
   return {
-    // name : 'koddex' | 'atelier' | 'mairie' | null
-    set(next) {
-      if (broken || next === name) return;
+    // name : 'koddex' | 'atelier' | 'mairie' | 'ending' | null. 'ending' : art.scenes.ending(arg.id, arg.flags)
+    // si l'art le fournit, sinon la mairie en repli (et le fond chaud CSS si WebGL manque).
+    set(next, arg) {
+      const key = next === 'ending' ? `ending:${arg?.id ?? ''}` : next;
+      if (broken || key === name) return;
       current?.dispose?.();
       current = null;
-      name = next;
-      canvas.classList.toggle('on', !!next);
-      if (!next || !scenes[next]) { stop(); return; }
+      name = key;
+      const make = next === 'ending' ? (typeof scenes.ending === 'function' ? () => scenes.ending(arg?.id, arg?.flags ?? []) : scenes.mairie) : scenes[next];
+      canvas.classList.toggle('on', !!(next && make));
+      if (!next || !make) { stop(); return; }
       try {
         renderer ??= new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
         renderer.setPixelRatio(1);
-        current = scenes[next]();
+        current = make();
         resize();
         if (!raf) raf = requestAnimationFrame(frame);
       } catch {

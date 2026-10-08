@@ -17,6 +17,9 @@ import { WEEKDAYS, WEEKDAYS_SHORT, PHASE_LABELS, LEGALITY, explain, afternoonMen
 import { phoneView, pullFeed, unreadItems, messageNode } from './phone.js';
 import { createVignette } from './vignette.js';
 import { carnetView, helpView, aboutView, carnetNews } from './codex.js';
+import { openMenu, isMenuOpen } from './menu.js';
+import { applySettings } from './settings.js';
+export { openMenu } from './menu.js';
 
 export const SAVE_KEY = 'rdb.save.v1';
 export const UI_KEY = 'rdb.ui.v1';           // préférences d'affichage de l'UI (non-lus, répliques entendues, avant-nuit)
@@ -117,7 +120,8 @@ export function mount(engine = {}, opts = {}) {
   function sceneFor() {
     if (!c) return null;
     if (shown() === 'koddex') return 'koddex';
-    if (c.step === 'ended' || (c.state.day === 14 && c.state.phase !== 'morning')) return 'mairie';
+    if (c.step === 'ended') return 'ending';
+    if (c.state.day === 14 && c.state.phase !== 'morning') return 'mairie';
     if (c.state.phase === 'morning') return 'koddex';
     if (c.step === 'actions' || c.state.phase === 'afternoon') return 'atelier';
     return null;
@@ -146,10 +150,10 @@ export function mount(engine = {}, opts = {}) {
     root.dataset.step = c ? shown() : 'title';
     if (!c) {
       vignette.set(null);
-      if (panel === 'help' || panel === 'about') return layer.append(h('div.ui-wrap', panelView()));
-      return layer.append(titleScreen());
+      layer.append(panel === 'help' || panel === 'about' ? h('div.ui-wrap', panelView()) : titleScreen());
+      return focusPrimary();
     }
-    if (fresh() && !meta.introSeen && introCards().length) { vignette.set('koddex'); return layer.append(introScreen()); }
+    if (fresh() && !meta.introSeen && introCards().length) { vignette.set('koddex'); layer.append(introScreen()); return focusPrimary(); }
     // Nouveaux messages : relevés une fois par phase (le moteur applique leurs effets)
     const at = `${c.state.day}:${c.state.phase}`;
     if (c.step !== 'ended' && meta.pulledAt !== at) {
@@ -158,7 +162,7 @@ export function mount(engine = {}, opts = {}) {
       view.notif = got.length ? got : view.notif;
       save();
     }
-    vignette.set(sceneFor());
+    vignette.set(sceneFor(), sceneFor() === 'ending' ? { id: c.state.ending?.id, flags: [...c.state.flags] } : undefined);
     root.dataset.scene = sceneFor() ?? 'none';
     const wrap = h('div.ui-wrap');
     if (c.step !== 'ended') wrap.append(header());
@@ -175,6 +179,18 @@ export function mount(engine = {}, opts = {}) {
     }
     layer.append(wrap);
     root.scrollTop = 0;
+    focusPrimary();
+  }
+  // Accessibilité : si le focus s'est perdu (l'élément a disparu au rendu), on le pose sur l'action principale.
+  const PRIMARY = ['[data-testid=result-next]', '[data-testid=intro-next]', '[data-testid=card-choice]:not([disabled])', '[data-testid=koddex-done]',
+    '[data-testid=koddex-option]:not([disabled])', '[data-testid=night-go]', '[data-testid=recap-next]', '[data-testid=end-continue]', '[data-testid=end-new]',
+    '[data-testid=title-continue]', '[data-testid=title-new]', '[data-testid=action]:not([disabled])', '[data-testid=phone-close]', '[data-testid=carnet-close]',
+    '[data-testid=help-close]', '[data-testid=about-close]'];
+  function focusPrimary(force = false) {
+    if (!visible || isMenuOpen()) return;
+    const a = document.activeElement;
+    if (!force && a && a !== document.body && layer.contains(a)) return;
+    for (const sel of PRIMARY) { const el = layer.querySelector(sel); if (el) { el.focus({ preventScroll: true }); return; } }
   }
   const introCards = () => (typeof c?.introCards === 'function' ? c.introCards() : narrative.introCards()) ?? [];
   function openPhone(tab) { panel = null; phone = { open: true, tab: tab ?? phone.tab }; view.notif = null; render(); }
@@ -274,7 +290,7 @@ export function mount(engine = {}, opts = {}) {
           h('button.ui-btn.ghost.ui-icon', { onclick: () => (panel === 'carnet' ? closePanel() : openPanel('carnet')), dataset: { testid: 'carnet-open' }, 'aria-label': 'Carnet (C)', title: 'Carnet (C)' },
             '📓', carnetNews(c, meta) ? h('span.ui-badge', carnetNews(c, meta)) : null),
           h('button.ui-btn.ghost.ui-icon', { onclick: () => (panel === 'help' ? closePanel() : openPanel('help')), dataset: { testid: 'help-open' }, 'aria-label': 'Comment jouer', title: 'Comment jouer' }, '❓'),
-          opts.onQuit ? h('button.ui-btn.ghost.ui-icon', { onclick: opts.onQuit, 'aria-label': 'Menu', title: 'Menu' }, '☰') : null)),
+          h('button.ui-btn.ghost.ui-icon', { onclick: () => showMenu(), dataset: { testid: 'menu-open' }, 'aria-label': 'Menu et réglages (Échap)', title: 'Menu (Échap)' }, '☰'))),
       h('div.ui-cal', Array.from({ length: 14 }, (_, k) => h(`i${k + 1 < S.day ? '.done' : ''}${k + 1 === S.day ? '.now' : ''}${evDays.has(k + 1) ? '.ev' : ''}`, { title: `Jour ${k + 1}` }))),
       up ? h('div.ui-upcoming', up.day === S.day ? 'Aujourd’hui : ' : `Jour ${up.day} (${WEEKDAYS_SHORT[c.weekday(up.day)]}) : `, h('b', up.title)) : null,
       h('div.ui-stats', stats));
@@ -405,6 +421,7 @@ export function mount(engine = {}, opts = {}) {
     }
     typing = null;
     menu.querySelectorAll('button').forEach((b) => { b.disabled = false; });
+    focusPrimary();
   }
   function pick(id, item) {
     const k = view.k;
@@ -552,9 +569,11 @@ export function mount(engine = {}, opts = {}) {
   // ── fin de campagne ─────────────────────────────────────────────────
   function endScreen() {
     const S = c.state;
+    const before = new Set(store.get(ENDINGS_KEY) ?? []);
     recordEnding();
     const found = new Set(store.get(ENDINGS_KEY) ?? []);
     const e = S.ending ?? {};
+    const isNew = e.id && !before.has(e.id);
     const front = S.endingMedia?.front ?? (e.id ? narrative.mediaEnding(e.id, S) : null);
     const buttons = h('div.ui-col');
     if (e.canContinue) buttons.append(h('button.ui-btn.center', { dataset: { testid: 'end-continue' }, onclick: () => { c.continueAfterEnding(); afterEngine(); view = {}; render(); } }, e.continueLabel ?? 'Continuer'));
@@ -562,30 +581,71 @@ export function mount(engine = {}, opts = {}) {
       if (opts.onNew && opts.campaign) return opts.onNew();
       store.del(SAVE_KEY); c = null; render();
     } }, 'Nouvelle campagne'));
-    return h('div.ui-card', { dataset: { testid: 'ending', id: e.id } },
-      h('span.ui-kicker', e.early ? `Fin anticipée · jour ${e.day}` : 'Commission du jour 14'),
-      h('p.ui-big', e.title ?? 'Fin'),
-      front ? h('div.ui-front', h('span.ui-kicker', 'La Voix du Nordiste'), front.headline ? h('h2', front.headline) : null, h('p', front.text)) : null,
-      h('div.ui-epilogue', (S.epilogue ?? []).map((t) => h('p', t))),
-      h('h3', 'Fins découvertes'),
-      endingsGrid(found, e.id),
-      buttons);
+    return [
+      // Le tableau de fin (art.scenes.ending) est rendu derrière ; ce bandeau laisse la place de le voir
+      h('div.ui-ending-hero', { dataset: { testid: 'ending-hero' } },
+        h('span.ui-kicker', { dataset: { testid: 'ending-kicker' } }, endingContext(e)),
+        h('h1.ui-big', e.title ?? 'Fin'),
+        isNew ? h('span.ui-new', 'Nouvelle fin découverte') : null),
+      front ? newspaper(front, S) : null,
+      h('div.ui-card', { dataset: { testid: 'ending', id: e.id } },
+        h('h2', 'Épilogue'),
+        h('div.ui-epilogue', (S.epilogue ?? []).map((t) => h('p', t))),
+        h('h3', `Fins découvertes · ${[...found].filter((id) => content.ENDINGS.some((x) => x.id === id)).length}/${content.ENDINGS.length}`),
+        endingsGrid(found, e.id),
+        buttons),
+    ];
   }
+  // Surtitre de la fin : une fin anticipée (garde à vue, licenciement, déménagement avant la commission) donne son vrai jour
+  const EARLY_CONTEXT = { custody: 'au commissariat', fired: 'chez Koddex', moving_out: 'les cartons' };
+  function endingContext(e) {
+    const early = c.cfg?.CAMPAIGN?.earlyEndings ?? ['custody', 'fired', 'moving_out'];
+    const day = e.day ?? c.state.day;
+    const isEarly = e.early || day < 14 || (early.includes(e.id) && !c.has('commission_done'));
+    if (!isEarly) return 'Commission du jour 14';
+    return `Jour ${day} · Fin anticipée${EARLY_CONTEXT[e.id] ? ` · ${EARLY_CONTEXT[e.id]}` : ''}`;
+  }
+  // La une de La Voix du Nordiste pour cette fin (MEDIA.press, entrée `ending`)
+  function newspaper(front, S) {
+    return h('article.ui-paper', { dataset: { testid: 'ending-paper' }, 'aria-label': 'Une de La Voix du Nordiste' },
+      h('div.ui-paper-mast', h('b', 'La Voix du Nordiste'), h('span', `Édition du matin · lendemain du jour ${S.ending?.day ?? S.day}`)),
+      front.headline ? h('h2.ui-paper-head', front.headline) : null,
+      front.photo ? h('div.ui-paper-photo', { role: 'img', 'aria-label': front.photo }, h('span', `📷 ${front.photo}`)) : null,
+      h('p.ui-paper-text', front.text));
+  }
+  // Galerie des fins : un emplacement par fin ; la fin secrète reste « ??? » tant qu'elle n'a pas été trouvée
   function endingsGrid(found, current) {
-    const list = content.ENDINGS.filter((x) => !x.secret || found.has(x.id)); // les fins secrètes restent cachées
-    return h('div.ui-endings', { dataset: { testid: 'endings' } }, list.map((x) => h(`div${found.has(x.id) ? '' : '.locked'}${x.id === current ? '.now' : ''}`,
-      { dataset: { ending: x.id } }, found.has(x.id) ? x.title : `🔒 ${x.title}`)));
+    return h('div.ui-endings', { dataset: { testid: 'endings' }, role: 'list' }, content.ENDINGS.map((x) => {
+      const got = found.has(x.id);
+      if (x.secret && !got) return h('div.locked.secret', { role: 'listitem', dataset: { slot: 'secret' }, 'aria-label': 'Fin secrète, pas encore trouvée' }, '???');
+      return h(`div${got ? '' : '.locked'}${x.id === current ? '.now' : ''}`, { role: 'listitem', dataset: { ending: x.id } }, got ? `✓ ${x.title}` : `🔒 ${x.title}`);
+    }));
   }
 
   // ── clavier : T ouvre le téléphone, Échap le ferme ──────────────────
   function onKey(e) {
-    if (!visible || e.target?.closest?.('input, textarea, select') || e.ctrlKey || e.metaKey || e.altKey) return;
-    if (e.code === 'Escape' && (phone.open || panel)) { phone.open = false; closePanel(); return; }
+    if (!visible || isMenuOpen() || e.target?.closest?.('input, textarea, select') || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.code === 'Escape') { e.preventDefault(); if (phone.open || panel) { phone.open = false; closePanel(); } else showMenu(); return; }
     if (!c) return;
+    // 1–9 : choisir la n-ième réponse d'une carte
+    if (/^Digit[1-9]$/.test(e.code) && shown() === 'cards' && !view.result && !phone.open && !panel) {
+      const b = layer.querySelectorAll('[data-testid=card-choice]:not([disabled])')[Number(e.code.slice(5)) - 1];
+      if (b) { e.preventDefault(); b.click(); }
+      return;
+    }
     if (e.code === 'KeyT') { e.preventDefault(); if (phone.open) closePhone(); else openPhone(); }
     else if (e.code === 'KeyC') { e.preventDefault(); if (panel === 'carnet') closePanel(); else openPanel('carnet'); }
   }
   window.addEventListener('keydown', onKey);
+  // Menu pause / réglages (Échap, ☰). « Quitter vers le titre » garde la sauvegarde (Continuer).
+  function showMenu() {
+    return openMenu({
+      campaign: c, meta,
+      onResume: () => focusPrimary(true),
+      onQuit: c ? () => { saveMeta(); c = null; view = {}; phone.open = false; panel = null; render(); } : undefined,
+    });
+  }
+  applySettings();
   const onResize = () => vignette.resize();
   window.addEventListener('resize', onResize);
 
@@ -603,6 +663,7 @@ export function mount(engine = {}, opts = {}) {
     root,
     get campaign() { return c; },
     render, show, hide, destroy, newCampaign, continueCampaign, openPhone, closePhone, openPanel, closePanel,
+    openMenu: showMenu,
     afterNight() { afterEngine(); show(); },
   };
   // autoContinue : reprendre la sauvegarde directement (retour de la nuit 3D, main.js)
