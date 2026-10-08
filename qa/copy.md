@@ -19,31 +19,42 @@ Line numbers re-checked on `main` at e46d826.
 ### Typography, everywhere in code strings (global row)
 | File | Line | Current | Fixed | Owner |
 |---|---|---|---|---|
-| src/ui/*.js, src/main.js, src/sim/*.js (player-facing logs), src/config.js (names, labels), index.html | all | `'` between letters, plain spaces in « … » and before : ; ! ?, `...` | apply the conventions above (e.g. `Seau d'eau : ${n}` → `Seau d’eau : ${n}`) | UI / build |
-| src/config.js | 61 | `Estaminet La Ch'tite Bernadette` (also in `PLACES` in content, now `Ch’tite`) | `Estaminet La Ch’tite Bernadette`, so the name renders the same in the HUD and on the cards | build |
+| src/ui/*.js, src/main.js, src/sim/*.js (player-facing logs), src/config.js (names, labels), index.html | all | `'` between letters, plain spaces in « … » and before : ; ! ?, `...` | apply the conventions above (e.g. `Seau d'eau : ${n}` → `Seau d’eau : ${n}`) | UI / build · **applied** (copy-apply) |
+| src/config.js | 61 | `Estaminet La Ch'tite Bernadette` (also in `PLACES` in content, now `Ch’tite`) | `Estaminet La Ch’tite Bernadette`, so the name renders the same in the HUD and on the cards | build · **applied** (copy-apply) |
 
 ### Wording, grammar, tu/vous, facts
 | File | Line | Current | Fixed | Owner |
 |---|---|---|---|---|
-| src/sim/sim.js | 270 | Quelqu'un urine contre **ta** porte d'entrée. Classique du samedi. | Quelqu’un urine contre **votre** porte d’entrée. Classique du samedi. | build |
-| src/sim/sim.js | 304 | … **approche-toi** à moins de ${…} m, dans la rue. | … Il faut mesurer : **approchez-vous** à moins de ${…} m, dans la rue. | build |
-| src/sim/sim.js | 435 | Trop loin : on voit une main, pas une enveloppe. **Rapproche-toi.** | Trop loin : on voit une main, pas une enveloppe. **Rapprochez-vous.** | build |
-| src/sim/sim.js | 455 | On sonne : la police, **pour toi**. Plainte du bloc pour « harcèlement ». Rappel à la loi. | On sonne : la police, **pour vous**. Plainte du bloc pour « harcèlement ». Rappel à la loi. | build |
-| src/sim/sim.js | 458 | … Contrôle d'identité… rien à **te** reprocher. Le bloc a essayé. | … Contrôle d’identité… rien à **vous** reprocher. Le bloc a essayé. | build |
-| src/sim/sim.js | 396 | Le teckel de Jérémie aboie comme un fou ! | Biloute, le teckel de Jérémie, aboie comme un fou ! | build |
-| src/sim/summary.js | 47 | Le **commissaire** s'intéresse aux cafés offerts. Lemaire transpire. | La hiérarchie de la police municipale s’intéresse aux cafés offerts. Lemaire transpire. (Lemaire's meals are only known after `seen_complaisance`: keep it to that branch.) | build |
-| src/sim/summary.js | 48 | Le bloc sait que c'est **toi qui appelles** au nom de l'Association. | Le bloc sait que c’est **vous qui appelez** au nom de l’Association. | build |
-| src/sim/police.js | 124 | … café offert, 0 PV (${n} infraction(s) **visibles**) | … (${n} infraction(s) **visible(s)**) | build |
-| src/sim/campaign.js | 559 | **L'IGPN** a bouclé son enquête : le brigadier Lemaire est muté. | L’enquête interne est bouclée : le brigadier Lemaire est muté. (The IGPN is national-police only; content says « enquête interne ».) | build |
-| src/config.js | 245 | Enquête de **l'IGPN** ouverte (pot-de-vin photographié) | Enquête interne ouverte (pot-de-vin photographié) | build |
-| src/config.js | 243 | Pilou a un gilet jaune **"livreur"** (encore moins reconnaissable) | Pilou a un gilet jaune « livreur » (encore moins reconnaissable) | build |
-| src/ui/index.js | 147 | La rue existe ; les personnages… (plain space before ;) | La rue existe ; les personnages… (U+202F before ;) | UI |
-| src/ui/index.js | 352 | 👁 Personne ne semble avoir **rien** vu. | 👁 Personne ne semble avoir vu quoi que ce soit. | UI |
-| src/ui/rules.js | 39, 51 | `jusqu'au`, `n'est` | `jusqu’au`, `n’est` | UI |
-| index.html | 35 | La **hotte du resto** souffle sous sa fenêtre. | La **gaine d’extraction** souffle sous sa fenêtre. (« gaine » everywhere else in the game) | build |
-| index.html | 34 | `l'<b>Estaminet La Ch'tite Bernadette</b>` | `l’<b>Estaminet La Ch’tite Bernadette</b>` | build |
-| index.html | 52 | 💬 Groupe WhatsApp de l'asso | 💬 Groupe WhatsApp « Radio Balcon » (read `WHATSAPP_GROUP` at runtime, so the v1.0 rename reaches this button) | build |
-| index.html | 50–51 | Police municipale (en mon nom) / Police, « pour l'Association… » | fine, apart from the apostrophe | build |
+| src/sim/sim.js | 270 | Quelqu'un urine contre **ta** porte d'entrée. Classique du samedi. | Quelqu’un urine contre **votre** porte d’entrée. Classique du samedi. | build · **applied** (copy-apply) |
+| src/sim/sim.js | 304 | … **approche-toi** à moins de ${…} m, dans la rue. | … Il faut mesurer : **approchez-vous** à moins de ${…} m, dans la rue. | build · **applied** (copy-apply) |
+| src/sim/sim.js | 435 | Trop loin : on voit une main, pas une enveloppe. **Rapproche-toi.** | Trop loin : on voit une main, pas une enveloppe. **Rapprochez-vous.** | build · **applied** (copy-apply) |
+| src/sim/sim.js | 455 | On sonne : la police, **pour toi**. Plainte du bloc pour « harcèlement ». Rappel à la loi. | On sonne : la police, **pour vous**. Plainte du bloc pour « harcèlement ». Rappel à la loi. | build · **applied** (copy-apply) |
+| src/sim/sim.js | 458 | … Contrôle d'identité… rien à **te** reprocher. Le bloc a essayé. | … Contrôle d’identité… rien à **vous** reprocher. Le bloc a essayé. | build · **applied** (copy-apply) |
+| src/sim/sim.js | 396 | Le teckel de Jérémie aboie comme un fou ! | Biloute, le teckel de Jérémie, aboie comme un fou ! | build · **applied** (copy-apply) |
+| src/sim/summary.js | 47 | Le **commissaire** s'intéresse aux cafés offerts. Lemaire transpire. | La hiérarchie de la police municipale s’intéresse aux cafés offerts. Lemaire transpire. (Lemaire's meals are only known after `seen_complaisance`: keep it to that branch.) | build · **applied** (copy-apply) |
+| src/sim/summary.js | 48 | Le bloc sait que c'est **toi qui appelles** au nom de l'Association. | Le bloc sait que c’est **vous qui appelez** au nom de l’Association. | build · **applied** (copy-apply) |
+| src/sim/police.js | 124 | … café offert, 0 PV (${n} infraction(s) **visibles**) | … (${n} infraction(s) **visible(s)**) | build · **applied** (copy-apply) |
+| src/sim/campaign.js | 559 | **L'IGPN** a bouclé son enquête : le brigadier Lemaire est muté. | L’enquête interne est bouclée : le brigadier Lemaire est muté. (The IGPN is national-police only; content says « enquête interne ».) | build · **applied** (copy-apply) |
+| src/config.js | 245 | Enquête de **l'IGPN** ouverte (pot-de-vin photographié) | Enquête interne ouverte (pot-de-vin photographié) | build · **applied** (copy-apply) |
+| src/config.js | 243 | Pilou a un gilet jaune **"livreur"** (encore moins reconnaissable) | Pilou a un gilet jaune « livreur » (encore moins reconnaissable) | build · **applied** (copy-apply) |
+| src/ui/index.js | 147 | La rue existe ; les personnages… (plain space before ;) | La rue existe ; les personnages… (U+202F before ;) | UI · **applied** (copy-apply) |
+| src/ui/index.js | 352 | 👁 Personne ne semble avoir **rien** vu. | 👁 Personne ne semble avoir vu quoi que ce soit. | UI · **applied** (copy-apply) |
+| src/ui/rules.js | 39, 51 | `jusqu'au`, `n'est` | `jusqu’au`, `n’est` | UI · **applied** (copy-apply) |
+| index.html | 35 | La **hotte du resto** souffle sous sa fenêtre. | La **gaine d’extraction** souffle sous sa fenêtre. (« gaine » everywhere else in the game) | build · **applied** (copy-apply) |
+| index.html | 34 | `l'<b>Estaminet La Ch'tite Bernadette</b>` | `l’<b>Estaminet La Ch’tite Bernadette</b>` | build · **applied** (copy-apply) |
+| index.html | 52 | 💬 Groupe WhatsApp de l'asso | 💬 Groupe WhatsApp « Radio Balcon » (read `WHATSAPP_GROUP` at runtime, so the v1.0 rename reaches this button) | build · **applied** (copy-apply) |
+| index.html | 50–51 | Police municipale (en mon nom) / Police, « pour l'Association… » | fine, apart from the apostrophe | build · **applied** (copy-apply) |
+
+## Applied (copy-apply)
+Every code-string row above was applied by the content agent, changing **string literals only** (no logic):
+- **tu → vous** in sim narration; « enquête interne » instead of the IGPN; « la hiérarchie de la police municipale » and « le Commandant Desmet » instead of « le commissaire » (including `sim.js` « Le commissaire veut voir ça »); Biloute named; « visible(s) »; « vu quoi que ce soit ».
+- **index.html**: « gaine d’extraction »; typographic quotes and apostrophes. The phone's WhatsApp button now reads `WHATSAPP_GROUP` (`src/main.js`: one import + one `textContent`).
+- **Typography** in `src/ui/*`, `src/main.js`, `src/sim/{sim,summary,police,campaign,nightActions,narrative,policies}.js`, `src/config.js`, `src/scene/director.js`, `src/art/portraits.js`, `src/world.js` (shop signs).
+  String-literal-only conversion, reviewed change by change. GLSL, CSS, selectors and ids are excluded. The three `'seau d’eau'` comparisons were converted together.
+- **Ids**: `igpn_open` → `inquiry_open`, `pm_igpn_report` → `pm_inquiry_report`, `press_igpn` → `press_inquiry`, `chef_igpn` → `chef_inquiry`, engine card/cause `'inquiry'`.
+  The balance knob `CAMPAIGN.igpn` and code identifiers (`S.igpn`, `updateIgpn`) are unchanged. A save made before the rename keeps `igpn_open` in its flags, so an inquiry already open in such a save is forgotten (`SAVE_VERSION` not bumped: pre-1.0).
+- **Test**: `tests/unit/typography.test.js` now also checks the displayed strings of `src/ui/{index,rules,phone}.js`, `src/main.js`, `src/config.js`, the sim's narration files and the text of `index.html`.
+  Tests that matched the old spacing were updated (`rules`, `ui-rules`, `campaign`, `night.e2e`).
 
 ## Content (fixed directly)
 
