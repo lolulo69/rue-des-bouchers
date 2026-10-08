@@ -24,14 +24,6 @@ export const KODDEX = {
   // ════════════════════════════════════════════════════════════════════════
   work: [
     {
-      id: 'work_todo_checkbox',
-      label: "Ajouter une case à cocher à l'appli de to-do de Stéphane",
-      job: +5,
-      once: true,
-      effects: { setFlags: ['todo_app_rust'] },
-      result: "Clode Kode a ajouté la case. Puis, « pour la cohérence », il a réécrit toute l'appli en Rust. C'est la quatrième fois. L'appli compte toujours trois tâches, dont « réécrire l'appli ».",
-    },
-    {
       id: 'work_todo_rewrite_again',
       label: "Corriger une faute de frappe dans l'appli de to-do",
       job: +4,
@@ -153,6 +145,20 @@ export const KODDEX = {
   // PROJETS PERSO (en douce, pour l'association)
   // ════════════════════════════════════════════════════════════════════════
   sideProjects: [
+    {
+      id: 'side_todo_rust',
+      label: "Laisser Clode Kode « jeter un œil » à l'appli de to-do de Stéphane",
+      legality: 'legal',
+      cost: { prompts: 1 },
+      job: -2,
+      risk: 0,
+      unlocks: 'todo_app_rust',
+      lines: [
+        { speaker: 'pilou', text: "Juste une case à cocher. Une seule. Tu ne touches à rien d'autre." },
+        { speaker: 'clode', text: "Bien entendu ! J'ai ajouté la case. Puis, par souci de cohérence, j'ai tout réécrit en Rust. Je vous présente mes plus plates excuses, et la version 4." },
+      ],
+      result: "Quatrième réécriture en Rust. L'appli compte toujours trois tâches, dont « réécrire l'appli ». Stéphane trouve qu'elle « a perdu son âme », et vous avez perdu la matinée.",
+    },
     {
       id: 'side_db_logger',
       label: 'Démon Rust de relevé de décibels (le micro à la fenêtre)',

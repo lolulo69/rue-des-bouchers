@@ -49,6 +49,7 @@ export const DIALOGUE = [
       "Tous les soirs à 22h, je sors Biloute. Officiellement, c'est une promenade hygiénique.",
       "Officieusement, c'est une ronde. Tu viens ? Le chien a le flair, moi j'ai le règlement.",
     ],
+    effects: { setFlags: ['joined_rounds'] },
   },
   {
     id: 'jeremie_rounds_regular',
