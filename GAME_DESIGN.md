@@ -242,8 +242,8 @@ Proof: **T** = automated test (vitest / Playwright / campaign simulator, runs in
 - [ ] Fixed events happen on their day: Saturdays 6 & 13, Colette's dinner (D4), the general meeting (D7), the inspector (D9), the exhaust meeting (D11), the commission (D14). **T Q**
 
 ### B. Characters (all present, recognisable, with a role and dialogue)
-- [ ] Pilou · Jérémie + dachshund · Klaas (Santa look, notebook) · Hilde · Tatie Bouchon (+ the "it's being fixed" email thread) · Seb & Nico + the cat · Hippolyte (carriage building). **Q**
-- [ ] Dédé · Ghislain (bun) · the waiter · Brigadier Lemaire · Agent Benali · the police chief · inspector Delphine Vermeersch · Stéphane (Koddex boss) · Colette Verhaeghe · mayor Bertrand Lescaut. **Q**
+- [ ] Pilou · Jérémie + dachshund · Klaas (Santa look, notebook) · Hilde · Tatie Bouchon (+ the "it's being fixed" email thread) · Seb & Nico + the cat · Hippolyte (carriage building). **Q** _(art side done: 3D model + portrait with 7 expressions for each, `qa/art-v0.5/portraits-1.jpg`; role/dialogue = content + wiring)_
+- [ ] Dédé · Ghislain (bun) · the waiter · Brigadier Lemaire · Agent Benali · the police chief · inspector Delphine Vermeersch · Stéphane (Koddex boss) · Colette Verhaeghe · mayor Bertrand Lescaut. **Q** _(art side done: models + portraits for all, incl. Lemaire/Benali/chef variants, Stéphane, Colette, Lescaut)_
 - [ ] Each association member has at least **8 lines** of contextual dialogue (reacting to the current state) and at least 1 action or event tied to them. **T** (content count) **Q**
 
 ### C. Night systems
@@ -291,8 +291,8 @@ The campaign simulator plays 1000 seeded campaigns per strategy bot. Targets:
 - [ ] Human feel: Lucas's playtest notes addressed. **L**
 
 ### I. Presentation and tech
-- [ ] Cute low-poly cast and street (stepped gables, carriage door, La Bombance, the cat, the dachshund). **Q**
-- [ ] Audio: crowd, chairs on cobbles, exhaust hum, 22:00 bell, mute (M). **Q**
+- [x] Cute low-poly cast and street (stepped gables, carriage door, La Bombance, the cat, the dachshund). **Q** _(art v0.3–v0.5: QA in Chrome, screenshots in `qa/art-v0.5/`)_
+- [x] Audio: crowd, chairs on cobbles, exhaust hum, 22:00 bell, mute (M). **Q** _(art v0.3; v0.5 adds sfx + day/hall loops)_
 - [ ] French only, satirical tone, Ch'ti touches. Copy proofread. **Q L**
 - [ ] 60 fps on a laptop iGPU (perf test logs the frame time). Loads in < 5 s. Bundle < 3 MB. **T Q**
 - [ ] CI green (unit + e2e + campaign simulator smoke). Deploy auto from main. **T**
@@ -499,3 +499,16 @@ so it reflects what the player actually did.
 - `c.doNightAction` now also spends the action's `cost.minutes`, ticking minute by minute inside the call, so the night clock moves forward during content actions.
 - Dédé, Ghislain and the police are now real witnesses for night content actions, so the reckless and stealthy custody rates may shift. Re-run `npm run sim` and update `qa/balance.md`.
 - `sim.state.exhaustBlocked` (cardboard on the exhaust) stops the exhaust's Sleep drain in `tick()`.
+
+**v0.5 art pass (art-v0.5): props, animations, portraits, perf**
+- **No change to main.js**: everything is an API, documented in `src/art/README.md` (`art.fx`, `art.props`, `art.anim`, `art.terrace`, `art.cast`, `art.portrait`, `art.scenes`, plus `audio.play/loop/mode`). `nightActions.js`'s `art` hooks (`fx`, `prop`, `terrace`, `anim: [who, state]`) work as written, without positions (default anchors). Checked by running every spec in Chrome.
+- **Perf**: from ~345k to **97–120k triangles on a weekday, ≤148k on Saturday** (≈210 characters), 115–270 draw calls, measured from 5 viewpoints. Characters are culled when off screen (neither animated nor drawn). Beyond 10 m they get simplified geometry with no small details (eyes, hands, shoes). Base geometry is lighter, and the static decor is merged per material **and per 22 m stretch** so frustum culling works. `?perf=1` = HUD (fps, ms, worst frame, draw calls, triangles, characters drawn/far). No impostors: the distance LOD was enough.
+- **Props**: generic `gadget` (dark box + blinking light) and `art.props.line(a, b)` (or `place('line')`) cover the discreet objects. Also cardboard on the exhaust, uritrottoir, a banner « LE SOMMEIL EST UN DROIT » (**French**, as all in-game text; the English slogan from the brief is not used), petition, police coffee table + waterzooi, chain and padlock (glue drop), stepladder, « OCCUPÉ » sign. Bernadette's tables have **furled parasols** that can be stolen.
+- **FX**: bucket splash (droplets, splashes, **wet cobbles** that dry, customers surprised), stink cloud (+ wavy lines, customers fanning), **blocked exhaust** (the steam stops, smoke comes out of the kitchen), generic smoke, bark puffs. A single small particle system (point shader with per-particle size and opacity).
+- **Characters**: expression bones (eyes, brows, mouth) + small marks (smile/frown arcs, anger mark, sweat drop, tear, side-eye). Items in hand switch with the state (`held`). States: binoculars, carnet, bark, cigarette break, cleaning the awning on a stepladder, glued padlock, greet the police, envelope (readable hand-off), patrol on foot/**bike** (no vehicles on Saturdays), tape measure, clipboard, filming, coffee, laxatives (comic rush to the toilet + queue), chair collapsing, 22:00 round (Jérémie + Biloute on a leash along `anchors.roundPath`). Builders for **every id** in `src/content/characters.js` (colette, lescaut, lemaire/benali/chef, stephane, journaliste, avocat, regis, clode = a small terminal with a face…), with fixed skin tones.
+- **Portraits**: `art.portrait(id, expression)` returns a PNG dataURL (offscreen WebGL, cached, background colour by group). `src/ui/dom.js` finds it automatically (glob `../art/*.js`).
+- **Day vignettes**: `art.scenes.koddex()` (Pilou typing, two screens, Clode Kode blinking, plants, « SHIP IT » poster), `atelier()` (the carriage workshop: calèche under restoration, association table, Hippolyte standing), `mairie()` (the commission hall: dais Delphine / Lescaut / the chief, the public split between association and bloc). Each one is `{ scene, camera, update, setAspect, dispose }`, rendered by the game's renderer.
+- **Audio**: `audio` is a singleton. `play()`: whatsapp, footsteps, police radio, splash, camera shutter, Koddex keyboard, bark, crash, padlock, paper, stomach rumble, pfff, flush, bell. `loop()`: **lo-fi** (piano, bass, brushed drums, vinyl, 76 bpm, generated live), **hall** (reverb, murmurs, coughs, chairs, papers, PA hum), **typing**. `mode('day')` silences the street.
+- **Gallery** (dev): `/src/art/gallery/`, with every prop, FX, state, portrait, vignette and sound on buttons, and `__gallery.step(n)` for QA in a background tab. It lives in a **subfolder** because `src/ui/dom.js` imports `../art/*.js` eagerly (the gallery broke the game for one push, c8518b6, fixed in 24396dd).
+- **[OPEN] for the build agent**: during `play('serveur', 'smoke')` and `play('ghislain', 'clean')`, `syncActors` must stop repositioning the waiter. `art.cast.officer(id, { bike })` can replace `person(0x1b2847)`. The patrol's path and duration follow the sim if you pass `path`.
+

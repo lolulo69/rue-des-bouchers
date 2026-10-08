@@ -173,7 +173,7 @@ export function createFx(scene, world, { onFrame, audio, react }) {
   }
 
   // Fumée générique (continue) : renvoie { stop() }
-  function smokeAt(at, { rate = 14, life = 4, color = 0x8a8a8a, rise = 0.6, spread = 0.25, size = [0.4, 1.6], alpha = 0.55, duration = 30, dir = null } = {}) {
+  function smokeAt(at = world.anchors.bernadetteDoor.clone().setY(2.2), { rate = 14, life = 4, color = 0x8a8a8a, rise = 0.6, spread = 0.25, size = [0.4, 1.6], alpha = 0.55, duration = 30, dir = null } = {}) {
     const o = toV(at).clone(), col = new THREE.Color(color), d = dir ? toV(dir) : null;
     return emitter(rate, () => smoke.spawn(p.set(o.x + (Math.random() - 0.5) * spread, o.y, o.z + (Math.random() - 0.5) * spread),
       v.set((d?.x ?? 0) + (Math.random() - 0.5) * 0.3, rise + (d?.y ?? 0) + Math.random() * 0.2, (d?.z ?? 0) + (Math.random() - 0.5) * 0.3), life * (0.7 + Math.random() * 0.6), size[0], size[1], alpha, col), duration);
