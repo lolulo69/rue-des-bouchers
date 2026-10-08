@@ -336,3 +336,9 @@ html[data-input=pad] :focus { outline: 3px solid #24406b !important; outline-off
 :is(#ui-root, #dayui, #ui-menu) .ui-commute { border-color: #cfe9bd; }
 :is(#ui-root, #dayui, #ui-menu) .ui-card-unlock { border-color: var(--ui-gold); background: linear-gradient(160deg, #fff6e6 60%, #fde8b4); }
 :is(#ui-root, #dayui, #ui-menu) .ui-unlock-hint kbd { background: var(--ui-ink); color: #fff3e0; border-radius: 8px; padding: 2px 10px; font-weight: 900; font-family: inherit; }
+/* Terminal sur le moniteur : notification et astuce en petit, en bas à droite (jamais sous le terminal) */
+:is(#ui-root, #dayui, #ui-menu).on-monitor .ui-notif,
+:is(#ui-root, #dayui, #ui-menu).on-monitor .ui-tip { position: fixed; right: 16px; width: min(340px, 40vw); z-index: 3; font-size: 14px; }
+:is(#ui-root, #dayui, #ui-menu).on-monitor .ui-notif { bottom: 16px; }
+:is(#ui-root, #dayui, #ui-menu).on-monitor .ui-notif .ui-feed.mini { display: none; }
+:is(#ui-root, #dayui, #ui-menu).on-monitor .ui-tip { bottom: 120px; }

@@ -7,14 +7,21 @@ async function setup(page, { quality } = {}) {
   await page.addInitScript((q) => {
     globalThis.__rdbUiSpeed = 0;
     if (q) localStorage.setItem('rdb.quality', q); else localStorage.removeItem('rdb.quality');
-    // Fausse art.day : pas de rendu, un moniteur légèrement en perspective (px CSS)
+    // Fausse art.day (même API que src/art/day.js) : pas de rendu, un moniteur en px CSS publié à chaque « image »
+    const listeners = new Set();
+    let active = null;
+    const rect = () => (active === 'koddex' || active === 'home'
+      ? { x: innerWidth * 0.22, y: innerHeight * 0.2, width: innerWidth * 0.57, height: innerHeight * 0.58,
+        corners: [{ x: innerWidth * 0.22, y: innerHeight * 0.2 }, { x: innerWidth * 0.8, y: innerHeight * 0.23 }, { x: innerWidth * 0.79, y: innerHeight * 0.78 }, { x: innerWidth * 0.23, y: innerHeight * 0.8 }] }
+      : null);
+    setInterval(() => { const r = rect(); if (r) for (const fn of listeners) fn(r); }, 50);
     globalThis.__rdbArtDay = {
-      start: (kind) => ({
-        kind, update() {}, setAspect() {}, dispose() {},
-        screenRect: kind === 'koddex' || kind === 'home'
-          ? (w, h) => [{ x: w * 0.22, y: h * 0.2 }, { x: w * 0.8, y: h * 0.23 }, { x: w * 0.79, y: h * 0.78 }, { x: w * 0.23, y: h * 0.8 }]
-          : undefined,
-      }),
+      scenes: ['koddex', 'street', 'atelier', 'mairie', 'home'],
+      async start(kind) { if (localStorage.getItem('rdb.quality') === 'bas') return false; active = kind; return true; },
+      stop() { active = null; },
+      screenRect: rect,
+      onScreenRect(fn) { listeners.add(fn); return () => listeners.delete(fn); },
+      get active() { return active; },
     };
   }, quality ?? null);
   await page.goto('/ui.html?fresh=1&seed=41');
@@ -105,4 +112,30 @@ test('après-midi : carnet sur la rue de jour, résultat à la mairie ; carte «
   await expect(page.locator('[data-testid=night]')).toHaveAttribute('data-twist', 'birthday_t4');
   await expect(page.locator('[data-testid=twist-title]')).toHaveText('Anniversaire à la table 4');
   await expect(page.locator('[data-testid=night-go]')).toBeFocused();
+});
+
+// Avec la vraie art.day (agent art) dans le jeu : le matin Koddex en 3D, le terminal sur le moniteur
+test('dans le jeu, avec la vraie art.day : terminal posé sur le moniteur de Koddex', async ({ page }) => {
+  test.setTimeout(300_000);
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
+  await page.addInitScript(() => { globalThis.__rdbUiSpeed = 0; localStorage.setItem('rdb.quality', 'moyen'); });
+  await page.goto('/?nolock=1&seed=5');
+  await page.evaluate(() => { localStorage.clear(); localStorage.setItem('rdb.quality', 'moyen'); });
+  await page.reload();
+  await page.click('#campaign');
+  await page.click('[data-testid=title-new]');
+  await page.click('[data-testid=intro-skip]');
+  await page.evaluate(() => {
+    const ui = window.__rdb.ui; const c = ui.campaign;
+    for (let i = 0; i < 50 && c.step === 'cards'; i++) c.resolveCard(c.card().choices.find((x) => x.available)?.i ?? 0);
+    ui.render();
+  });
+  await expect(page.locator('[data-testid=terminal]')).toBeVisible();
+  await expect(page.locator('#ui-root')).toHaveAttribute('data-stage', 'day3d', { timeout: 60_000 });
+  await expect(page.locator('#ui-root')).toHaveClass(/on-monitor/, { timeout: 60_000 });
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: 'test-results/v11-real-koddex.png' });
+  expect(errors).toEqual([]);
 });
