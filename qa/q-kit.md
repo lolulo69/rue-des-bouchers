@@ -119,3 +119,10 @@ Checks I'd like done in Chrome on http://192.168.1.163:8090 (real browser, point
 | b8 | Échap in the 3D night | Press Échap during a night | With the UI menu (`openMenu`, UI agent): the pause / settings menu opens; « Reprendre » recaptures the mouse. Without it: « Pause. Cliquez pour reprendre. » |
 | b9 | Audio cues | Night, sound on (M toggles) | P (photo): shutter. Phone → police: radio crackle, and again when the patrol enters the street. Phone → WhatsApp with photos to share: WhatsApp ping. F at the window: splash. |
 | b10 | Free night weekdays | `/?day=mardi` → « Nuit libre » | Header « Mardi · nuit libre »; `?day=sat` adds « (sans voitures) » and the crowd. |
+
+### Design agent results (2026-10-08 23:20, public URL https://rue-des-bouchers.lucaslefort.dev, Chrome)
+- b2 ✅ 13 JS chunks (three / world / art / sim / content / narrative / game…), **449 KB transferred** total; title screen interactive at ~5.2 s on a loaded Mac mini (CI measures 147 ms on a clean runner).
+- b3 ✅ « Oups. La rue des Bouchers a planté. » with the message, « Recharger » and « Copier le rapport ».
+- b5 ✅ a save from a newer version shows the red notice on the title and offers a new campaign; the old save is set aside.
+- b10 ✅ `?day=mardi` accepted.
+- b1, b4, b6–b9: covered by the e2e suites (robustness / campaign / edge); not repeated by hand.
