@@ -3,34 +3,46 @@
 // bras, chaises...) sont dessinés par des InstancedMesh partagés : une trentaine de draw calls pour toute la rue,
 // quel que soit le nombre de clients. Mise à jour juste avant chaque rendu (scene.onBeforeRender), donc aucun
 // appel à ajouter dans la boucle de jeu.
+// Perf (v0.5) : les proxies hors champ ne sont ni animés ni dessinés ; au-delà de LOD_DIST, un personnage n'est
+// plus dessiné qu'avec ses gros volumes en géométrie simplifiée (yeux, mains, oreilles... disparaissent).
 import * as THREE from 'three';
 
-const limbGeo = () => {
+const limbGeo = (cap, radial) => {
   // Capsule dont le pivot est en haut (épaule / hanche) et qui descend sur 1 unité, diamètre 1.
-  const g = new THREE.CapsuleGeometry(0.5, 1, 4, 8);
+  const g = new THREE.CapsuleGeometry(0.5, 1, cap, radial);
   g.translate(0, -1, 0);
   g.scale(1, 0.5, 1);
   return g;
 };
-const torsoGeo = () => new THREE.LatheGeometry(
+const torsoGeo = (seg) => new THREE.LatheGeometry(
   [[0, 0], [0.4, 0], [0.5, 0.12], [0.52, 0.42], [0.48, 0.72], [0.36, 0.92], [0.16, 1], [0, 1]].map(([x, y]) => new THREE.Vector2(x, y)),
-  14,
+  seg,
 );
 
 export const GEO = {
-  head: new THREE.SphereGeometry(1, 16, 11),
-  sphere: new THREE.SphereGeometry(1, 11, 8),
-  ball: new THREE.SphereGeometry(1, 8, 6),
-  hemi: new THREE.SphereGeometry(1, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2),
-  limb: limbGeo(),
-  torso: torsoGeo(),
-  cyl: new THREE.CylinderGeometry(0.5, 0.5, 1, 12),
-  cone: new THREE.ConeGeometry(0.5, 1, 12),
-  skirt: new THREE.CylinderGeometry(0.3, 0.5, 1, 14),
+  head: new THREE.SphereGeometry(1, 12, 9),
+  sphere: new THREE.SphereGeometry(1, 9, 6),
+  ball: new THREE.SphereGeometry(1, 6, 4),
+  hemi: new THREE.SphereGeometry(1, 12, 5, 0, Math.PI * 2, 0, Math.PI / 2),
+  limb: limbGeo(2, 6),
+  torso: torsoGeo(10),
+  cyl: new THREE.CylinderGeometry(0.5, 0.5, 1, 10),
+  cone: new THREE.ConeGeometry(0.5, 1, 8),
+  skirt: new THREE.CylinderGeometry(0.3, 0.5, 1, 10),
   box: new THREE.BoxGeometry(1, 1, 1),
-  torus: new THREE.TorusGeometry(1, 0.16, 6, 18),
+  torus: new THREE.TorusGeometry(1, 0.16, 4, 12),
+  // versions lointaines (LOD)
+  headLo: new THREE.SphereGeometry(1, 7, 5),
+  hemiLo: new THREE.SphereGeometry(1, 7, 3, 0, Math.PI * 2, 0, Math.PI / 2),
+  limbLo: new THREE.CylinderGeometry(0.5, 0.5, 1, 4, 1).translate(0, -0.5, 0),
+  torsoLo: torsoGeo(6),
+  cylLo: new THREE.CylinderGeometry(0.5, 0.5, 1, 5),
 };
 export const defineGeo = (name, geo) => { GEO[name] = geo; };
+// Géométrie de remplacement au-delà de LOD_DIST (null = morceau omis de loin)
+const FAR = { head: 'headLo', sphere: 'ball', hemi: 'hemiLo', limb: 'limbLo', torso: 'torsoLo', cyl: 'cylLo', skirt: 'cylLo', chair: 'chairLo', ball: 'ball', box: 'box', cone: 'cone' };
+export const LOD_DIST = 15;
+export const defineFar = (geo, farGeo) => { FAR[geo] = farGeo; };
 
 const MATS = {
   solid: new THREE.MeshLambertMaterial({ color: 0xffffff }),
@@ -49,15 +61,19 @@ export function matrix(pos = [0, 0, 0], scale = 1, rot) {
   return new THREE.Matrix4().compose(_p.set(...pos), _q.setFromEuler(_e.set(...rot)), _s.set(...s));
 }
 // Un morceau : géométrie partagée + os + transformation locale + couleur. glow = non éclairé (bougies, braises, yeux de chat).
-export function part(geo, bone, pos, scale, color, rot, glow = false) {
-  return { key: geo + (glow ? '*' : ''), geo, glow, bone, m: matrix(pos, scale, rot), c: new THREE.Color(color) };
+// keep = gardé de loin même s'il est petit (ex. la braise d'une cigarette).
+export function part(geo, bone, pos, scale, color, rot, glow = false, keep = false) {
+  const s = typeof scale === 'number' ? scale : Math.max(...scale);
+  const farGeo = keep ? geo : s < 0.1 || geo === 'torus' ? null : FAR[geo] ?? geo;
+  return { key: geo + (glow ? '*' : ''), farKey: farGeo && farGeo + (glow ? '*' : ''), geo, farGeo, glow, bone, m: matrix(pos, scale, rot), c: new THREE.Color(color) };
 }
 
 const registry = new Set();
 // Crée le proxy d'un "rig" : parts + fonction d'animation qui remplit rig.bones (Matrix4 relatives au proxy).
-export function makeRig(parts, { bones = ['root'], animate = null, data = {} } = {}) {
+// radius : rayon de la sphère englobante (culling), centrée à 0.8 m au-dessus de l'origine du proxy.
+export function makeRig(parts, { bones = ['root'], animate = null, data = {}, radius = 1.2 } = {}) {
   const proxy = new THREE.Object3D();
-  const rig = { parts, animate, bones: {}, boneW: {}, seed: Math.random(), st: {}, ...data };
+  const rig = { parts, animate, bones: {}, boneW: {}, seed: Math.random(), st: {}, radius, ...data };
   for (const b of bones) { rig.bones[b] = new THREE.Matrix4(); rig.boneW[b] = new THREE.Matrix4(); }
   proxy.userData.rig = rig;
   proxy.userData.phase = rig.seed * 10;
@@ -69,14 +85,14 @@ export function makeRig(parts, { bones = ['root'], animate = null, data = {} } =
 
 // ---------- Rendu ----------
 class Pool {
-  constructor(root, geo, glow, cap = 128) {
+  constructor(root, geo, glow, cap = 64) {
     this.root = root; this.geo = geo; this.glow = glow; this.n = 0;
     this.alloc(cap);
   }
   alloc(cap) {
     const old = this.mesh;
     const mesh = new THREE.InstancedMesh(GEO[this.geo], this.glow ? MATS.glow : MATS.solid, cap);
-    mesh.frustumCulled = false; // les instances bougent : la sphère englobante serait fausse
+    mesh.frustumCulled = false; // les instances bougent : culling fait à la main, par proxy
     mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     mesh.setColorAt(0, new THREE.Color());
     mesh.instanceColor.setUsage(THREE.DynamicDrawUsage);
@@ -99,35 +115,43 @@ class Pool {
   }
   flush() {
     this.mesh.count = this.n;
+    this.mesh.visible = this.n > 0;
     this.mesh.instanceMatrix.needsUpdate = true;
     this.mesh.instanceColor.needsUpdate = true;
     this.n = 0;
   }
 }
 
-function shown(o) {
+// La scène à laquelle appartient le proxy (null s'il est caché ou détaché)
+function sceneOf(o) {
   for (let p = o; p; p = p.parent) {
-    if (!p.visible) return false;
-    if (p.isScene) return true;
+    if (!p.visible) return null;
+    if (p.isScene) return p;
   }
-  return false;
+  return null;
 }
 
-const _m = new THREE.Matrix4();
-const frameHooks = [];
-// Appelé à chaque frame (dt, t, camera) juste avant le rendu : animations du décor, audio.
-export const onFrame = (fn) => frameHooks.push(fn);
+const _m = new THREE.Matrix4(), _pm = new THREE.Matrix4(), _fr = new THREE.Frustum(), _sph = new THREE.Sphere(), _cam = new THREE.Vector3();
+const mainHooks = [];
+// Appelé à chaque frame (dt, t, camera) juste avant le rendu de la scène principale : animations du décor, audio.
+export const onFrame = (fn) => mainHooks.push(fn);
+export const stats = { proxies: 0, drawn: 0, far: 0 };
 
-export function attachRigs(scene) {
+/**
+ * Branche le rendu instancié sur une scène. main: true = la rue (reçoit les onFrame globaux).
+ * Renvoie { onFrame(fn) } pour des crochets propres à cette scène (vignettes, portraits).
+ */
+export function attachRigs(scene, { main = false, lod = true } = {}) {
   const root = new THREE.Group();
   root.name = 'rigs';
   scene.add(root);
   const pools = new Map();
-  const pool = (p) => {
-    let pl = pools.get(p.key);
-    if (!pl) pools.set(p.key, (pl = new Pool(root, p.geo, p.glow)));
+  const pool = (key, geo, glow) => {
+    let pl = pools.get(key);
+    if (!pl) pools.set(key, (pl = new Pool(root, geo, glow)));
     return pl;
   };
+  const hooks = main ? mainHooks : [];
   let last = performance.now();
   const prev = scene.onBeforeRender;
   scene.onBeforeRender = function (renderer, sc, camera, target) {
@@ -136,16 +160,35 @@ export function attachRigs(scene) {
     const dt = Math.min(0.1, (nowMs - last) / 1000);
     last = nowMs;
     const t = nowMs / 1000;
+    for (const fn of hooks) fn(dt, t, camera, renderer);
+    _fr.setFromProjectionMatrix(_pm.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
+    camera.getWorldPosition(_cam);
+    let n = 0, drawn = 0, far = 0;
     for (const proxy of registry) {
-      if (!shown(proxy)) continue;
+      if (sceneOf(proxy) !== sc) continue;
+      n++;
       const rig = proxy.userData.rig;
-      if (rig.animate) rig.animate(rig, t, dt, proxy);
+      const e = proxy.matrixWorld.elements;
+      const sy = Math.hypot(e[4], e[5], e[6]);
+      _sph.center.set(e[12] + e[4] * 0.8, e[13] + e[5] * 0.8, e[14] + e[6] * 0.8);
+      _sph.radius = rig.radius * sy;
+      if (!_fr.intersectsSphere(_sph)) continue;
+      drawn++;
+      const isFar = lod && _sph.center.distanceTo(_cam) > LOD_DIST * Math.max(1, rig.radius);
+      if (isFar) far++;
+      if (rig.animate) rig.animate(rig, t, dt, proxy, isFar);
       for (const b in rig.bones) rig.boneW[b].multiplyMatrices(proxy.matrixWorld, rig.bones[b]);
-      for (const p of rig.parts) pool(p).push(_m.multiplyMatrices(rig.boneW[p.bone], p.m), p.c);
+      for (const p of rig.parts) {
+        // morceau conditionnel : visible seulement si l'état (anim / objet tenu / drapeau) correspond
+        if (p.when !== undefined && p.when !== rig.anim && p.when !== rig.held && !rig.flags?.[p.when]) continue;
+        if (isFar) { if (p.farKey) pool(p.farKey, p.farGeo, p.glow).push(_m.multiplyMatrices(rig.boneW[p.bone], p.m), p.c); }
+        else pool(p.key, p.geo, p.glow).push(_m.multiplyMatrices(rig.boneW[p.bone], p.m), p.c);
+      }
     }
     for (const pl of pools.values()) pl.flush();
-    for (const fn of frameHooks) fn(dt, t, camera);
+    if (main) Object.assign(stats, { proxies: n, drawn, far });
   };
+  return { onFrame: (fn) => hooks.push(fn), root };
 }
 
 // Petits outils d'animation

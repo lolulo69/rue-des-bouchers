@@ -28,7 +28,7 @@ export function mat(color, opts = {}) {
 
 // Habillage des terrasses par resto (les autres prennent la couleur de config.js)
 const REST_STYLE = {
-  bernadette: { chair: 0xc49152, top: 0x8a5a35, cloth: 0xc4473d, awning: ['#a83232', '#f3e6cc'], proj: 0.45, tilt: 0.95 },
+  bernadette: { chair: 0xc49152, top: 0x8a5a35, cloth: 0xc4473d, parasol: 0xa83232, awning: ['#a83232', '#f3e6cc'], proj: 0.45, tilt: 0.95 },
   goulot: { chair: 0x3a5a8c, top: 0xe8e4dc, awning: ['#2b4a8a', '#f3eee0'], proj: 0.75, tilt: 0.75 },
   malunes: { chair: 0x4c8a55, top: 0x5b3a1e, awning: ['#2b6a3a', '#efe6cc'], proj: 0.6, tilt: 0.85 },
 };
@@ -41,7 +41,9 @@ function buildTable(rest, x, z, idx, scene, fixedCount) {
   const st = styleOf(rest);
   const group = new THREE.Group();
   group.position.set(x, 0, z);
-  group.add(bistroTable({ top: st.top, cloth: st.cloth }));
+  const top = bistroTable({ top: st.top, cloth: st.cloth, parasol: st.parasol });
+  group.add(top);
+  const chairs = [];
 
   // Nombre de convives : parfois au-dessus de la limite
   const over = Math.random() < RULES.overLimitChance;
@@ -56,7 +58,9 @@ function buildTable(rest, x, z, idx, scene, fixedCount) {
     seat.position.set(Math.cos(a) * R, 0, Math.sin(a) * R);
     seat.rotation.y = Math.atan2(-Math.cos(a), -Math.sin(a));
     const p = customer('sit');
-    seat.add(chair(st.chair), p);
+    const ch = chair(st.chair);
+    chairs.push(ch);
+    seat.add(ch, p);
     group.add(seat);
     people.push(p);
   }
@@ -65,7 +69,7 @@ function buildTable(rest, x, z, idx, scene, fixedCount) {
   group.add(hit);
 
   scene.add(group);
-  const table = { id: `${rest.id}-${idx + 1}`, label: `${rest.name}, table ${idx + 1}`, rest, group, hit, people, count, out: true, clearAt: null, clearedAt: null, clearedBy: null, evidence: new Set() };
+  const table = { id: `${rest.id}-${idx + 1}`, label: `${rest.name}, table ${idx + 1}`, rest, group, hit, people, chairs, top, count, out: true, clearAt: null, clearedAt: null, clearedBy: null, evidence: new Set() };
   hit.userData.table = table;
   return table;
 }
@@ -102,7 +106,7 @@ function rotatedKit(parent, rng, x, z, faceDir) {
 
 // opts.tables : disposition des terrasses tirée par la simulation (src/sim/layout.js) : { id, restId, x, z, count }
 export function buildWorld(scene, opts = {}) {
-  attachRigs(scene);
+  attachRigs(scene, { main: true });
   const rng = seeded(1729); // la rue date de 1729
   const city = new THREE.Group();
   scene.add(city);
@@ -441,7 +445,7 @@ export function buildWorld(scene, opts = {}) {
   waiter.position.set(-(W - 2.5), 0, bz - 6.8);
   waiter.scale.setScalar(1.1);
   scene.add(waiter);
-  cast.waiter = waiter;
+  cast.waiter = cast.serveur = waiter;
   // Dédé et Ghislain devant l'estaminet
   putChar('dede', CAST.dede(), scene, new THREE.Vector3(-(W - 0.75), 0, P0 - 1.0), toward(-1) + 0.3);
   putChar('ghislain', CAST.ghislain(), scene, new THREE.Vector3(-(W - 0.4), 0, P0 - 1.9), toward(-1) - 0.5);
@@ -450,6 +454,7 @@ export function buildWorld(scene, opts = {}) {
   putChar('jeremie', CAST.jeremie(), scene, new THREE.Vector3(-(W - 0.9), 0, bz + 9.3), Math.PI * 0.75);
   putChar('dog', dachshund(), scene, new THREE.Vector3(-(W - 1.35), 0, bz + 8.7), Math.PI * 0.8);
   anchors.jeremie = cast.jeremie.position;
+  cast.biloute = cast.dog;
   // Fenêtres : Tatie (milieu de rue), Klaas & Hilde (fond de la place, vue en enfilade)
   const leanAt = (name, obj, side, z, wy, parent = scene, kitX = kit.X) => {
     const hip = obj.userData.rig.k.hipY;
@@ -467,6 +472,7 @@ export function buildWorld(scene, opts = {}) {
   putChar('nico', CAST.nico(), scene, new THREE.Vector3(bal.x - 0.05, bal.y, bz + 0.6), toward(1) - 0.25);
   putChar('cat', cat(), scene, new THREE.Vector3(W - 0.78, bal.y + 0.95, bz + 2.0), toward(1) + 0.2);
   anchors.cat = cast.cat.position;
+  cast.gaufre = cast.cat;
   // Hippolyte devant sa porte cochère
   putChar('hippolyte', CAST.hippolyte(), scene, new THREE.Vector3(sq.x + 3, 0, sq.z0 + 10.6), -Math.PI * 0.7);
   // Pas encore en scène : Pilou (vue subjective) et l'inspectrice Delphine
@@ -554,7 +560,7 @@ function makeSteam(origin) {
         pos[i * 3 + 1] = origin.y + t * 2.2;
         pos[i * 3 + 2] = origin.z - t * 0.4 + Math.cos(i * 3 + t * 5) * 0.15;
       }
-      mat.opacity = 0.35 * this.intensity;
+      mat.opacity = 0.35 * (this.blocked ? 0 : this.intensity); // blocked : carton sur la hotte (art.fx.exhaustBlocked)
       geo.attributes.position.needsUpdate = true;
     },
   };

@@ -57,11 +57,62 @@ function hair(add, style, r, c) {
   }
 }
 
+
+// ---------- Expressions (os eyeL/eyeR/browL/browR/mouth) ----------
+// eye : ouverture verticale · by : hauteur des sourcils (× r) · bt : inclinaison (positif = bout intérieur bas)
+// bLift : sourcil gauche en plus (suspicion) · ms : bouche [largeur, hauteur] · mx : décalage de la bouche (× r)
+export const EXPRESSIONS = {
+  neutral: { eye: 1, by: 0, bt: 0, ms: [1, 0.35], mx: 0 },
+  happy: { eye: 0.45, by: 0.06, bt: -0.1, ms: [1.5, 1.1], mx: 0 },
+  angry: { eye: 0.75, by: -0.06, bt: 0.45, ms: [1.4, 0.3], mx: 0 },
+  suspicious: { eye: 0.4, by: 0, bt: 0.15, bLift: 0.1, ms: [0.8, 0.3], mx: 0.18 },
+  surprised: { eye: 1.35, by: 0.12, bt: -0.15, ms: [0.8, 1.9], mx: 0 },
+  sick: { eye: 0.65, by: 0.04, bt: -0.4, ms: [1.2, 0.45], mx: 0.05 },
+  sad: { eye: 0.8, by: 0.03, bt: -0.45, ms: [1.0, 0.25], mx: 0 },
+};
+
+// ---------- Objets tenus : un morceau n'apparaît que si rig.held (ou rig.anim) vaut son nom ----------
+function heldItems(addW, k, o) {
+  const r = k.r, cy = 0.92 * r;
+  addW('beer', 'cyl', 'handR', [0, 0.05, 0.03], [0.08, 0.13, 0.08], 0xf0a830);
+  addW('beer', 'cyl', 'handR', [0, 0.125, 0.03], [0.084, 0.03, 0.084], 0xfff6e0);
+  addW('wine', 'cyl', 'handR', [0, 0.0, 0.03], [0.012, 0.08, 0.012], 0xdfe8ee);
+  addW('wine', 'sphere', 'handR', [0, 0.07, 0.03], [0.045, 0.05, 0.045], o.wine ?? 0x8e1b3a);
+  addW('mug', 'cyl', 'handR', [0, 0.05, 0.03], [0.09, 0.1, 0.09], o.mugColor ?? 0xf3efe6);
+  addW('coffee', 'cyl', 'handR', [0, 0.04, 0.03], [0.07, 0.07, 0.07], 0xf3efe6);
+  addW('coffee', 'cyl', 'handR', [0, 0.0, 0.03], [0.12, 0.012, 0.12], 0xf3efe6);
+  addW('cig', 'cyl', 'handR', [0, 0.02, 0.06], [0.012, 0.012, 0.09], 0xf3efe6, [Math.PI / 2, 0, 0]);
+  addW('cig', 'ball', 'handR', [0, 0.02, 0.105], 0.014, 0xff6a1a, null, true, true);
+  addW('phone', 'box', 'handR', [0, 0.05, 0.03], [0.07, 0.13, 0.015], 0x9fd0ff, [-0.4, 0, 0], true, true);
+  addW('film', 'box', 'handR', [0, 0.07, 0.02], [0.13, 0.075, 0.012], 0x2a2a2e, [0, 0, 0]);
+  addW('film', 'box', 'handR', [0, 0.07, -0.008], [0.11, 0.06, 0.004], 0xbfe0ff, [0, 0, 0], true, true);
+  addW('film', 'ball', 'handR', [0.045, 0.095, 0.03], 0.012, 0xff3030, null, true, true);
+  addW('envelope', 'box', 'handR', [0, 0.04, 0.05], [0.2, 0.13, 0.015], 0xf6f0dc, [-0.3, 0, 0]);
+  addW('envelope', 'box', 'handR', [0, 0.065, 0.06], [0.2, 0.012, 0.02], 0xd9c79a, [-0.3, 0, 0]);
+  addW('key', 'cyl', 'handR', [0, 0.03, 0.07], [0.02, 0.1, 0.02], 0xe8c45a, [Math.PI / 2, 0, 0]);
+  addW('clipboard', 'box', 'handL', [0, 0.02, 0.06], [0.2, 0.015, 0.26], 0x8a5a35, [0.3, 0, 0]);
+  addW('clipboard', 'box', 'handL', [0, 0.03, 0.06], [0.17, 0.012, 0.21], 0xf6f2ea, [0.3, 0, 0]);
+  addW('notebook', 'box', 'handL', [0, 0.03, 0.05], [0.14, 0.02, 0.18], 0x2b4d7a);
+  addW('brush', 'cyl', 'handR', [0, 0.35, 0.02], [0.03, 0.8, 0.03], 0x8a5a35);
+  addW('brush', 'box', 'handR', [0, 0.78, 0.02], [0.3, 0.08, 0.1], 0xe8c45a);
+  addW('tape', 'box', 'handL', [0, 0.02, 0.04], [0.1, 0.1, 0.06], 0xf2c230);
+  addW('tape', 'box', 'tape', [0, 0, 0.5], [0.025, 0.004, 1], 0xf7d84a, null, true, true);
+  // jumelles : devant les yeux (os de la tête), mains levées par la pose
+  addW('binoculars', 'cyl', 'head', [0.1 * r / 0.26, cy + 0.06 * r, 1.12 * r], [0.07, 0.13, 0.07], 0x1e2126, [Math.PI / 2, 0, 0]);
+  addW('binoculars', 'cyl', 'head', [-0.1 * r / 0.26, cy + 0.06 * r, 1.12 * r], [0.07, 0.13, 0.07], 0x1e2126, [Math.PI / 2, 0, 0]);
+  addW('binoculars', 'cyl', 'head', [0, cy + 0.06 * r, 1.08 * r], [0.12, 0.04, 0.04], 0x3a3d42, [0, 0, Math.PI / 2]);
+  // la goutte de sueur (laxatif) : comique, pas dégoûtant
+  addW('rush', 'ball', 'head', [0.75 * r, cy + 0.6 * r, 0.5 * r], [0.07, 0.1, 0.05], 0x9fd8ff, null, true, true);
+  // radio d'épaule (police)
+  addW('radio', 'box', 'body', [0.15, k.th * 0.8, 0.14], [0.06, 0.1, 0.04], 0x111111);
+}
+
 // ---------- Humanoïde ----------
 /**
  * o: { skin, shirt, pants, shoes, hair, hairColor, height, girth, headR, pose: 'stand'|'sit'|'lean',
- *      skirt, belly, glasses, beard, mustache, blush, held: 'beer'|'wine'|'mug'|'cig'|'phone'|null,
- *      anim: 'chat'|'idle'|'write'|'tray'|'leash'|'smoke'|'cane'|'clipboard', talk (0..1), extras(add, k) }
+ *      skirt, belly, glasses, beard, mustache, blush, held, anim, expr, talk (0..1), extras(add, k) }
+ * held : 'beer'|'wine'|'mug'|'coffee'|'cig'|'phone'|'envelope'|'key'|'clipboard'|'notebook'|'brush'|null
+ * anim : voir STATES (animHuman). On peut tout changer à chaud : setState(proxy, { anim, held, expr }).
  */
 export function humanoid(o = {}) {
   const h = o.height ?? 1, g = o.girth ?? 1, r = o.headR ?? 0.26;
@@ -70,32 +121,37 @@ export function humanoid(o = {}) {
   const legLen = 0.37 * h;
   const hipY = sit ? 0.5 : legLen + 0.075;
   const th = 0.48 * h, tw = 0.46 * g, td = 0.36 * g;
-  const k = { h, g, r, pose, hipY, th, neck: th - 0.03, shX: tw * 0.46, shY: th * 0.78, armLen: 0.33 * h, legX: 0.1 * Math.min(g, 1.2), legLen };
-  const skin = o.skin ?? pick(SKIN);
-  const shirt = o.shirt ?? pick(SHIRTS);
-  const pants = o.pants ?? pick(PANTS);
+  const k = { h, g, r, pose, hipY, standHip: legLen + 0.075, th, neck: th - 0.03, shX: tw * 0.46, shY: th * 0.78, armLen: 0.33 * h, legX: 0.1 * Math.min(g, 1.2), legLen };
+  const look = { ...o };
+  look.skin = o.skin ?? pick(SKIN);
+  look.shirt = o.shirt ?? pick(SHIRTS);
+  look.pants = o.pants ?? pick(PANTS);
+  look.hairColor = o.hairColor ?? pick(HAIR);
+  const { skin, shirt, pants } = look;
   const shoes = o.shoes ?? 0x2b2522;
   const parts = [];
-  const add = (geo, bone, pos, scale, color, rot, glow) => parts.push(part(geo, bone, pos, scale, color, rot, glow));
+  const add = (geo, bone, pos, scale, color, rot, glow, keep) => { const p = part(geo, bone, pos, scale, color, rot, glow, keep); parts.push(p); return p; };
+  const addW = (when, ...a) => { add(...a).when = when; };
 
   // Corps en poire
   add('torso', 'body', [0, -0.03, 0], [tw, th, td], shirt);
   add('sphere', 'body', [0, 0.05, 0], [tw * 0.5, 0.12, td * 0.52], o.skirt && !sit ? o.skirt : pants);
   if (o.belly) add('sphere', 'body', [0, th * 0.4, td * 0.22], [tw * 0.42 * o.belly, th * 0.42 * o.belly, td * 0.45 * o.belly], shirt);
   if (o.skirt && !sit) add('skirt', 'body', [0, -0.13, 0], [tw * 1.15, 0.36, td * 1.25], o.skirt);
-  // Tête
+  // Tête et visage
   const cy = 0.92 * r;
   add('head', 'head', [0, cy, 0], r, skin);
-  for (const sx of [-1, 1]) {
-    add('ball', 'head', [sx * 0.34 * r, cy + 0.06 * r, 0.9 * r], [0.1 * r, 0.15 * r, 0.07 * r], DARK);
-    add('ball', 'head', [sx * 0.31 * r, cy + 0.12 * r, 0.96 * r], [0.035 * r, 0.035 * r, 0.02 * r], 0xffffff, null, true);
+  for (const [sx, eb, bb] of [[1, 'eyeL', 'browL'], [-1, 'eyeR', 'browR']]) {
+    add('ball', eb, [0, 0, 0], [0.1 * r, 0.15 * r, 0.07 * r], DARK);
+    add('ball', eb, [-sx * 0.03 * r, 0.06 * r, 0.06 * r], [0.035 * r, 0.035 * r, 0.02 * r], 0xffffff, null, true);
+    add('box', bb, [0, 0, 0], [0.26 * r, 0.055 * r, 0.05 * r], o.brows ?? new THREE.Color(look.hairColor).multiplyScalar(0.7).getHex());
     if (o.blush !== false) add('ball', 'head', [sx * 0.56 * r, cy - 0.2 * r, 0.77 * r], [0.15 * r, 0.08 * r, 0.05 * r], new THREE.Color(skin).lerp(new THREE.Color(0xff7f86), 0.45).getHex());
     add('ball', 'head', [sx * 0.97 * r, cy, 0], [0.12 * r, 0.2 * r, 0.12 * r], skin); // oreilles
   }
   add('ball', 'head', [0, cy - 0.1 * r, 0.98 * r], 0.1 * r, new THREE.Color(skin).multiplyScalar(0.88).getHex());
   add('ball', 'mouth', [0, 0, 0], [0.11 * r, 0.06 * r, 0.04 * r], 0x6a2a2a);
-  hair(add, o.hair ?? 'short', r, o.hairColor ?? pick(HAIR));
-  if (o.beard) { // grosse barbe blanche de Père Noël
+  hair(add, o.hair ?? 'short', r, look.hairColor);
+  if (o.beard) { // grosse barbe (blanche pour Klaas)
     add('sphere', 'head', [0, cy - 0.55 * r, 0.42 * r], [0.95 * r, 0.9 * r, 0.62 * r], o.beard);
     add('sphere', 'head', [0, cy - 1.1 * r, 0.5 * r], [0.55 * r, 0.5 * r, 0.4 * r], o.beard);
   }
@@ -104,115 +160,190 @@ export function humanoid(o = {}) {
   if (o.cap) { // casquette de police municipale
     add('cyl', 'head', [0, cy + 0.8 * r, -0.04 * r], [2.05 * r, 0.42 * r, 2.05 * r], o.cap);
     add('cyl', 'head', [0, cy + 1.04 * r, -0.04 * r], [2.2 * r, 0.1 * r, 2.2 * r], o.cap);
-    add('cyl', 'head', [0, cy + 0.7 * r, -0.04 * r], [2.08 * r, 0.14 * r, 2.08 * r], 0x8fb3e8);
+    add('cyl', 'head', [0, cy + 0.7 * r, -0.04 * r], [2.08 * r, 0.14 * r, 2.08 * r], o.capBand ?? 0x8fb3e8);
     add('box', 'head', [0, cy + 0.6 * r, 0.95 * r], [1.2 * r, 0.06 * r, 0.6 * r], 0x111317, [0.35, 0, 0]);
     add('ball', 'head', [0, cy + 0.85 * r, 1.02 * r], 0.12 * r, 0xe8c45a, null, true);
   }
   // Bras (manches + mains)
   for (const [b, hb] of [['armL', 'handL'], ['armR', 'handR']]) {
-    add('limb', b, [0, 0, 0], [0.13 * Math.sqrt(g), k.armLen, 0.13 * Math.sqrt(g)], shirt);
-    add('ball', hb, [0, 0, 0], 0.068, skin);
+    add('limb', b, [0, 0, 0], [0.13 * Math.sqrt(g), k.armLen, 0.13 * Math.sqrt(g)], o.sleeves ?? shirt);
+    add('ball', hb, [0, 0, 0], 0.068, o.gloves ?? skin);
   }
-  // Jambes
+  // Jambes (cuisse + tibia : assis, debout, à vélo, tombé)
   if (!lean) for (const b of ['legL', 'legR']) {
-    const lc = o.skirt ? (sit ? o.skirt : skin) : pants;
-    if (sit) {
-      add('limb', b, [0, 0, 0], [0.15 * Math.min(g, 1.2), 0.36, 0.15 * Math.min(g, 1.2)], o.skirt ?? pants, [-Math.PI / 2, 0, 0]);
-      add('limb', b, [0, 0, 0.34], [0.13, hipY - 0.07, 0.13], o.skirt ? skin : pants);
-      add('ball', b, [0, -(hipY - 0.06), 0.39], [0.075, 0.055, 0.11], shoes);
-    } else {
-      add('limb', b, [0, 0, 0], [0.15 * Math.min(g, 1.2), legLen, 0.15 * Math.min(g, 1.2)], lc);
-      add('ball', b, [0, -legLen, 0.035], [0.08, 0.06, 0.12], shoes);
-    }
+    const lc = o.skirt ? skin : pants;
+    add('limb', b, [0, 0, 0], [0.15 * Math.min(g, 1.2), 0.36 * h, 0.15 * Math.min(g, 1.2)], o.skirt ?? pants);
+    add('limb', b === 'legL' ? 'shinL' : 'shinR', [0, 0, 0], [0.13, 0.36 * h, 0.13], lc);
+    add('ball', b === 'legL' ? 'shinL' : 'shinR', [0, -0.36 * h + 0.01, 0.04], [0.08, 0.06, 0.12], shoes);
   }
-  // Objet tenu en main droite
-  const held = o.held;
-  if (held === 'beer') { add('cyl', 'handR', [0, 0.05, 0.03], [0.08, 0.13, 0.08], 0xf0a830); add('cyl', 'handR', [0, 0.125, 0.03], [0.084, 0.03, 0.084], 0xfff6e0); }
-  else if (held === 'wine') { add('cyl', 'handR', [0, 0.0, 0.03], [0.012, 0.08, 0.012], 0xdfe8ee); add('sphere', 'handR', [0, 0.07, 0.03], [0.045, 0.05, 0.045], o.wine ?? 0x8e1b3a); }
-  else if (held === 'mug') { add('cyl', 'handR', [0, 0.05, 0.03], [0.09, 0.1, 0.09], o.mugColor ?? 0xf3efe6); }
-  else if (held === 'cig') { add('cyl', 'handR', [0, 0.02, 0.06], [0.012, 0.012, 0.09], 0xf3efe6, [Math.PI / 2, 0, 0]); add('ball', 'handR', [0, 0.02, 0.105], 0.012, 0xff6a1a, null, true); }
-  else if (held === 'phone') { add('box', 'handR', [0, 0.04, 0.03], [0.07, 0.13, 0.015], 0x9fd0ff, [-0.4, 0, 0], true); }
-  o.extras?.(add, k);
+  heldItems(addW, k, o);
+  o.extras?.(add, k, addW);
 
-  const bones = ['root', 'hips', 'body', 'head', 'mouth', 'armL', 'armR', 'handL', 'handR', 'legL', 'legR'];
-  const proxy = makeRig(parts, { bones, animate: animHuman, data: { k, anim: o.anim ?? 'idle', held, talk: o.talk ?? 0.6, drinkPeriod: rnd(7, 13) } });
+  const bones = ['root', 'hips', 'body', 'head', 'mouth', 'eyeL', 'eyeR', 'browL', 'browR', 'armL', 'armR', 'handL', 'handR', 'legL', 'legR', 'shinL', 'shinR', 'tape'];
+  const proxy = makeRig(parts, { bones, animate: animHuman, data: { k, anim: o.anim ?? 'idle', held: o.held ?? null, expr: o.expr ?? 'neutral', talk: o.talk ?? 0.6, drinkPeriod: rnd(7, 13), flags: {}, tapeLen: 1.5 } });
   proxy.userData.kind = 'human';
+  proxy.userData.look = look;
   return proxy;
 }
+// Change l'état d'un personnage (anim, objet tenu, expression, bavardage) à chaud
+export function setState(proxy, s = {}) {
+  const rig = proxy.userData.rig;
+  for (const key of ['anim', 'held', 'expr', 'talk', 'tapeLen']) if (s[key] !== undefined) rig[key] = s[key];
+  if (s.flags) Object.assign(rig.flags, s.flags);
+  return proxy;
+}
+// Même personne, autre pose (un client assis qui se lève pour courir aux toilettes)
+export const relook = (proxy, pose, extra = {}) => humanoid({ ...proxy.userData.look, pose, ...extra });
 
 const _sm = new THREE.Matrix4();
 function animHuman(rig, t, dt, proxy) {
   const { k, st, bones: B } = rig;
-  const ph = t + rig.seed * 37;
+  const still = rig.still; // portraits : pose figée, sans bavardage
+  const ph = still ? 0.6 : t + rig.seed * 37;
   // Vitesse au sol (le gameplay déplace le proxy, on en déduit la marche)
   const e = proxy.matrixWorld.elements;
   const sp = st.px === undefined ? 0 : Math.hypot(e[12] - st.px, e[14] - st.pz) / Math.max(dt, 1e-3);
   st.px = e[12]; st.pz = e[14];
   st.walk = lerp(st.walk ?? 0, sp > 0.25 && dt > 0 ? 1 : 0, Math.min(1, dt * 8));
-  st.wp = (st.wp ?? 0) + dt * (5 + Math.min(sp, 3) * 2) * st.walk;
-  const walk = k.pose === 'stand' ? st.walk : 0;
+  st.wp = (st.wp ?? 0) + dt * (5 + Math.min(sp, 4) * 2.2) * st.walk;
+  const anim = rig.anim;
+  const ride = anim === 'ride', fallen = anim === 'fallen';
+  const sit = k.pose === 'sit' || anim === 'type' || anim === 'meeting';
+  const lean = k.pose === 'lean';
+  const walk = k.pose === 'stand' && !ride ? st.walk : 0;
 
-  const sit = k.pose === 'sit', lean = k.pose === 'lean';
-  let bob = Math.sin(ph * 2.1) * 0.008, br = Math.sin(ph * 1.7) * 0.018;
-  let nod = 0, turn = Math.sin(ph * 0.43) * 0.3, tilt = Math.sin(ph * 0.71) * 0.05, leanX = lean ? 0.35 : 0;
+  let hipY = k.pose === 'sit' ? k.hipY : sit ? 0.5 : k.hipY;
+  let bob = still ? 0 : Math.sin(ph * 2.1) * 0.008, br = still ? 0 : Math.sin(ph * 1.7) * 0.018;
+  let nod = 0, turn = still ? 0 : Math.sin(ph * 0.43) * 0.3, tilt = still ? 0 : Math.sin(ph * 0.71) * 0.05, leanX = lean ? 0.35 : 0;
   const armRest = sit ? -1.05 : lean ? -1.35 : -0.08;
   let raiseL = armRest, raiseR = armRest, yawL = 0, yawR = 0, spreadL = sit || lean ? 0.05 : 0.14, spreadR = spreadL, tipL = 0, tipR = 0;
-  let mouth = 0.35;
+  let mouth = 0;
+  // jambes : cuisse (rotation X à la hanche) et tibia (rotation X au genou, relative à la cuisse)
+  let thighL = sit ? -Math.PI / 2 : 0, thighR = thighL, kneeL = sit ? Math.PI / 2 : 0, kneeR = kneeL;
+  const talk = still ? 0 : rig.talk;
 
   // Bavardage : la moitié du temps, hochements de tête, bouche qui bouge, main qui gesticule
-  const tk = clamp01(Math.sin(ph * 0.31 + rig.seed * 7) * 1.6) * rig.talk;
+  const tk = clamp01(Math.sin(ph * 0.31 + rig.seed * 7) * 1.6) * talk;
   nod += Math.sin(ph * 9) * 0.07 * tk;
   mouth += tk * Math.abs(Math.sin(ph * 11)) * 1.6;
   raiseL += -0.55 * tk * (0.5 + 0.5 * Math.sin(ph * 2.7));
   bob += Math.abs(Math.sin(ph * 7)) * 0.012 * tk;
   // Fou rire de temps en temps
-  const la = smooth((Math.sin(ph * 0.17 + rig.seed * 3) - 0.93) / 0.07) * rig.talk;
+  const la = smooth((Math.sin(ph * 0.17 + rig.seed * 3) - 0.93) / 0.07) * talk;
   nod -= 0.4 * la; bob += Math.abs(Math.sin(ph * 22)) * 0.02 * la; mouth += la * 1.8; br += la * 0.03;
 
   // Boire / fumer : la main droite monte à la bouche
-  if (rig.held && rig.held !== 'phone') {
-    const P = rig.held === 'cig' ? 6 : rig.drinkPeriod;
+  const held = rig.held;
+  if (!still && (held === 'beer' || held === 'wine' || held === 'mug' || held === 'coffee' || held === 'cig')) {
+    const P = held === 'cig' ? 6 : rig.drinkPeriod;
     const u = (ph + rig.seed * 20) % P;
     const s = u < 0.8 ? smooth(u / 0.8) : u < 2.0 ? 1 : u < 2.8 ? 1 - smooth((u - 2.0) / 0.8) : 0;
     raiseR = lerp(raiseR, -2.3, s); yawR = 0.75 * s; spreadR = lerp(spreadR, 0.05, s);
-    tipR = s * (rig.held === 'cig' ? 0 : 1.0);
-    nod = lerp(nod, rig.held === 'cig' ? -0.1 : -0.45, s); turn *= 1 - s; mouth = lerp(mouth, 0.5, s);
-    if (rig.held !== 'cig' && sit === false && !lean) raiseR = Math.min(raiseR, lerp(-0.7, -2.3, s)); // debout : verre à hauteur de poitrine
-  } else if (rig.held === 'phone') {
+    tipR = s * (held === 'cig' ? 0 : 1.0);
+    nod = lerp(nod, held === 'cig' ? -0.1 : -0.45, s); turn *= 1 - s; mouth = lerp(mouth, 0.5, s);
+    if (held !== 'cig' && !sit && !lean) raiseR = Math.min(raiseR, lerp(-0.7, -2.3, s)); // debout : verre à hauteur de poitrine
+  } else if (held === 'phone') {
     raiseR = -1.3; yawR = 0.5; nod = 0.35; turn *= 0.2;
+  } else if (held === 'envelope' || held === 'key') {
+    raiseR = -1.2; yawR = 0.3;
   }
-  switch (rig.anim) {
+  switch (anim) {
     case 'write': // Klaas note tout dans son carnet
       raiseR = -1.25 + Math.sin(ph * 15) * 0.05; yawR = 0.5 + Math.sin(ph * 4) * 0.08;
-      raiseL = -1.35; yawL = -0.45; tipL = 0.0;
-      if (Math.sin(ph * 0.4) > 0) { nod = 0.32; turn *= 0.2; mouth = 0.3; }
+      raiseL = -1.35; yawL = -0.45;
+      if (Math.sin(ph * 0.4) > 0) { nod = 0.32; turn *= 0.2; mouth = 0; }
+      break;
+    case 'binoculars': // les deux mains aux jumelles, balayage lent de la rue
+      raiseL = raiseR = -2.35; yawL = -0.85; yawR = 0.85; spreadL = spreadR = 0.15;
+      nod = 0.12 + Math.sin(ph * 0.5) * 0.05; turn = Math.sin(ph * 0.3) * 0.25; mouth = 0;
+      break;
+    case 'film': // téléphone levé à hauteur des yeux
+      raiseR = -2.0; yawR = 0.55; spreadR = 0.05; nod = -0.05; turn *= 0.2;
       break;
     case 'tray': raiseL = -1.45; yawL = -0.2; break;
     case 'leash': raiseL = -0.6; spreadL = 0.25; break;
     case 'cane': raiseL = -0.35; spreadL = 0.2; break;
-    case 'clipboard': raiseL = -1.3; yawL = -0.5; break;
+    case 'clipboard': raiseL = -1.3; yawL = -0.5; raiseR = -1.1 + Math.sin(ph * 12) * 0.05; yawR = 0.6; nod = 0.25; break;
+    case 'measure': // mètre ruban déroulé jusqu'au sol, devant elle
+      raiseL = -0.9; yawL = -0.2; nod = 0.45; turn = 0; raiseR = -0.6;
+      break;
     case 'wave': raiseL = -2.6 + Math.sin(ph * 8) * 0.25; spreadL = 0.4; break;
+    case 'greet': // Dédé accueille la police : grand sourire, main tendue, petits sauts
+      raiseR = -1.35 + Math.sin(ph * 9) * 0.15; yawR = 0.15; raiseL = -2.4 + Math.sin(ph * 7) * 0.3; spreadL = 0.35;
+      bob += Math.abs(Math.sin(ph * 4.5)) * 0.04; mouth = Math.max(mouth, 0.9);
+      break;
+    case 'give': // tend l'enveloppe, en regardant autour (furtif)
+      raiseR = -1.45; yawR = 0.25; turn = Math.sin(ph * 2.5) * 0.7; nod = 0.1; leanX = 0.15;
+      break;
+    case 'smoke': // pause clope : main gauche dans la poche, épaule au mur
+      raiseL = 0.15; spreadL = 0.05; tilt += 0.08;
+      break;
+    case 'clean': // Ghislain frotte le store au balai-brosse, bras levés
+      raiseR = -2.7 + Math.sin(ph * 6) * 0.25; yawR = 0.2 + Math.sin(ph * 6) * 0.2; raiseL = -2.3 + Math.sin(ph * 6) * 0.2; yawL = -0.5;
+      nod = -0.5; turn = 0; mouth = 0;
+      break;
+    case 'struggle': // serrure collée : penché, clé qui ne tourne pas, bras qui tremblent
+      leanX = 0.35; raiseR = -1.5 + Math.sin(ph * 25) * 0.08; raiseL = -1.4 + Math.sin(ph * 23) * 0.08; yawL = -0.35; yawR = 0.2;
+      bob += Math.abs(Math.sin(ph * 25)) * 0.01; nod = 0.2;
+      break;
+    case 'rush': // laxatif : mains sur le ventre, petits pas pressés (comique)
+      raiseL = raiseR = -0.55; yawL = -0.95; yawR = 0.95; spreadL = spreadR = -0.05; leanX = 0.18;
+      bob += Math.abs(Math.sin(ph * 14)) * 0.02; turn = 0;
+      break;
+    case 'type': // Pilou au clavier
+      raiseL = raiseR = -1.3 + Math.sin(ph * 18) * 0.04; yawL = -0.35; yawR = 0.35; nod = 0.12; turn = Math.sin(ph * 0.4) * 0.1; mouth = 0;
+      raiseL += Math.max(0, Math.sin(ph * 13)) * 0.06; raiseR += Math.max(0, Math.sin(ph * 13 + 1.7)) * 0.06;
+      break;
+    case 'meeting': break;
+    case 'ride': // à vélo : assis sur la selle, mains au guidon, pédalage selon la vitesse
+      hipY = 0.86; leanX = 0.3; raiseL = raiseR = -1.25; yawL = -0.15; yawR = 0.15; spreadL = spreadR = 0.12; turn *= 0.3;
+      break;
+    case 'fallen': // chaise dévissée : sur les fesses, jambes en l'air, bras qui moulinent
+      hipY = 0.12; leanX = -0.35; raiseL = -2.6 + Math.sin(ph * 10) * 0.4; raiseR = -2.6 + Math.cos(ph * 10) * 0.4; spreadL = spreadR = 0.6;
+      thighL = thighR = -1.25; kneeL = kneeR = 0.3; mouth = 1.8;
+      break;
+  }
+  if (anim === 'ride') {
+    st.crank = (st.crank ?? 0) + dt * Math.min(sp, 6) * 2.2;
+    thighL = -1.15 + Math.sin(st.crank) * 0.45; thighR = -1.15 - Math.sin(st.crank) * 0.45;
+    kneeL = 1.2 - Math.sin(st.crank) * 0.3; kneeR = 1.2 + Math.sin(st.crank) * 0.3;
   }
   // Marche
   if (walk > 0.01) {
     const sw = Math.sin(st.wp);
+    const rush = anim === 'rush' ? 0.5 : 1;
     bob += Math.abs(Math.cos(st.wp)) * 0.035 * walk;
-    raiseL = lerp(raiseL, -0.45 * sw, walk * (rig.anim === 'tray' ? 0 : 1));
-    raiseR = lerp(raiseR, 0.45 * sw, walk * (rig.held ? 0.3 : 1));
+    if (anim !== 'tray' && anim !== 'rush' && anim !== 'leash' && anim !== 'binoculars') raiseL = lerp(raiseL, -0.45 * sw, walk);
+    if (!held && anim !== 'rush' && anim !== 'film') raiseR = lerp(raiseR, 0.45 * sw, walk);
+    thighL = 0.55 * sw * walk * rush; thighR = -thighL;
+    kneeL = Math.max(0, -Math.cos(st.wp)) * 0.6 * walk; kneeR = Math.max(0, Math.cos(st.wp)) * 0.6 * walk;
     turn *= 1 - walk;
   }
-  const r = k.r;
-  trs(B.hips, 0, k.hipY + bob, 0, leanX);
+  // Expression
+  const X = EXPRESSIONS[anim === 'rush' ? 'sick' : anim === 'fallen' ? 'surprised' : rig.expr] ?? EXPRESSIONS.neutral;
+  const r = k.r, cy = 0.92 * r;
+  const blink = still ? 1 : (ph * 0.9 + rig.seed * 5) % 4.3 < 0.12 ? 0.1 : 1;
+  trs(B.hips, 0, hipY + bob, 0, leanX);
   B.body.copy(B.hips).multiply(_sm.makeScale(1 + br * 0.5, 1 + br, 1 + br * 0.5));
   B.head.copy(B.hips).multiply(trs(_t, 0, k.neck * (1 + br), 0, nod, turn, tilt, 'YXZ'));
-  B.mouth.copy(B.head).multiply(trs(_t, 0, 0.92 * r - 0.42 * r, 0.9 * r, 0, 0, 0, 'XYZ', 1, Math.min(2.2, mouth), 1));
+  const ms = X.ms;
+  B.mouth.copy(B.head).multiply(trs(_t, X.mx * r, cy - 0.42 * r, 0.9 * r, 0, 0, 0, 'XYZ', ms[0], Math.min(2.4, ms[1] + mouth), 1));
+  for (const [sx, eb, bb] of [[1, 'eyeL', 'browL'], [-1, 'eyeR', 'browR']]) {
+    B[eb].copy(B.head).multiply(trs(_t, sx * 0.34 * r, cy + 0.06 * r, 0.9 * r, 0, 0, 0, 'XYZ', 1, X.eye * blink, 1));
+    const lift = (X.by + (sx > 0 ? X.bLift ?? 0 : 0)) * r;
+    B[bb].copy(B.head).multiply(trs(_t, sx * 0.34 * r, cy + 0.33 * r + lift, 0.9 * r, 0, 0, sx * X.bt));
+  }
   B.armL.copy(B.hips).multiply(trs(_t, k.shX, k.shY, 0, raiseL, yawL, spreadL, 'YZX'));
   B.armR.copy(B.hips).multiply(trs(_t, -k.shX, k.shY, 0, raiseR, yawR, -spreadR, 'YZX'));
   B.handL.copy(B.armL).multiply(trs(_t, 0, -k.armLen, 0, -raiseL - tipL));
   B.handR.copy(B.armR).multiply(trs(_t, 0, -k.armLen, 0, -raiseR - tipR));
-  const swing = walk * Math.sin(st.wp) * 0.55;
-  trs(B.legL, k.legX, k.hipY - 0.03 + bob * 0.5, 0, sit ? 0 : swing);
-  trs(B.legR, -k.legX, k.hipY - 0.03 + bob * 0.5, 0, sit ? 0 : -swing);
+  const lh = 0.36 * k.h;
+  for (const [sx, lb, sb, th, kn] of [[1, 'legL', 'shinL', thighL, kneeL], [-1, 'legR', 'shinR', thighR, kneeR]]) {
+    B[lb].copy(B.hips).multiply(trs(_t, sx * k.legX, -0.03 - (hipY - k.hipY) * 0, 0, th - leanX));
+    B[sb].copy(B[lb]).multiply(trs(_t, 0, -lh, 0, kn));
+  }
+  // mètre ruban : du pied de Delphine vers l'avant, longueur rig.tapeLen
+  trs(B.tape, 0.1, 0.02, 0.2, 0, 0, 0, 'XYZ', 1, 1, rig.tapeLen);
 }
 
 // ---------- Animaux ----------
@@ -222,58 +353,120 @@ export function dachshund() {
   const fur = 0x8a4b26, dark = 0x5a2e16;
   add('sphere', 'body', [0, 0, 0], [0.11, 0.1, 0.27], fur);
   add('sphere', 'body', [0, 0.01, 0.16], [0.115, 0.11, 0.12], fur);
-  add('torus', 'body', [0, 0.05, 0.25], [0.075, 0.075, 0.075], 0xd23c3c, [0, 0, 0]);
-  for (const [x, z] of [[0.065, 0.17], [-0.065, 0.17], [0.065, -0.17], [-0.065, -0.17]]) {
-    add('limb', 'root', [x, 0.16, z], [0.06, 0.13, 0.06], dark);
-    add('ball', 'root', [x, 0.02, z + 0.02], [0.04, 0.025, 0.05], dark);
+  add('torus', 'body', [0, 0.05, 0.25], [0.075, 0.075, 0.075], 0xd23c3c);
+  for (const [b, x, z] of [['fl', 0.065, 0.17], ['fr', -0.065, 0.17], ['bl', 0.065, -0.17], ['br', -0.065, -0.17]]) {
+    parts.push(part('limb', b, [0, 0, 0], [0.06, 0.13, 0.06], dark));
+    parts.push(part('ball', b, [0, -0.14, 0.02], [0.04, 0.025, 0.05], dark));
+    void x; void z;
   }
   add('sphere', 'head', [0, 0.04, 0.02], 0.1, fur);
-  add('sphere', 'head', [0, 0.0, 0.12], [0.055, 0.05, 0.09], fur);
+  add('sphere', 'head', [0, 0.0, 0.12], [0.055, 0.045, 0.09], fur);
+  add('sphere', 'jaw', [0, 0, 0.06], [0.045, 0.02, 0.07], dark);
   add('ball', 'head', [0, 0.025, 0.205], 0.025, 0x1a1412);
   for (const sx of [-1, 1]) {
     add('sphere', 'head', [sx * 0.085, -0.01, 0.0], [0.028, 0.085, 0.055], dark, [0, 0, sx * 0.25]);
     add('ball', 'head', [sx * 0.045, 0.075, 0.085], 0.018, 0x1a1412);
   }
   add('limb', 'tail', [0, 0, 0], [0.035, 0.15, 0.035], fur);
-  const proxy = makeRig(parts, { bones: ['root', 'body', 'head', 'tail'], animate: animDog });
+  const proxy = makeRig(parts, { bones: ['root', 'body', 'head', 'jaw', 'tail', 'fl', 'fr', 'bl', 'br'], animate: animDog, radius: 0.5, data: { anim: 'idle' } });
   proxy.userData.kind = 'dog';
   return proxy;
 }
 function animDog(rig, t, dt, proxy) {
-  const B = rig.bones, ph = t + rig.seed * 20;
-  const sniff = smooth((Math.sin(ph * 0.6) - 0.3) / 0.4);
-  const bob = Math.abs(Math.sin(ph * 3)) * 0.006;
-  trs(B.body, 0, 0.2 + bob, 0);
-  B.head.copy(B.body).multiply(trs(_t, 0, 0.07, 0.27, 0.15 + sniff * 0.6 + Math.sin(ph * 12) * 0.04 * sniff, Math.sin(ph * 0.8) * 0.5 * (1 - sniff), 0, 'YXZ'));
-  B.tail.copy(B.body).multiply(trs(_t, 0, 0.04, -0.26, 2.3, Math.sin(ph * 14) * 0.6, 0, 'YXZ'));
+  const B = rig.bones, st = rig.st, ph = rig.still ? 0.5 : t + rig.seed * 20;
+  const e = proxy.matrixWorld.elements;
+  const sp = st.px === undefined ? 0 : Math.hypot(e[12] - st.px, e[14] - st.pz) / Math.max(dt, 1e-3);
+  st.px = e[12]; st.pz = e[14];
+  st.walk = lerp(st.walk ?? 0, sp > 0.2 ? 1 : 0, Math.min(1, dt * 8));
+  st.wp = (st.wp ?? 0) + dt * 16 * st.walk;
+  const bark = rig.anim === 'bark' ? 1 : 0;
+  const barkPulse = bark * Math.max(0, Math.sin(ph * 9));
+  const sniff = (1 - bark) * (1 - st.walk) * smooth((Math.sin(ph * 0.6) - 0.3) / 0.4);
+  const bob = Math.abs(Math.sin(ph * 3)) * 0.006 + Math.abs(Math.sin(st.wp)) * 0.02 * st.walk + barkPulse * 0.03;
+  trs(B.body, 0, 0.2 + bob, 0, -barkPulse * 0.15);
+  B.head.copy(B.body).multiply(trs(_t, 0, 0.07, 0.27, 0.15 + sniff * 0.6 + Math.sin(ph * 12) * 0.04 * sniff - bark * 0.45, Math.sin(ph * 0.8) * 0.5 * (1 - sniff) * (1 - bark), 0, 'YXZ'));
+  B.jaw.copy(B.head).multiply(trs(_t, 0, -0.035, 0.08, barkPulse * 0.6));
+  B.tail.copy(B.body).multiply(trs(_t, 0, 0.04, -0.26, 2.3, Math.sin(ph * (14 + bark * 10)) * 0.6, 0, 'YXZ'));
+  const sw = Math.sin(st.wp) * 0.6 * st.walk;
+  trs(B.fl, 0.065, 0.16 + bob, 0.17, sw); trs(B.br, -0.065, 0.16 + bob, -0.17, sw);
+  trs(B.fr, -0.065, 0.16 + bob, 0.17, -sw); trs(B.bl, 0.065, 0.16 + bob, -0.17, -sw);
 }
 
 export function cat(color = 0xe39548) {
   const parts = [];
-  const add = (geo, bone, pos, scale, c, rot, glow) => parts.push(part(geo, bone, pos, scale, c, rot, glow));
+  const add = (geo, bone, pos, scale, c, rot, glow, keep) => parts.push(part(geo, bone, pos, scale, c, rot, glow, keep));
   add('sphere', 'body', [0, 0.13, -0.02], [0.12, 0.15, 0.13], color);
   add('sphere', 'body', [0, 0.12, 0.07], [0.07, 0.1, 0.06], 0xfff4e6);
   add('sphere', 'body', [0.07, 0.05, -0.04], [0.06, 0.06, 0.1], color);
   add('sphere', 'body', [-0.07, 0.05, -0.04], [0.06, 0.06, 0.1], color);
   for (const sx of [-1, 1]) add('ball', 'body', [sx * 0.04, 0.02, 0.09], [0.03, 0.025, 0.04], 0xfff4e6);
-  add('sphere', 'head', [0, 0, 0], [0.105, 0.095, 0.095], color);
+  add('sphere', 'head', [0, 0, 0], [0.105, 0.095, 0.095], color, null, false, true);
   for (const sx of [-1, 1]) {
-    add('cone', 'head', [sx * 0.06, 0.09, -0.01], [0.055, 0.075, 0.04], color, [0, 0, -sx * 0.25]);
-    add('ball', 'head', [sx * 0.04, 0.015, 0.085], [0.021, 0.028, 0.012], 0xd8f06a, null, true);
+    add('cone', 'head', [sx * 0.06, 0.09, -0.01], [0.055, 0.075, 0.04], color, [0, 0, -sx * 0.25], false, true);
+    add('ball', 'head', [sx * 0.04, 0.015, 0.085], [0.021, 0.028, 0.012], 0xd8f06a, null, true, true);
     add('ball', 'head', [sx * 0.04, 0.015, 0.093], [0.006, 0.022, 0.006], 0x111111);
   }
   add('ball', 'head', [0, -0.015, 0.095], [0.014, 0.01, 0.01], 0xf08ca0);
   add('limb', 'tail', [0, 0, 0], [0.04, 0.24, 0.04], color);
-  const proxy = makeRig(parts, { bones: ['root', 'body', 'head', 'tail'], animate: animCat });
+  const proxy = makeRig(parts, { bones: ['root', 'body', 'head', 'tail'], animate: animCat, radius: 0.4 });
   proxy.userData.kind = 'cat';
   return proxy;
 }
-function animCat(rig, t, dt) {
-  const B = rig.bones, ph = t + rig.seed * 20;
+function animCat(rig, t) {
+  const B = rig.bones, ph = rig.still ? 0.5 : t + rig.seed * 20;
   const br = Math.sin(ph * 1.5) * 0.02;
   trs(B.body, 0, 0, 0, 0, 0, 0, 'XYZ', 1 + br, 1 + br, 1 + br);
-  trs(B.head, 0, 0.31 + br * 0.1, 0.03, Math.sin(ph * 0.5) * 0.1, Math.sin(ph * 0.27) * 0.7, Math.sin(ph * 0.9) * 0.12, 'YXZ');
+  trs(B.head, 0, 0.31 + br * 0.1, 0.03, Math.sin(ph * 0.5) * 0.1, rig.still ? 0 : Math.sin(ph * 0.27) * 0.7, Math.sin(ph * 0.9) * 0.12, 'YXZ');
   trs(B.tail, 0, 0.05, -0.13, 1.9, 0, Math.sin(ph * 1.3) * 0.5, 'XZY');
+}
+
+// Vélo de la police municipale (samedi : pas de voitures). À ajouter comme enfant du policier (pose 'ride').
+export function bike(color = 0x1d2f5c) {
+  const parts = [];
+  const add = (geo, bone, pos, scale, c, rot) => parts.push(part(geo, bone, pos, scale, c, rot));
+  for (const [b, z] of [['wf', 0.5], ['wb', -0.5]]) {
+    add('torus', b, [0, 0, 0], [0.32, 0.32, 0.5], 0x1a1a1a, [0, Math.PI / 2, 0]);
+    add('cyl', b, [0, 0, 0], [0.05, 0.1, 0.05], 0xbfc4ca, [0, 0, Math.PI / 2]);
+    void z;
+  }
+  add('cyl', 'root', [0, 0.55, 0], [0.04, 0.9, 0.04], color, [Math.PI / 2 - 0.15, 0, 0]);
+  add('cyl', 'root', [0, 0.62, -0.25], [0.035, 0.45, 0.035], color, [0.3, 0, 0]);
+  add('cyl', 'root', [0, 0.62, 0.4], [0.035, 0.5, 0.035], color, [-0.25, 0, 0]);
+  add('box', 'root', [0, 0.88, -0.22], [0.12, 0.04, 0.22], 0x111111);
+  add('cyl', 'root', [0, 0.95, 0.45], [0.03, 0.5, 0.03], 0x2a2a2a, [0, 0, Math.PI / 2]);
+  add('box', 'root', [0, 0.45, -0.62], [0.28, 0.2, 0.22], 0xf2f2f2); // sacoche « POLICE »
+  add('ball', 'root', [0, 0.8, 0.62], 0.05, 0xfff2c0, null);
+  const proxy = makeRig(parts, { bones: ['root', 'wf', 'wb'], animate: animBike, radius: 1 });
+  proxy.userData.kind = 'bike';
+  return proxy;
+}
+function animBike(rig, t, dt, proxy) {
+  const st = rig.st, e = proxy.matrixWorld.elements;
+  const sp = st.px === undefined ? 0 : Math.hypot(e[12] - st.px, e[14] - st.pz) / Math.max(dt, 1e-3);
+  st.px = e[12]; st.pz = e[14];
+  st.a = (st.a ?? 0) + (dt * Math.min(sp, 8)) / 0.32;
+  trs(rig.bones.wf, 0, 0.32, 0.5, st.a); trs(rig.bones.wb, 0, 0.32, -0.5, st.a);
+}
+
+// Clode Kode : l'assistant de code, un petit terminal à visage (portrait et vignette Koddex)
+export function clodeBot() {
+  const parts = [];
+  const add = (geo, bone, pos, scale, c, rot, glow) => parts.push(part(geo, bone, pos, scale, c, rot, glow, true));
+  add('box', 'head', [0, 0.3, 0], [0.62, 0.46, 0.12], 0x2a2d36);
+  add('box', 'head', [0, 0.3, 0.062], [0.54, 0.38, 0.01], 0x1d3a4a, null, true);
+  for (const sx of [-1, 1]) add('box', 'eyeL', [sx * 0.11, 0, 0], [0.06, 0.1, 0.01], 0x7fe0ff, null, true);
+  add('box', 'mouth', [0, 0, 0], [0.14, 0.025, 0.01], 0x7fe0ff, null, true);
+  add('cyl', 'root', [0, 0.04, 0], [0.12, 0.08, 0.12], 0x3a3d48);
+  add('cyl', 'root', [0, -0.05, 0], [0.3, 0.03, 0.2], 0x3a3d48);
+  const proxy = makeRig(parts, { bones: ['root', 'head', 'eyeL', 'mouth'], animate: (rig, t) => {
+    const ph = rig.still ? 0 : t;
+    const X = { neutral: [1, 1], happy: [0.4, 2.5], angry: [0.6, 1.2], suspicious: [0.35, 0.8], surprised: [1.4, 1.5], sad: [0.7, 0.8], sick: [0.6, 1] }[rig.expr] ?? [1, 1];
+    trs(rig.bones.head, 0, Math.sin(ph * 1.5) * 0.01, 0);
+    rig.bones.eyeL.copy(rig.bones.head).multiply(trs(_t, 0, 0.33, 0.069, 0, 0, 0, 'XYZ', 1, X[0] * ((ph * 0.8) % 3.5 < 0.1 ? 0.1 : 1), 1));
+    rig.bones.mouth.copy(rig.bones.head).multiply(trs(_t, 0, 0.2, 0.069, 0, 0, 0, 'XYZ', 1, X[1] + Math.abs(Math.sin(ph * 9)) * (rig.talk ?? 0), 1));
+  }, radius: 0.5, data: { expr: 'neutral', talk: 0 } });
+  proxy.userData.kind = 'bot';
+  return proxy;
 }
 
 // ---------- Clients ----------
@@ -294,48 +487,81 @@ export function customer(pose = 'sit') {
   });
 }
 
-// ---------- Le casting ----------
-const notebook = (add) => add('box', 'handL', [0, 0.03, 0.05], [0.14, 0.02, 0.18], 0x2b4d7a);
+// ---------- Le casting (ids = src/content/characters.js) ----------
+const police = (o = {}) => humanoid({ hair: 'short', hairColor: pick(HAIR), shirt: 0x1d2f5c, pants: 0x18233f, shoes: 0x111111, cap: 0x1a2648, height: 1.05, talk: 0.2,
+  ...o,
+  extras: (add, k, addW) => {
+    add('box', 'body', [0, 0.1, 0], [0.48 * k.g, 0.06, 0.38 * k.g], 0x111111); // ceinturon
+    add('box', 'body', [0, k.th * 0.55, 0.0], [0.47 * k.g, 0.05, 0.37 * k.g], 0x8fb3e8); // bande bleu clair
+    add('box', 'body', [0.1, k.th * 0.65, 0.17 * k.g], [0.06, 0.07, 0.01], 0xe8c45a, null, true); // écusson
+    add('box', 'body', [0, k.th * 0.45, -0.18 * k.g], [0.3, 0.06, 0.01], 0xf2f2f2); // « POLICE MUNICIPALE » au dos
+    add('box', 'body', [0.15, k.th * 0.8, 0.14 * k.g], [0.06, 0.1, 0.04], 0x111111); // radio d'épaule
+    o.extras?.(add, k, addW);
+  } });
 export const CAST = {
-  pilou: () => humanoid({ hair: 'spiky', hairColor: 0x5a3b26, shirt: 0x7d8790, pants: 0x2f3542, glasses: 0x222222, skin: 0xf6d2b4,
+  pilou: (o = {}) => humanoid({ hair: 'spiky', hairColor: 0x5a3b26, shirt: 0x7d8790, pants: 0x2f3542, glasses: 0x222222, skin: 0xf6d2b4, ...o,
     extras: (add, k) => add('hemi', 'body', [0, k.th * 0.86, -0.12], [0.2, 0.12, 0.16], 0x6c757d, [-1.9, 0, 0]) }), // capuche
-  jeremie: () => humanoid({ hair: 'short', hairColor: 0x3b2a20, shirt: 0xc9a46a, pants: 0x3d4a63, glasses: 0x3a2a1a, height: 1.05, anim: 'leash',
-    extras: (add, k) => add('box', 'handL', [0, -0.02, 0.35], [0.01, 0.01, 0.7], 0xd23c3c, [0.6, 0, 0]) }),
+  jeremie: (o = {}) => humanoid({ hair: 'short', hairColor: 0x3b2a20, shirt: 0xc9a46a, pants: 0x3d4a63, glasses: 0x3a2a1a, height: 1.05, anim: 'leash', ...o,
+    extras: (add, k, addW) => addW('leash', 'box', 'handL', [0, -0.02, 0.35], [0.01, 0.01, 0.7], 0xd23c3c, [0.6, 0, 0]) }),
+  biloute: () => dachshund(),
   klaas: (pose = 'lean') => humanoid({ pose, height: 1.12, girth: 1.18, headR: 0.29, skin: 0xf3cdb0, hair: 'bald', hairColor: 0xf7f5f0,
-    beard: 0xf7f5f0, mustache: 0xf7f5f0, glasses: 0xc9a227, shirt: 0xc0392b, pants: 0x4a3f35, anim: 'write', talk: 0.2,
-    extras: (add, k) => { notebook(add); for (let i = 0; i < 3; i++) add('ball', 'body', [0, k.th * (0.35 + i * 0.18), k.g * 0.17], 0.025, 0xf7f5f0); add('limb', 'handR', [0, 0.08, 0.04], [0.015, 0.12, 0.015], 0x222222, [0.6, 0, 0]); } }),
+    beard: 0xf7f5f0, mustache: 0xf7f5f0, glasses: 0xc9a227, shirt: 0xc0392b, pants: 0x4a3f35, anim: 'write', held: 'notebook', talk: 0.2,
+    extras: (add, k, addW) => {
+      for (let i = 0; i < 3; i++) add('ball', 'body', [0, k.th * (0.35 + i * 0.18), k.g * 0.17], 0.025, 0xf7f5f0);
+      addW('write', 'limb', 'handR', [0, 0.08, 0.04], [0.015, 0.12, 0.015], 0x222222, [0.6, 0, 0]);
+      addW('write', 'box', 'handL', [0, 0.03, 0.05], [0.14, 0.02, 0.18], 0x2b4d7a);
+    } }),
   hilde: (pose = 'lean') => humanoid({ pose, hair: 'bob', hairColor: 0xe6e6e6, shirt: 0xb39ddb, pants: 0x55617a, skin: 0xf6d2b4, held: 'mug', mugColor: 0xf3b3c8, talk: 0.5, height: 0.95, glasses: 0x8a6a9a }),
   tatie: (pose = 'lean') => humanoid({ pose, hair: 'curly', hairColor: 0xa26cc4, shirt: 0xe85d9b, pants: 0x3d4a63, glasses: 0xd4af37, held: 'phone', talk: 0.9, height: 0.92, girth: 1.12 }),
   seb: (pose = 'stand') => humanoid({ pose, hair: 'short', hairColor: 0x1f1a17, beard: 0x1f1a17, shirt: 0x2a9d8f, pants: 0xe8e2d0, held: 'wine', height: 1.1, talk: 1 }),
   nico: (pose = 'stand') => humanoid({ pose, hair: 'quiff', hairColor: 0xe0c070, shirt: 0xf2a7b8, pants: 0x3d4a63, held: 'wine', wine: 0xf0d080, talk: 1 }),
-  hippolyte: () => humanoid({ hair: 'side', hairColor: 0xd8d8d8, mustache: 0xd8d8d8, shirt: 0x6b5e3a, pants: 0x4a4436, height: 1.08, anim: 'cane', talk: 0.3,
-    extras: (add, k) => {
+  gaufre: () => cat(),
+  hippolyte: (o = {}) => humanoid({ hair: 'side', hairColor: 0xd8d8d8, mustache: 0xd8d8d8, shirt: 0x6b5e3a, pants: 0x4a4436, height: 1.08, anim: 'cane', talk: 0.3, ...o,
+    extras: (add, k, addW) => {
       add('sphere', 'body', [0, k.th * 0.86, 0.1], [0.08, 0.06, 0.06], 0x8e1b3a); // lavallière
       add('torso', 'body', [0, k.th * 0.25, 0.02], [0.47, k.th * 0.55, 0.37], 0x8c7a4a); // gilet
-      add('cyl', 'handL', [0, -0.32, 0.02], [0.03, 0.7, 0.03], 0x2a1a10); add('ball', 'handL', [0, 0.02, 0.02], 0.035, 0xd4af37);
+      addW('cane', 'cyl', 'handL', [0, -0.32, 0.02], [0.03, 0.7, 0.03], 0x2a1a10);
+      addW('cane', 'ball', 'handL', [0, 0.02, 0.02], 0.035, 0xd4af37);
     } }),
-  dede: () => humanoid({ hair: 'bald', hairColor: 0x3b2a20, mustache: 0x3b2a20, shirt: 0x24305e, pants: 0x2f3542, height: 0.84, girth: 1.55, headR: 0.29, talk: 0.9,
+  regis: (o = {}) => humanoid({ hair: 'quiff', hairColor: 0x8a5a2b, shirt: 0xf0e6d0, pants: 0x55617a, height: 1.02, girth: 1.08, held: 'phone', talk: 0.7, ...o,
+    extras: (add, k) => {
+      for (const sx of [-1, 1]) add('ball', 'head', [sx * 0.1, 0.92 * k.r + 0.2, 0.1], [0.07, 0.035, 0.05], 0x1a1a1a); // lunettes de soleil sur la tête
+      add('torus', 'body', [0, k.th * 0.85, 0.02], [0.13, 0.13, 0.2], 0x7fb3d5, [Math.PI / 2, 0, 0]); // pull sur les épaules
+    } }),
+  dede: (o = {}) => humanoid({ hair: 'bald', hairColor: 0x3b2a20, mustache: 0x3b2a20, shirt: 0x24305e, pants: 0x2f3542, height: 0.84, girth: 1.55, headR: 0.29, talk: 0.9, ...o,
     extras: (add, k) => add('box', 'body', [0, k.th * 0.28, k.g * 0.19], [0.36, k.th * 0.5, 0.02], 0xf3efe6, [-0.12, 0, 0]) }), // tablier court
-  ghislain: () => humanoid({ hair: 'manbun', hairColor: 0x2b1d14, beard: null, shirt: 0x1d1d22, pants: 0x1d1d22, height: 1.22, girth: 0.72, headR: 0.24, held: 'cig', talk: 0.15 }),
-  waiter: () => humanoid({ hair: 'quiff', hairColor: 0x3b2a20, shirt: 0x1f1f24, pants: 0x1f1f24, height: 1.02, anim: 'tray', talk: 0.4,
-    extras: (add, k) => {
+  ghislain: (o = {}) => humanoid({ hair: 'manbun', hairColor: 0x2b1d14, shirt: 0x1d1d22, pants: 0x1d1d22, height: 1.22, girth: 0.72, headR: 0.24, held: 'cig', talk: 0.15, ...o }),
+  serveur: (o = {}) => humanoid({ hair: 'quiff', hairColor: 0x3b2a20, shirt: 0x1f1f24, pants: 0x1f1f24, height: 1.02, anim: 'tray', talk: 0.4, ...o,
+    extras: (add, k, addW) => {
       add('box', 'body', [0, -0.08, 0.17], [0.34, 0.52, 0.02], 0xf6f2ea); // grand tablier blanc
-      add('cyl', 'handL', [0, 0.02, 0], [0.4, 0.02, 0.4], 0xc0c4ca); // plateau
-      add('cyl', 'handL', [0.07, 0.09, 0.04], [0.07, 0.12, 0.07], 0xf0a830);
-      add('cyl', 'handL', [-0.07, 0.09, -0.03], [0.07, 0.12, 0.07], 0xf0a830);
+      addW('tray', 'cyl', 'handL', [0, 0.02, 0], [0.4, 0.02, 0.4], 0xc0c4ca); // plateau
+      addW('tray', 'cyl', 'handL', [0.07, 0.09, 0.04], [0.07, 0.12, 0.07], 0xf0a830);
+      addW('tray', 'cyl', 'handL', [-0.07, 0.09, -0.03], [0.07, 0.12, 0.07], 0xf0a830);
     } }),
-  police: () => humanoid({ hair: 'short', hairColor: pick(HAIR), shirt: 0x1d2f5c, pants: 0x18233f, shoes: 0x111111, cap: 0x1a2648, height: 1.05, talk: 0.2,
-    extras: (add, k) => {
-      add('box', 'body', [0, 0.1, 0], [0.48, 0.06, 0.38], 0x111111); // ceinturon
-      add('box', 'body', [0, k.th * 0.55, 0.0], [0.47, 0.05, 0.37], 0x8fb3e8); // bande bleu clair
-      add('box', 'body', [0.1, k.th * 0.65, 0.17], [0.06, 0.07, 0.01], 0xe8c45a, null, true); // écusson
-    } }),
-  delphine: () => humanoid({ hair: 'bob', hairColor: 0x2d2420, shirt: 0x2f3e5c, skirt: 0x2f3542, height: 1.05, girth: 0.92, glasses: 0x111111, anim: 'clipboard', talk: 0.4,
-    extras: (add, k) => {
-      add('box', 'handL', [0, 0.02, 0.06], [0.2, 0.015, 0.26], 0x8a5a35, [0.3, 0, 0]);
-      add('box', 'body', [0, k.th * 0.6, 0.18], [0.05, 0.08, 0.01], 0xffffff); // badge
-    } }),
+  // Police municipale : Lemaire (rond, moustache, bonhomme), Benali (jeune, carnet), le chef (galons dorés)
+  lemaire: (o = {}) => police({ hair: 'short', hairColor: 0x6b5b4b, mustache: 0x5a4a3a, height: 0.98, girth: 1.35, headR: 0.28, talk: 0.6, ...o }),
+  benali: (o = {}) => police({ hair: 'short', hairColor: 0x1f1a17, skin: 0xc98e5f, height: 1.12, girth: 0.9, headR: 0.25, held: 'notebook', ...o }),
+  chef: (o = {}) => police({ hair: 'side', hairColor: 0xb0b0b0, height: 1.1, girth: 1.1, capBand: 0xe8c45a, glasses: 0x333333, ...o }),
+  police: (o = {}) => police(o),
+  delphine: (o = {}) => humanoid({ hair: 'bob', hairColor: 0x2d2420, shirt: 0x2f3e5c, skirt: 0x2f3542, height: 1.05, girth: 0.92, glasses: 0x111111, anim: 'clipboard', held: 'clipboard', talk: 0.4, ...o,
+    extras: (add, k) => add('box', 'body', [0, k.th * 0.6, 0.18], [0.05, 0.08, 0.01], 0xffffff) }), // badge
+  colette: (o = {}) => humanoid({ hair: 'bob', hairColor: 0xe8d39a, shirt: 0xb0283a, skirt: 0x2a2a35, height: 0.98, girth: 1.08, talk: 0.8, ...o,
+    extras: (add, k) => { for (let i = 0; i < 9; i++) { const a = -0.9 + i * 0.225; add('ball', 'body', [Math.sin(a) * 0.15, k.th * 0.92 - Math.cos(a) * 0.06, 0.13 + Math.cos(a) * 0.03], 0.022, 0xf8f4ea); } } }), // collier de perles
+  lescaut: (o = {}) => humanoid({ hair: 'side', hairColor: 0x4a3f35, shirt: 0x2b3550, pants: 0x2b3550, glasses: 0x333333, height: 1.1, talk: 0.5, ...o,
+    extras: (add, k) => { add('box', 'body', [0, k.th * 0.6, 0.17], [0.06, k.th * 0.55, 0.02], 0x9a2a3a); add('box', 'body', [0, k.th * 0.7, 0.165], [0.14, k.th * 0.4, 0.015], 0xf2f2f2); } }), // cravate
+  journaliste: (o = {}) => humanoid({ hair: 'ponytail', hairColor: 0xa0522d, shirt: 0xc9b48a, pants: 0x3d4a63, height: 1.0, held: 'notebook', talk: 0.8, ...o,
+    extras: (add, k) => add('torus', 'body', [0, k.th * 0.9, 0.02], [0.14, 0.14, 0.25], 0x2a9d8f, [Math.PI / 2, 0, 0]) }), // écharpe
+  avocat: (o = {}) => humanoid({ hair: 'side', hairColor: 0x2d2420, shirt: 0x15151a, pants: 0x15151a, glasses: 0x222222, height: 1.08, talk: 0.5, ...o,
+    extras: (add, k) => { add('box', 'body', [0, k.th * 0.78, 0.17], [0.12, 0.12, 0.015], 0xffffff); add('skirt', 'body', [0, -0.2, 0], [0.62, 0.5, 0.5], 0x15151a); } }), // robe et rabat
+  stephane: (o = {}) => humanoid({ hair: 'quiff', hairColor: 0xd9b26a, shirt: 0x3a3f4a, pants: 0x3d4a63, shoes: 0xf2f2f2, height: 1.06, held: 'phone', talk: 1, ...o,
+    extras: (add, k) => { add('torso', 'body', [0, k.th * 0.2, 0.01], [0.48, k.th * 0.62, 0.38], 0x5a7a9a); for (const sx of [-1, 1]) add('ball', 'head', [sx * 0.98 * k.r, 0.85 * k.r, 0.1 * k.r], 0.05, 0xffffff); } }), // doudoune sans manches, écouteurs
+  clode: () => clodeBot(),
 };
+// Anciens noms (v0.3) → ids de contenu
+CAST.waiter = CAST.serveur;
+CAST.dog = CAST.biloute;
+CAST.cat = CAST.gaufre;
+export const CAST_IDS = ['pilou', 'jeremie', 'biloute', 'klaas', 'hilde', 'tatie', 'seb', 'nico', 'gaufre', 'hippolyte', 'regis', 'dede', 'ghislain', 'serveur', 'lemaire', 'benali', 'chef', 'delphine', 'colette', 'lescaut', 'journaliste', 'avocat', 'stephane', 'clode'];
 
 // Ancienne API : person(color) = un passant debout. La couleur de l'uniforme de police donne un agent.
 export function person(color) {
