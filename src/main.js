@@ -75,6 +75,7 @@ Object.assign(ANCHORS, {
   streetDoor: xyz(world.streetDoor),
   bed: { ...xyz(world.bed), y: world.bed.y + 0.6 },
   ...(world.exhaust && { exhaust: xyz(world.exhaust) }),
+  ...(world.anchors?.balcony && { balcony: { ...xyz(world.anchors.balcony), y: world.anchors.balcony.y + 1.5 } }), // [art v0.3] yeux de Seb & Nico
 });
 for (const v of world.tables) v.hit.userData.target = { kind: 'table', id: v.id };
 
@@ -82,53 +83,16 @@ for (const v of world.tables) v.hit.userData.target = { kind: 'table', id: v.id 
 const v3 = (p, y = p.y ?? 0) => new THREE.Vector3(p.x, y, p.z);
 const COLORS = [0x264653, 0x2a9d8f, 0xe9c46a, 0xf4a261, 0xe76f51, 0x6d597a, 0x355070, 0xb5838d, 0x3d405b];
 
-// Klaas à sa fenêtre sur la place Maurice-Schumann, face à la rue (barbe blanche, gilet rouge) : allumée tant qu'il veille
-const klaas = new THREE.Group();
-{
-  const facade = new THREE.Mesh(new THREE.BoxGeometry(5, ANCHORS.klaasWindow.y + 3, 0.4), mat(0xb9a58c));
-  facade.position.set(0, -ANCHORS.klaasWindow.y + (ANCHORS.klaasWindow.y + 3) / 2, 0.25);
-  const pane = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 1.5), new THREE.MeshStandardMaterial({ color: 0x332211, emissive: 0xffc070, emissiveIntensity: 0.9 }));
-  pane.rotation.y = Math.PI;
-  const k = person(0xb3261e);
-  k.position.set(0, -1.25, 0.1);
-  k.rotation.y = Math.PI;
-  const beard = new THREE.Mesh(new THREE.SphereGeometry(0.13, 8, 6), mat(0xf4f4f4));
-  beard.position.set(0, 1.1, 0.08);
-  k.add(beard);
-  klaas.add(facade, pane, k);
-  klaas.userData = { pane, figure: k };
-  klaas.position.copy(v3(ANCHORS.klaasWindow));
-  scene.add(klaas);
-}
-// Balcon de Seb & Nico : le chat = ils sont là
-const balcony = new THREE.Group();
-const cat = new THREE.Group();
-{
-  const slab = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.1, 2.2), mat(0xcfc6b8));
-  const rail = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.9, 2.2), mat(0x1c1c1c, { metalness: 0.6 }));
-  rail.position.set(-0.43, 0.45, 0);
-  const fur = mat(0x2b2b2b);
-  const body = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.2, 0.18), fur);
-  body.position.y = 0.2;
-  const head = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.15, 0.15), fur);
-  head.position.set(-0.22, 0.32, 0);
-  for (const dz of [-0.05, 0.05]) {
-    const ear = new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.08, 4), fur);
-    ear.position.set(-0.22, 0.43, dz);
-    cat.add(ear);
-  }
-  cat.add(body, head);
-  balcony.add(slab, rail, cat);
-  balcony.position.copy(v3(ANCHORS.balcony)).setX(W - 0.45);
-  scene.add(balcony);
-}
+// [art v0.3] Klaas & Hilde (fenêtre sur la place), Seb & Nico et le chat (balcon) sont dessinés par world.js : world.cast
+const klaas = { userData: { figure: world.cast.klaas } };
+const cat = world.cast.cat;
 // Buveurs debout (samedi)
 const standingViews = S.standing.map((g) => {
   const grp = new THREE.Group();
   for (let i = 0; i < g.size; i++) {
     const p = person(COLORS[(i * 3 + g.size) % COLORS.length]);
     const a = (i / g.size) * Math.PI * 2;
-    p.position.set(Math.cos(a) * 0.45, 0.25, Math.sin(a) * 0.45);
+    p.position.set(Math.cos(a) * 0.6, 0, Math.sin(a) * 0.6); // [art v0.3] persos posés au sol
     p.rotation.y = -a + Math.PI / 2;
     grp.add(p);
   }
@@ -140,7 +104,6 @@ const standingViews = S.standing.map((g) => {
 // Pipis dans les portes : une petite réserve de silhouettes
 const peeViews = Array.from({ length: 4 }, (_, i) => {
   const p = person(COLORS[(i * 2 + 1) % COLORS.length]);
-  p.position.y = 0.25;
   const hit = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 1.8, 6), new THREE.MeshBasicMaterial({ visible: false }));
   hit.position.y = 0.9;
   p.add(hit);
@@ -216,7 +179,7 @@ function syncActors() {
     v.hit.userData.target = p ? { kind: 'pee', id: p.id } : null;
     if (!p) return;
     const side = Math.sign(p.doorway.x);
-    v.p.position.set(p.doorway.x - side * 0.45, 0.25, p.doorway.z);
+    v.p.position.set(p.doorway.x - side * 0.45, 0, p.doorway.z);
     v.p.rotation.y = side > 0 ? Math.PI / 2 : -Math.PI / 2;
   });
   // Patrouille : position interpolée sur l'horloge de la simulation
@@ -535,8 +498,6 @@ function animate(dt) {
   world.steam.intensity = S.min < NOISE.exhaustOffMinute ? 1 : Math.max(0, world.steam.intensity - dt * 0.3);
   world.steam.update(dt);
   splash.update(dt);
-  cat.rotation.y = Math.sin(now * 0.5) * 0.25;
-  klaas.userData.pane.material.emissiveIntensity = sim.klaasAwake() ? 0.9 : 0;
 }
 
 function syncCamera() {
