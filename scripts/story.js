@@ -114,6 +114,14 @@ function night() {
         if (r.ok) say(r.startedAt, `**Pilou** : ${K.ACTIONS.find((x) => x.id === id)?.label ?? id}${r.seen.length ? ` (vu par ${r.seen.map((s) => s.name).join(', ')})` : ''}`);
       }
     }
+    // Événements de nuit à leur heure (campaign.nightEventDue), choix du bot
+    for (let ev = c.nightEventDue(sim); ev; ev = c.nightEventDue(sim)) {
+      const ok = ev.choices.filter((x) => x.available);
+      const i = ok.length ? bot.choose(c, ev, ok) : 0;
+      const r = c.resolveNightEvent(sim, i);
+      say(sim.state.min, `🃏 **${ev.data.title}** \`${ev.id}\` : ${ev.data.text}`);
+      say(sim.state.min, `→ **${ev.choices[i]?.label ?? 'OK'}**${r ? ` : ${r}` : ''}`);
+    }
     for (const e of sim.drainEvents()) if (e.type === 'log') say(e.min, e.text);
     const m = sim.state.min;
     for (const [t, kind] of Object.entries(bells)) {

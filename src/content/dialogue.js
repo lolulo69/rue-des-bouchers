@@ -267,7 +267,7 @@ export const DIALOGUE = [
     speaker: 'klaas',
     when: { flags: ['seen_complaisance', 'met_klaas'] },
     lines: [
-      "22h40. Voiture de police devant l’estaminet. 22h41 : un café. 22h55 : un deuxième café. 23h10 : départ. Procès-verbaux : zéro.",
+      "Voiture de police devant l’estaminet. Un café. Puis un deuxième café. Puis le départ. Procès-verbaux : zéro.",
       "C’est la première fois que je souligne une ligne deux fois.",
     ],
     once: true,
@@ -737,8 +737,8 @@ export const DIALOGUE = [
     speaker: 'nico',
     when: { flags: ['met_seb_nico'], notFlags: ['joined_whatsapp'] },
     lines: [
-      "Règle du groupe : pas de photos de visages, pas d’insultes, pas d’audios de plus d’une minute.",
-      "Seb enfreint la troisième tous les jours. On l’aime quand même.",
+      "Règles du groupe : on reste poli, on horodate, et on ne parle pas de la carbonnade. La troisième, c’est moi qui l’ai ajoutée.",
+      "Seb enfreint la deuxième tous les jours. On l’aime quand même.",
     ],
   },
   {
@@ -1468,8 +1468,8 @@ export const DIALOGUE = [
     speaker: 'regis',
     when: { flags: ['regis_courted'], notFlags: ['traitor_known'] },
     lines: [
-      "Moi, à l’estaminet ? Une fois. Bon, deux. Pour observer. De l’intérieur. Pour l’association.",
-      "Klaas a noté ? Il note tout, Klaas. Même les gens qui n’ont rien fait. Enfin, rien de grave.",
+      "Moi, je dîne chez moi. Le plus souvent. Il faut savoir sortir, aussi, prendre le pouls de la rue. Dans la nuance.",
+      "Klaas et son carnet… Il note tout, Klaas. Même les gens qui n’ont rien fait. Surtout eux, j’ai l’impression.",
     ],
     once: true,
   },
@@ -1508,7 +1508,7 @@ export const DIALOGUE = [
   {
     id: 'journaliste_first',
     speaker: 'journaliste',
-    when: { flags: ['press_contacted'], notFlags: ['press_article'] },
+    when: { flags: ['press_contacted'], notFlags: ['press_article'], stats: { dossier: '<40' } },
     lines: [
       "Vous avez des éléments ? Des photos, des PV, des dates ?",
       "Parce que « mon voisin fait du bruit », j’en reçois quarante par semaine. Je les classe par quartier.",

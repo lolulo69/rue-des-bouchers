@@ -635,3 +635,20 @@ so it reflects what the player actually did.
   - **turncoat**: Pilou on the terrace with a carbonnade, Dédé patting his shoulder, Klaas taking notes in the background.
   - **the_return**: La Bombance reopened as a bar, a pink blinking neon « LA BOMBANCE · BAR », the queue already forming.
 
+
+
+**Story fixes (story-fixes) — what I changed in the engine (for the build agent: you're in these files too)**
+- `src/sim/campaign.js`:
+  - `createCampaign` gets new state `S.lastShown` (day an entry was last shown) and `S.nightEvents`, both defaulted for old saves.
+  - `cooled()` / `shown()` helpers.
+  - `buildCards()`: night-phase events, fixed or random, go to `S.nightEvents` (`{ id, at }`) instead of cards when `CAMPAIGN.nightEventsAtTime`. The cooldown also applies to random events, counter-moves and dialogue.
+  - New `resolveEvent(e, i)`, extracted from `c.resolveCard`, which now calls it and records `shown()` for dialogue and counter-moves.
+  - `koddexOptions` / `koddex`: cooldown on work items and gags.
+  - New `c.nightEventDue(sim)`, `c.resolveNightEvent(sim, i)`, and `NIGHT_EVENT_EFFECTS.rain`, used by the content's `simEffect: 'rain'`.
+  - `c.finishNight` clears `S.nightEvents`; unplayed ones are dropped.
+- `src/config.js` `CAMPAIGN`: `repeatCooldownDays: 4`, `nightEventsAtTime: true`, `nightEventAt: 21h00`.
+- `src/sim/campaignRunner.js`: `playNight(sim, policy, c, dt, contentEvery, choose)` resolves due night events. `runCampaign` passes `bot.choose`.
+- `src/sim/sim.js`: one narrated witness line per witness kind and act (the `witnessAct` narrator line).
+- `src/main.js`: `tick()` opens due night events in the night-menu overlay (`openNightEvent`, which pauses like any overlay). `renderNightMenu` resets its heading.
+- Content: events take `at` (minutes since midnight) and `simEffect`. Entries can opt out of the cooldown with `repeatable: true`.
+- The UI (`src/ui`) no longer receives night-phase event cards before the night, so it needs no change.

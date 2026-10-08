@@ -187,3 +187,16 @@ only English is deliberate (`rv_tourist`, the « OPENING » sign).
 | | legal / mixed | Asso 100 by D4 and Dossier 100 by D5: the last 9 days have no stakes. | Diminishing returns on Asso / Dossier. | balance |
 | | reckless / stealthy | Stink bombs raise Sleep (they empty the terrace under the window); Risk sits at 84 for days, then custody on a morning with no act; nine buckets leave Risk at 33. | Review the Risk decay and the custody trigger. | balance |
 | | diplomat | Now reaches negotiated peace through `r_charter_talks` (chance 0.6, D8–13). | Re-run `npm run sim`; the peace ≥ 40 % target may be met now. | balance |
+
+### Pass 2 (transcripts) · follow-up, task `story-fixes`
+Status changes for the rows above (re-checked on fresh `legal-3` and `diplomat-8` transcripts):
+
+| Row | Now |
+|---|---|
+| D14: the day went on after the verdict | **fixed** by 10a1dfd (build agent): the campaign ends right after `d14_commission`, `early: false`. Both refreshed transcripts end at the commission. |
+| `r_drache` had no effect on the night | **fixed**: `simEffect: 'rain'` clears every terrace within about 4 minutes; nothing comes back out. |
+| Night-phase events shown before the night | **fixed**: events get an `at` hour and play inside the night (`campaign.nightEventDue` / `resolveNightEvent`, `main.js` overlay, `playNight`). |
+| Koddex « travail » repeated / repeats in general | **fixed**: 3b36eac (build agent) avoids duplicates within a morning. A `repeatCooldownDays` (4) cooldown now applies to dialogue, counter-moves, random events, Koddex work items and gags, unless the entry is marked `repeatable: true`. The same work result now comes back every 4 days at most. |
+| Witness line repeated per witness | **fixed**: one narrated line per witness kind and act. |
+| `klaas_complaisance`, `journaliste_first` / `journaliste_solid`, `nico_hello`, `regis_courted`, `pm_bloc_fooled` / `tatie_bloc_fooled` | **fixed**: no clock times; the journalist's first contact only while the dossier is thin; Nico's rules match `wa_welcome`; Régis deflects instead of half-confessing; the bloc's reaction to the fake « manif samedi » comes after the first Saturday, in the past tense. |
+| Still open | Engine: nightly verdict score, custody verdict text, the police call counter, the 20:30 photo dB, the « Théo » UI label, hello-line ordering, the IGPN trigger. Balance: the rows above. `serveur_named` (« Tu m'appelles Théo maintenant ? » days late) is still open for the dialogue owner. |

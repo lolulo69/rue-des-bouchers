@@ -688,9 +688,9 @@ export const ACTIONS = [
     legality: 'grey',
     once: true,
     cost: { time: 1 },
-    requires: { flags: ['tatie_fake_leak'], chance: 0.6 },
+    requires: { flags: ['tatie_fake_leak', 'saturday1_done'], chance: 0.6 },
     effects: { setFlags: ['bloc_fooled'], hostility: -10, dossier: +2 },
-    result: "Le bloc a loué des barrières pour une manifestation qui n’existe pas. Dédé les range lui-même. Et la preuve que Colette renseigne l’estaminet est désormais dans votre dossier.",
+    result: "Samedi, le bloc avait loué des barrières pour une manifestation qui n’a jamais existé. Dédé les a rangées lui-même. Et la preuve que Colette renseigne l’estaminet est désormais dans votre dossier.",
   },
   {
     id: 'pm_klaas_forget',
