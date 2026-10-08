@@ -316,6 +316,7 @@ describe('§13.F2 · l\'épilogue cite ce que le joueur a fait', () => {
 describe('§13.G1 · invariants (compléments à invariants.test.js et campaign.test.js)', () => {
   it('Pilou n\'est jamais à deux endroits : ses actions de nuit ne se chevauchent pas dans le temps', () => {
     const c = drive(fresh(41), (x) => x.step === 'night');
+    c.state.unlocked = K.UNLOCKS.map((u) => u.id); // test de mécanique : outils débloqués (verrouillage v1.1 : twistEngine.test.js)
     const sim = c.createNight();
     while (sim.state.min < 21 * 60) sim.tick(1);
     for (const id of ['night_film_faces', 'night_camera_window', 'night_stink_bomb', 'night_flood_police']) c.doNightAction(sim, id);

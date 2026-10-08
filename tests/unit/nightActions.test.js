@@ -18,6 +18,8 @@ function night({ seed = 3, flags = [], stats = {}, day } = {}) {
   }
   if (day) c.state.day = day;
   c.apply({ setFlags: flags, ...stats }, 'engine', 'test');
+  // Ces tests portent sur la mécanique des actions : outils tous débloqués (le verrouillage v1.1 est testé dans twistEngine.test.js)
+  c.state.unlocked = content.UNLOCKS.map((u) => u.id);
   return { c, sim: c.createNight() };
 }
 const tickTo = (sim, min) => { while (sim.state.min < min && !sim.state.ended) sim.tick(0.5); };

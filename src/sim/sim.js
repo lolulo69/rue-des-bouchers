@@ -221,7 +221,9 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
         }
         if (S.sleeping && S.noiseBed < SLEEP.thresholdDb) d += SLEEP.recoverPerMinute;
         S.sleep = clamp(S.sleep + d * dMin, earlyEndings ? 0 : CAMPAIGN.preGate.sleepFloor, 100);
-        if (S.sleep <= 0) sim.end('sleep');
+        // Nuit isolée : à 0, Pilou craque et la nuit s'arrête. En campagne (sleepEndsNight: false), une nuit blanche ne
+        // clôt rien à elle seule : elle coûte tout le Sommeil de campagne, et le déménagement se décide sur la stat de campagne.
+        if (S.sleep <= 0 && carry.sleepEndsNight !== false) sim.end('sleep');
       }
       if (S.min >= RULES.nightEnd) sim.end('time');
     },

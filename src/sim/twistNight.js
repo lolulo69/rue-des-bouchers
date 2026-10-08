@@ -4,8 +4,10 @@
 import { createRng } from './rng.js';
 import { fmt } from './time.js';
 
-// `noise` est un multiplicateur de bruit des sources extérieures : en dB, +40·log10(noise) (×1.15 → +2,4 dB, ×1.3 → +4,6 dB)
-export const noiseOffsetDb = (noise = 1) => (noise > 0 ? 40 * Math.log10(noise) : 0);
+// `noise` multiplie l'amplitude des sources extérieures : en dB, +20·log10(noise) (×1.15 → +1,2 dB, ×1.3 → +2,3 dB).
+// Les pics des moments (`events[].simEffect.noise`, en dB) durent 5 minutes par défaut (un but, une chanson).
+export const noiseOffsetDb = (noise = 1) => (noise > 0 ? 20 * Math.log10(noise) : 0);
+export const EVENT_NOISE_MINUTES = 5;
 
 export function setupTwist(sim, twist) {
   const S = sim.state;
@@ -70,7 +72,7 @@ export function updateTwist(sim) {
     sim.note('twist-event', { twistId: S.twist?.id, i: e.i });
     if (e.text) sim.log(e.text);
     const fx = e.simEffect ?? {};
-    if (fx.noise) S.noiseBoosts.push({ db: fx.noise, until: S.min + (fx.minutes ?? 10) });
+    if (fx.noise) S.noiseBoosts.push({ db: fx.noise, until: S.min + (fx.minutes ?? EVENT_NOISE_MINUTES) });
     if (fx.rain) startRain(sim, { spareAwning: fx.rain !== 'all' });
     if (fx.exhaustOff) S.exhaustOff = true;
     if (typeof fx.darkness === 'number') S.darkness = Math.max(0, Math.min(1, fx.darkness));

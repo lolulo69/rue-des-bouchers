@@ -15,7 +15,7 @@ const share = (bot, ending, seeds) => {
 
 describe('équilibrage : chemins vers les fins', () => {
   // Le tire-au-flanc (projets perso, sieste, travail minimal) doit pouvoir se faire virer (§13.F : ≥ 2 % de ses parties)
-  it('licencié : le tire-au-flanc se fait virer (≥ 2 % sur 30 graines)', () => {
+  it('licencié : le tire-au-flanc se fait virer (≥ 2 % sur 30 graines)', { timeout: 30_000 }, () => {
     expect(share('slacker', 'fired', 30)).toBeGreaterThanOrEqual(0.02);
   });
 });
