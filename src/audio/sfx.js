@@ -1,5 +1,5 @@
 // Bruitages ponctuels, tous synthétisés (aucun fichier). play(name, { when, gain, pan, ... }).
-export const SFX_NAMES = ['whatsapp', 'notify', 'footsteps', 'radio', 'splash', 'shutter', 'keyboard', 'bark', 'crash', 'rattle', 'paper', 'rumble', 'pfff', 'flush', 'bell', 'click'];
+export const SFX_NAMES = ['cheer', 'megaphone', 'birthday', 'whatsapp', 'notify', 'footsteps', 'radio', 'splash', 'shutter', 'keyboard', 'bark', 'crash', 'rattle', 'paper', 'rumble', 'pfff', 'flush', 'bell', 'click'];
 
 export function makeSfx(ctx, out, noise, reverbIn) {
   const env = (g, t, a, peak, d) => { g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(peak, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + a + d); };
@@ -98,6 +98,29 @@ export function makeSfx(ctx, out, noise, reverbIn) {
     },
     pfff(t, o, dest) { burst(dest, t, { type: 'lowpass', f: 1500, f2: 400, a: 0.2, d: 1.2, peak: 0.25 * o.gain }); },
     flush(t, o, dest) { burst(dest, t, { type: 'bandpass', f: 600, q: 0.5, f2: 300, a: 0.1, d: 1.6, peak: 0.3 * o.gain }); },
+    // But ! clameur de la terrasse qui monte puis retombe
+    cheer(t, o, dest) {
+      burst(dest, t, { type: 'bandpass', f: 900, q: 0.6, a: 0.25, d: 2.2, peak: 0.5 * o.gain });
+      burst(dest, t + 0.1, { type: 'bandpass', f: 2200, q: 0.8, a: 0.3, d: 1.6, peak: 0.25 * o.gain });
+      for (let i = 0; i < 6; i++) tone(dest, t + 0.2 + i * 0.12, { type: 'sawtooth', f: 260 + Math.random() * 200, f2: 400 + Math.random() * 200, a: 0.05, d: 0.35, peak: 0.04 * o.gain });
+    },
+    // Mégaphone : voix nasillarde saturée, quelques syllabes (« WOUHOU ! »)
+    megaphone(t, o, dest) {
+      const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1500; bp.Q.value = 2; bp.connect(dest);
+      const ws = ctx.createWaveShaper(); const curve = new Float32Array(256); for (let i = 0; i < 256; i++) { const x = i / 128 - 1; curve[i] = Math.tanh(x * 4); } ws.curve = curve; ws.connect(bp);
+      for (let i = 0; i < 4; i++) tone(ws, t + i * 0.22, { type: 'sawtooth', f: 330 + Math.random() * 120, f2: 260 + Math.random() * 80, a: 0.03, d: 0.18, peak: 0.25 * o.gain });
+    },
+    // « Joyeux anniversaire » chanté faux par une tablée (voix en formants, un peu désaccordées)
+    birthday(t, o, dest) {
+      const notes = [[0, 0.75], [0, 0.25], [2, 1], [0, 1], [5, 1], [4, 2], [0, 0.75], [0, 0.25], [2, 1], [0, 1], [7, 1], [5, 2]];
+      const base = 392 / 2 ** (7 / 12); // do grave
+      const f1 = ctx.createBiquadFilter(); f1.type = 'bandpass'; f1.frequency.value = 700; f1.Q.value = 3; f1.connect(dest);
+      let tt = t;
+      for (const [n, d] of notes) {
+        for (let v = 0; v < 4; v++) tone(f1, tt + Math.random() * 0.04, { type: 'sawtooth', f: base * 2 ** ((n + (Math.random() - 0.5) * 0.5) / 12), a: 0.06, d: d * 0.42, peak: 0.05 * o.gain });
+        tt += d * 0.42;
+      }
+    },
     click(t, o, dest) { burst(dest, t, { type: 'highpass', f: 4000, d: 0.015, peak: 0.2 * o.gain }); },
     // Une cloche (le moteur principal sonne les 10 coups de 22h)
     bell(t, o) {

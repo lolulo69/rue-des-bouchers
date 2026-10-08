@@ -85,6 +85,12 @@ section('Personnages (art.anim)', [
   ['Expressions Dédé (en boucle)', () => { const ex = art.expressions; let i = 0; const p = art.anim.get('dede'); at(p.position, [1.6, 1.4, 0]); const id = setInterval(() => { art.anim.expr('dede', ex[i++ % ex.length]); note('Dédé : ' + ex[(i - 1) % ex.length]); if (i > ex.length * 2) clearInterval(id); }, 1200); }],
   ['tout remettre', () => { for (const id of Object.keys(world.cast)) try { art.anim.stop(id); } catch { /* */ } art.anim.round(false); }],
 ]);
+section('Twists de la nuit (art.twists)', [
+  ...art.twists.ids.map((id) => [id, () => { art.twists.show(id); at(A.bernadetteDoor, [3, 3, 6]); }]),
+  ['but ! (tv_screen)', () => art.twists.trigger('tv_screen', 'goal')],
+  ['on chante (birthday_cake)', () => art.twists.trigger('birthday_cake', 'song')],
+  ['tout enlever', () => art.twists.clear()],
+]);
 section('Terrasses (art.terrace)', [
   ['chaise qui s\'effondre', () => { art.terrace.collapse(t0, 0, { recover: 8 }); at(t0.group.position); }],
   ['laxatifs : course aux toilettes', () => { art.terrace.rush(t0, 3, { returnAfter: 10 }); at(A.bernadetteDoor, [3, 2.4, 3]); }],

@@ -513,6 +513,9 @@ export function buildWorld(scene, opts = {}) {
   anchors.square = new THREE.Vector3(0, 0, (sq.z0 + sq.z1) / 2);
 
   mergeStatic(city);
+  // Matériaux qui brillent la nuit (fenêtres, vitrines, lanternes, enseignes) : la panne de courant les éteint
+  const emissiveMaterials = [];
+  city.traverse((o) => { const m = o.material; if (o.isMesh && m?.emissiveIntensity > 0 && !emissiveMaterials.some((e) => e.m === m)) emissiveMaterials.push({ m, base: m.emissiveIntensity }); });
 
   const world = {
     tables,
@@ -531,6 +534,8 @@ export function buildWorld(scene, opts = {}) {
     setCatVisible(v) { cast.cat.visible = v; },
     groundMaterials,
     streetLights,
+    emissiveMaterials,
+    windowSpots: kit.windows,
     standingCrowd: (o) => standingCrowd(scene, o),
   };
   world.audio = audio.attachStreet({ tables, exhaust, steam, apt, getMinutes: () => world.gameMinutes ?? window.__rdb?.sim?.state?.min ?? window.__rdb?.S?.min });

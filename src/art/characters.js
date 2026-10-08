@@ -89,6 +89,15 @@ function heldItems(addW, k, o) {
   addW('film', 'ball', 'handR', [0.045, 0.095, 0.03], 0.012, 0xff3030, null, true, true);
   addW('envelope', 'box', 'handR', [0, 0.04, 0.05], [0.2, 0.13, 0.015], 0xf6f0dc, [-0.3, 0, 0]);
   addW('envelope', 'box', 'handR', [0, 0.065, 0.06], [0.2, 0.012, 0.02], 0xd9c79a, [-0.3, 0, 0]);
+  // mégaphone (EVJF), accordéon (musicien), parapluie fermé levé du guide
+  addW('megaphone', 'cone', 'handR', [0, 0.06, 0.16], [0.16, 0.3, 0.16], 0xf2f2ee, [-Math.PI / 2, 0, 0]);
+  addW('megaphone', 'cyl', 'handR', [0, 0.0, 0.03], [0.04, 0.12, 0.04], 0xc0262d);
+  addW('accordion', 'box', 'body', [0, k.th * 0.45, 0.27], [0.36, 0.3, 0.12], 0xb0232a);
+  addW('accordion', 'box', 'body', [0, k.th * 0.45, 0.335], [0.3, 0.26, 0.012], 0xf6f2ea);
+  addW('accordion', 'box', 'body', [0.2, k.th * 0.45, 0.27], [0.05, 0.32, 0.14], 0x1a1a1a);
+  addW('guide', 'cyl', 'handR', [0, 0.45, 0.02], [0.03, 0.9, 0.03], 0x2a2a2a);
+  addW('guide', 'cone', 'handR', [0, 0.62, 0.02], [0.09, 0.5, 0.09], o.umbrella ?? 0x2b9d8f, [Math.PI, 0, 0]);
+  addW('guide', 'box', 'handR', [0.12, 0.95, 0.02], [0.22, 0.14, 0.01], 0xffd23f, null, true, true); // petit fanion
   // parapluie ouvert au-dessus de la tête (pluie)
   addW('umbrella', 'cyl', 'handR', [0, 0.45, 0.02], [0.025, 0.95, 0.025], 0x2a2a2a);
   addW('umbrella', 'cone', 'handR', [0, 0.98, 0.02], [1.15, 0.32, 1.15], o.umbrella ?? 0x2b4d7a, null, false, true);
@@ -312,6 +321,18 @@ function animHuman(rig, t, dt, proxy) {
       raiseL += Math.max(0, Math.sin(ph * 13)) * 0.06; raiseR += Math.max(0, Math.sin(ph * 13 + 1.7)) * 0.06;
       break;
     case 'meeting': break;
+    case 'accordion': // le soufflet s'ouvre et se ferme
+      raiseL = raiseR = -1.05 + Math.sin(ph * 3) * 0.08; yawL = -0.55 - Math.sin(ph * 3) * 0.25; yawR = 0.55 + Math.sin(ph * 3) * 0.25;
+      bob += Math.abs(Math.sin(ph * 3)) * 0.015; tilt += Math.sin(ph * 1.5) * 0.12; nod = 0.1;
+      break;
+    case 'guide': raiseR = -2.75; yawR = 0.1; spreadR = 0.1; mouth = Math.max(mouth, 0.4 + Math.abs(Math.sin(ph * 9)) * 1.2); break;
+    case 'megaphone': raiseR = -1.75; yawR = 0.65; nod = -0.15; turn = Math.sin(ph * 0.7) * 0.5; raiseL = -2.5 + Math.sin(ph * 6) * 0.3; spreadL = 0.4; break;
+    case 'cheer': // but ! bras en l'air, petits sauts
+      raiseL = raiseR = -2.8 + Math.sin(ph * 10) * 0.2; spreadL = spreadR = 0.35; bob += Math.abs(Math.sin(ph * 8)) * 0.06; mouth = 1.8; nod = -0.25;
+      break;
+    case 'sing': // on chante (joyeux anniversaire), on se balance
+      tilt += Math.sin(ph * 2.5) * 0.15; mouth = 0.6 + Math.abs(Math.sin(ph * 5)) * 1.2; raiseL = -1.4 + Math.sin(ph * 2.5) * 0.3; nod = -0.15;
+      break;
     case 'fan': // s'évente devant le nez (odeur)
       raiseR = -2.1 + Math.sin(ph * 14) * 0.3; yawR = 0.7; spreadR = 0.1; nod = -0.15; turn = Math.sin(ph * 2) * 0.4;
       break;

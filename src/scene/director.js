@@ -102,6 +102,7 @@ export function createDirector({ scene, world, art, audio }) {
   // ---------- événements de la simulation ----------
   function onEvent(e) {
     if (e.type === 'splash') art.fx.splash();
+    else if (e.type === 'twist-moment') art.twists?.trigger(e.prop ?? null, e.moment, e); // ex. { prop: 'tv_screen', moment: 'goal' }
     else if (e.type === 'art') {
       const pos = toV(e.pos);
       if (e.fx && e.fx !== 'exhaustBlocked') art.fx[e.fx]?.(pos ?? undefined); // la hotte bouchée suit l'état (update)
@@ -319,6 +320,10 @@ export function createDirector({ scene, world, art, audio }) {
     const wet = plan && min >= plan.start ? (min < plan.end ? (w?.intensity ?? 0) / (plan.kind === 'drache' ? 1 : 0.35) * (plan.kind === 'drache' ? 1 : 0.5) : Math.max(0, (plan.kind === 'drache' ? 1 : 0.5) - (min - plan.end) / 40)) : 0;
     art.weather?.set(w?.kind ?? null, w?.intensity ?? 0, wet);
     audio?.rain?.(w ? w.intensity : 0);
+
+    // Twist de la nuit (§12b.A) : les accessoires listés par le contenu (sim.twist.props)
+    const tw = sim.twist ?? S.twist ?? null;
+    art.twists?.sync(tw?.props ?? []);
 
     // Drapeaux de campagne (banderoles, uritrottoir, caméras)
     syncFlags(cs?.flags ?? []);

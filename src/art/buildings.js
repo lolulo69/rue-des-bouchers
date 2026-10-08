@@ -64,7 +64,9 @@ export function makeKit(city, W, rng) {
   };
   const faceRot = (side) => -side * Math.PI / 2; // plan (normale +Z) tourné vers la rue
 
+  const windows = []; // positions des fenêtres (bougies de la panne, ventilateurs de la canicule)
   function windowAt(side, z, y, { lit = rng() < 0.4, open = false, noPane = false, noSill = false, w = WW, h = WH, curtains = rng() < 0.5 } = {}) {
+    if (!open && !noPane && W > 1) windows.push({ x: X(side, 0), y, z, side });
     const pane = lit ? mats.lit[rng() < 0.15 ? 2 : rng() < 0.5 ? 1 : 0] : mats.dark;
     if (!noPane) fbox(side, 0.0, y, z, 0.04, h, w, pane);
     fbox(side, 0.04, y, z - w / 2 - 0.06, 0.1, h + 0.08, 0.12, mats.stone);
@@ -278,7 +280,7 @@ export function makeKit(city, W, rng) {
     fbox(side, 0.1, h + w / 2 + 0.5, z, 0.12, 0.6, 0.6, mats.stone); // clef
   }
 
-  return { mats, X, fbox, add, windowAt, bays, stringCourse, steppedGable, corniceTop, roofPrism, door, lantern, shopfront, awning, sign3D, panel, flowerBox, balcony, carriageDoor, faceRot };
+  return { mats, windows, X, fbox, add, windowAt, bays, stringCourse, steppedGable, corniceTop, roofPrism, door, lantern, shopfront, awning, sign3D, panel, flowerBox, balcony, carriageDoor, faceRot };
 }
 
 // Une maison complète (sauf exceptions gérées par world.js)

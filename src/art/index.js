@@ -11,6 +11,7 @@ import { perfHud } from './perf.js';
 import { createWeather } from './weather.js';
 import { createQuality, QUALITY_PRESETS, QUALITY_LEVELS } from './quality.js';
 import { createView } from './view.js';
+import { createTwists } from './twists.js';
 import { audio } from '../audio/index.js';
 import { portrait, portraitIds, portraitExpressions } from './portraits.js';
 import { scenes } from './scenes.js';
@@ -43,6 +44,7 @@ export function attachArt(scene, world) {
       },
     },
     weather: createWeather(scene, world, { onFrame, fx, particles }),
+    twists: createTwists(scene, world, { onFrame, audio, anim: director }),
     view,
     quality,
     // Réglages : art.setQuality('bas' | 'moyen' | 'haut') ; art.quality.level ; art.quality.presets (libellés, effets)

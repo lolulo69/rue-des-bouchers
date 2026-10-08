@@ -1,6 +1,6 @@
 // Boucles procédurales : 'lofi' (phase de jour, chill), 'hall' (salle de la commission, J14), 'typing' (Koddex).
 // Ordonnanceur classique : setInterval qui programme les notes ~0.4 s à l'avance sur l'horloge audio.
-export const LOOP_NAMES = ['lofi', 'hall', 'typing'];
+export const LOOP_NAMES = ['lofi', 'hall', 'typing', 'musette'];
 
 const mtof = (m) => 440 * 2 ** ((m - 69) / 12);
 
@@ -128,7 +128,27 @@ export function makeMusic(ctx, out, noise, makeReverbBus) {
     return () => { stop(); setTimeout(() => bus.disconnect(), 500); };
   }
 
-  const makers = { lofi, hall, typing };
+  // ---------- Musette : accordéon de rue (valse à 3 temps), un peu désaccordé, sous la fenêtre ----------
+  function musette() {
+    const bus = ctx.createGain(); bus.gain.value = 0; bus.gain.linearRampToValueAtTime(0.35, ctx.currentTime + 1.5);
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2600;
+    const trem = ctx.createGain(); trem.gain.value = 0.85;
+    const tl = ctx.createOscillator(); tl.frequency.value = 6; const tg = ctx.createGain(); tg.gain.value = 0.15; tl.connect(tg).connect(trem.gain); tl.start();
+    bus.connect(trem).connect(lp).connect(out);
+    const chords = [[57, 60, 64], [57, 60, 64], [52, 56, 59], [52, 56, 59], [57, 60, 64], [50, 53, 57], [52, 56, 59], [57, 60, 64]]; // la m · mi · ré m
+    const tune = [76, 74, 72, 71, 72, 74, 76, 79, 77, 76, 74, 72, 71, 69, 71, 72, 74, 72, 71, 69, 68, 69, 71, 72];
+    const beat = 60 / 150;
+    const reed = (m, t, d, pk) => { for (const det of [-0.004, 0.004]) { const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = mtof(m) * (1 + det); o.connect(envGain(bus, t, 0.03, pk, d)); o.start(t); o.stop(t + d + 0.1); } };
+    const stop = scheduler(24, () => beat, (i, t) => {
+      const ch = chords[Math.floor(i / 3) % chords.length];
+      if (i % 3 === 0) reed(ch[0] - 12, t, beat * 0.9, 0.05); // basse
+      else ch.forEach((m) => reed(m, t, beat * 0.5, 0.018)); // accord « pom-pom »
+      reed(tune[i % tune.length], t, beat * 0.95, 0.045); // mélodie
+    });
+    return () => { bus.gain.setTargetAtTime(0, ctx.currentTime, 0.4); stop(); setTimeout(() => { tl.stop(); bus.disconnect(); }, 2000); };
+  }
+
+  const makers = { lofi, hall, typing, musette };
   return {
     loop(name, on = true) {
       if (!makers[name]) { console.warn(`audio.loop : boucle inconnue « ${name} »`); return; }

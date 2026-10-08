@@ -125,3 +125,22 @@ Target: 60 fps on a laptop iGPU at « Moyen ».
 - **Title screen**: while `#title` is shown, a slow camera move down the street at dusk, with a more transparent title backdrop (`#title.art-backdrop` class). `art.view.set({ title: false })` turns it off.
 Both are applied right before rendering (the game resets its camera every frame, so nothing accumulates); `main.js` doesn't change.
 
+## Night twists (`art.twists`, v1.1)
+Props and small scenes for the night twists (§12b.A). The scene director places `sim.twist.props` every frame, i.e. `twist.props` from `src/content/twists.js`.
+
+| id (aliases) | What appears | Moments (`trigger`) |
+|---|---|---|
+| `birthday_cake` (`balloons`, `candles`) | cake with flickering candles + 5 balloons at Bernadette's table 4 | `song` (the table sings, « Joyeux anniversaire » sound), `blow` |
+| `ring_light` (`influencer`, `phone`) | ring light on a tripod + the influencer posing / filming | — |
+| `tv_screen` (`football`) | screen above Mal Lunés' awning, a live match, score | `goal` (`{ away }`): « BUT ! », the terraces cheer, crowd roar |
+| `evjf` (`megaphone`, `sashes`) | the bride (veil, tiara) and 4 friends with pink sashes, one with a megaphone (shouts) | — |
+| `delivery_van` | brewery van in the corridor, hazard lights, beer kegs | — |
+| `busker` (`accordion`) | accordion player under Pilou's window, hat and coins; musette while he's there | — |
+| `power_cut` (`candles_windows`) | lanterns, street lights and windows off, candles in ~30 windows, the exhaust stops | — |
+| `heatwave` (`fans`) | fans in windows, customers fanning themselves | — |
+| `fete_voisins` (`bunting`) | gingham tables, bunting across the street, banner, neighbours | — |
+| `firefighters` (`fire_brigade`, `tape_measure`) | two sapeurs-pompiers measuring the corridor (tape measure, clipboard) | — |
+| `tour_group` (`tour_guide`, `guide_umbrella`) | the guide with her raised umbrella, 8 tourists, back and forth, a stop at the estaminet | — |
+
+Manual: `art.twists.show(id)` / `hide(id)` / `trigger(id, moment)` / `clear()`. `sync(ids)` (director) only touches what it placed itself.
+

@@ -809,3 +809,7 @@ so it reflects what the player actually did.
 - Home days happen at the **living-room desk by the street window** (corrected §12b.D). The daughter is never named or on stage (tested).
 - New flag `ebike_battery_died` (the battery dies once, D4–D12, 30 %: Job −3, Sleep −2), read by an office line and a Clode line.
 - The daytime opportunity `home_terrace_setup` (11:30) adds a legal photo (quality 0.6 with `legal_view`, 0.4 without) for Job −2: the balance agent may want to cap it (it can recur on every home day from D2).
+**art-v1.1 (1) · twist props** — @build agent, @content-story agent
+- The scene director reads **`sim.twist ?? sim.state.twist`** (`{ id, props: [...] }`) every frame and places those props (`art.twists.sync`). Engine side: expose that object for the night. **Timed moments**: push a sim event `{ type: 'twist-moment', prop: 'tv_screen', moment: 'goal', away?: true }` (or `prop: 'birthday_cake', moment: 'song' | 'blow'`) and the director forwards it to the art.
+- Prop ids (use these, or an alias) are listed in `src/art/README.md` § Night twists: `birthday_cake`, `ring_light`, `tv_screen`, `evjf`, `delivery_van`, `busker`, `power_cut`, `heatwave`, `fete_voisins`, `firefighters`, `tour_group`. Unknown ids only print a console warning. New sounds: `cheer`, `megaphone`, `birthday`, plus the `musette` loop (the busker). Screenshots: `qa/art-v1.1/twist-*.jpg`.
+
