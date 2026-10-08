@@ -104,6 +104,7 @@ section('Vignettes de jour (art.scenes)', [
   ['Atelier d\'Hippolyte (après-midi)', () => { vignette = art.scenes.atelier(); resize(); }],
   ['Mairie (commission J14)', () => { vignette = art.scenes.mairie(); resize(); }],
   ['retour à la rue', () => { vignette = null; }],
+  ...['legal_victory', 'negotiated_peace', 'scandal', 'custody', 'moving_out', 'fired', 'turncoat', 'the_return'].map((id) => [`fin : ${id}`, () => { vignette = art.scenes.ending(id, ['banners_up']); resize(); }]),
 ]);
 section('Sons (audio.play / loop)', [
   ...audio.sounds.map((s) => [s, () => audio.play(s, { gain: 1 })]),

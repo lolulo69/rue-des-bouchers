@@ -86,6 +86,8 @@ States for `play` (any character can take most of them):
 
 ## Portraits and day vignettes
 - `art.portrait(id, expression = 'neutral', { size = 256 })` returns a PNG **dataURL** (cached). Ids come from `src/content/characters.js` (`art.portraitIds()`); expressions are `art.portraitExpressions`. Background colour by group (asso, bloc, police, city, koddex…).
+- **Ending tableaux**: `art.scenes.ending(endingId, flags)` (ids from `src/content/endings.js`: legal_victory, negotiated_peace, scandal, custody, moving_out, fired, turncoat, the_return; `flags` = `campaign.state.flags`, e.g. `banners_up` adds the banner). No-argument variants `art.scenes.ending_<id>()` also exist, so `src/ui/vignette.js`'s `set('ending_scandal')` works as is.
+- **Weather**: `art.weather.set(kind, intensity, wetness)`, driven by the scene director from `sim.weather()`.
 - `art.scenes.koddex()`, `art.scenes.atelier()`, `art.scenes.mairie()` return `{ scene, camera, update(dt), setAspect(a), dispose() }`. Render them with the game's renderer behind the 2D UI: `v.update(dt); renderer.render(v.scene, v.camera)`.
 
 ## Audio (`audio` or `art.audio`)

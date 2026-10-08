@@ -5,14 +5,15 @@ import * as THREE from 'three';
 import { attachRigs } from './rig.js';
 import { CAST, setState, humanoid } from './characters.js';
 import { canvasTexture, panelTex, brickTex } from './textures.js';
+import { endingScene, ENDING_IDS } from './endings.js';
 
 const mats = new Map();
-const M = (color, o = {}) => {
+export const M = (color, o = {}) => {
   const k = color + JSON.stringify(o);
   if (!mats.has(k)) mats.set(k, new THREE.MeshStandardMaterial({ color, roughness: 0.8, ...o }));
   return mats.get(k);
 };
-function kit(scene) {
+export function kit(scene) {
   const add = (geo, mat, x = 0, y = 0, z = 0, rx = 0, ry = 0, rz = 0) => {
     const m = new THREE.Mesh(geo, mat);
     m.position.set(x, y, z); m.rotation.set(rx, ry, rz);
@@ -43,7 +44,7 @@ function kit(scene) {
   const seat = (p, x, z, ry) => { chair(x, z, ry); p.position.set(x, 0, z); p.rotation.y = ry; scene.add(p); return p; };
   return { add, box, plant, lit, chair, seat };
 }
-function vignette(build, { fov = 38, pos, look }) {
+export function vignette(build, { fov = 38, pos, look }) {
   const scene = new THREE.Scene();
   attachRigs(scene, { lod: false });
   const camera = new THREE.PerspectiveCamera(fov, 16 / 9, 0.05, 100);
@@ -60,7 +61,7 @@ function vignette(build, { fov = 38, pos, look }) {
 }
 
 // Écran de code et écran Clode Kode
-const codeTex = () => canvasTexture(256, 160, (g, w, h) => {
+export const codeTex = () => canvasTexture(256, 160, (g, w, h) => {
   g.fillStyle = '#1b1f2a'; g.fillRect(0, 0, w, h);
   const cols = ['#c792ea', '#82aaff', '#c3e88d', '#f78c6c', '#89ddff', '#eeffff'];
   for (let y = 10; y < h - 6; y += 9) {
@@ -68,7 +69,7 @@ const codeTex = () => canvasTexture(256, 160, (g, w, h) => {
     while (x < w - 20 && Math.random() < 0.85) { const l = 8 + Math.random() * 34; g.fillStyle = cols[Math.floor(Math.random() * cols.length)]; g.fillRect(x, y, l, 4); x += l + 5; }
   }
 });
-const clodeTex = (blink = false) => canvasTexture(256, 160, (g, w, h) => {
+export const clodeTex = (blink = false) => canvasTexture(256, 160, (g, w, h) => {
   const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#16324a'); gr.addColorStop(1, '#0d1d2c');
   g.fillStyle = gr; g.fillRect(0, 0, w, h);
   g.fillStyle = '#7fe0ff';
@@ -77,9 +78,9 @@ const clodeTex = (blink = false) => canvasTexture(256, 160, (g, w, h) => {
   g.beginPath(); g.arc(128, 92, 22, 0.15 * Math.PI, 0.85 * Math.PI); g.lineWidth = 6; g.strokeStyle = '#7fe0ff'; g.stroke();
   g.font = 'bold 18px ui-monospace, monospace'; g.fillText('Clode Kode', 76, 140);
 });
-const skyTex = (top, bottom) => canvasTexture(16, 128, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, top); gr.addColorStop(1, bottom); g.fillStyle = gr; g.fillRect(0, 0, w, h); });
+export const skyTex = (top, bottom) => canvasTexture(16, 128, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, top); gr.addColorStop(1, bottom); g.fillStyle = gr; g.fillRect(0, 0, w, h); });
 // Toits de Lille vus par la fenêtre : pignons à gradins en silhouette
-const roofsTex = () => canvasTexture(512, 256, (g, w, h) => {
+export const roofsTex = () => canvasTexture(512, 256, (g, w, h) => {
   const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#9fd0f2'); gr.addColorStop(1, '#fbe6c8');
   g.fillStyle = gr; g.fillRect(0, 0, w, h);
   let x = -10;
@@ -211,4 +212,8 @@ export const scenes = {
     ];
     for (const [p, x, z] of pub) { k.seat(p, x, z, Math.PI); if (!['write', 'meeting'].includes(p.userData.rig.anim)) setState(p, { anim: 'idle' }); p.userData.rig.talk = 0.25; }
   }, { pos: [0, 2.6, 6.2], look: [0, 1.2, -1.5] }),
+
+  // Tableaux de fin : scenes.ending('scandal', campaign.state.flags), ou scenes.ending_scandal() (sans argument)
+  ending: (id, flags = []) => endingScene(id, flags),
+  ...Object.fromEntries(ENDING_IDS.map((id) => [`ending_${id}`, () => endingScene(id, [])])),
 };

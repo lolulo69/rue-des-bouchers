@@ -623,3 +623,15 @@ so it reflects what the player actually did.
 - New `src/sim/weather.js`: `S.weather` is planned at night creation. **Drache**: `carry.weather = 'drache'`, set by `c.createNight()` when the `r_drache` event was drawn that day. Rain at 21:15 for 70 min; all out tables are cleared within 4 minutes (`clearedBy: 'rain'`, shown in the summary as « la pluie »), standing groups leave, and tipped tables don't come back in the rain. **Drizzle**: about 12% of nights, purely ambient, no effect on play. It's drawn from its own RNG, so no other random draw of the night shifts. Exposed as `sim.weather()` → `{ kind, intensity }`. Tests: `tests/unit/weather.test.js` (invariants hold, drizzle = same night as dry).
 - 3D (`art.weather`, driven by the director): rain streaks around the camera (one draw call), cobbles darker and shinier while wet (they dry about 40 game min after the rain), small splashes on the ground, passers-by with umbrellas during the drache, and a rain sound (`audio.rain(level)`, muffled in the apartment). Screenshot: `qa/art-v0.7/drache.jpg`.
 
+**art-v0.7 (4) · ending tableaux** — @UI agent
+- `art.scenes.ending(endingId, flags)` returns the same contract as the day vignettes (`{ scene, camera, update(dt), setAspect(a), dispose() }`). Use `campaign.state.flags` for `flags`. Shortcut: `scenes['ending_' + id]` takes no argument, so in `src/ui/vignette.js` a simple `vignette.set('ending_' + ending.id)` behind the end screen is enough. An unknown id falls back to the quiet street.
+- The eight tableaux (screenshots `qa/art-v0.7/ending-*.jpg`):
+  - **legal_victory**: Pilou at his open window, with no terrace, the duct taken up to the roof, the cat in the street and a banner if `banners_up`.
+  - **negotiated_peace**: the signed « CHARTE DE BON VOISINAGE » on a table, the clock at 22:00 sharp, Dédé and Jérémie shaking hands, the chairs stacked.
+  - **scandal**: the front page of La Voix du Nordiste (« LE CAFÉ ÉTAIT OFFERT, LES PV NON »), and Lemaire's empty chair with his cold coffee and forgotten cap.
+  - **custody**: the bench at the municipal police station, a flickering neon light, Pilou head down, Benali at the counter.
+  - **moving_out**: a removal van « Lille → Wazemmes » in the cobbled street, boxes, the mattress, Pilou with the last box.
+  - **fired**: the empty desk at Koddex, Clode Kode on screen saying « Je suis vraiment désolé… », the box of belongings.
+  - **turncoat**: Pilou on the terrace with a carbonnade, Dédé patting his shoulder, Klaas taking notes in the background.
+  - **the_return**: La Bombance reopened as a bar, a pink blinking neon « LA BOMBANCE · BAR », the queue already forming.
+
