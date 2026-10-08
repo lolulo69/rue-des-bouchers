@@ -146,7 +146,7 @@ describe('chaîne IGPN', () => {
     c.finishNight(sim);
     expect(c.has('bribe_photo')).toBe(true);
     expect(c.has('corruption_proof')).toBe(true);
-    expect(c.has('igpn_open')).toBe(true);
+    expect(c.has('inquiry_open')).toBe(true);
     const corr = c.state.hidden.corruption;
     drive(c, CAMPAIGN_BOTS.passive(), (x) => x.has('lemaire_transferred'));
     expect(c.state.day).toBe(1 + c.cfg.CAMPAIGN.igpn.transferAfterDays);
@@ -252,7 +252,7 @@ describe('preuves : relevé dB, horodatage, légalité', () => {
     expect(cam).toMatchObject({ type: 'camera', legal: false });
     c.finishNight(sim);
     expect(c.has('bribe_photo_illegal')).toBe(true);
-    expect(c.has('igpn_open')).toBe(true);
+    expect(c.has('inquiry_open')).toBe(true);
     const bribe = c.state.evidence.find((e) => e.kind === 'bribe');
     expect(bribe.legal).toBe(false);
     expect(bribe.value).toBeGreaterThan(0);

@@ -512,8 +512,8 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     const bribeSent = N.evidence.some((e) => e.kind === 'bribe' && (e.shared || !e.legal));
     if (bribeSent && !S.igpn) {
       S.igpn = { openedDay: S.day };
-      setFlag('igpn_open');
-      apply({ corruption: C.igpn.openCorruption }, 'engine', 'igpn');
+      setFlag('inquiry_open');
+      apply({ corruption: C.igpn.openCorruption }, 'engine', 'inquiry');
     }
     // Contenu : actions natives de la sim (sim: 'photo' | 'db' | 'police' | …) → effets en bonus, une fois par nuit,
     // seulement si l'action a vraiment abouti. Police : `simArgs.asso` (ou un id contenant "asso") distingue l'appel « pour l'Association ».
@@ -555,8 +555,8 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
       S.igpn.transferred = S.day;
       S.police.lemaireTransferred = true;
       setFlag('lemaire_transferred');
-      apply({ corruption: C.igpn.transferCorruption }, 'engine', 'igpn');
-      S.cards.push({ type: 'info', id: 'igpn', title: 'Enquête interne', text: 'L’enquête interne est bouclée : le brigadier Lemaire est muté. Au commissariat, on regarde ses chaussures.' });
+      apply({ corruption: C.igpn.transferCorruption }, 'engine', 'inquiry');
+      S.cards.push({ type: 'info', id: 'inquiry', title: 'Enquête interne', text: 'L’enquête interne est bouclée : le brigadier Lemaire est muté. Au commissariat, on regarde ses chaussures.' });
     }
   }
 

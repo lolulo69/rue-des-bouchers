@@ -349,7 +349,7 @@ export function mount(engine = {}, opts = {}) {
     if (c.step === 'ended') recordEnding();
     const seenNode = seen?.length
       ? h('p', { dataset: { testid: 'seen' } }, '👁 Vu par : ', seen.map((s) => `${witnessName(s.id)}${s.ally ? ' (allié)' : ''}`).join(', '))
-      : (a.legality !== 'legal' ? h('p', '👁 Personne ne semble avoir rien vu.') : null);
+      : (a.legality !== 'legal' ? h('p', '👁 Personne ne semble avoir vu quoi que ce soit.') : null);
     view = { result: { title: a.label, text: result, deltas: deltas(before), seenNode: h('div', seenNode, first ? tutorial('first_afternoon_action') : null) } };
     render();
   }

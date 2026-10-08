@@ -529,7 +529,7 @@ so it reflects what the player actually did.
   - The night starts with the campaign's Asso, Risk, hostility, corruption, police fatigue (calls minus 1/day), transfers and flags.
   - At the end of the night: Sleep += (night's sleep − 60) × 0.5, Asso/Risk come back from the night, Risk −5/day, Job −6/day.
   - Legal evidence → dossier (×0.9); illegal evidence → `pressFile()` only.
-  - The engine sets the "posés par le moteur" flags of `flags.js`, plus `bribe_photo(_illegal)`, `corruption_proof`, `igpn_open`, `lemaire_transferred`, `custody` (Risk ≥ 90 from night 5), `tatie_leaked_plan` (Tatie wavering + hostile bloc: 25 %/evening, `CAMPAIGN.tatieLeak`), `saturday1/2_done`, `boss_noticed`, `unemployed`.
+  - The engine sets the "posés par le moteur" flags of `flags.js`, plus `bribe_photo(_illegal)`, `corruption_proof`, `inquiry_open`, `lemaire_transferred`, `custody` (Risk ≥ 90 from night 5), `tatie_leaked_plan` (Tatie wavering + hostile bloc: 25 %/evening, `CAMPAIGN.tatieLeak`), `saturday1/2_done`, `boss_noticed`, `unemployed`.
 - **Balance (qa/balance.md, design agent's findings)**:
   - Asso gain capped at +8/night, with diminishing returns per share.
   - Evidence: same restaurant + same type the same night ×0.2.

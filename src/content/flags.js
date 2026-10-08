@@ -123,7 +123,7 @@ export const FLAGS = {
   bribe_photo: 'Enveloppe / repas offert à la police photographié depuis un point légal',
   bribe_photo_illegal: "Pot-de-vin photographié depuis l’arrière-salle (preuve illicite)",
   corruption_proof: 'Pilou détient une preuve de corruption police–bloc',
-  igpn_open: "Enquête interne ouverte sur la police municipale",
+  inquiry_open: "Enquête interne ouverte sur la police municipale",
   lemaire_transferred: 'Le brigadier Lemaire est muté',
   klaas_persuaded: 'Klaas a accepté de ne pas noter un acte de Pilou',
   klaas_lied_to: 'Pilou a menti à Klaas',

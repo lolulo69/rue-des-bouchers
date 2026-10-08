@@ -60,7 +60,7 @@ Stage directions for Biloute and Gaufre now address Pilou as *vous*. Clode is co
 « le Trou » is no longer revealed by `night_bucket` or by the `the_return` cocktail list without `knows_trou`. Vandamme bills « à l’heure entamée » as in his bio, and Lille has « quartiers », not « arrondissements ».
 The braderie (September) became a summer-proof joke. Régis no longer offers Dédé a table at Dédé's own restaurant (`cm_regis_blunder`). The arithmetic in `r_consultation` is fixed.
 **Grammar**: tense and mood fixes (`hilde_laxative`, `jeremie_ag_soon`, `pm_formal_notice`), agreement (`wa_cat_2`), « Il y reste dix-sept » (`lemaire.complaisance`), « me l’a dit », « à Tourcoing », « la une », missing commas.
-**Length**: 9 press texts over 220 characters shortened to ≤ 220 (`press_igpn`, `press_rule_2200`, `press_trou`, `press_saturday_1`, `press_residents`, `press_petition_duel`, `press_scandal`, `press_commission_eve`, `press_end_legal`).
+**Length**: 9 press texts over 220 characters shortened to ≤ 220 (`press_inquiry`, `press_rule_2200`, `press_trou`, `press_saturday_1`, `press_residents`, `press_petition_duel`, `press_scandal`, `press_commission_eve`, `press_end_legal`).
 No dialogue, Koddex, night or tutorial string is over 220 now. Intro cards and event/epilogue cards are paragraphs (all ≤ 600) and were left as they are.
 **Tone**: no line is mean about a real group; Seb & Nico are written by their role throughout.
 

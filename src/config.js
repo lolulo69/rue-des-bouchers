@@ -242,7 +242,7 @@ export const ENGINE_FLAGS = {
   disguise_hood: 'Pilou a une capuche (moins reconnaissable)',
   disguise_vest: 'Pilou a un gilet jaune « livreur » (encore moins reconnaissable)',
   camera_awning: 'Caméra cachée sous le store de Bernadette (filme tout, preuves illégales)',
-  igpn_open: 'Enquête interne ouverte (pot-de-vin photographié)',
+  inquiry_open: 'Enquête interne ouverte (pot-de-vin photographié)',
   lemaire_transferred: 'Le brigadier Lemaire est muté',
   unemployed: 'Pilou est viré de Koddex et continue la lutte à plein temps',
 };

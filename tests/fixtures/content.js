@@ -5,7 +5,7 @@ export const FLAGS = {
   night_photo: '', night_db: '', corridor_measured: '', called_police: '', called_as_asso: '', seen_complaisance: '',
   seen_tipoff: '', serial_caller: '', benali_fined: '', benali_transferred: '', chief_came: '', saw_pee: '', pee_at_door: '',
   bucket_used: '', bucket_witnessed: '', video_viral: '', klaas_noted_pilou: '', talked_waiter: '', bribe_photo: '',
-  bribe_photo_illegal: '', corruption_proof: '', igpn_open: '', lemaire_transferred: '', unemployed: '', custody: '',
+  bribe_photo_illegal: '', corruption_proof: '', inquiry_open: '', lemaire_transferred: '', unemployed: '', custody: '',
   saturday1_done: '', saturday2_done: '', boss_noticed: '',
   // test
   met_klaas: '', stance_legal: '', stance_direct: '', stance_dialogue: '', petition_started: '', press_contacted: '',

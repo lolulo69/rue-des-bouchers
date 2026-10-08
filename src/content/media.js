@@ -520,8 +520,8 @@ export const MEDIA = {
       text: "Des riverains ont documenté des arrangements répétés entre un établissement de la rue et certaines patrouilles. La police municipale « prend ces allégations très au sérieux ». Le café, lui, reste offert.",
     },
     {
-      id: 'press_igpn',
-      when: { flags: ['igpn_open'] },
+      id: 'press_inquiry',
+      when: { flags: ['inquiry_open'] },
       author: 'journaliste',
       headline: 'Une enquête interne ouverte',
       text: "Des riverains ont transmis des documents : une enquête interne vise des agents municipaux. Le maire promet « la transparence totale ». L’ex-maire Colette Verhaeghe n’a « aucun commentaire, sauf que c’est scandaleux ».",

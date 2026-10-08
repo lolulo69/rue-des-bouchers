@@ -1213,9 +1213,9 @@ export const DIALOGUE = [
     once: true,
   },
   {
-    id: 'chef_igpn',
+    id: 'chef_inquiry',
     speaker: 'chef',
-    when: { flags: ['igpn_open'] },
+    when: { flags: ['inquiry_open'] },
     lines: [
       "Une enquête interne est ouverte. Je n’ai aucun commentaire, sauf celui-ci : la police municipale de Lille est exemplaire. Globalement.",
     ],
