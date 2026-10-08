@@ -197,3 +197,20 @@ Tunable rules live in `src/config.js`.
 ## 11. Still open
 - [CHECK] 22:00 vs the city's summer hours (23:00 / midnight).
 - Is Bernadette's terrace marked on the ground (the area is checkable)?
+
+## Build notes
+> Appended by the build agent. Simplest-option choices made for v0.1, to confirm or override.
+
+**v0.1 (build-v0.1)**
+- Restaurants in v0.1: **Estaminet La Ch'tite Bernadette** (under Pilou), **Les Bouchers Mal Lunés** (same side, further down), **Le Goulot** (opposite). All values in `src/config.js`.
+- **Tables clear per table**: each table rolls its restaurant's `compliance`. Success means it goes in between 21:55 and 22:05. Failure means it goes in at a random time in that restaurant's `lateClear` window. "Table out after 22:00" counts as evidence only after a **5-min grace** (`lateGraceMinutes`). Each clear logs a "raclement de chaises" message (once per restaurant every 5 min) and a short 80 dB noise burst.
+- **Noise model**: each table is one source of `personDb + 10·log10(headcount)` at 1 m, with 20·log10(d) falloff. Late-evening boosts apply (+3 dB after 22:00, +3 dB after 23:00), and the exhaust stays on until 23:30. Indoors subtracts 8 dB (window always open, no close action in v0.1). The HUD shows dB at Pilou's ear.
+- **Sleep** is driven by the noise **at Pilou's bed**, not where he stands, and only after 22:00. The exhaust smell adds a flat drain. **Bed (E)** = "try to sleep": time runs ×12, and Sleep recovers only if the bed is under 35 dB. This is the only way to skip ahead to the end. Sleep 0 ends the night (moving-out ending).
+- **Photos (P)**: a crosshair raycast on out tables, range 35 m, allowed from the street or from the window (not through walls). Each table can yield at most one "over 6" piece and one "out after 22:00" piece. Quality = f(Sleep, distance), and low Sleep gives a "floue" photo. All photos in v0.1 are legal.
+- **Police**: one patrol at a time. Arrival delay is 10–22 game min, +50% per extra call. From the 4th call: "c'est encore vous", nobody comes. The patrol targets the restaurant with the most infractions at call time. On arrival: if no infraction, "tout est en ordre". Otherwise P(act) = 0.3 + 0.07·dossier(on that restaurant) + 0.2·Asso − 0.6·influence. "Act" brings in late tables or trims over-limit tables to 6, and the restaurant complies for the rest of the night. Failure = **complaisance** ("café offert, 0 PV"), logged as a dossier piece worth 2. No tip-off and no patrol personalities yet (v0.2).
+- **WhatsApp (asso)**: sharing new photos gives +3 Asso per photo. Sending a message with no photo costs −3. **Mairie**: one report per night, logged as a 0.5 piece if it has attachments. No inspector visit at night.
+- **Waiter** (E, street, after 22:00, Bernadette only): P = 0.15 + 0.5·compliance + 0.25·Asso. Success brings in all of Bernadette's out tables. 10-min cooldown.
+- **Bucket (F, at the window)**: clears the out tables on Pilou's side within 3.5 m along the street, +45 Risk, −20 Asso, 15-min refill. No witness check (v0.2): Risk is applied unconditionally. Risk ≥ 30 warns ("video circulating"), ≥ 60 means a complaint, ≥ 90 means custody and ends the night immediately (so 2 buckets = custody).
+- Menus (phone, dossier) **pause** the game. Losing pointer lock shows a pause screen. `?nolock=1` runs without pointer lock, and `window.__rdb.step(n)` advances frames, both for automated tests.
+- Rendering: no shadows; 4 street point lights + 1 in the apartment (other lanterns are emissive only); the static decor is merged per material.
+- Deploy: CT 105 pulls `origin/main` every 2 min (`deploy/`), served at http://192.168.1.163:8090.
