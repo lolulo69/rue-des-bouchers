@@ -212,4 +212,7 @@ export const FLAGS = {
   traitor_public: 'Régis a été dénoncé publiquement sur le groupe WhatsApp',
   fire_brigade_filmed: 'Pilou a filmé le camion de secours bloqué par les tables',
   fire_brigade_helped: 'Pilou a aidé à dégager le passage des secours (avec Dédé)',
+
+  // ── content-workdays (workdays.js, §12b.D) ──────────────────────────────
+  ebike_battery_died: 'La batterie du vélo électrique a lâché en plein trajet (une fois)',
 };
