@@ -118,3 +118,72 @@ Epilogue *part* gates were changed only where the text claimed something false (
 New content: actions `pm_waiter_testimony`, `pm_klaas_notebook`, `pm_answer_hate_wave`; flags `waiter_testimony`, `klaas_log_certified`, `backroom_caught`, `bombance_wait`;
 media `press_petition_duel`; dialogue `nico_hate_wave_answered`, `klaas_certified`, `serveur_testimony`, `serveur_backroom`, `hilde_laxative`, `avocat_backroom_caught`.
 Audit re-run: 0 flags set-but-never-read; read-but-never-set = `custody`, `tatie_leaked_plan` (engine).
+
+## 2026-10-08 · pass 2 (transcripts) · design agent, task `story-transcripts`
+
+**Method.** `npm run story -- --bot <name> --seed N --out qa/stories/<bot>-<N>.md` (new `scripts/story.js`) plays one full campaign
+headless, with `narrative.js` and the same night narrator as `main.js`. It prints the campaign day by day: Koddex picks and results,
+event cards and the bot's choice, counter-moves, dialogue, afternoon actions, the night log (actions, police, witnesses, Klaas's notebook,
+bell, barks), the recap headline, the phone, then the commission scene, the ending and its epilogue. There are 12 transcripts in
+`qa/stories/` (2 seeds per bot). They were read like a player would, by the design agent (`legal-3`) plus 4 parallel readers, and every
+finding was checked against the transcript before being logged here. About 140 raw findings came out, many duplicated across runs;
+they are grouped below. The transcripts were then regenerated after the fixes (the diplomat runs now reach **negotiated peace** through the
+new negotiation event, where they used to end in « the return » with a charter nobody had negotiated).
+
+**Tone:** no break found. The satire stays on the institutions, the bloc and Pilou; Ch'ti stays light, tu/vous is consistent, and the
+only English is deliberate (`rv_tourist`, the « OPENING » sign).
+
+| File | Id | Problem (seen in) | Fix | Status |
+|---|---|---|---|---|
+| **Biggest: the run ignores what happened** | | | | |
+| campaign.js | D14 | After the commission's verdict the day goes on: dialogue, afternoon actions, counter-moves, a full night with the suspended terrace still out, and the recap « La commission du jour 14 va devoir l'écouter » (all 12). A lost commission ends at once instead, flagged `early: true`. | End the campaign right after `d14_commission` for every outcome, with `early: false`. | engine |
+| events.js / sim | `r_drache` | « Les terrasses se vident en quatre minutes » but the night log keeps every table out until midnight (6 runs). | The sim should read `random_drache` (clear the terraces around 21:15, or start the night rained-out). | engine |
+| campaign.js | night-phase events (`r_suitcases` 1h07, `r_waiter_smoke` 0h20, `r_fire_brigade` 22h35, `r_bachelor_party` 23h40, `d4_colette_dinner`) | Shown as cards before the night, so a 1h07 scene comes before 20:30. On D4, Colette sits at « LA table » the stink bomb emptied at 20:33. | Show night-phase cards at their clock time inside the night (or right after it), and let the D4 dinner put a table out. | engine |
+| actions.js | `klaas_noted_pilou` in 8 `witnessed.effects` | Any witness (a customer, Dédé) set « Klaas noted it », so Klaas, Jérémie and the epilogue reacted to things Klaas never saw (reckless-12). | Removed from content: the engine already sets it only when Klaas is a witness (campaign.js day witnesses, night memories, nightActions.js). | fixed |
+| events.js | `d14_commission` charter pitch | The diplomat won with « une charte… signée par les deux camps » that was never negotiated (diplomat ×2). | New event `r_charter_talks` (D8–13, after an AG « dialogue » vote): negotiate article by article (sets `charter_drafted`) or walk out. The pitch now requires `charter_drafted`. | fixed |
+| **Fixed texts that contradict the sim** | | | | |
+| media.js / dialogue.js | `wa_tipoff`, `seb_tipoff` | Hard-coded « 22h14 / 22h19 / 22h30 » and « 22h38 / 22h43 », and « l'estaminet », against the real tip-off of the night (all runs). | Rewritten without clock times. | fixed |
+| dialogue.js | `klaas_complaisance` | « 22h40 … un café … 23h10 » against the night log. | Rewrite without times. | open (dialogue owner) |
+| actions.js | `night_ronde_jeremie` result | « À 22h04, trois terrasses sont encore dehors » printed at 21:30, every night. | Rewritten, no clock time. | fixed |
+| koddex.js | `clode_db_logger_pride`, `standup_three` | « 81 dB à 0h12 », « 82 dB » (never measured; the passive bot has no logger). | No numbers. | fixed |
+| koddex.js | `proj_db_report` | « six pages, un graphe par nuit » after 1–2 nights. | « Un PDF, un graphe par nuit ». | fixed |
+| koddex.js | `clode_scraper_find` | « Nouvel avis » quoted the D1 review `rv_boast_1`. | A new review quote. | fixed |
+| media.js | `wa_pee_door` « vers 1h », `wa_drache` « trois minutes » vs the card's « quatre », `wa_banners` « trois » vs `pm_banners` « six ». | Aligned (« hier soir », « quatre », « six »). | fixed |
+| events.js | `d14_commission` | Ghislain's « 412 clients… Bruges » vs `cm_happy_petition`'s 2 300 / « Jean Bon (Bruxelles) ». Delphine's « constaté au jour 9 », « réunion du jour 11 », and the pitch « depuis le J9 »: game jargon in a hearing. | 2 300 + Jean Bon; « mardi », « jeudi ». | fixed |
+| events.js | `d13_saturday`, `r_biloute_chairs`, `r_bachelor_party`, `r_tatie_proverb`, `d4` (« jeudi prochain »), `d9` (« jardinière ») | « 21h58. Une première » (it wasn't); « pendant la ronde, à 20h45 » (the round starts at 21:30); « Klaas appellera ça mardi » on a Wednesday; Tatie's tea day changing; the AC « jardinière » vs « bâche ». | Times, weekdays and « firsts » removed or aligned. | fixed |
+| endings.js | `legal_victory` (`ac_violation_confirmed`), `the_return` | « une jardinière de géraniums » after a surprise visit (no jardinière); « Vous auriez dû garder ce surnom pour vous » (Pilou never told anyone); « Pendant une semaine » vs the front page « À peine la commission passée ». | Fixed in each part. | fixed |
+| events.js | `r_influencer` | Someone urinates on Pilou's door on a weekday (Saturday-only in the bible). | The door is blocked by a chair instead. | fixed |
+| **Characters reacting to what didn't happen, or ignoring what did** | | | | |
+| dialogue.js | `lemaire_order`, `lemaire_priorities` | Lemaire speaks after his transfer (mixed-6). | `notFlags: ['lemaire_transferred']`. | fixed |
+| dialogue.js / media.js / events.js | `seb_traitor`, `wa_regis_unmasked`, `r_traitor_gossip` | Régis « a quitté le groupe » even when Pilou told Jérémie discreetly; then Seb wants to remove him from the group he already left. | New flag `traitor_public` (set by the « balancer sur le groupe » choice), which gates `wa_regis_unmasked`; `seb_traitor` is excluded once it's set. | fixed |
+| dialogue.js | `tatie_resist`, `tatie_wavering`, `delphine_ac`, `biloute_stairs`, `seb_hello`, `regis_after`, `klaas_saturday`, `seb_group_activity`, `hippolyte_hello` | « Pas moi » while wavering; « hier » three days later; « Je ne vous promets rien » after the violation was confirmed; Biloute smells carbonnade on a Pilou who never ate any; Seb « adds » Pilou to the group he joined on D1 and mentions a sound meter he doesn't have; Régis in Pilou's stairs (he lives at n°27); « deux pipis » after a Saturday of a dozen; « depuis 22h » said in the afternoon; 1832 vs 1827. | Gated or reworded. | fixed |
+| countermoves.js | `cm_regis_leak_petition` | « Une heure avant que votre pétition soit imprimée » after it was delivered. | `notFlags: ['petition_delivered']`. | fixed |
+| countermoves.js | `cm_table_dance_again` | Same text up to 8 times in a run, including after the commission. | `once: true`. | fixed |
+| events.js | `r_colette_interview` | Anne-Sophie asks « Vous avez des éléments ? » after publishing the interview. | `notFlags: ['press_article']`. | fixed |
+| actions.js | `pm_press_contact` | « une ex-maire ? » on D2, before Colette's dinner ties her to the case. | Removed. | fixed |
+| actions.js | `night_stink_bomb` result | « Personne n'accuse le farceur » right after customers point at Pilou's window; « un record » every night. | Neutral wording. | fixed |
+| events.js | `r_bombance_project` | Both anti-bar options greyed for a player who has Hippolyte's workshop (`hippolyte_room`) and his support. | The Hippolyte option needs `hippolyte_room` (was `heritage_angle`). | fixed |
+| dialogue.js | `regis_courted`, `journaliste_first` / `journaliste_solid`, `nico_hello`, `serveur_named` | Régis half-confesses before he is unmasked; the journalist's first contact after « Ça, c'est un dossier »; Nico's group rules differ from `wa_welcome`; « Tu m'appelles Théo maintenant ? » days after first naming him. | Gate on order (`once` + flags) and align the rules. | open (dialogue owner) |
+| actions.js / dialogue.js | `pm_bloc_fooled`, `tatie_bloc_fooled` | The fake « manif samedi » plan is « foiled » the same Monday, and told twice. | Needs a delay (day gate) and one telling. | open (actions owner) |
+| endings.js | `legal_victory`, endings without `video_viral` | The « Waterzooi-gate » scandal, the viral video and the hate wave are missing from the epilogues of runs that had them. | Add parts on `press_scandal`, `video_viral`, `hate_wave_answered`. | open (design agent, next pass) |
+| **Night text** | | | | |
+| night.js | police `nothing` / `tipoff` | « Rien à constater » / « une rue d'une sagesse exemplaire » while other restaurants are still out. | The lines name the one restaurant the patrol checked (`{rest}`). | fixed |
+| night.js | `POLICE_LINES.ignored` | « votre 14e appel » counted the carried-over fatigue, not tonight's calls. | No ordinal. | fixed (the counter itself: engine) |
+| night.js | bark « Il est 22h10 » | Said at 20:45. | Rewritten without a time. | fixed |
+| night.js | `WAITER_LINES.theo.refused` | One line, said 4–12 times a night. | 4 variants (the repeats themselves: engine). | fixed |
+| night.js / narrative.js | recap | Stink-bomb or sabotage nights read « Une nuit ordinaire, quelques photos de plus », even with no photo. | Headlines `h_kitchen`, `h_stink`, `h_sabotage` (fed by the `night-action` journal); the quiet headline no longer mentions photos. | fixed |
+| nightActions.js | `night_bribe_photo_window` | The envelope is photographed at 20:30 with no patrol in the street. | Needs a patrol on site (`policeOnsite`). | fixed |
+| **Engine (for the build agent)** | | | | |
+| campaign.js | Koddex « travail » | Each generic `'work'` pick resolves to the same work item, so the same result prints 2–3 times a morning, every day (all 12). Weekends have stand-ups too. | Resolve each `'work'` to a different available item (or rotate); decide on weekend mornings. | engine |
+| campaign.js | afternoon | The same repeatable action twice in one afternoon (`pm_whatsapp_rally`, `pm_fake_reviews` ×7). | One use per afternoon for repeatable actions. | engine |
+| sim / main.js narrator | repeats | The same witness line for each witness of one act (« C'est lui ! Là-haut ! » ×4), the same bark twice a night, Théo's refusal every 10 minutes. | De-duplicate by witness kind per act; keep a short « recently said » memory per pool. | engine |
+| summary.js | verdict | The nightly verdict scores only that night (« Pas grand-chose à montrer » at Dossier 62, « Dossier solide » on D1 at 17); the custody verdict always blames « le seau d'eau ». | Score on the campaign's Dossier; say what actually caused the custody. | engine |
+| police.js / campaign.js | call counter | « appel n°2 » again each night (the counter carries the fatigue). | Count tonight's calls for display. | engine |
+| sim.js | photo dB | Every 20:30 photo reads 36 dB (`noiseBed` is only computed after 22:00). | Measure at the table when the photo is taken. | engine |
+| ui (`nameOf`) | « Théo » | The speaker label shows « Théo » before `met_waiter` (the transcript script now uses « Le serveur »). | Use `CHARACTERS.serveur.title` until `met_waiter`. | engine (UI) |
+| dialogue scheduling | `*_hello` | Klaas introduces himself on D12 after reading his notebook to Pilou on D2. | Show a character's hello before any other line of theirs. | engine |
+| campaign.js | `press_scandal` / `bribe_photo` | The press scandal changes nothing (no inquiry), while a bribe photo opens an inquiry on its own on night 1 with no transmission. | Tie the inquiry to an actual transmission (IGPN report or the press). | engine |
+| **Balance (for the balance agent)** | | | | |
+| | legal / mixed | Asso 100 by D4 and Dossier 100 by D5: the last 9 days have no stakes. | Diminishing returns on Asso / Dossier. | balance |
+| | reckless / stealthy | Stink bombs raise Sleep (they empty the terrace under the window); Risk sits at 84 for days, then custody on a morning with no act; nine buckets leave Risk at 33. | Review the Risk decay and the custody trigger. | balance |
+| | diplomat | Now reaches negotiated peace through `r_charter_talks` (chance 0.6, D8–13). | Re-run `npm run sim`; the peace ≥ 40 % target may be met now. | balance |
