@@ -4,6 +4,11 @@ on:
   push:
   pull_request:
 
+# Many agents push to main: only the newest commit per branch needs a verdict.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
