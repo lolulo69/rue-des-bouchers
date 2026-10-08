@@ -81,3 +81,31 @@ Delphine always married to Stéphane. No real person or business, and no real-wo
 **Counts after this pass (dialogue.js, 177 entries):** Jérémie 19 · Klaas 15 · Tatie 14 · Seb 13 · Hilde 12 · Nico 12 · Hippolyte 11 · Régis 7 · Ghislain 7 ·
 chef 6 · Stéphane 6 · journaliste 6 · avocat 6 · Biloute 6 · Dédé 5 · serveur 5 · Lemaire 5 · Delphine 5 · Gaufre 5 · Benali 4 · Colette 4 · Lescaut 4.
 Only `pilou` and `clode` have none (Pilou is the player; Clode speaks in koddex.js).
+
+## 2026-10-08 · pass 1b · night.js, intro.js, media.js
+
+**Clean, no finding:** the group name always comes from `WHATSAPP_GROUP`. Théo is only named under `met_waiter`, and Régis is only a traitor under `traitor_known`.
+The roster, `read_*`, La Bombance and the zones are gated. Rule facts are right (22:00, 6/table, corridor, Saturdays, 20:30–01:30, Klaas asleep at 01:00), voices match, and no illegal act is described as a how-to.
+
+| File | Id | Problem | Fix | Status |
+|---|---|---|---|---|
+| night.js / src/config.js / src/sim/witness.js | `WITNESS_LINES.gaystapo`, `WITNESS.gaystapo` | The witness id is `gaystapo` while actions.js uses `seb_nico` (13×), so the `by` lookups never match. It also bakes the v1.0 group label into code, although §2 and the README say the label lives only in `WHATSAPP_GROUP`. | Rename the key to `seb_nico` (sim, config, night.js). The display label stays `WHATSAPP_GROUP`. | open |
+| intro.js | `tuto_night_end` | « Treize nuits avant la commission »: the commission is on the D14 afternoon, so 12 nights remain after night 1. | « Douze nuits ». | open |
+| intro.js | `card_street` | Reveals « le Trou » on day 1, so `knows_trou` (Hippolyte, the guided tour, `press_trou`, an ending) becomes pointless. | « Une rue pavée de 150 mètres, ouverte en 1729. » | open |
+| intro.js | `card_exhaust` | « On lui répond que c'est en cours » has no antecedent, and the open AC case isn't stated. | « Une inspectrice est passée ; le dossier est ouvert. L'estaminet, lui, répond que « c'est en cours de résolution ». » | open |
+| night.js | `POLICE_LINES.call.asso[1]` | « un téléphone vibre chez Dédé » hints at the tip-off before `seen_tipoff`. | Keep only « le bloc saura qui a appelé ». | open |
+| night.js | `POLICE_LINES.lemaire.never_came[1]`, `BARKS.police_passing[0]` | Hints at Lemaire's free meals (« il dîne… pas au hasard », « il est sympa ») without `seen_complaisance`. | Neutral wording. | open |
+| night.js | `KLAAS_NOTEBOOK.complaisance.precise[1]`, `lemaire/benali/chief.act[1]` | Name Dédé while `{rest}` can be any restaurant. | « le patron », or only for `bernadette`. | open |
+| night.js | `POLICE_LINES.benali.act[0]` | Always cites the 22:00 rule, even when the fine is for capacity or the corridor. | « Vous êtes en infraction. » + `{detail}`. | open |
+| night.js | `KLAAS_NOTEBOOK.pilou.precise[0]`, `.vague[0]` | Every act is placed at « fenêtre du n°10 », including street-level ones. | « devant le n°10 », or pick the line by location. | open |
+| night.js | `KLAAS_NOTEBOOK.pee.precise[1]`, `POLICE_LINES.lemaire.for_pilou[1]` | Uncounted « Troisième » and « pour la première fois de la semaine ». | `{n}` / « Encore un. »; « pour une fois ». | open |
+| night.js | `RECAP_HEADLINES.h_bucket_seen`, `h_scandal` | « la vidéo circule » without `video_viral`; « le commissaire » (the chief is Commandant Desmet, municipal police). | « des témoins parlent »; « la hiérarchie de la police municipale ». | open |
+| media.js | `wa_tipoff` | Tables in at 22h01 is just the legal closing, not a tip-off. Klaas, on the square, can't hear a phone at n°10. | §7 timing (22h14 tables in, 22h19 police, 22h30 out again); drop the phone. | open |
+| media.js | `wa_cat_2`, `press_petition`, `rv_carbonnade_good` | Mention petition leaflets / the bloc's petition / banners without `petition_started` / `cm_happy_petition` / `banners_up`. | Add the flags. | open |
+| media.js | `wa_cardboard` | Klaas « a vu un pyjama » at a fixed 0h52 with no witness flag. | Gate on `klaas_noted_pilou`, or « constaté le matin ». | open |
+| media.js | `press_scandal`, `press_igpn` | Claims documented tip-offs / « nos révélations » when the source can be the bribe photo alone. | Add `seen_tipoff` / `press_scandal`, or reword. | open |
+| media.js | `press_rule_2200` | « contre minuit rue de Gand » on Mon–Tue (elsewhere it's 23:00 Sun–Wed); this is the journalist's voice, not the bloc's. | « contre 23h ou minuit ailleurs dans le Vieux-Lille ». | open |
+| media.js | `so_bloemkool` | « carte d'automne »; the campaign is in summer (d9 « en plein été »). | « carte d'été ». | open |
+| media.js | `rv_boast_3` | Customers at n°10 see Klaas writing from the far square. | « un vieux monsieur barbu, tout au bout, nous regardait en écrivant ». | open |
+| night.js / media.js | `BARKS` « Uber », `h_bucket_unseen` « Météo-France », `press_bombance` « boules Quies » | Real brands/bodies, harmless. | Optional: « VTC », « les météorologues », « bouchons d'oreille ». | open |
+| dialogue.js | (cross-check) | `hippolyte_trou` already stays silent once `knows_trou` is set; nothing in dialogue.js contradicts night/intro/media. | — | fixed |
