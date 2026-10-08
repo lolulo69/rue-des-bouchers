@@ -120,6 +120,8 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null } 
       if (k === 'job' && !c.has('unemployed')) lo = C.preGate.jobFloor;
     }
     S.stats[k] = clamp(v, lo, hi);
+    // Le Risque franchit le seuil de garde à vue (à partir de la nuit 5) : le moteur pose le drapeau `custody`
+    if (k === 'risk' && c.gateOpen() && S.stats.risk >= cfg.RISK.custody) setFlag('custody');
     return S.stats[k] - before;
   }
   function setFlag(f) { if (!S.flags.includes(f)) S.flags.push(f); }

@@ -73,7 +73,7 @@ export const ENDINGS = [
   { id: 'fired', title: 'Viré', priority: 90, when: { stats: { job: '<=0' } }, continue: { label: 'Continuer au chômage', effects: { asso: 5 } }, epilogue: [{ text: 'Stéphane parle de vibes.' }] },
   { id: 'moving_out', title: 'Wazemmes', priority: 80, whenAny: [{ stats: { sleep: '<=0' } }, { flags: ['commission_lost'] }], epilogue: [{ text: 'Au moins à Wazemmes, le bruit c\'est le matin.' }] },
   { id: 'scandal', title: 'Le scandale', priority: 70, when: { flags: ['corruption_proof', 'press_contacted'] }, epilogue: [{ text: 'La Voix du Nordiste titre sur {best}.' }] },
-  { id: 'return', title: 'Le retour', priority: 65, when: { flags: ['commission_won', 'bombance_bar_project'] }, epilogue: [{ text: 'Un bar à La Bombance.' }] },
+  { id: 'the_return', title: 'Le retour', priority: 65, when: { flags: ['commission_won', 'bombance_bar_project'] }, epilogue: [{ text: 'Un bar à La Bombance.' }] },
   { id: 'legal_victory', title: 'Victoire', priority: 60, when: { flags: ['won_legal'] }, epilogue: [{ text: 'Dossier {dossier}/100, {pieces} pièces.' }, { when: { flags: ['met_klaas'] }, text: 'Klaas sourit.' }] },
-  { id: 'peace', title: 'La paix', priority: 50, when: { flags: ['won_peace'] }, epilogue: [{ text: 'Une charte.' }] },
+  { id: 'negotiated_peace', title: 'La paix', priority: 50, when: { flags: ['won_peace'] }, epilogue: [{ text: 'Une charte.' }] },
 ];

@@ -253,7 +253,7 @@ export const CAMPAIGN = {
   weekdays: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'], // le jour 1 est un lundi
   saturdays: [6, 13],
   start: { sleep: 70, asso: 40, risk: 0, job: 70, dossier: 0, hostility: 20, corruption: 60 },
-  endings: ['legal_victory', 'peace', 'scandal', 'custody', 'moving_out', 'fired', 'turncoat', 'return'],
+  endings: ['legal_victory', 'negotiated_peace', 'scandal', 'custody', 'moving_out', 'fired', 'turncoat', 'the_return'], // ids de src/content/endings.js
   earlyEndings: ['custody', 'fired', 'moving_out'], // ou `early: true` sur la fin
   earlyFromDay: 5,               // aucune fin anticipée avant la nuit 5
   preGate: { riskCap: 89, sleepFloor: 5, jobFloor: 5 }, // avant la nuit 5 : on frôle, on ne tombe pas

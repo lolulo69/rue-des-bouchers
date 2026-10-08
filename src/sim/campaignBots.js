@@ -16,7 +16,11 @@ function score(effects = {}, w, witnessed) {
   return s;
 }
 
-const flagWeights = (prefix) => ({ won_legal: 50, won_peace: 50, commission_won: 30, corruption_proof: 15, press_contacted: 10, ...prefix });
+// Valeurs communes : gagner la commission, prouver la corruption, bloquer le bar de La Bombance ; ne pas devenir un habitué
+const flagWeights = (prefix) => ({
+  won_legal: 50, won_peace: 50, won_scandal: 50, commission_won: 30, corruption_proof: 15, press_contacted: 10, bombance_blocked: 30,
+  carbonnade_1: -20, carbonnade_2: -30, carbonnade_3: -60, ...prefix,
+});
 
 function make({ name, weights, legality, sideProjects = 1, nightPolicy, nightContent, maxRisk = 100, continueFired = false }) {
   const allowed = (a, c) => legality.includes(a.legality ?? 'legal') && (a.legality === 'legal' || c.state.stats.risk < maxRisk);
@@ -30,8 +34,10 @@ function make({ name, weights, legality, sideProjects = 1, nightPolicy, nightCon
       return picks;
     },
     afternoon(c, actions) {
+      // Rendements décroissants : une action déjà faite intéresse moins (sinon le bot répète la même tous les jours)
+      const done = (id) => c.state.counts.actions[id] ?? 0;
       const best = actions.filter((a) => allowed(a, c))
-        .map((a) => ({ a, s: score(a.effects, weights, a.witnessed) / (a.cost?.time ?? 1) }))
+        .map((a) => ({ a, s: score(a.effects, weights, a.witnessed) / (a.cost?.time ?? 1) / (1 + done(a.id)) }))
         .filter((x) => x.s > 0)
         .sort((x, y) => y.s - x.s)[0];
       return best?.a.id ?? null;
@@ -117,8 +123,8 @@ export const TARGETS = {
     { label: 'scandale atteignable', ok: (d) => (d.scandal ?? 0) > 0 },
   ],
   mixed: [{ label: 'meilleur score moyen', ok: (d, all, name) => Object.entries(all).every(([k, v]) => k === name || v.score <= all[name].score) }],
-  diplomat: [{ label: 'paix négociée ≥ 40 %', ok: (d) => (d.peace ?? 0) >= 0.4 }],
+  diplomat: [{ label: 'paix négociée ≥ 40 %', ok: (d) => (d.negotiated_peace ?? 0) >= 0.4 }],
 };
 
 // Score de fin (pour "meilleur score moyen") : les bonnes fins valent plus
-export const ENDING_SCORE = { legal_victory: 100, peace: 90, scandal: 70, return: 60, turncoat: 20, fired: 10, moving_out: 0, custody: -20, none: 0 };
+export const ENDING_SCORE = { legal_victory: 100, negotiated_peace: 90, scandal: 70, the_return: 60, turncoat: 20, fired: 10, moving_out: 0, custody: -20, none: 0 };
