@@ -178,3 +178,9 @@ Stealthy got the waiter fired in 100 % of runs: customers at the terrace saw the
 `tatie_fake_leak` weight 3 → 5: the fake leak scored exactly 0, so `pm_bloc_fooled` was never reached.
 
 No dominant action (`--ablate mixed`, 1000 runs, base 97 %): `pm_klaas_roster` −13, `pm_klaas_notebook` −12, `pm_heritage` / `pm_press_contact` −4, the rest ≤ 3. Max 13 < 25 ✅.
+
+## 2026-10-08 23:05 · design agent verification · main c24436b · 1000 × 7 on CT 106
+All §13.H targets ✅ and §13.F (every ending ≥ 2% for its target bot) ✅. **Every action (68), event (28) and ending (8) is reached**; invariants ✅.
+Legal careful 59% legal victory / 37% scandal · reckless 100% custody (night 5) · stealthy 22% custody, 23% scandal · mixed 88% legal, best score 94 · diplomat 26% peace + 42% the return + 14% turncoat · slacker 40% fired. Asso now ends at 73–77 (saturation fixed).
+Decision (design): the turncoat at 14% of diplomat runs is **kept**. A diplomat who gives up and starts eating at the estaminet is in character, and it still needs 3 deliberate carbonnades + attending the commission as a regular.
+Left (minor): counter-moves cm_regis_leak_petition, cm_camera_found_paranoia never reached; 13 dialogue lines never surfaced (incl. the « hello » lines).
