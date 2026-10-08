@@ -102,7 +102,8 @@ export function mount(engine = {}, opts = {}) {
   const afterEngine = () => { save(); if (c.step === 'ended') recordEnding(); };
   // Étape affichée : le bilan de la matinée Koddex reste à l'écran jusqu'à « Quitter Koddex » (BUG-002),
   // même si le moteur est déjà passé à l'après-midi.
-  const shown = () => (view.k?.done && !view.k.left && c.step !== 'ended' ? 'koddex' : c.step);
+  // BUG-002 : le bilan Koddex reste affiché ; BUG-004 : le résultat de la dernière carte d'une phase aussi
+  const shown = () => (c.step === 'ended' ? c.step : view.k?.done && !view.k.left ? 'koddex' : view.cardResult ? 'cards' : c.step);
 
   // ── tutoriel (déclencheurs de jour) ────────────────────────────────
   function tutorial(trigger) {
@@ -329,7 +330,7 @@ export function mount(engine = {}, opts = {}) {
     for (let k = 0; k < merged && c.step === 'cards' && c.card()?.type === 'dialogue'; k++) c.resolveCard(0);
     afterEngine();
     const dl = deltas(before);
-    view = result || Object.values(dl).some(Boolean) ? { result: { title: d.title ?? nameOf(d.speaker), text: result, deltas: dl } } : {};
+    view = result || Object.values(dl).some(Boolean) ? { result: { title: d.title ?? nameOf(d.speaker), text: result, deltas: dl }, cardResult: true } : {};
     render();
   }
   function resultCard(r, onNext, extra = null) {

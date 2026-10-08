@@ -143,4 +143,55 @@ test.describe('campagne (interface de jour)', () => {
     await page.screenshot({ path: 'test-results/campaign-ending.png', timeout: 60_000 });
     expect(errors).toEqual([]);
   });
+
+  test('BUG-004 (corrigé) · la dernière carte d’une phase affiche son résultat avant la phase suivante', async ({ page }) => {
+    await newCampaign(page, 101);
+    let checked = 0;
+    for (let guard = 0; guard < 80 && checked < 2; guard++) {
+      // Avance par l'API jusqu'à la dernière carte d'une phase dont le choix a un texte de résultat
+      const last = await page.evaluate(() => {
+        const { ui } = window.__rdb, c = ui.campaign;
+        for (let i = 0; i < 3000 && !c.ended && c.state.day <= 14; i++) {
+          if (c.step === 'cards') {
+            const k = c.card(), ch = k.choices.find((x) => x.available) ?? k.choices[0];
+            if (c.state.cards.length === 1 && k.data?.choices?.[ch.i]?.result) { ui.render(); return { i: ch.i, result: k.data.choices[ch.i].result }; }
+            c.resolveCard(ch.i);
+          } else if (c.step === 'koddex') c.koddex(['work', 'work', 'work']);
+          else if (c.step === 'actions') c.endAfternoon();
+          else if (c.step === 'night') { const sim = c.createNight(); for (let k = 0; !sim.state.ended && k < 2000; k++) sim.tick(1); c.finishNight(sim); }
+          else if (c.step === 'recap') c.nextDay();
+        }
+        return null;
+      });
+      if (!last) break;
+      await page.click(`[data-testid=card-choice][data-i="${last.i}"]`);
+      await expect(page.locator('[data-testid=result]')).toContainText(last.result.slice(0, 30));
+      await page.click('[data-testid=result-next]');
+      await expect(page.locator('[data-testid=result]')).toHaveCount(0);
+      checked++;
+    }
+    test.skip(!checked, 'aucune fin de phase avec un texte de résultat sur toute la campagne (graine 101)');
+  });
+
+  test('BUG-003 (corrigé) · la commission du J14 joue sa scène (répliques) avant les plaidoiries', async ({ page }) => {
+    await newCampaign(page, 101); // la graine 101 atteint le J14 en jeu passif
+    const scene = await page.evaluate(() => {
+      const { ui } = window.__rdb;
+      const c = ui.campaign;
+      for (let i = 0; i < 2000 && !c.ended; i++) {
+        if (c.step === 'cards') { const k = c.card(); if (k.id === 'd14_commission') break; c.resolveCard(k.choices.find((x) => x.available)?.i ?? 0); }
+        else if (c.step === 'koddex') c.koddex(['work', 'work', 'work']);
+        else if (c.step === 'actions') c.endAfternoon();
+        else if (c.step === 'night') { const sim = c.createNight(); for (let k = 0; !sim.state.ended && k < 2000; k++) sim.tick(1); c.finishNight(sim); }
+        else if (c.step === 'recap') c.nextDay();
+      }
+      ui.render();
+      const k = c.step === 'cards' ? c.card() : null;
+      return k?.id === 'd14_commission' ? (k.scene ?? []).map((s) => s.text) : null;
+    });
+    test.skip(!scene, 'campagne terminée avant la commission avec cette graine');
+    expect(scene.length).toBeGreaterThan(1);
+    const shown = await page.locator('[data-testid=card]').innerText();
+    for (const t of scene) expect(shown).toContain(t.slice(0, 40));
+  });
 });
