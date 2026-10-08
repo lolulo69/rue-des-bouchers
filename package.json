@@ -19,7 +19,7 @@
   },
   "keywords": [],
   "author": "Lucas Lefort",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "type": "module",
   "dependencies": {
     "three": "^0.186.1"

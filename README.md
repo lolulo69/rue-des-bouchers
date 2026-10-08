@@ -8,7 +8,7 @@ sous sa fenêtre et les terrasses ne rentrent jamais à 22h. Photos, décibels, 
 > élus et institutions représentés sont fictifs. Toute ressemblance avec des personnes ou des établissements existants
 > serait fortuite. Aucune personne réelle n'est représentée ni mise en cause.
 
-**▶ [Jouer](#)** _(lien à venir)_
+**▶ [Jouer](https://rue-des-bouchers.lucaslefort.dev)**
 
 | | |
 |---|---|
@@ -103,7 +103,7 @@ Pour proposer un texte ou un événement : [docs/CONTRIBUTING.md](docs/CONTRIBUT
 
 ## Licence
 
-MIT (voir `package.json`).
+Tous droits réservés © 2026 Lucas Lefort. Le code est public pour être lu, pas pour être réutilisé : voir [`LICENSE`](LICENSE).
 
 ---
 
@@ -114,4 +114,4 @@ police officer and official in it is fictional. Pilou lives above a restaurant w
 14 in-game days to build a case before the city's terrace commission. Each day is a morning at the startup job, an afternoon
 of neighbourhood politics and a first-person night in the street (photos, decibel readings, police calls… or a bucket of water,
 if nobody is watching). There are eight endings. The game is in French. Run it with `npm install && npm run dev`, test it with
-`npm test`. MIT licensed. An idea by Lucas Lefort, built with three.js and Vite and developed with AI coding agents.
+`npm test`. All rights reserved (see LICENSE). Play it at https://rue-des-bouchers.lucaslefort.dev. An idea by Lucas Lefort, built with three.js and Vite and developed with AI coding agents.
