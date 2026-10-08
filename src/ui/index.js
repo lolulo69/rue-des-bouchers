@@ -1,28 +1,23 @@
 // Interface 2D des journées (GAME_DESIGN §3, §10, §13.A/D). Propriétaire : agent UI.
 //
-//   import { mount } from './ui/index.js';
-//   const ui = mount(engine?, { onNight, root, seed });
+// Dans le jeu (main.js) :
+//   mountDayUI({ campaign, root, content, onSave, onNight, onQuit, onNew }) → { show(), hide(), destroy() }
+//   La campagne vient de main.js (créée avec narrative.js). onNight() part jouer la nuit 3D (rechargement de page).
+// Page autonome (ui.html, tests) :
+//   mount(engine?, { root, seed, onNight? }) : écran titre + sauvegarde localStorage ; sans onNight, nuits simulées.
 //
-// engine (facultatif) : { createCampaign, content } ; par défaut src/sim/index.js + src/content/*.
-// onNight(c, ui)      : appelé quand c.step === 'night'. L'hôte (main.js) cache l'UI, joue la nuit 3D
-//                       (c.createNight() … c.finishNight(sim)) et résout la promesse : l'UI sauvegarde et reprend.
-//                       Sans onNight, l'UI propose de passer la nuit en simulation (repli sans 3D, tests).
-// Sauvegarde : localStorage 'rdb.save.v1' après chaque appel au moteur (README de src/sim).
+// Le moteur fournit la narration (c.tutorial, c.mediaFeed / c.readMedia, S.lastHeadline, S.endingMedia, c.introCards).
 import './ui.css';
+import * as narrative from '../sim/narrative.js';
 import { createCampaign as defaultCreate, contentFromGlob, POLICIES, playNight } from '../sim/index.js';
-import { NIGHT_END } from '../content/night.js';
-import { introCards, tutorialPrompt, recapHeadline, mediaEnding } from '../sim/narrative.js';
+import { NIGHT_END, KLAAS_NOTEBOOK } from '../content/night.js';
 import { h, clear, portrait, nameOf, typewrite, effectChips, STAT_LABELS, setPortraitProvider } from './dom.js';
-import {
-  WEEKDAYS, WEEKDAYS_SHORT, PHASE_LABELS, LEGALITY, explain, afternoonMenu, upcomingEvent, eventDays,
-  witnessName,
-} from './rules.js';
-import { phoneView, pullFeed, unread } from './phone.js';
-
-const INTRO_CARDS = introCards() ?? [];
+import { WEEKDAYS, WEEKDAYS_SHORT, PHASE_LABELS, LEGALITY, explain, afternoonMenu, upcomingEvent, eventDays, witnessName } from './rules.js';
+import { phoneView, pullFeed, unreadItems, messageNode } from './phone.js';
+import { createVignette } from './vignette.js';
 
 export const SAVE_KEY = 'rdb.save.v1';
-export const UI_KEY = 'rdb.ui.v1';           // historique du téléphone, tutoriel vu, intro vue
+export const UI_KEY = 'rdb.ui.v1';           // préférences d'affichage de l'UI (non-lus, répliques entendues, avant-nuit)
 export const ENDINGS_KEY = 'rdb.endings.v1'; // fins découvertes, toutes campagnes confondues
 
 const DEFAULT_CONTENT = contentFromGlob(import.meta.glob('../content/*.js', { eager: true }));
@@ -33,35 +28,56 @@ const store = {
   del(k) { try { localStorage.removeItem(k); } catch { /* idem */ } },
 };
 
+// Variables des lignes du carnet de Klaas (night.js) : jamais de {variable} laissée telle quelle
+const klaasLine = (pool, day) => (pool?.length ? narrative.fill(pool[day % pool.length], { time: '01h00', n: 0 }) : null);
+
+export function mountDayUI({ campaign, root, content, onSave, onNight, onQuit, onNew } = {}) {
+  const ui = mount({ content }, { campaign, root, onSave, onNight, onQuit, onNew, deferRender: true });
+  return { show: ui.show, hide: ui.hide, destroy: ui.destroy, render: ui.render };
+}
+
 export function mount(engine = {}, opts = {}) {
   const create = engine.createCampaign ?? defaultCreate;
   const content = engine.content ?? DEFAULT_CONTENT;
   if (opts.portrait) setPortraitProvider(opts.portrait);
   let root = opts.root ?? document.getElementById('ui-root');
   if (!root) { root = h('div#ui-root'); document.body.append(root); }
-  root.classList.remove('ui-hidden');
+  root.classList.add('ui-root');
+  const layer = h('div.ui-layer');
+  const vignette = createVignette(root);
+  root.append(layer);
 
-  let c = null;
-  let meta = freshMeta();
-  let view = {};          // état local de l'écran courant (résultats affichés, terminal…)
+  let c = opts.campaign ?? null;
+  let meta = loadMeta();
+  let view = {};
   let phone = { open: false, tab: 'whatsapp' };
   let typing = null;
+  let visible = false;
 
-  function freshMeta() { return { seed: 0, tuto: [], introDone: false, feed: [], mediaSeen: [], pulledAt: '' }; }
-  const save = () => { if (!c) return; store.set(SAVE_KEY, c.save()); store.set(UI_KEY, meta); };
+  function loadMeta() {
+    const m = store.get(UI_KEY) ?? {};
+    return { opened: [], overheard: [], dialogueAt: '', pulledAt: '', preNight: null, introSeen: false, workDone: [], ...m };
+  }
+  const saveMeta = () => store.set(UI_KEY, meta);
+  const save = () => {
+    if (!c) return;
+    if (opts.onSave) opts.onSave(); else store.set(SAVE_KEY, c.save());
+    saveMeta();
+  };
   const statsSnap = () => ({ ...c.state.stats });
   const deltas = (before) => Object.fromEntries(Object.keys(STAT_LABELS).map((k) => [k, Math.round(c.state.stats[k] - before[k])]));
+  const fresh = () => c.state.day === 1 && c.state.phase === 'morning' && !c.state.seen.events.length && !c.state.seen.dialogue.length;
 
-  // ── campagne ────────────────────────────────────────────────────────
+  // ── campagne (page autonome) ────────────────────────────────────────
   function loadSave() {
     const s = store.get(SAVE_KEY);
     if (!s) return null;
-    try { return create({ content, save: s }); } catch { return null; } // version incompatible → « Nouvelle campagne »
+    try { return create({ content, save: s, narrative }); } catch { return null; } // version incompatible → nouvelle
   }
   function newCampaign(seed = opts.seed ?? (Date.now() % 2147483646) + 1) {
-    c = create({ seed, content });
-    meta = freshMeta();
-    meta.seed = seed;
+    if (opts.onNew && opts.campaign) return opts.onNew();
+    c = create({ seed, content, narrative });
+    meta = { ...loadMeta(), opened: [], overheard: [], dialogueAt: '', pulledAt: '', preNight: null, introSeen: false, workDone: [] };
     view = {};
     save();
     render();
@@ -70,45 +86,83 @@ export function mount(engine = {}, opts = {}) {
   function continueCampaign() {
     c = loadSave();
     if (!c) return null;
-    meta = { ...freshMeta(), ...(store.get(UI_KEY) ?? {}), introDone: true };
     view = {};
     render();
     return c;
   }
   function recordEnding() {
     const found = new Set(store.get(ENDINGS_KEY) ?? []);
-    if (c.state.ending?.id) found.add(c.state.ending.id);
+    if (c?.state.ending?.id) found.add(c.state.ending.id);
     store.set(ENDINGS_KEY, [...found]);
   }
+  const afterEngine = () => { save(); if (c.step === 'ended') recordEnding(); };
 
-  // ── tutoriel (déclencheurs côté jour) ──────────────────────────────
+  // ── tutoriel (déclencheurs de jour) ────────────────────────────────
   function tutorial(trigger) {
-    const t = tutorialPrompt(trigger, { ...c.state, seenTutorial: meta.tuto });
+    const t = typeof c.tutorial === 'function' ? c.tutorial(trigger) : null;
     if (!t) return null;
-    meta.tuto.push(t.id);
-    store.set(UI_KEY, meta);
-    return h('div.ui-card', { dataset: { testid: 'tutorial' } }, h('span.ui-kicker', 'Astuce'), h('p', t.text));
+    save();
+    return h('div.ui-card.ui-tip', { dataset: { testid: 'tutorial' } }, h('span.ui-kicker', 'Astuce'), h('p', t.text));
+  }
+
+  // ── vignette selon l'écran ─────────────────────────────────────────
+  function sceneFor() {
+    if (!c) return null;
+    if (c.step === 'ended' || (c.state.day === 14 && c.state.phase !== 'morning')) return 'mairie';
+    if (c.step === 'koddex' || c.state.phase === 'morning') return 'koddex';
+    if (c.step === 'actions' || c.state.phase === 'afternoon') return 'atelier';
+    return null;
   }
 
   // ── rendu ───────────────────────────────────────────────────────────
+  // U4 : une seule boîte de dialogue par transition. Les cartes de dialogue suivantes de la même phase sont
+  // « entendues en passant » (rangées dans le téléphone) et résolues AVANT le rendu, pour que l'étape affichée soit juste.
+  function settleDialogues() {
+    if (!c || view.result) return;
+    const at = `${c.state.day}:${c.state.phase}`;
+    let moved = false;
+    for (let card = c.step === 'cards' ? c.card() : null; card && card.type === 'dialogue' && meta.dialogueAt === at; card = c.step === 'cards' ? c.card() : null) {
+      meta.overheard.push({ id: `overheard:${card.id}:${c.state.day}`, speaker: card.data.speaker, text: (card.data.lines ?? []).join(' '), day: c.state.day });
+      if (meta.overheard.length > 120) meta.overheard.shift();
+      c.resolveCard(0);
+      moved = true;
+    }
+    if (moved) afterEngine();
+  }
+
   function render() {
     if (typing) { typing.skip?.(); typing = null; }
-    clear(root);
+    clear(layer);
+    settleDialogues();
     root.dataset.step = c ? c.step : 'title';
-    if (!c) return root.append(titleScreen());
-    if (!meta.introDone && INTRO_CARDS.length) return root.append(introScreen());
-    // Nouveaux messages du téléphone, relevés une fois par phase (effets appliqués par le moteur)
+    if (!c) { vignette.set(null); return layer.append(titleScreen()); }
+    if (fresh() && !meta.introSeen && introCards().length) { vignette.set('koddex'); return layer.append(introScreen()); }
+    // Nouveaux messages : relevés une fois par phase (le moteur applique leurs effets)
     const at = `${c.state.day}:${c.state.phase}`;
-    if (c.step !== 'ended' && meta.pulledAt !== at) { meta.pulledAt = at; pullFeed(c, meta); save(); }
+    if (c.step !== 'ended' && meta.pulledAt !== at) {
+      meta.pulledAt = at;
+      const got = pullFeed(c);
+      view.notif = got.length ? got : view.notif;
+      save();
+    }
+    vignette.set(sceneFor());
+    root.dataset.scene = sceneFor() ?? 'none';
     const wrap = h('div.ui-wrap');
     if (c.step !== 'ended') wrap.append(header());
-    if (phone.open) wrap.append(phoneView(meta, {
-      tab: phone.tab, onTab: (t) => { phone.tab = t; render(); }, onClose: () => { phone.open = false; render(); },
-    }));
-    else wrap.append(...[].concat(screen()).filter(Boolean));
-    root.append(wrap);
+    if (phone.open) {
+      wrap.append(phoneView(c, meta, { tab: phone.tab, onTab: (t) => { phone.tab = t; render(); }, onClose: closePhone }));
+      saveMeta();
+    } else {
+      const notif = notification();
+      if (notif) wrap.append(notif);
+      wrap.append(...[].concat(screen()).filter(Boolean));
+    }
+    layer.append(wrap);
     root.scrollTop = 0;
   }
+  const introCards = () => (typeof c?.introCards === 'function' ? c.introCards() : narrative.introCards()) ?? [];
+  function openPhone(tab) { phone = { open: true, tab: tab ?? phone.tab }; view.notif = null; render(); }
+  function closePhone() { phone.open = false; render(); }
 
   function screen() {
     switch (c.step) {
@@ -118,11 +172,24 @@ export function mount(engine = {}, opts = {}) {
       case 'night': return nightScreen();
       case 'recap': return recapScreen();
       case 'ended': return endScreen();
-      default: return h('div.ui-card', h('p', `Étape inconnue : ${c.step}`));
+      default: return h('div.ui-card', h('p', `Étape inconnue : ${c.step}`));
     }
   }
 
-  // ── écran titre ─────────────────────────────────────────────────────
+  // ── notification du téléphone (entre deux phases) ─────────────────
+  function notification() {
+    const unread = unreadItems(c, meta);
+    if (!unread.length || c.step === 'recap' || c.step === 'ended') return null;
+    // Le matin : les messages de la nuit sur le groupe, en aperçu
+    const preview = unread.filter((m) => m.channel === 'whatsapp').slice(-2);
+    return h('div.ui-notif', { dataset: { testid: 'phone-notif' } },
+      h('div.ui-notif-head', h('b', `📱 ${unread.length} nouveau${unread.length > 1 ? 'x' : ''} message${unread.length > 1 ? 's' : ''}`),
+        c.state.phase === 'morning' ? h('span', ' · cette nuit sur le groupe') : null),
+      c.state.phase === 'morning' && preview.length ? h('div.ui-feed.mini', preview.map(messageNode)) : null,
+      h('button.ui-btn.light', { onclick: () => openPhone(unread.at(-1).channel), dataset: { testid: 'phone-notif-open' } }, 'Lire (T)'));
+  }
+
+  // ── écran titre (page autonome) ────────────────────────────────────
   function titleScreen() {
     const existing = store.get(SAVE_KEY) ? loadSave() : null;
     const found = new Set(store.get(ENDINGS_KEY) ?? []);
@@ -131,35 +198,36 @@ export function mount(engine = {}, opts = {}) {
       col.append(h('button.ui-btn', { onclick: continueCampaign, dataset: { testid: 'title-continue' } },
         `Continuer · jour ${existing.state.day}/14, ${WEEKDAYS[existing.weekday()]}`));
     } else if (store.get(SAVE_KEY)) {
-      col.append(h('p.note', 'Votre sauvegarde vient d’une ancienne version du jeu : il faut recommencer.'));
+      col.append(h('p.note', 'Votre sauvegarde vient d’une ancienne version du jeu : il faut recommencer.'));
     }
     const newBtn = h('button.ui-btn' + (existing ? '.ghost' : ''), { dataset: { testid: 'title-new' } }, 'Nouvelle campagne');
     newBtn.onclick = () => {
-      if (existing && !newBtn.dataset.armed) { newBtn.dataset.armed = '1'; newBtn.textContent = 'Écraser la sauvegarde ? Cliquez encore'; return; }
+      if (existing && !newBtn.dataset.armed) { newBtn.dataset.armed = '1'; newBtn.textContent = 'Écraser la sauvegarde ? Cliquez encore'; return; }
       newCampaign();
     };
     col.append(newBtn);
     return h('div.ui-title', h('div',
       h('h1', 'Rue des Bouchers'),
-      h('p.sub', "Vieux-Lille. Quatorze jours avant la commission des terrasses. Pilou habite au-dessus de l’estaminet, la gaine souffle sous sa fenêtre, et les terrasses doivent rentrer à 22h. En théorie."),
+      h('p.sub', "Vieux-Lille. Quatorze jours avant la commission des terrasses. Pilou habite au-dessus de l'estaminet, la gaine souffle sous sa fenêtre, et les terrasses doivent rentrer à 22h. En théorie."),
       col,
       found.size ? endingsGrid(found, null) : null,
-      h('p.note', "Œuvre de fiction. La rue existe ; les personnages, commerces, policiers et élus sont inventés.")));
+      h('p.note', 'Œuvre de fiction. La rue existe ; les personnages, commerces, policiers et élus sont inventés.')));
   }
 
-  // ── intro (jour 1) ──────────────────────────────────────────────────
+  // ── intro (une fois, avant la première matinée) ─────────────────────
   function introScreen() {
-    const i = view.intro ?? 0;
-    const card = INTRO_CARDS[i];
-    const next = () => { if (i + 1 >= INTRO_CARDS.length) { meta.introDone = true; save(); view = {}; } else view.intro = i + 1; render(); };
-    const skip = () => { meta.introDone = true; save(); view = {}; render(); };
-    return h('div.ui-wrap', h('div.ui-card', { dataset: { testid: 'intro' } },
-      h('span.ui-kicker', `${i + 1} / ${INTRO_CARDS.length}`),
-      card.speaker ? h('div.ui-dialogue', portrait(card.speaker), h('h2', card.title)) : h('h2', card.title),
-      h('p', card.text),
+    const cards = introCards();
+    const i = Math.min(view.intro ?? 0, cards.length - 1);
+    const card = cards[i];
+    const done = () => { meta.introSeen = true; saveMeta(); view = {}; render(); };
+    const next = () => { if (i + 1 >= cards.length) done(); else { view.intro = i + 1; render(); } };
+    return h('div.ui-wrap.ui-intro', h('div.ui-card', { dataset: { testid: 'intro' } },
+      h('div.ui-dots', cards.map((_, k) => h(`i${k === i ? '.on' : ''}`))),
+      card.speaker ? h('div.ui-dialogue', portrait(card.speaker, 'neutral', 'lg'), h('h2', card.title)) : h('h2', card.title),
+      h('p.ui-lead', card.text),
       h('div.ui-row',
-        h('button.ui-btn', { onclick: next, dataset: { testid: 'intro-next' } }, i + 1 >= INTRO_CARDS.length ? 'Commencer' : 'Suivant'),
-        h('button.ui-btn.light', { onclick: skip, dataset: { testid: 'intro-skip' } }, 'Passer'))));
+        h('button.ui-btn', { onclick: next, dataset: { testid: 'intro-next' } }, i + 1 >= cards.length ? 'Commencer la journée' : 'Suivant'),
+        h('button.ui-btn.light', { onclick: done, dataset: { testid: 'intro-skip' } }, 'Passer l’intro'))));
   }
 
   // ── en-tête ─────────────────────────────────────────────────────────
@@ -167,21 +235,25 @@ export function mount(engine = {}, opts = {}) {
     const S = c.state;
     const evDays = eventDays(c);
     const up = upcomingEvent(c);
-    const phases = ['morning', 'afternoon', 'night'];
+    const unread = unreadItems(c, meta).length;
     const stats = Object.entries(STAT_LABELS).map(([k, label]) => h(`div.ui-stat${k === 'risk' ? '.danger' : ''}`, { dataset: { stat: k } },
       `${label} ${Math.round(S.stats[k])}`, h('i', h('b', { style: { width: `${S.stats[k]}%` } }))));
     return h('header.ui-header', { dataset: { testid: 'day-header', day: S.day, step: c.step } },
       h('div.ui-header-top',
         h('h1.ui-day', `Jour ${S.day}/14`, h('small', `${WEEKDAYS[c.weekday()]}${c.isSaturday() ? ' · sans voitures' : ''}`)),
         h('div.ui-row',
-          h('div.ui-phase', phases.map((p) => h(`span${p === S.phase ? '.on' : ''}`, PHASE_LABELS[p]))),
-          h('button.ui-btn.ghost', { onclick: () => { phone.open = !phone.open; render(); }, dataset: { testid: 'phone-open', unread: unread(meta) }, 'aria-label': 'Téléphone' }, '📱', unread(meta) ? h('span.ui-badge', unread(meta)) : null))),
+          h('div.ui-phase', ['morning', 'afternoon', 'night'].map((p) => h(`span${p === S.phase ? '.on' : ''}`, PHASE_LABELS[p]))),
+          h('button.ui-btn.ghost.ui-icon', { onclick: () => (phone.open ? closePhone() : openPhone()), dataset: { testid: 'phone-open', unread }, 'aria-label': 'Téléphone (T)', title: 'Téléphone (T)' },
+            '📱', unread ? h('span.ui-badge', unread) : null),
+          opts.onQuit ? h('button.ui-btn.ghost.ui-icon', { onclick: opts.onQuit, 'aria-label': 'Menu', title: 'Menu' }, '☰') : null)),
       h('div.ui-cal', Array.from({ length: 14 }, (_, k) => h(`i${k + 1 < S.day ? '.done' : ''}${k + 1 === S.day ? '.now' : ''}${evDays.has(k + 1) ? '.ev' : ''}`, { title: `Jour ${k + 1}` }))),
-      up ? h('div.ui-upcoming', up.day === S.day ? 'Aujourd’hui : ' : `Jour ${up.day} (${WEEKDAYS_SHORT[c.weekday(up.day)]}) : `, h('b', up.title)) : null,
+      up ? h('div.ui-upcoming', up.day === S.day ? 'Aujourd’hui : ' : `Jour ${up.day} (${WEEKDAYS_SHORT[c.weekday(up.day)]}) : `, h('b', up.title)) : null,
       h('div.ui-stats', stats));
   }
 
   // ── cartes (événements, dialogues, contre-offensives, infos) ──────
+  // U4 : une seule boîte de dialogue par transition de phase. Les répliques suivantes sont « entendues en passant »
+  // (rangées dans le téléphone) ; deux cartes consécutives du même personnage sont fusionnées dans la même boîte.
   function cardScreen() {
     if (view.result) return resultCard(view.result, () => { view = {}; render(); });
     const card = c.card();
@@ -189,34 +261,47 @@ export function mount(engine = {}, opts = {}) {
     const d = card.data ?? card;
     const speaker = d.speaker;
     const kicker = { event: typeof d.day === 'number' ? 'Événement' : 'Imprévu', dialogue: 'Conversation', countermove: 'Le bloc contre-attaque', info: 'Nouvelles' }[card.type];
-    const body = h('div.ui-card', { dataset: { testid: 'card', type: card.type, id: card.id } }, h('span.ui-kicker', kicker));
+    const body = h(`div.ui-card.ui-card-${card.type}`, { dataset: { testid: 'card', type: card.type, id: card.id } }, h('span.ui-kicker', kicker));
+    let merged = 0;
     if (card.type === 'dialogue') {
-      for (const line of d.lines ?? []) body.append(h('div.ui-dialogue', portrait(speaker), h('div.ui-bubble', h('span.who', nameOf(speaker)), line)));
+      const lines = [...(d.lines ?? [])];
+      // fusionne les cartes suivantes du même personnage
+      for (const next of c.state.cards.slice(1)) {
+        if (next.type !== 'dialogue') break;
+        const nd = c.content.DIALOGUE.find((x) => x.id === next.id);
+        if (!nd || nd.speaker !== speaker) break;
+        lines.push(...(nd.lines ?? []));
+        merged++;
+      }
+      body.append(h('div.ui-dialogue', portrait(speaker, 'happy', 'lg'),
+        h('div.ui-bubble', h('span.who', nameOf(speaker)), lines.map((l) => h('p', l)))));
     } else {
-      body.append(speaker ? h('div.ui-dialogue', portrait(speaker, card.type === 'countermove' ? 'suspicious' : 'neutral'), h('h2', d.title ?? nameOf(speaker))) : h('h2', d.title ?? ''));
-      if (d.text) body.append(h('p', d.text));
+      const expr = card.type === 'countermove' ? 'suspicious' : 'neutral';
+      body.append(speaker ? h('div.ui-dialogue', portrait(speaker, expr, 'lg'), h('h2', d.title ?? nameOf(speaker))) : h('h2', d.title ?? ''));
+      if (d.text) body.append(h('p.ui-lead', d.text));
+      if (card.scene?.length) body.append(h('div.ui-scene', card.scene.map((s) => h('div.ui-dialogue', portrait(s.speaker, 'neutral', 'sm'), h('div.ui-bubble', h('span.who', s.name ?? nameOf(s.speaker)), s.text)))));
     }
     const choices = h('div.ui-col');
     for (const ch of card.choices) {
       const src = d.choices?.[ch.i];
       const why = ch.available ? [] : explain(src?.requires, c);
-      choices.append(h('button.ui-action', {
-        disabled: !ch.available, style: { '--c': 'var(--ui-gold)' }, dataset: { testid: 'card-choice', i: ch.i },
-        onclick: () => choose(card, ch.i),
+      choices.append(h('button.ui-action.ui-choice', {
+        disabled: !ch.available, dataset: { testid: 'card-choice', i: ch.i },
+        onclick: () => choose(card, ch.i, merged),
       }, h('span.lbl', ch.label === 'OK' ? 'Continuer' : ch.label), why.length ? h('span.why', why.join(' · ')) : null));
     }
     body.append(choices);
     return body;
   }
-  function choose(card, i) {
+  function choose(card, i, merged = 0) {
     const before = statsSnap();
     const d = card.data ?? card;
+    if (card.type === 'dialogue') meta.dialogueAt = `${c.state.day}:${c.state.phase}`;
     const result = c.resolveCard(i);
-    save();
-    if (c.step === 'ended') recordEnding();
+    for (let k = 0; k < merged && c.step === 'cards' && c.card()?.type === 'dialogue'; k++) c.resolveCard(0);
+    afterEngine();
     const dl = deltas(before);
-    if (result || Object.values(dl).some(Boolean)) view = { result: { title: d.title ?? nameOf(d.speaker), text: result, deltas: dl } };
-    else view = {};
+    view = result || Object.values(dl).some(Boolean) ? { result: { title: d.title ?? nameOf(d.speaker), text: result, deltas: dl } } : {};
     render();
   }
   function resultCard(r, onNext, extra = null) {
@@ -228,52 +313,57 @@ export function mount(engine = {}, opts = {}) {
       h('button.ui-btn.center', { onclick: onNext, dataset: { testid: 'result-next' } }, 'Continuer'));
   }
 
-  // ── matin : Koddex (terminal Clode Kode) ───────────────────────────
+  // ── matin : Koddex (terminal Clode Kode, prompts en cartes) ───────
   function koddexScreen() {
     const S = c.state;
     if (!view.k || view.k.day !== S.day) {
-      const opts = c.koddexOptions(); // une seule fois par matinée (tire le gag au sort)
-      view.k = { day: S.day, opts, picks: [], log: [], done: false, tuto: tutorial('morning_start') };
-      if (opts.gag) for (const l of opts.gag.lines ?? []) view.k.log.push({ cls: opts.gag.speaker === 'clode' ? 'clode' : 'sys', text: opts.gag.speaker === 'clode' ? l : `${nameOf(opts.gag.speaker)} : ${l}`, fresh: true });
+      const o = c.koddexOptions(); // une seule fois par matinée (le gag est tiré au sort)
+      view.k = { day: S.day, opts: o, picks: [], usedWork: [], log: [], done: false, tuto: tutorial('morning_start') };
+      if (o.gag) for (const l of o.gag.lines ?? []) view.k.log.push(termLine(o.gag.speaker, l));
     }
     const k = view.k;
     const term = h('div.ui-term-body');
     const termBox = h('div.ui-term', { dataset: { testid: 'terminal' }, onclick: () => typing?.skip?.() },
       h('div.ui-term-bar', h('i'), h('i'), h('i'), h('span', 'clode-kode — koddex/todo-app (main)')), term);
-    const usedProjects = new Set(k.picks);
-    const works = workChoices(k);
     const menu = h('div.ui-col', { dataset: { testid: 'koddex-menu' } });
     if (!k.done) {
-      menu.append(h('div.ui-prompts', `Prompts restants : `, Array.from({ length: k.opts.prompts }, (_, i) => h(`i${i < k.picks.length ? '.used' : ''}`))));
-      const w = works[k.picks.length % works.length];
-      menu.append(h('button.ui-action', { style: { '--c': 'var(--ui-legal)' }, dataset: { testid: 'koddex-option', id: 'work' }, onclick: () => pick('work', w) },
-        h('span.lbl', w ? w.label : 'Faire le vrai travail'), h('span.cost', 'Travail · Job +')));
-      for (const p of k.opts.sideProjects) {
-        if (!p.available || usedProjects.has(p.id)) continue;
-        const L = LEGALITY[p.legality ?? 'legal'];
-        menu.append(h('button.ui-action', {
-          style: { '--c': `var(--ui-${p.legality ?? 'legal'})` }, dataset: { testid: 'koddex-option', id: p.id }, onclick: () => pick(p.id, p),
-        }, h('span.lbl', p.label), h('span.cost', `Projet perso · ${L.label}`),
-        h('span.why', `Job ${p.job ?? -10}${p.risk ? ` · Risque +${p.risk} si Stéphane remarque` : ''}`)));
+      menu.append(h('div.ui-prompts', 'Prompts restants : ', Array.from({ length: k.opts.prompts }, (_, i) => h(`i${i < k.picks.length ? '.used' : ''}`))));
+      // U1 : trois vrais travaux différents proposés, jamais deux fois le même dans la matinée
+      const grid = h('div.ui-prompt-grid');
+      for (const w of workChoices(k).slice(0, 2)) {
+        grid.append(promptCard({ id: 'work', item: w, label: w.label, tag: 'Vrai travail', hint: 'Job +', legality: 'legal' }));
       }
+      for (const p of k.opts.sideProjects) {
+        if (!p.available || k.picks.includes(p.id)) continue;
+        grid.append(promptCard({ id: p.id, item: p, label: p.label, tag: `Projet perso · ${LEGALITY[p.legality ?? 'legal'].label}`,
+          hint: `Job ${p.job ?? -10}${p.risk ? ` · Risque +${p.risk} si Stéphane remarque` : ''}`, legality: p.legality ?? 'legal' }));
+      }
+      menu.append(grid);
     } else {
       menu.append(h('button.ui-btn.center', { dataset: { testid: 'koddex-done' }, onclick: () => { view = {}; render(); } }, 'Quitter Koddex (direction la rue)'));
     }
-    // Rejoue le journal : les lignes déjà tapées s'affichent d'un coup, les nouvelles à la machine à écrire
-    const fresh = [];
+    const freshLines = [];
     for (const line of k.log) {
       const node = h(`div.ui-term-line.${line.cls}`);
       term.append(node);
-      if (line.fresh) { fresh.push([node, line.text]); line.fresh = false; } else node.textContent = line.text;
+      if (line.fresh) { freshLines.push([node, line.text]); line.fresh = false; } else node.textContent = line.text;
     }
-    queueMicrotask(() => typeAll(fresh, term, menu));
+    queueMicrotask(() => typeAll(freshLines, term, menu));
     return [k.tuto, termBox, menu];
   }
+  function promptCard({ id, item, label, tag, hint, legality }) {
+    return h(`button.ui-prompt.${legality}`, { dataset: { testid: 'koddex-option', id, work: id === 'work' ? item.id : undefined }, onclick: () => pick(id, item) },
+      h('span.ui-prompt-tag', tag), h('span.lbl', label), h('span.why', hint));
+  }
+  function termLine(speaker, text) {
+    if (speaker === 'clode') return { cls: 'clode', text, fresh: true };
+    if (speaker === 'pilou') return { cls: 'me', text, fresh: true };
+    return { cls: 'sys', text: `${nameOf(speaker)} : ${text}`, fresh: true };
+  }
   function workChoices(k) {
-    const S = c.state;
-    const ok = (k.opts.work ?? []).filter((w) => c.check(w.requires, false) && !(w.once && (meta.workDone ?? []).includes(w.id)));
-    if (!ok.length) return [{ id: 'work', label: 'Faire le vrai travail', result: 'Clode Kode a fait le travail. Stéphane a mis un emoji 🚀.' }];
-    const start = (S.day * 7 + meta.seed) % ok.length;
+    const ok = (k.opts.work ?? []).filter((w) => c.check(w.requires, false) && !(w.once && meta.workDone.includes(w.id)) && !k.usedWork.includes(w.id));
+    if (!ok.length) return [{ id: 'backlog', label: 'Vider le backlog de Stéphane', result: 'Clode Kode a vidé le backlog. Stéphane a mis un emoji 🚀.' }];
+    const start = (c.state.day * 7) % ok.length;
     return [...ok.slice(start), ...ok.slice(0, start)];
   }
   async function typeAll(list, term, menu) {
@@ -292,25 +382,25 @@ export function mount(engine = {}, opts = {}) {
     if (k.done || k.picks.length >= k.opts.prompts) return;
     if (k.picks.length === 0) k.tuto = tutorial('first_prompt');
     k.picks.push(id);
-    k.log.push({ cls: 'me', text: item?.label ?? 'Faire le vrai travail', fresh: true });
+    k.log.push({ cls: 'me', text: item.label, fresh: true });
     if (id === 'work') {
-      k.log.push({ cls: 'clode', text: item?.result ?? 'Fait. Avec toutes mes excuses pour le retard de 0,2 seconde.', fresh: true });
-      if (item?.once) meta.workDone = [...(meta.workDone ?? []), item.id];
+      k.usedWork.push(item.id);
+      if (item.once) meta.workDone.push(item.id);
+      k.log.push({ cls: 'clode', text: item.result ?? 'Fait. Avec toutes mes excuses pour le retard de 0,2 seconde.', fresh: true });
     } else {
-      for (const l of item.lines ?? []) k.log.push({ cls: l.speaker === 'clode' ? 'clode' : l.speaker === 'pilou' ? 'me' : 'sys', text: l.speaker === 'clode' || l.speaker === 'pilou' ? l.text : `${nameOf(l.speaker)} : ${l.text}`, fresh: true });
+      for (const l of item.lines ?? []) k.log.push(termLine(l.speaker, l.text));
     }
     if (k.picks.length >= k.opts.prompts) {
       const before = statsSnap();
       c.koddex(k.picks);
       for (const pid of k.picks) {
         const p = k.opts.sideProjects.find((x) => x.id === pid);
-        if (p?.result) k.log.push({ cls: 'sys', text: `✔ Livré : ${p.result}`, fresh: true });
+        if (p?.result) k.log.push({ cls: 'sys', text: `✔ Livré : ${p.result}`, fresh: true });
       }
       const dl = deltas(before);
-      k.log.push({ cls: 'sys', text: `— Fin de matinée. Job ${dl.job >= 0 ? '+' : ''}${dl.job}${dl.risk ? `, Risque +${dl.risk}` : ''}${c.has('boss_noticed') && dl.risk ? ' (Stéphane a remarqué quelque chose)' : ''}.`, fresh: true });
+      k.log.push({ cls: 'sys', text: `— Fin de matinée. Job ${dl.job >= 0 ? '+' : ''}${dl.job}${dl.risk ? `, Risque +${dl.risk} (Stéphane a remarqué quelque chose)` : ''}.`, fresh: true });
       k.done = true;
-      save();
-      if (c.step === 'ended') recordEnding();
+      afterEngine();
     }
     render();
   }
@@ -318,7 +408,7 @@ export function mount(engine = {}, opts = {}) {
   // ── après-midi : menu d'actions ────────────────────────────────────
   function actionsScreen() {
     const S = c.state;
-    if (view.result) return resultCard(view.result, () => { view = { afterFirst: true }; render(); }, view.result.seenNode);
+    if (view.result) return resultCard(view.result, () => { view = { tutoShown: true }; render(); }, view.result.extra);
     const tuto = view.tutoShown ? null : tutorial('afternoon_start');
     view.tutoShown = true;
     const menu = afternoonMenu(c);
@@ -327,30 +417,38 @@ export function mount(engine = {}, opts = {}) {
       if (!items.length) return null;
       items.sort((a, b) => Number(b.available) - Number(a.available));
       return h(`section.ui-group.${lg}`, { dataset: { testid: `group-${lg}` } },
-        h('h3', LEGALITY[lg].label, h('small', { style: { fontWeight: 600, textTransform: 'none', opacity: 0.7, letterSpacing: 0 } }, ` · ${LEGALITY[lg].hint}`)),
+        h('h3', LEGALITY[lg].label, h('small', ` · ${LEGALITY[lg].hint}`)),
         items.map(({ action: a, cost, available, why }) => h('button.ui-action', {
           disabled: !available, dataset: { testid: 'action', id: a.id }, onclick: () => doAction(a),
-        }, h('span.lbl', a.label), h('span.cost', `${cost} créneau${cost > 1 ? 'x' : ''}`), why.length ? h('span.why', why.join(' · ')) : null)));
+        }, h('span.lbl', a.label), h('span.cost', '⏱'.repeat(cost), ` ${cost} créneau${cost > 1 ? 'x' : ''}`),
+        available ? hintOf(a) : h('span.why', '🔒 ', why.join(' · ')))));
     });
     return [
       tuto,
-      h('div.ui-slots', { dataset: { testid: 'slots', left: S.timeLeft } }, 'Temps libre cet après-midi : ',
+      h('div.ui-slots', { dataset: { testid: 'slots', left: S.timeLeft } }, 'Temps libre cet après-midi : ',
         Array.from({ length: Math.max(S.timeLeft, 0) }, () => h('i')), S.timeLeft ? null : ' plus rien'),
       ...groups,
-      h('button.ui-btn.center', { dataset: { testid: 'action-end' }, onclick: () => { c.endAfternoon(); save(); view = {}; render(); } },
+      h('button.ui-btn.center', { dataset: { testid: 'action-end' }, onclick: () => { c.endAfternoon(); afterEngine(); view = {}; render(); } },
         S.timeLeft ? 'Laisser tomber et attendre le soir' : 'Le soir tombe… (vers la nuit)'),
     ];
+  }
+  // Indice d'effets (sans tout dévoiler) : ce que l'action fait bouger, et le risque d'être vu
+  function hintOf(a) {
+    const e = a.effects ?? {};
+    const parts = Object.entries(STAT_LABELS).filter(([k]) => e[k] && k !== 'risk').map(([k, l]) => `${l} ${e[k] > 0 ? '▲' : '▼'}`);
+    if (e.evidence) parts.push('Pièce au dossier');
+    if (a.legality !== 'legal') parts.push('👁 peut se savoir');
+    return parts.length ? h('span.why.hint', parts.join(' · ')) : null;
   }
   function doAction(a) {
     const before = statsSnap();
     const first = !c.state.seen.actions.length;
     const { result, seen } = c.doAction(a.id);
-    save();
-    if (c.step === 'ended') recordEnding();
+    afterEngine();
     const seenNode = seen?.length
-      ? h('p', { dataset: { testid: 'seen' } }, '👁 Vu par : ', seen.map((s) => `${witnessName(s.id)}${s.ally ? ' (allié)' : ''}`).join(', '))
-      : (a.legality !== 'legal' ? h('p', '👁 Personne ne semble avoir vu quoi que ce soit.') : null);
-    view = { result: { title: a.label, text: result, deltas: deltas(before), seenNode: h('div', seenNode, first ? tutorial('first_afternoon_action') : null) } };
+      ? h('p', { dataset: { testid: 'seen' } }, '👁 Vu par : ', seen.map((s) => `${witnessName(s.id)}${s.ally ? ' (allié)' : ''}`).join(', '))
+      : (a.legality !== 'legal' ? h('p', '👁 Personne ne semble avoir rien vu.') : null);
+    view = { tutoShown: true, result: { title: a.label, text: result, deltas: deltas(before), extra: h('div', seenNode, first ? tutorial('first_afternoon_action') : null) } };
     render();
   }
 
@@ -360,47 +458,65 @@ export function mount(engine = {}, opts = {}) {
     const go = h('button.ui-btn.center', { dataset: { testid: 'night-go' } }, opts.onNight ? 'Descendre dans la rue (nuit)' : 'Passer la nuit');
     go.onclick = async () => {
       go.disabled = true;
+      meta.preNight = { day: c.state.day, stats: statsSnap(), evidence: c.state.evidence.length };
+      save();
       if (opts.onNight) {
-        hide();
-        try { await opts.onNight(c, ui); } finally { save(); show(); }
+        await opts.onNight(c, publicApi);
+        if (c.step !== 'night') { afterEngine(); render(); }
       } else {
-        // Repli sans 3D (tests, page autonome) : nuit simulée, Pilou reste à sa fenêtre sans rien faire.
+        // Repli sans 3D (page autonome, tests) : nuit simulée, Pilou reste à sa fenêtre.
         const sim = c.createNight();
         playNight(sim, POLICIES.passive(), c);
         c.finishNight(sim);
-        save();
-        if (c.step === 'ended') recordEnding();
+        afterEngine();
+        view = {};
         render();
       }
     };
-    return h('div.ui-card', { dataset: { testid: 'night' } },
+    return h('div.ui-card.ui-night', { dataset: { testid: 'night' } },
       h('span.ui-kicker', `Nuit ${c.state.day}`),
       h('h2', sat ? 'Samedi soir, sans voitures. La rue est à eux.' : '20h30. Les terrasses se remplissent.'),
-      h('p', "Photos, décibels, appels : tout ce qui se passe ce soir pèsera à la commission. Les nuits ne se rattrapent pas."),
+      h('p', 'Photos, décibels, appels : tout ce qui se passe ce soir pèsera à la commission. Les nuits ne se rattrapent pas.'),
       go);
   }
 
-  // ── bilan de nuit ───────────────────────────────────────────────────
+  // ── bilan de nuit (U7) ─────────────────────────────────────────────
   function recapScreen() {
     const S = c.state;
     const sum = S.lastNight ?? {};
     const night = S.nights.at(-1) ?? {};
-    const head = recapHeadline(sum);
+    const head = S.lastHeadline ?? narrative.recapHeadline(sum);
     const endLines = NIGHT_END?.[sum.reason ?? 'time'] ?? [];
     const mood = endLines.length ? endLines[S.day % endLines.length] : null;
+    const pre = meta.preNight?.day === S.day ? meta.preNight : null;
     const last = S.day >= 14;
-    return h('div.ui-card', { dataset: { testid: 'recap' } },
-      h('span.ui-kicker', `Bilan de la nuit ${night.day ?? S.day}`),
-      head ? h('h2', { style: { fontFamily: 'Georgia, serif' } }, head.text) : null,
+    // ▲▼ depuis le début de la nuit
+    const deltaRow = h('div.ui-deltas', { dataset: { testid: 'recap-deltas' } }, Object.entries(STAT_LABELS).map(([k, label]) => {
+      const now = Math.round(S.stats[k]);
+      const d = pre ? now - Math.round(pre.stats[k]) : 0;
+      const good = k === 'risk' ? d < 0 : d > 0;
+      return h(`div.ui-delta${d ? (good ? '.up' : '.down') : ''}`, h('span', label), h('b', now), d ? h('em', `${d > 0 ? '▲' : '▼'} ${Math.abs(d)}`) : h('em', '='));
+    }));
+    // Carnet de Klaas : les pièces de la nuit qu'il a notées, sinon une ligne de son carnet
+    const nightEv = S.evidence.filter((e) => e.day === S.day);
+    const klaas = nightEv.filter((e) => /Klaas|carnet/i.test(e.label) || ['complaisance', 'tipoff'].includes(e.nightType)).slice(0, 2).map((e) => e.label);
+    if (!klaas.length) { const l = klaasLine(KLAAS_NOTEBOOK?.bedtime?.precise ?? KLAAS_NOTEBOOK?.bedtime ?? [], S.day); if (l) klaas.push(l); }
+    const unread = unreadItems(c, meta).slice(-3);
+    return h('div.ui-card.ui-recap', { dataset: { testid: 'recap' } },
+      h('span.ui-kicker', `La Voix du Nordiste · lendemain de la nuit ${night.day ?? S.day}`),
+      head ? h('h2.ui-headline', { dataset: { testid: 'recap-headline' } }, head.text) : null,
       mood ? h('p.ui-result', mood) : null,
-      h('ul.ui-list', (sum.verdict ?? []).map((v) => h('li', v))),
+      deltaRow,
       h('div.ui-fx',
-        h('span', `Pièces cette nuit : ${night.evidence ?? 0}`),
-        h('span', `Dossier +${night.gained ?? 0}`),
-        h('span', `Appels police : ${night.police ?? 0}`),
-        night.witnesses ? h('span.down', `Témoins : ${night.witnesses}`) : null),
-      (sum.police ?? []).length ? h('div', h('h3', 'Police'), h('ul.ui-list', sum.police.map((p) => h('li', `${p.called} → ${p.arrived ?? '—'} · ${p.outcome ?? ''}`)))) : null,
-      h('button.ui-btn.center', { dataset: { testid: 'recap-next' }, onclick: () => { c.nextDay(); save(); if (c.step === 'ended') recordEnding(); view = {}; render(); } },
+        h('span', `📸 Pièces : ${night.evidence ?? 0}`), h('span', `📁 Dossier +${night.gained ?? 0}`),
+        h('span', `🚓 Appels : ${night.police ?? 0}`), night.witnesses ? h('span.down', `👁 Témoins : ${night.witnesses}`) : null),
+      (sum.verdict ?? []).length ? h('ul.ui-list', sum.verdict.map((v) => h('li', v))) : null,
+      klaas.length ? h('div.ui-notebook', { dataset: { testid: 'recap-klaas' } }, portrait('klaas', 'neutral', 'sm'),
+        h('div', h('span.who', 'Carnet de Klaas'), klaas.map((t) => h('p', t)))) : null,
+      (sum.police ?? []).length ? h('div', h('h3', 'Main courante'), h('ul.ui-list.ui-police', sum.police.map((p) =>
+        h('li', h('b', p.called), ` → ${p.arrived ?? '—'}`, p.patrol ? ` · ${p.patrol}` : '', ` · ${p.outcome ?? ''}`)))) : null,
+      unread.length ? h('div', h('h3', '📱 Sur le téléphone'), h('div.ui-feed.mini', unread.map(messageNode))) : null,
+      h('button.ui-btn.center', { dataset: { testid: 'recap-next' }, onclick: () => { c.nextDay(); afterEngine(); view = {}; render(); } },
         last ? 'Le verdict de la commission' : `Jour ${S.day + 1} →`));
   }
 
@@ -410,15 +526,17 @@ export function mount(engine = {}, opts = {}) {
     recordEnding();
     const found = new Set(store.get(ENDINGS_KEY) ?? []);
     const e = S.ending ?? {};
+    const front = S.endingMedia?.front ?? (e.id ? narrative.mediaEnding(e.id, S) : null);
     const buttons = h('div.ui-col');
-    if (e.canContinue) buttons.append(h('button.ui-btn.center', { dataset: { testid: 'end-continue' }, onclick: () => { c.continueAfterEnding(); save(); view = {}; render(); } }, e.continueLabel ?? 'Continuer'));
-    buttons.append(h('button.ui-btn.center' + (e.canContinue ? '.light' : ''), { dataset: { testid: 'end-new' }, onclick: () => { store.del(SAVE_KEY); c = null; render(); } }, 'Nouvelle campagne'));
-    const front = e.id ? mediaEnding(e.id, S) : null;
+    if (e.canContinue) buttons.append(h('button.ui-btn.center', { dataset: { testid: 'end-continue' }, onclick: () => { c.continueAfterEnding(); afterEngine(); view = {}; render(); } }, e.continueLabel ?? 'Continuer'));
+    buttons.append(h('button.ui-btn.center' + (e.canContinue ? '.light' : ''), { dataset: { testid: 'end-new' }, onclick: () => {
+      if (opts.onNew && opts.campaign) return opts.onNew();
+      store.del(SAVE_KEY); c = null; render();
+    } }, 'Nouvelle campagne'));
     return h('div.ui-card', { dataset: { testid: 'ending', id: e.id } },
       h('span.ui-kicker', e.early ? `Fin anticipée · jour ${e.day}` : 'Commission du jour 14'),
       h('p.ui-big', e.title ?? 'Fin'),
-      front ? h('div.ui-result', { style: { fontFamily: 'Georgia, serif', fontStyle: 'normal' } },
-        h('span.ui-kicker', 'La Voix du Nordiste'), front.headline ? h('h2', front.headline) : null, h('p', front.text)) : null,
+      front ? h('div.ui-front', h('span.ui-kicker', 'La Voix du Nordiste'), front.headline ? h('h2', front.headline) : null, h('p', front.text)) : null,
       h('div.ui-epilogue', (S.epilogue ?? []).map((t) => h('p', t))),
       h('h3', 'Fins découvertes'),
       endingsGrid(found, e.id),
@@ -430,17 +548,32 @@ export function mount(engine = {}, opts = {}) {
       { dataset: { ending: x.id } }, found.has(x.id) ? x.title : `🔒 ${x.title}`)));
   }
 
+  // ── clavier : T ouvre le téléphone, Échap le ferme ──────────────────
+  function onKey(e) {
+    if (!visible || !c || e.target?.closest?.('input, textarea, select')) return;
+    if (e.code === 'KeyT') { e.preventDefault(); if (phone.open) closePhone(); else openPhone(); }
+    else if (e.code === 'Escape' && phone.open) closePhone();
+  }
+  window.addEventListener('keydown', onKey);
+  const onResize = () => vignette.resize();
+  window.addEventListener('resize', onResize);
+
   // ── API publique ────────────────────────────────────────────────────
-  function hide() { root.classList.add('ui-hidden'); }
-  function show() { root.classList.remove('ui-hidden'); render(); }
-  const ui = {
+  function hide() { visible = false; vignette.pause(); root.classList.add('ui-hidden'); }
+  function show() { visible = true; root.classList.remove('ui-hidden', 'hidden'); vignette.resume(); render(); }
+  function destroy() {
+    window.removeEventListener('keydown', onKey);
+    window.removeEventListener('resize', onResize);
+    vignette.dispose();
+    clear(layer);
+    layer.remove();
+  }
+  const publicApi = {
     root,
     get campaign() { return c; },
-    render, show, hide, newCampaign, continueCampaign,
-    /** À appeler par l'hôte si la nuit s'est terminée hors de onNight (ex. rechargement) */
-    afterNight() { save(); show(); },
-    destroy() { clear(root); },
+    render, show, hide, destroy, newCampaign, continueCampaign, openPhone, closePhone,
+    afterNight() { afterEngine(); show(); },
   };
-  if (opts.autoContinue && store.get(SAVE_KEY)) continueCampaign(); else render();
-  return ui;
+  if (!opts.deferRender) show();
+  return publicApi;
 }

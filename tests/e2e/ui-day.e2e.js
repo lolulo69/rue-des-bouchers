@@ -27,7 +27,7 @@ async function advance(page, seen) {
       await expect(page.locator('[data-testid=terminal]')).toBeVisible();
       // un projet perso légal s'il y en a, sinon le vrai travail
       const side = page.locator('[data-testid=koddex-option]:enabled:not([data-id=work])').first();
-      const work = page.locator('[data-testid=koddex-option][data-id=work]:enabled');
+      const work = page.locator('[data-testid=koddex-option][data-id=work]:enabled').first();
       await ((await side.count()) ? side : work).click();
       break;
     }
@@ -59,14 +59,41 @@ test('jours 1 à 3 joués dans l’interface : Koddex, après-midi, nuit, bilan,
   await expect(page.locator('.ui-upcoming')).toContainText('Aujourd’hui');
 
   await expect(page.locator('[data-testid=card]')).toBeVisible();
+  // U3 : portrait rendu par art.portrait (image), pas les initiales
+  await expect(page.locator('[data-testid=card] .ui-portrait img').first()).toBeVisible();
   await page.waitForTimeout(400);
   await page.screenshot({ path: 'test-results/ui-card.png', fullPage: true });
   const seen = new Set();
   let checkedMenu = false;
   let checkedPhone = false;
   let reloaded = false;
+  let checkedRecap = false;
+  let sawNotif = false;
+  const dialoguesAt = new Map(); // U4 : au plus une boîte de dialogue par transition
   for (let i = 0; i < 300 && (await day(page)) < 4; i++) {
     const s = await step(page);
+    const d = await day(page);
+    if (await page.locator('[data-testid=phone-notif]').count()) sawNotif = true;
+    if (s === 'cards' && await page.locator('[data-testid=card][data-type=dialogue]').count()) {
+      const key = `${d}:${await page.locator('.ui-phase span.on').textContent()}`;
+      const id = await page.locator('[data-testid=card]').getAttribute('data-id');
+      dialoguesAt.set(key, new Set([...(dialoguesAt.get(key) ?? []), id]));
+      expect(dialoguesAt.get(key).size, `deux boîtes de dialogue en ${key}`).toBe(1);
+    }
+    // U1 : jamais deux fois le même vrai travail proposé
+    if (s === 'koddex' && await page.locator('[data-testid=koddex-option][data-id=work]').count()) {
+      const ids = await page.locator('[data-testid=koddex-option][data-id=work]').evaluateAll((els) => els.map((e) => e.dataset.work));
+      expect(new Set(ids).size).toBe(ids.length);
+    }
+    // U7 : bilan de nuit riche
+    if (s === 'recap' && !checkedRecap) {
+      await expect(page.locator('[data-testid=recap-headline]')).not.toBeEmpty();
+      await expect(page.locator('[data-testid=recap-deltas] .ui-delta')).toHaveCount(5);
+      await expect(page.locator('[data-testid=recap-klaas]')).toBeVisible();
+      await page.waitForTimeout(400);
+      await page.screenshot({ path: 'test-results/ui-recap.png', fullPage: true });
+      checkedRecap = true;
+    }
     // Après-midi : les actions indisponibles sont grisées avec une raison
     if (s === 'actions' && !checkedMenu && !(await page.locator('[data-testid=result-next]').count())) {
       await expect(page.locator('[data-testid=group-legal]')).toBeVisible();
@@ -98,7 +125,8 @@ test('jours 1 à 3 joués dans l’interface : Koddex, après-midi, nuit, bilan,
   }
   expect(await day(page)).toBe(4);
   for (const s of ['cards', 'koddex', 'actions', 'night', 'recap']) expect(seen, `étape ${s} jamais vue`).toContain(s);
-  expect(checkedMenu && checkedPhone && reloaded).toBe(true);
+  expect(checkedMenu && checkedPhone && reloaded && checkedRecap).toBe(true);
+  expect(sawNotif, 'aucune notification du téléphone').toBe(true);
   await page.screenshot({ path: 'test-results/ui-day4.png', fullPage: true });
   expect(errors).toEqual([]);
 });
@@ -114,4 +142,25 @@ test('mobile : la journée tient sur un écran de téléphone', async ({ page })
   const overflow = await page.evaluate(() => document.getElementById('ui-root').scrollWidth - window.innerWidth);
   expect(overflow).toBeLessThanOrEqual(0);
   await page.screenshot({ path: 'test-results/ui-mobile-koddex.png', fullPage: true });
+});
+
+test('dans le jeu : #dayui monte l’interface des journées (mountDayUI)', async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.addInitScript(() => { globalThis.__rdbUiSpeed = 0; });
+  await page.goto('/?nolock=1&seed=5');
+  await page.evaluate(() => localStorage.clear());
+  await page.reload();
+  await page.click('#new-campaign');
+  await expect(page.locator('#dayui [data-testid=intro]')).toBeVisible();
+  await page.click('#dayui [data-testid=intro-skip]');
+  await expect(page.locator('#dayui [data-testid=day-header]')).toHaveAttribute('data-day', '1');
+  await expect(page.locator('#dayui')).toContainText('Jour 1');
+  // T ouvre le téléphone
+  await page.keyboard.press('KeyT');
+  await expect(page.locator('#dayui [data-testid=phone]')).toBeVisible();
+  await page.keyboard.press('KeyT');
+  await expect(page.locator('#dayui [data-testid=card]')).toBeVisible();
+  await page.waitForTimeout(2500);
+  await page.screenshot({ path: 'test-results/ui-game-day1.png' });
+  expect(errors).toEqual([]);
 });

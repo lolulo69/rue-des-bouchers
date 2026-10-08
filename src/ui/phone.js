@@ -1,57 +1,69 @@
-// Le téléphone de Pilou : groupe WhatsApp, presse, réseaux (src/content/media.js via narrative.mediaFeed).
-// Chaque entrée n'apparaît qu'une fois : à la lecture, l'UI la range dans l'historique (meta.feed, sauvegardé)
-// et applique ses effets par le moteur (c.apply). Voir GAME_DESIGN, Build notes « narrative-wiring ».
+// Le téléphone de Pilou : groupe WhatsApp, presse, réseaux.
+// Les messages arrivent par le moteur (c.mediaFeed() → c.readMedia(feed, id) : marque reçu, applique les effets,
+// note { type: 'media', feed, id, day } au journal). L'historique affiché est relu depuis ce journal.
+// meta.opened : ids déjà ouverts dans le téléphone (pastille de non-lus, purement cosmétique).
+// meta.overheard : répliques de dialogue « entendues en passant » (au-delà d'une boîte de dialogue par transition).
 import { h, portrait, nameOf } from './dom.js';
 import { WHATSAPP_GROUP, PLACES } from '../content/characters.js';
-import { mediaFeed } from '../sim/narrative.js';
 
 export const FEEDS = ['whatsapp', 'press', 'social'];
 const TABS = { whatsapp: '💬 ' + WHATSAPP_GROUP, press: '📰 Presse', social: '📣 Réseaux' };
 
-// Relève les nouveaux messages (tous fils) : les ajoute à meta.feed, applique leurs effets. Renvoie le nombre de nouveautés.
-export function pullFeed(c, meta) {
-  meta.mediaSeen ??= [];
-  meta.feed ??= [];
-  const fresh = mediaFeed(c.state, c.state.day, { seen: meta.mediaSeen });
-  let n = 0;
-  for (const channel of FEEDS) {
-    for (const m of fresh[channel] ?? []) {
-      meta.mediaSeen.push(m.id);
-      meta.feed.push({ id: m.id, channel, day: c.state.day, author: m.author, handle: m.handle, text: m.text, headline: m.headline, photo: m.photo, stars: m.stars, kind: m.kind });
-      const effects = { ...(m.effects ?? {}) };
-      if (m.setFlags?.length) effects.setFlags = [...(effects.setFlags ?? []), ...m.setFlags];
-      if (Object.keys(effects).length) c.apply(effects, 'story', m.id);
-      n++;
-    }
-  }
-  if (meta.feed.length > 300) meta.feed.splice(0, meta.feed.length - 300);
-  return n;
+// Relève les nouveaux messages : le moteur les marque reçus et applique leurs effets. → [{ feed, id }]
+export function pullFeed(c) {
+  if (typeof c.mediaFeed !== 'function') return [];
+  const fresh = c.mediaFeed();
+  const got = [];
+  for (const feed of FEEDS) for (const m of fresh[feed] ?? []) if (c.readMedia(feed, m.id)) got.push({ feed, id: m.id });
+  return got;
 }
 
-export const unread = (meta) => (meta.feed ?? []).filter((m) => !m.read).length;
+// Tout ce qui est arrivé dans le téléphone, du plus ancien au plus récent
+export function phoneHistory(c, meta) {
+  const M = c.content.MEDIA ?? {};
+  const items = [];
+  for (const j of c.state.journal) {
+    if (j.type !== 'media') continue;
+    const m = (M[j.feed] ?? []).find((x) => x.id === j.id);
+    if (m) items.push({ ...m, channel: j.feed, day: j.day, phase: j.phase });
+  }
+  for (const o of meta.overheard ?? []) items.push({ ...o, channel: 'whatsapp', overheard: true });
+  return items.sort((a, b) => (a.day ?? 0) - (b.day ?? 0));
+}
+export const unreadItems = (c, meta) => phoneHistory(c, meta).filter((m) => !(meta.opened ?? []).includes(m.id));
 
 function authorName(m) {
   if (m.handle) return m.handle;
   if (PLACES[m.author]) return PLACES[m.author].name;
   if (m.author === 'reviewer') return 'Un client';
-  return nameOf(m.author);
+  return nameOf(m.author ?? m.speaker);
 }
 
-export function phoneView(meta, { tab = 'whatsapp', onTab, onClose }) {
-  const items = (meta.feed ?? []).filter((i) => i.channel === tab).slice(-40).reverse();
-  for (const i of items) i.read = true;
+export function messageNode(m) {
+  const who = m.author ?? m.speaker;
+  const face = m.channel !== 'press' && who && !PLACES[who] && who !== 'reviewer';
+  return h(`div.ui-msg.${m.channel}`, { dataset: { media: m.id } },
+    face ? portrait(who, 'neutral', 'sm') : null,
+    h('div.ui-bubble',
+      h('span.who', authorName(m), m.overheard ? ' · en passant' : '', m.stars ? ` · ${'★'.repeat(m.stars)}${'☆'.repeat(5 - m.stars)}` : ''),
+      m.headline ? h('b', m.headline) : null,
+      h('p', m.text),
+      m.photo ? h('p.ui-photo', `📷 ${m.photo}`) : null,
+      m.day ? h('time', `jour ${m.day}`) : null));
+}
+
+export function phoneView(c, meta, { tab = 'whatsapp', onTab, onClose }) {
+  const all = phoneHistory(c, meta);
+  const unread = new Set(unreadItems(c, meta).map((m) => m.id));
+  const items = all.filter((i) => i.channel === tab).slice(-40).reverse();
+  meta.opened = [...new Set([...(meta.opened ?? []), ...items.map((i) => i.id)])];
+  const count = (f) => all.filter((m) => m.channel === f && unread.has(m.id)).length;
   const feed = h('div.ui-feed', items.length
-    ? items.map((i) => h(`div.ui-msg.${i.channel}`, { dataset: { media: i.id } },
-      i.channel !== 'press' && !PLACES[i.author] && i.author !== 'reviewer' ? portrait(i.author, 'neutral', 'sm') : null,
-      h('div.ui-bubble',
-        h('span.who', authorName(i), i.stars ? ` · ${'★'.repeat(i.stars)}${'☆'.repeat(5 - i.stars)}` : ''),
-        i.headline ? h('b', i.headline) : null,
-        h('p', i.text),
-        i.photo ? h('p', { style: { fontStyle: 'italic', opacity: 0.75 } }, `📷 ${i.photo}`) : null,
-        h('time', `jour ${i.day}`))))
+    ? items.map(messageNode)
     : h('p.ui-empty', tab === 'whatsapp' ? 'Le groupe est calme. Pour une fois.' : tab === 'press' ? 'Rien dans le journal. La rue des Bouchers attend son heure.' : 'Aucune publication. Le bloc prépare sûrement quelque chose.'));
   return h('div.ui-phone', { dataset: { testid: 'phone' } },
-    h('div.ui-phone-tabs', FEEDS.map((t) => h(`button${t === tab ? '.on' : ''}`, { onclick: () => onTab(t), dataset: { tab: t } }, TABS[t]))),
+    h('div.ui-phone-tabs', FEEDS.map((t) => h(`button${t === tab ? '.on' : ''}`, { onclick: () => onTab(t), dataset: { tab: t } },
+      TABS[t], t !== tab && count(t) ? h('span.ui-badge', count(t)) : null))),
     feed,
-    h('button.ui-btn.center', { onclick: onClose, dataset: { testid: 'phone-close' } }, 'Ranger le téléphone'));
+    h('button.ui-btn.center', { onclick: onClose, dataset: { testid: 'phone-close' } }, 'Ranger le téléphone (T)'));
 }
