@@ -5,6 +5,15 @@ When a bug is fixed, remove the `fixme` (the test then guards against regression
 
 ## Open
 
+### BUG-006 · CRITICAL · The production game mounts a second, engine-less day UI (ui.html's standalone) on top of its own
+- **Test**: `tests/e2e/edge.e2e.js` › « BUG-006 · le jeu (index.html) ne monte qu’une seule interface de jour, celle du jeu 3D »
+- **Files**: `vite.config.js` (cf61d8c): the `ui` code-splitting group `/src[\\/]ui[\\/]/` also captures `src/ui/standalone.js`, the entry module of `ui.html`. Its top-level side effect `window.__rdbUi = mount({}, { seed })` is now inside `dist/assets/ui-*.js`, which the game imports (`game.js` › `showDay()`).
+- **Steps**: `npm run build && vite preview`, open `/`, « Campagne (14 jours) » → « Nouvelle campagne ».
+- **Expected**: one day UI (the game's, with `onNight` → the 3D night).
+- **Actual**: two `.ui-layer`s in `#ui-root`; `window.__rdbUi` is defined; the click on « Nouvelle campagne » lands on the standalone instance (drawn on top), so **the player's campaign runs without the 3D night** (the standalone falls back to « Passer la nuit », a simulated passive night). `window.__rdb.ui.campaign` stays `null`, which also breaks every e2e test that drives the campaign through it (full runs, album, campaign-flow). Only in the production build (`vite preview` / deploy); `vite dev` serves modules unbundled.
+- **Owner guess**: build agent (vite.config.js): exclude the entry, e.g. `['ui', /src[\\/]ui[\\/](?!standalone\.js)/]`, or move `standalone.js` out of `src/ui/`. One line.
+
+
 ### BUG-005 · Keyboard navigation is impossible in the day UI (Tab is swallowed)
 - **Test**: `tests/e2e/edge.e2e.js` › « BUG-005 · une journée au clavier seul (Tab / Entrée) : Koddex puis après-midi »
 - **Files**: `src/main.js:369`: the global `keydown` listener does `if (e.code === 'Tab') e.preventDefault();` **before** checking whether a night is running, so it also fires on the title screen and in the whole day UI.

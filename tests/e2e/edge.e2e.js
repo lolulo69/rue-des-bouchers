@@ -122,3 +122,17 @@ test('M coupe et rétablit le son (avec un message à l’écran)', async ({ pag
   await page.keyboard.press('KeyM');
   await expect(page.getByText(/🔊 Son \(M\)/)).toBeVisible();
 });
+
+// BUG-006 (qa/bugs.md) : le build met src/ui/standalone.js (entrée de ui.html) dans le chunk « ui » partagé ;
+// son effet de bord monte une 2e interface de jour, sans 3D, par-dessus celle du jeu sur index.html.
+(process.env.QA_RUN_FIXME ? test : test.fixme)('BUG-006 · le jeu (index.html) ne monte qu’une seule interface de jour, celle du jeu 3D', async ({ page }) => {
+  await page.goto('/?nolock=1&seed=3');
+  await page.evaluate(() => localStorage.clear());
+  await page.reload();
+  await page.click('#campaign');
+  await page.click('[data-testid=title-new]');
+  const r = await page.evaluate(() => ({ layers: document.querySelectorAll('.ui-layer').length, standalone: typeof window.__rdbUi, own: !!window.__rdb.ui?.campaign }));
+  expect(r.standalone, 'la page autonome ui.html ne doit pas tourner dans le jeu').toBe('undefined');
+  expect(r.layers).toBe(1);
+  expect(r.own, 'la campagne créée est celle de l’interface du jeu (nuits en 3D)').toBe(true);
+});
