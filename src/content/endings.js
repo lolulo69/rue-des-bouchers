@@ -718,8 +718,12 @@ export const ENDINGS = [
         text: "La gaine ronronne toujours sous votre fenêtre. Mais à 23h30, maintenant, quelqu’un tape au carreau de la cuisine et dit « Pilou dort ». Elle s’arrête. Pas toujours. Souvent. C’est l’article 4, appliqué à une gaine.",
       },
       {
-        when: { flags: ['cm_regis_nuance'] },
+        when: { flags: ['cm_regis_nuance'], notFlags: ['traitor_known'] },
         text: "Régis s’est proposé comme « médiateur » de la charte. La charte prévoit un interlocuteur unique côté bloc. Elle n’en prévoit aucun côté Régis.",
+      },
+      {
+        when: { flags: ['cm_regis_nuance', 'traitor_known'] },
+        text: "Juste avant de quitter l’association, Régis s’était proposé comme « médiateur » de la charte. Le bloc a décliné. L’association aussi. Pour une fois, tout le monde était d’accord.",
       },
       ...ASSO_FATES,
       ...INSTITUTIONS,
