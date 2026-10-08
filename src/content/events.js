@@ -4,6 +4,7 @@
 //   • aléatoires : pas de `day`, une condition `when` (avec `chance`), `once` par défaut.
 // Chaque choix : { label, requires?, effects?, result }. Un choix sans `requires` est toujours proposé,
 // donc chaque événement fixe a au moins une issue de repli.
+// J14 : `scene` = discours modulaires (cf. d14_commission), affichés avant les choix.
 // Évidences : quality 0–1 (même échelle que la sim), legal: false = inutilisable devant la commission.
 import { WHATSAPP_GROUP } from './characters.js';
 
@@ -300,6 +301,156 @@ export const EVENTS = [
     title: 'J14 · Commission des terrasses, salle du conseil',
     text:
       "Lambris, micro qui grésille, carafe d'eau tiède. Au premier rang, le bloc en tenue du dimanche : Dédé sourit à tout le monde, Ghislain a apporté son classeur, désormais à 600 pages. Colette Verhaeghe s'assoit « en simple citoyenne », au premier rang, à côté du micro. Bertrand Lescaut ouvre la séance : « Je vous entends tous. Je vous écoute, maintenant. » C'est à vous.",
+    // Scène de la commission : le moteur affiche, dans l'ordre, chaque réplique dont `when` correspond
+    // (même principe que les épilogues), puis les choix. Forces et faiblesses du dossier → discours.
+    scene: [
+      // ── Ouverture ──────────────────────────────────────────────────────
+      {
+        speaker: 'lescaut',
+        when: {},
+        text: "« Mesdames, messieurs, la commission examine ce jour le renouvellement de l'autorisation d'occupation temporaire de l'Estaminet La Ch'tite Bernadette. Chacun aura la parole. Brièvement. Monsieur Ghislain, merci de ne pas lire les 600 pages. »",
+      },
+
+      // ── Jérémie, pour l'association : les forces du dossier ────────────
+      {
+        speaker: 'jeremie',
+        when: {},
+        text: "« Monsieur le maire, je préside l'Association de la rue des Bouchers. Nous ne sommes pas contre les terrasses. Nous sommes pour l'arrêté. Celui que vous avez signé. »",
+      },
+      {
+        speaker: 'jeremie',
+        when: { stats: { dossier: '>=70' } },
+        text: "« Notre dossier compte des dizaines de pièces : photos horodatées, relevés en décibels, nombre de personnes par table. Nous ne racontons pas nos nuits. Nous les avons mesurées. »",
+      },
+      {
+        speaker: 'jeremie',
+        when: { stats: { dossier: '>=40' } },
+        text: "« Tables dehors après 22h00, soir après soir. Ce n'est pas une impression : c'est un tableau. Je l'ai imprimé en A3. »",
+      },
+      {
+        speaker: 'jeremie',
+        when: { flags: ['corridor_measured'] },
+        text: "« Le couloir de passage a été mesuré au mètre ruban. Des tables empiètent de plusieurs dizaines de centimètres. C'est par là que passent les poussettes, les fauteuils et les pompiers. »",
+      },
+      {
+        speaker: 'jeremie',
+        when: { flags: ['proj_db_logger'] },
+        text: "« Un enregistreur tourne en continu à la fenêtre d'un riverain. Il ne dort pas, lui. Les courbes sont en annexe 4. »",
+      },
+      {
+        speaker: 'jeremie',
+        when: { flags: ['colette_dinner_photo'] },
+        text: "« Pièce 12 : un dîner de huit personnes à une table de six, le jeudi de la première semaine. » Il ne regarde pas le premier rang. Tout le monde regarde le premier rang.",
+      },
+      {
+        speaker: 'jeremie',
+        when: { flags: ['tatie_emails_shared'] },
+        text: "« Madame Bouchon a reçu sept réponses écrites de l'établissement, toutes identiques sur le fond : « c'est en cours de résolution ». Nous les versons au dossier. Elles parlent d'elles-mêmes. Elles ne parlent que de ça. »",
+      },
+      {
+        speaker: 'jeremie',
+        when: { flags: ['petition_delivered'] },
+        text: "« Et voici la pétition des riverains. » Il pose sur la table un volume relié cuir. Hippolyte, au fond, hoche la tête avec fierté.",
+      },
+      {
+        speaker: 'jeremie',
+        when: { stats: { dossier: '<30' } },
+        text: "« Nous avons… quelques photos. » Il les étale. Deux sont floues. Une montre surtout Biloute. Le silence est long.",
+      },
+
+      // ── Ghislain, pour l'établissement : les faiblesses du dossier ─────
+      {
+        speaker: 'ghislain',
+        when: {},
+        text: "« Monsieur le maire, l'établissement a toujours fait preuve d'une démarche constructive. Toutes les remarques ont été prises en compte et sont en cours de résolution. » Il ouvre son classeur à la page 1. Il y en a 600.",
+      },
+      {
+        speaker: 'ghislain',
+        when: { flags: ['cm_happy_petition'] },
+        text: "« Je verse au dossier une pétition de 412 clients satisfaits, dont plusieurs habitent Tourcoing, et un à Bruges. Leur attachement à la rue est sincère. »",
+      },
+      {
+        speaker: 'ghislain',
+        when: { flags: ['bucket_witnessed'] },
+        text: "« Je rappelle aussi qu'un plaignant a vidé un seau d'eau sur nos clients, devant témoins. Nous parlons de nuisances ? Parlons-en. »",
+      },
+      {
+        speaker: 'ghislain',
+        when: { flags: ['video_viral'] },
+        text: "« La vidéo a été vue plusieurs milliers de fois. Je la tiens à disposition de la commission. » Il ne la montre pas. Il n'a pas besoin.",
+      },
+      {
+        speaker: 'ghislain',
+        when: { flags: ['complaint_filed'] },
+        text: "« Une plainte est en cours contre l'un des riverains ici présents. Je ne la commenterai pas. » Il la commente du regard pendant dix secondes.",
+      },
+      {
+        speaker: 'ghislain',
+        when: { flags: ['serial_caller'] },
+        text: "« La police municipale a reçu un nombre d'appels… disons, remarquable. Au point de ne plus se déplacer. Cela dit quelque chose. Je laisse la commission juger quoi. »",
+      },
+      {
+        speaker: 'ghislain',
+        when: { flags: ['read_quotes'] },
+        text: "« Certaines pièces adverses proviennent manifestement de nos documents internes. Je m'interroge sur leur provenance. Je ne suis pas le seul, je crois. »",
+      },
+      {
+        speaker: 'ghislain',
+        when: { flags: ['traitor_recruited'], notFlags: ['traitor_known'] },
+        text: "« Les riverains eux-mêmes sont divisés. J'ai ici le message d'un membre de l'association qui « comprend les deux côtés ». » Jérémie se fige. Régis regarde le plafond.",
+      },
+      {
+        speaker: 'ghislain',
+        when: { flags: ['fake_reviews_traced'] },
+        text: "« Des faux avis ont été publiés contre nous. Ils ont été retracés. Je n'en dirai pas plus, par délicatesse. » Il en dit plus.",
+      },
+      {
+        speaker: 'ghislain',
+        when: { flags: ['stance_dialogue'] },
+        text: "« Cela dit, nous avons noté la démarche de dialogue de l'association. Nous… y sommes ouverts. » On dirait que la phrase lui coûte un rein.",
+      },
+
+      // ── Delphine Vermeersch, l'inspectrice ─────────────────────────────
+      {
+        speaker: 'delphine',
+        when: { flags: ['ac_violation_confirmed'], notFlags: ['conflict_exposed'] },
+        text: "« Pour le service : groupe de climatisation extérieur, posé en façade sans autorisation, constaté au jour 9. L'infraction est caractérisée. Je n'ai pas d'adjectif à ajouter. Le service du patrimoine en a plusieurs. »",
+      },
+      {
+        speaker: 'delphine',
+        when: { flags: ['ac_case_stalled'], notFlags: ['conflict_exposed'] },
+        text: "« La visite de contrôle était annoncée. Le jour dit, il n'y avait plus de climatisation sur la façade, mais une jardinière. Le dossier reste ouvert. » Elle referme le sien avec un bruit sec.",
+      },
+      {
+        speaker: 'delphine',
+        when: { flags: ['exhaust_meeting_won'] },
+        text: "« Pour mémoire, la réunion technique du jour 11 a acté le déplacement de la gaine d'extraction en toiture. La ville a donc déjà reconnu le problème. »",
+      },
+      {
+        speaker: 'delphine',
+        when: { flags: ['conflict_exposed'] },
+        text: "Delphine Vermeersch n'est pas là. Un collègue lit sa note d'une voix monocorde : « L'inspectrice s'est déportée de ce dossier pour des raisons de déontologie. » Ghislain sourit pour la première fois de l'année.",
+      },
+
+      // ── Colette Verhaeghe, « simple citoyenne » ────────────────────────
+      {
+        speaker: 'colette',
+        when: { notFlags: ['press_scandal'] },
+        text: "Colette Verhaeghe se lève sans qu'on lui donne la parole : « Mes chers amis, la convivialité, c'est l'ADN de Lille. Rue de Gand, on ferme à minuit. Je dis ça, je ne dis rien. » Elle se rassoit. Elle a tout dit.",
+      },
+
+      // ── Le maire, avant la parole de Pilou ─────────────────────────────
+      {
+        speaker: 'lescaut',
+        when: { flags: ['lescaut_ally'] },
+        text: "Bertrand Lescaut vous fait un signe de tête discret. « J'ai lu votre dossier, monsieur Dubeton. Tout votre dossier. Je vous écoute. »",
+      },
+      {
+        speaker: 'lescaut',
+        when: { notFlags: ['lescaut_ally'] },
+        text: "Bertrand Lescaut se tourne vers vous : « Monsieur Dubeton. Vous avez la parole. Trois minutes. Je vous entends. »",
+      },
+    ],
     choices: [
       {
         label: 'Plaider le dossier complet : photos, dB, couloir, PV',
