@@ -280,3 +280,16 @@
 :is(#ui-root, #dayui, #ui-menu) .ui-ending-hero .ui-big { padding: 8px 16px; }
 :is(#ui-root, #dayui, #ui-menu) .ui-ending-hero > .ui-new { background: var(--ui-gold); color: #3a2622; padding: 4px 12px; font-size: 13px; }
 :is(#ui-root, #dayui, #ui-menu) .ui-seg.q3 { grid-template-columns: repeat(3, 1fr); }
+
+/* ── Manette (src/input) ── */
+.ui-pad-keys { display: none; }
+html[data-input=pad] .keys { display: none; }
+html[data-input=pad] .ui-pad-keys { display: grid; gap: 6px; font-size: 14px; }
+.ui-pad-keys kbd { background: #ffffff1a; border: 1px solid #ffffff33; border-radius: 6px; padding: 1px 7px; font-family: inherit; font-weight: 700; }
+/* En mode manette, le focus est toujours visible, même hors de l'interface de jour (overlays de la nuit) */
+html[data-input=pad] :focus { outline: 3px solid #24406b !important; outline-offset: 2px; box-shadow: 0 0 0 7px #f2c45a !important; }
+#ui-pad-hold { position: fixed; left: 50%; bottom: 18%; transform: translateX(-50%); z-index: 70; background: #2a1714e6; color: #fff3e0; border-radius: 14px; padding: 10px 16px; display: grid; gap: 8px; min-width: 260px; text-align: center; font: 700 15px/1.3 system-ui, sans-serif; box-shadow: 0 10px 30px #0008; pointer-events: none; }
+#ui-pad-hold i { display: block; height: 8px; border-radius: 4px; background: #ffffff26; overflow: hidden; }
+#ui-pad-hold b { display: block; height: 100%; width: 0; background: #e5483a; }
+:is(#ui-root, #dayui, #ui-menu) .ui-menu-sub { margin: 6px 0 0; font-size: 15px; color: var(--ui-ink); text-transform: none; letter-spacing: 0; }
+:is(#ui-root, #dayui, #ui-menu) .ui-field em { font-style: normal; color: var(--ui-mute); font-weight: 700; }

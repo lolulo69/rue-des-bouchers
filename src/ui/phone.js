@@ -5,6 +5,7 @@
 // meta.overheard : répliques de dialogue « entendues en passant » (au-delà d'une boîte de dialogue par transition).
 import { h, portrait, nameOf } from './dom.js';
 import { WHATSAPP_GROUP, PLACES } from '../content/characters.js';
+import { keyHint } from '../input/hints.js';
 
 export const FEEDS = ['whatsapp', 'press', 'social'];
 const TABS = { whatsapp: '💬 ' + WHATSAPP_GROUP, press: '📰 Presse', social: '📣 Réseaux' };
@@ -65,5 +66,5 @@ export function phoneView(c, meta, { tab = 'whatsapp', onTab, onClose }) {
     h('div.ui-phone-tabs', FEEDS.map((t) => h(`button${t === tab ? '.on' : ''}`, { onclick: () => onTab(t), dataset: { tab: t } },
       TABS[t], t !== tab && count(t) ? h('span.ui-badge', count(t)) : null))),
     feed,
-    h('button.ui-btn.center', { onclick: onClose, dataset: { testid: 'phone-close' } }, 'Ranger le téléphone (T)'));
+    h('button.ui-btn.center', { onclick: onClose, dataset: { testid: 'phone-close' } }, `Ranger le téléphone (${keyHint('T')})`));
 }

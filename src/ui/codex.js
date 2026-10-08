@@ -3,6 +3,8 @@
 // meta.codexSeen : clés déjà vues (fiche ou mise à jour) → pastille « nouveau » la première fois.
 import { h, portrait } from './dom.js';
 import { CODEX } from '../content/codex.js';
+import { keyHint, padControlsText } from '../input/hints.js';
+import { inputMode } from '../input/index.js';
 
 export const CARNET_TABS = [
   { id: 'characters', label: '👥 Personnes' },
@@ -48,13 +50,15 @@ export function carnetView(c, meta, { tab = 'characters', onTab, onClose }) {
     h('div.ui-codex-head', h('h2', '📓 Le Carnet de Pilou'), h('p', 'Ce que vous savez de la rue, des gens et des règles. Il se remplit au fil des jours.')),
     h('div.ui-phone-tabs', tabs),
     h('div.ui-codex-list', list.length ? list : h('p.ui-empty', 'Rien encore. Ouvrez l’œil.')),
-    h('button.ui-btn.center', { onclick: onClose, dataset: { testid: 'carnet-close' } }, 'Refermer le carnet (C)'));
+    h('button.ui-btn.center', { onclick: onClose, dataset: { testid: 'carnet-close' } }, `Refermer le carnet (${keyHint('C')})`));
 }
 
 export function helpView({ onClose }) {
   return h('div.ui-codex', { dataset: { testid: 'help' } },
     h('div.ui-codex-head', h('h2', '❓ Comment jouer')),
-    h('div.ui-codex-list', (CODEX.help ?? []).map((x) => h('article.ui-codex-card', { dataset: { help: x.id } }, h('h3', x.title), h('p', x.text)))),
+    // En mode manette, la carte des touches montre les boutons de la manette
+    h('div.ui-codex-list', (CODEX.help ?? []).map((x) => h('article.ui-codex-card', { dataset: { help: x.id } }, h('h3', x.title),
+      h('p', x.id === 'h_touches' && inputMode().mode === 'pad' ? padControlsText() : x.text)))),
     h('button.ui-btn.center', { onclick: onClose, dataset: { testid: 'help-close' } }, 'Compris'));
 }
 

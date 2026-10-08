@@ -1,7 +1,9 @@
 // Réglages du joueur : volume, son coupé, vitesse du texte, grand texte. Persistés (localStorage), appliqués partout.
 // Audio : src/audio (agent art). On utilise audio.setVolume(v) / audio.setMuted(b) s'ils existent ; sinon le son
 // coupé passe par la touche M que l'audio écoute déjà, et le volume est mémorisé en attendant l'API.
-import { audio } from '../audio/index.js';
+// Le moteur audio est chargé à la demande (navigateur seulement) : ce module reste importable sous Node (tests).
+let audio = null;
+if (typeof window !== 'undefined') import('../audio/index.js').then((m) => { audio = m.audio; applySettings(); }).catch(() => {});
 
 export const SETTINGS_KEY = 'rdb.settings.v1';
 export const TEXT_SPEEDS = {
@@ -10,12 +12,16 @@ export const TEXT_SPEEDS = {
   fast: { label: 'Rapide', cps: 220 },
   instant: { label: 'Instantanée', cps: 0 },
 };
-export const DEFAULTS = { volume: 0.9, muted: false, textSpeed: 'normal', bigText: false };
+export const DEFAULTS = { volume: 0.9, muted: false, textSpeed: 'normal', bigText: false, padDeadzone: 0.2, padLook: 1 };
+// Copie en mémoire (lue à chaque image par la manette : pas de JSON.parse par frame)
+let cache = null;
+export const currentSettings = () => (cache ??= loadSettings());
 
 export function loadSettings() {
   try { return { ...DEFAULTS, ...(JSON.parse(localStorage.getItem(SETTINGS_KEY)) ?? {}) }; } catch { return { ...DEFAULTS }; }
 }
 export function saveSettings(s) {
+  cache = { ...s };
   try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); } catch { /* stockage indisponible */ }
   applySettings(s);
   return s;
@@ -25,7 +31,7 @@ export const audioCan = () => ({ volume: typeof audio?.setVolume === 'function',
 export function applySettings(s = loadSettings()) {
   // Vitesse du texte : lue par typewrite() (dom.js). Les tests forcent __rdbUiSpeed = 0, qui reste prioritaire.
   globalThis.__rdbUiCps = TEXT_SPEEDS[s.textSpeed]?.cps ?? 90;
-  document.documentElement.classList.toggle('rdb-big-text', !!s.bigText);
+  if (typeof document !== 'undefined') document.documentElement.classList.toggle('rdb-big-text', !!s.bigText);
   if (!audio) return;
   if (typeof audio.setVolume === 'function') audio.setVolume(s.volume);
   if (typeof audio.setMuted === 'function') audio.setMuted(s.muted);

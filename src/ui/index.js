@@ -19,6 +19,8 @@ import { createVignette } from './vignette.js';
 import { carnetView, helpView, aboutView, carnetNews } from './codex.js';
 import { openMenu, isMenuOpen } from './menu.js';
 import { applySettings } from './settings.js';
+import { startPad, onInputMode } from '../input/index.js';
+import { startHints, keyHint } from '../input/hints.js';
 export { openMenu } from './menu.js';
 
 export const SAVE_KEY = 'rdb.save.v1';
@@ -225,7 +227,7 @@ export function mount(engine = {}, opts = {}) {
       h('div.ui-notif-head', h('b', `📱 ${unread.length} nouveau${unread.length > 1 ? 'x' : ''} message${unread.length > 1 ? 's' : ''}`),
         c.state.phase === 'morning' ? h('span', ' · cette nuit sur le groupe') : null),
       c.state.phase === 'morning' && preview.length ? h('div.ui-feed.mini', preview.map(messageNode)) : null,
-      h('button.ui-btn.light', { onclick: () => openPhone(unread.at(-1).channel), dataset: { testid: 'phone-notif-open' } }, 'Lire (T)'));
+      h('button.ui-btn.light', { onclick: () => openPhone(unread.at(-1).channel), dataset: { testid: 'phone-notif-open' } }, `Lire (${keyHint('T')})`));
   }
 
   // ── écran titre (page autonome) ────────────────────────────────────
@@ -285,12 +287,12 @@ export function mount(engine = {}, opts = {}) {
         h('h1.ui-day', `Jour ${S.day}/14`, h('small', `${WEEKDAYS[c.weekday()]}${c.isSaturday() ? ' · sans voitures' : ''}`)),
         h('div.ui-row',
           h('div.ui-phase', ['morning', 'afternoon', 'night'].map((p) => h(`span${p === S.phase ? '.on' : ''}`, PHASE_LABELS[p]))),
-          h('button.ui-btn.ghost.ui-icon', { onclick: () => (phone.open ? closePhone() : openPhone()), dataset: { testid: 'phone-open', unread }, 'aria-label': 'Téléphone (T)', title: 'Téléphone (T)' },
+          h('button.ui-btn.ghost.ui-icon', { onclick: () => (phone.open ? closePhone() : openPhone()), dataset: { testid: 'phone-open', unread }, 'aria-label': `Téléphone (${keyHint('T')})`, title: `Téléphone (${keyHint('T')})` },
             '📱', unread ? h('span.ui-badge', unread) : null),
-          h('button.ui-btn.ghost.ui-icon', { onclick: () => (panel === 'carnet' ? closePanel() : openPanel('carnet')), dataset: { testid: 'carnet-open' }, 'aria-label': 'Carnet (C)', title: 'Carnet (C)' },
+          h('button.ui-btn.ghost.ui-icon', { onclick: () => (panel === 'carnet' ? closePanel() : openPanel('carnet')), dataset: { testid: 'carnet-open' }, 'aria-label': `Carnet (${keyHint('C')})`, title: `Carnet (${keyHint('C')})` },
             '📓', carnetNews(c, meta) ? h('span.ui-badge', carnetNews(c, meta)) : null),
           h('button.ui-btn.ghost.ui-icon', { onclick: () => (panel === 'help' ? closePanel() : openPanel('help')), dataset: { testid: 'help-open' }, 'aria-label': 'Comment jouer', title: 'Comment jouer' }, '❓'),
-          h('button.ui-btn.ghost.ui-icon', { onclick: () => showMenu(), dataset: { testid: 'menu-open' }, 'aria-label': 'Menu et réglages (Échap)', title: 'Menu (Échap)' }, '☰'))),
+          h('button.ui-btn.ghost.ui-icon', { onclick: () => showMenu(), dataset: { testid: 'menu-open' }, 'aria-label': `Menu et réglages (${keyHint('Échap')})`, title: `Menu (${keyHint('Échap')})` }, '☰'))),
       h('div.ui-cal', Array.from({ length: 14 }, (_, k) => h(`i${k + 1 < S.day ? '.done' : ''}${k + 1 === S.day ? '.now' : ''}${evDays.has(k + 1) ? '.ev' : ''}`, { title: `Jour ${k + 1}` }))),
       up ? h('div.ui-upcoming', up.day === S.day ? 'Aujourd’hui : ' : `Jour ${up.day} (${WEEKDAYS_SHORT[c.weekday(up.day)]}) : `, h('b', up.title)) : null,
       h('div.ui-stats', stats));
@@ -646,6 +648,10 @@ export function mount(engine = {}, opts = {}) {
     });
   }
   applySettings();
+  // Manette : navigation au focus (src/input) et glyphes ; on redessine quand l'entrée change (clavier ↔ manette)
+  startPad();
+  startHints();
+  const offMode = onInputMode(() => { if (visible) render(); });
   const onResize = () => vignette.resize();
   window.addEventListener('resize', onResize);
 
@@ -653,6 +659,7 @@ export function mount(engine = {}, opts = {}) {
   function hide() { visible = false; vignette.pause(); root.classList.add('ui-hidden'); }
   function show() { visible = true; root.classList.remove('ui-hidden', 'hidden'); vignette.resume(); render(); }
   function destroy() {
+    offMode();
     window.removeEventListener('keydown', onKey);
     window.removeEventListener('resize', onResize);
     vignette.dispose();
