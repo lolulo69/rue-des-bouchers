@@ -176,4 +176,9 @@ export const FLAGS = {
   bombance_bar_project: 'Projet de bar à La Bombance déposé',
   bombance_blocked: 'Projet de bar à La Bombance bloqué',
   random_drache: 'Une drache a vidé les terrasses',
+
+  // ── content-actions (actions.js) ────────────────────────────────────────
+  asso_meeting: "Pilou a réuni l'association un après-midi",
+  kitchen_sabotaged: "Cuisine de l'estaminet sabotée (sel et sucre inversés)",
+  kitchen_sabotage_caught: 'Pilou identifié pour le sabotage de la cuisine',
 };
