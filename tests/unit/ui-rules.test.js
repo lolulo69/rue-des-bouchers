@@ -8,7 +8,7 @@ import * as KODDEX from '../../src/content/koddex.js';
 import * as ENDINGS from '../../src/content/endings.js';
 import * as COUNTERMOVES from '../../src/content/countermoves.js';
 import * as DIALOGUE from '../../src/content/dialogue.js';
-import { explain, afternoonMenu, upcomingEvent, pickHeadline } from '../../src/ui/rules.js';
+import { explain, afternoonMenu, upcomingEvent } from '../../src/ui/rules.js';
 
 const content = normalizeContent([FLAGS, CHARACTERS, ACTIONS, EVENTS, KODDEX, ENDINGS, COUNTERMOVES, DIALOGUE]);
 
@@ -29,9 +29,7 @@ describe('ui/rules : lecture humaine de l’état', () => {
     for (const m of menu) if (!m.available) expect(m.why.length).toBeGreaterThan(0);
   });
 
-  it('prochain événement fixe et manchette par priorité', () => {
+  it('prochain événement fixe', () => {
     expect(upcomingEvent(c)?.day).toBe(1);
-    const h = pickHeadline([{ id: 'a', priority: 1, when: {} }, { id: 'b', priority: 9, when: { pieces: '>=2' } }], { pieces: 3 });
-    expect(h.id).toBe('b');
   });
 });

@@ -1,9 +1,10 @@
 // Petits utilitaires DOM de l'interface jour. Aucune dépendance, aucun état global.
 import { CHARACTERS } from '../content/characters.js';
 
-// art.portrait(id, expression) : cherché dans src/art/* (agent art). Surcharge possible : setPortraitProvider(fn).
-const ART_MODULES = import.meta.glob('../art/*.js', { eager: true });
-let portraitFn = Object.values(ART_MODULES).map((m) => m.portrait).find((f) => typeof f === 'function') ?? null;
+// art.portrait(id, expression) → dataURL (src/art/portraits.js, agent art). Import explicite : ne jamais glober src/art/*
+// (gallery.js touche au DOM dès son import). Surcharge possible : setPortraitProvider(fn).
+import { portrait as artPortrait } from '../art/portraits.js';
+let portraitFn = artPortrait;
 export const setPortraitProvider = (fn) => { portraitFn = typeof fn === 'function' ? fn : portraitFn; };
 
 // h('div.ui-card#x', { onclick, disabled, dataset: {...} }, ...enfants) → HTMLElement

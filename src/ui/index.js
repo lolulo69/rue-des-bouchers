@@ -10,14 +10,16 @@
 // Sauvegarde : localStorage 'rdb.save.v1' après chaque appel au moteur (README de src/sim).
 import './ui.css';
 import { createCampaign as defaultCreate, contentFromGlob, POLICIES, playNight } from '../sim/index.js';
-import { INTRO_CARDS, TUTORIAL } from '../content/intro.js';
-import { RECAP_HEADLINES, NIGHT_END } from '../content/night.js';
+import { NIGHT_END } from '../content/night.js';
+import { introCards, tutorialPrompt, recapHeadline, mediaEnding } from '../sim/narrative.js';
 import { h, clear, portrait, nameOf, typewrite, effectChips, STAT_LABELS, setPortraitProvider } from './dom.js';
 import {
   WEEKDAYS, WEEKDAYS_SHORT, PHASE_LABELS, LEGALITY, explain, afternoonMenu, upcomingEvent, eventDays,
-  witnessName, recapVars, pickHeadline,
+  witnessName,
 } from './rules.js';
-import { phoneView } from './phone.js';
+import { phoneView, pullFeed, unread } from './phone.js';
+
+const INTRO_CARDS = introCards() ?? [];
 
 export const SAVE_KEY = 'rdb.save.v1';
 export const UI_KEY = 'rdb.ui.v1';           // historique du téléphone, tutoriel vu, intro vue
@@ -45,7 +47,7 @@ export function mount(engine = {}, opts = {}) {
   let phone = { open: false, tab: 'whatsapp' };
   let typing = null;
 
-  function freshMeta() { return { seed: 0, history: [], tuto: [], introDone: false, koddexDay: 0 }; }
+  function freshMeta() { return { seed: 0, tuto: [], introDone: false, feed: [], mediaSeen: [], pulledAt: '' }; }
   const save = () => { if (!c) return; store.set(SAVE_KEY, c.save()); store.set(UI_KEY, meta); };
   const statsSnap = () => ({ ...c.state.stats });
   const deltas = (before) => Object.fromEntries(Object.keys(STAT_LABELS).map((k) => [k, Math.round(c.state.stats[k] - before[k])]));
@@ -78,11 +80,10 @@ export function mount(engine = {}, opts = {}) {
     if (c.state.ending?.id) found.add(c.state.ending.id);
     store.set(ENDINGS_KEY, [...found]);
   }
-  const pushHistory = (e) => { meta.history.push({ day: c.state.day, ...e }); if (meta.history.length > 200) meta.history.shift(); };
 
   // ── tutoriel (déclencheurs côté jour) ──────────────────────────────
   function tutorial(trigger) {
-    const t = (TUTORIAL ?? []).find((x) => x.trigger === trigger && !meta.tuto.includes(x.id) && (!x.when || c.check(x.when, false)));
+    const t = tutorialPrompt(trigger, { ...c.state, seenTutorial: meta.tuto });
     if (!t) return null;
     meta.tuto.push(t.id);
     store.set(UI_KEY, meta);
@@ -95,10 +96,13 @@ export function mount(engine = {}, opts = {}) {
     clear(root);
     root.dataset.step = c ? c.step : 'title';
     if (!c) return root.append(titleScreen());
-    if (!meta.introDone && INTRO_CARDS?.length) return root.append(introScreen());
+    if (!meta.introDone && INTRO_CARDS.length) return root.append(introScreen());
+    // Nouveaux messages du téléphone, relevés une fois par phase (effets appliqués par le moteur)
+    const at = `${c.state.day}:${c.state.phase}`;
+    if (c.step !== 'ended' && meta.pulledAt !== at) { meta.pulledAt = at; pullFeed(c, meta); save(); }
     const wrap = h('div.ui-wrap');
     if (c.step !== 'ended') wrap.append(header());
-    if (phone.open) wrap.append(phoneView(c, meta.history, {
+    if (phone.open) wrap.append(phoneView(meta, {
       tab: phone.tab, onTab: (t) => { phone.tab = t; render(); }, onClose: () => { phone.open = false; render(); },
     }));
     else wrap.append(...[].concat(screen()).filter(Boolean));
@@ -171,7 +175,7 @@ export function mount(engine = {}, opts = {}) {
         h('h1.ui-day', `Jour ${S.day}/14`, h('small', `${WEEKDAYS[c.weekday()]}${c.isSaturday() ? ' · sans voitures' : ''}`)),
         h('div.ui-row',
           h('div.ui-phase', phases.map((p) => h(`span${p === S.phase ? '.on' : ''}`, PHASE_LABELS[p]))),
-          h('button.ui-btn.ghost', { onclick: () => { phone.open = !phone.open; render(); }, dataset: { testid: 'phone-open' }, 'aria-label': 'Téléphone' }, '📱'))),
+          h('button.ui-btn.ghost', { onclick: () => { phone.open = !phone.open; render(); }, dataset: { testid: 'phone-open', unread: unread(meta) }, 'aria-label': 'Téléphone' }, '📱', unread(meta) ? h('span.ui-badge', unread(meta)) : null))),
       h('div.ui-cal', Array.from({ length: 14 }, (_, k) => h(`i${k + 1 < S.day ? '.done' : ''}${k + 1 === S.day ? '.now' : ''}${evDays.has(k + 1) ? '.ev' : ''}`, { title: `Jour ${k + 1}` }))),
       up ? h('div.ui-upcoming', up.day === S.day ? 'Aujourd’hui : ' : `Jour ${up.day} (${WEEKDAYS_SHORT[c.weekday(up.day)]}) : `, h('b', up.title)) : null,
       h('div.ui-stats', stats));
@@ -208,8 +212,6 @@ export function mount(engine = {}, opts = {}) {
     const before = statsSnap();
     const d = card.data ?? card;
     const result = c.resolveCard(i);
-    const text = card.type === 'dialogue' ? (d.lines ?? []).join(' ') : d.text;
-    if (card.type !== 'info') pushHistory({ type: card.type, id: card.id, speaker: d.speaker, title: d.title, text: result ? `${text ?? ''} ${result}`.trim() : text });
     save();
     if (c.step === 'ended') recordEnding();
     const dl = deltas(before);
@@ -345,7 +347,6 @@ export function mount(engine = {}, opts = {}) {
     const { result, seen } = c.doAction(a.id);
     save();
     if (c.step === 'ended') recordEnding();
-    pushHistory({ type: 'action', id: a.id, speaker: 'pilou', title: a.label, text: result ?? '', channel: null });
     const seenNode = seen?.length
       ? h('p', { dataset: { testid: 'seen' } }, '👁 Vu par : ', seen.map((s) => `${witnessName(s.id)}${s.ally ? ' (allié)' : ''}`).join(', '))
       : (a.legality !== 'legal' ? h('p', '👁 Personne ne semble avoir rien vu.') : null);
@@ -384,7 +385,7 @@ export function mount(engine = {}, opts = {}) {
     const S = c.state;
     const sum = S.lastNight ?? {};
     const night = S.nights.at(-1) ?? {};
-    const head = pickHeadline(RECAP_HEADLINES, recapVars(sum, c));
+    const head = recapHeadline(sum);
     const endLines = NIGHT_END?.[sum.reason ?? 'time'] ?? [];
     const mood = endLines.length ? endLines[S.day % endLines.length] : null;
     const last = S.day >= 14;
@@ -412,9 +413,12 @@ export function mount(engine = {}, opts = {}) {
     const buttons = h('div.ui-col');
     if (e.canContinue) buttons.append(h('button.ui-btn.center', { dataset: { testid: 'end-continue' }, onclick: () => { c.continueAfterEnding(); save(); view = {}; render(); } }, e.continueLabel ?? 'Continuer'));
     buttons.append(h('button.ui-btn.center' + (e.canContinue ? '.light' : ''), { dataset: { testid: 'end-new' }, onclick: () => { store.del(SAVE_KEY); c = null; render(); } }, 'Nouvelle campagne'));
+    const front = e.id ? mediaEnding(e.id, S) : null;
     return h('div.ui-card', { dataset: { testid: 'ending', id: e.id } },
       h('span.ui-kicker', e.early ? `Fin anticipée · jour ${e.day}` : 'Commission du jour 14'),
       h('p.ui-big', e.title ?? 'Fin'),
+      front ? h('div.ui-result', { style: { fontFamily: 'Georgia, serif', fontStyle: 'normal' } },
+        h('span.ui-kicker', 'La Voix du Nordiste'), front.headline ? h('h2', front.headline) : null, h('p', front.text)) : null,
       h('div.ui-epilogue', (S.epilogue ?? []).map((t) => h('p', t))),
       h('h3', 'Fins découvertes'),
       endingsGrid(found, e.id),

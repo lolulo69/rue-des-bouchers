@@ -1,58 +1,57 @@
-// Le téléphone de Pilou : groupe WhatsApp, presse, réseaux.
-// Source : src/content/media.js (MEDIA) s'il existe, sinon l'historique des cartes vues pendant la campagne.
-// MEDIA attendu : [{ id, channel: 'whatsapp'|'press'|'social', speaker?, author?, when?, text, title? }]
+// Le téléphone de Pilou : groupe WhatsApp, presse, réseaux (src/content/media.js via narrative.mediaFeed).
+// Chaque entrée n'apparaît qu'une fois : à la lecture, l'UI la range dans l'historique (meta.feed, sauvegardé)
+// et applique ses effets par le moteur (c.apply). Voir GAME_DESIGN, Build notes « narrative-wiring ».
 import { h, portrait, nameOf } from './dom.js';
-import { WHATSAPP_GROUP } from '../content/characters.js';
+import { WHATSAPP_GROUP, PLACES } from '../content/characters.js';
+import { mediaFeed } from '../sim/narrative.js';
 
-const MEDIA_MODULES = import.meta.glob('../content/media.js', { eager: true });
-const RAW_MEDIA = Object.values(MEDIA_MODULES)[0]?.MEDIA ?? [];
-// media.js exporte { whatsapp: [...], press: [...], social: [...] } (§14) : on aplatit en entrées avec `channel`.
-// Les entrées `ending` ne s'affichent que sur l'écran de fin.
-const MEDIA = Array.isArray(RAW_MEDIA) ? RAW_MEDIA : Object.entries(RAW_MEDIA)
-  .flatMap(([channel, list]) => list.filter((m) => !m.ending).map((m) => ({ ...m, channel, title: m.title ?? m.headline })));
+export const FEEDS = ['whatsapp', 'press', 'social'];
+const TABS = { whatsapp: '💬 ' + WHATSAPP_GROUP, press: '📰 Presse', social: '📣 Réseaux' };
 
-const TABS = [
-  { id: 'whatsapp', label: '💬 ' + WHATSAPP_GROUP },
-  { id: 'press', label: '📰 Presse' },
-  { id: 'social', label: '📣 Réseaux' },
-];
-
-// Classe une carte vue dans un canal du téléphone (repli sans media.js)
-export function channelOfCard(card) {
-  const who = card.speaker;
-  if (card.type === 'countermove' && /post|réseaux|partages|en ligne/i.test(card.text)) return 'social';
-  if (/Voix du Nordiste|article|journal|manchette/i.test(card.text) || who === 'journaliste') return 'press';
-  if (['seb', 'nico', 'jeremie', 'klaas', 'hilde', 'tatie', 'hippolyte', 'regis'].includes(who)) return 'whatsapp';
-  if (card.type === 'countermove') return 'social';
-  return null;
+// Relève les nouveaux messages (tous fils) : les ajoute à meta.feed, applique leurs effets. Renvoie le nombre de nouveautés.
+export function pullFeed(c, meta) {
+  meta.mediaSeen ??= [];
+  meta.feed ??= [];
+  const fresh = mediaFeed(c.state, c.state.day, { seen: meta.mediaSeen });
+  let n = 0;
+  for (const channel of FEEDS) {
+    for (const m of fresh[channel] ?? []) {
+      meta.mediaSeen.push(m.id);
+      meta.feed.push({ id: m.id, channel, day: c.state.day, author: m.author, handle: m.handle, text: m.text, headline: m.headline, photo: m.photo, stars: m.stars, kind: m.kind });
+      const effects = { ...(m.effects ?? {}) };
+      if (m.setFlags?.length) effects.setFlags = [...(effects.setFlags ?? []), ...m.setFlags];
+      if (Object.keys(effects).length) c.apply(effects, 'story', m.id);
+      n++;
+    }
+  }
+  if (meta.feed.length > 300) meta.feed.splice(0, meta.feed.length - 300);
+  return n;
 }
 
-export function feedItems(c, history) {
-  const items = [];
-  for (const m of MEDIA) {
-    if (m.when && !c.check(m.when, false)) continue;
-    items.push({ channel: m.channel, speaker: m.speaker, author: m.author, title: m.title, text: m.text, day: m.when?.day?.[0] });
-  }
-  for (const e of history) {
-    const ch = e.channel ?? channelOfCard(e);
-    if (ch) items.push({ ...e, channel: ch });
-  }
-  return items;
+export const unread = (meta) => (meta.feed ?? []).filter((m) => !m.read).length;
+
+function authorName(m) {
+  if (m.handle) return m.handle;
+  if (PLACES[m.author]) return PLACES[m.author].name;
+  if (m.author === 'reviewer') return 'Un client';
+  return nameOf(m.author);
 }
 
-export function phoneView(c, history, { tab = 'whatsapp', onTab, onClose }) {
-  const items = feedItems(c, history).filter((i) => i.channel === tab).slice(-40).reverse();
+export function phoneView(meta, { tab = 'whatsapp', onTab, onClose }) {
+  const items = (meta.feed ?? []).filter((i) => i.channel === tab).slice(-40).reverse();
+  for (const i of items) i.read = true;
   const feed = h('div.ui-feed', items.length
-    ? items.map((i) => h(`div.ui-msg.${i.channel}`,
-      i.speaker ? portrait(i.speaker, 'neutral', 'sm') : null,
+    ? items.map((i) => h(`div.ui-msg.${i.channel}`, { dataset: { media: i.id } },
+      i.channel !== 'press' && !PLACES[i.author] && i.author !== 'reviewer' ? portrait(i.author, 'neutral', 'sm') : null,
       h('div.ui-bubble',
-        h('span.who', i.author ?? (i.speaker ? nameOf(i.speaker) : i.title ?? '')),
-        i.title && i.speaker ? h('b', i.title) : null,
+        h('span.who', authorName(i), i.stars ? ` · ${'★'.repeat(i.stars)}${'☆'.repeat(5 - i.stars)}` : ''),
+        i.headline ? h('b', i.headline) : null,
         h('p', i.text),
-        i.day ? h('time', `jour ${i.day}`) : null)))
+        i.photo ? h('p', { style: { fontStyle: 'italic', opacity: 0.75 } }, `📷 ${i.photo}`) : null,
+        h('time', `jour ${i.day}`))))
     : h('p.ui-empty', tab === 'whatsapp' ? 'Le groupe est calme. Pour une fois.' : tab === 'press' ? 'Rien dans le journal. La rue des Bouchers attend son heure.' : 'Aucune publication. Le bloc prépare sûrement quelque chose.'));
   return h('div.ui-phone', { dataset: { testid: 'phone' } },
-    h('div.ui-phone-tabs', TABS.map((t) => h(`button${t.id === tab ? '.on' : ''}`, { onclick: () => onTab(t.id), dataset: { tab: t.id } }, t.label))),
+    h('div.ui-phone-tabs', FEEDS.map((t) => h(`button${t === tab ? '.on' : ''}`, { onclick: () => onTab(t), dataset: { tab: t } }, TABS[t]))),
     feed,
     h('button.ui-btn.center', { onclick: onClose, dataset: { testid: 'phone-close' } }, 'Ranger le téléphone'));
 }

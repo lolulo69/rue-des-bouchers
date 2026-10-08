@@ -76,34 +76,3 @@ export function upcomingEvent(c) {
   return fixed.find((e) => e.day > c.state.day || (e.day === c.state.day && !c.state.seen.events.includes(e.id))) ?? null;
 }
 export const eventDays = (c) => new Set(c.content.EVENTS.filter((e) => typeof e.day === 'number').map((e) => e.day));
-
-// Manchette du bilan de nuit (night.js RECAP_HEADLINES) : variables tirées du résumé.
-export function recapVars(summary, c) {
-  const outs = (summary.police ?? []).map((p) => p.outcome ?? '');
-  return {
-    reason: summary.reason,
-    scandal: (summary.verdict ?? []).some((v) => /commissaire/i.test(v)),
-    tipoffs: outs.filter((o) => /tuyau/.test(o)).length,
-    complaisance: outs.filter((o) => /café offert/.test(o)).length,
-    acts: outs.filter((o) => o === 'PV').length,
-    ignored: outs.filter((o) => /encore vous/.test(o)).length,
-    bucket: summary.bucketUses ?? 0,
-    witnesses: (summary.witnesses ?? []).length,
-    saturday: c.isSaturday(),
-    pees: 0,
-    allOnTime: (summary.restaurants ?? []).every((r) => r.onTime === r.total),
-    ratio: summary.dossier ? summary.dossier.score / summary.dossier.target : 0,
-    blocKnows: (summary.verdict ?? []).some((v) => /bloc sait/i.test(v)),
-    pieces: summary.dossier?.pieces ?? 0,
-  };
-}
-export function pickHeadline(list = [], vars) {
-  const ok = list.filter((h) => Object.entries(h.when ?? {}).every(([k, want]) => {
-    const v = vars[k];
-    if (typeof want === 'boolean' || typeof want === 'string' && !/^[<>=!]/.test(want)) return v === want;
-    if (typeof want === 'number') return v === want;
-    const { op, value } = parseComparison(want);
-    return { '>=': v >= value, '<=': v <= value, '>': v > value, '<': v < value, '==': v === value, '=': v === value, '!=': v !== value }[op];
-  }));
-  return ok.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))[0] ?? null;
-}
