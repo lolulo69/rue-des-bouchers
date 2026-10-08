@@ -51,7 +51,7 @@ describe('typographie du contenu', () => {
 // pas les sélecteurs, le CSS, les shaders ni les identifiants.
 const ROOT = join(import.meta.dirname, '..', '..');
 const CODE_FILES = [
-  'src/ui/index.js', 'src/ui/rules.js', 'src/ui/phone.js', 'src/main.js', 'src/config.js',
+  'src/ui/index.js', 'src/ui/rules.js', 'src/ui/phone.js', 'src/ui/codex.js', 'src/ui/vignette.js', 'src/main.js', 'src/config.js',
   'src/sim/sim.js', 'src/sim/summary.js', 'src/sim/police.js', 'src/sim/campaign.js', 'src/sim/nightActions.js', 'src/sim/narrative.js',
 ];
 const CODEY = /void main|gl_|precision |px\b|rgba?\(|var\(--|!important|=>|querySelector|^[#.[][\w-]|^[\w.:/#[\]=-]+$/;

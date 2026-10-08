@@ -17,11 +17,11 @@ function buildReport(err) {
   const e = err instanceof Error ? err : new Error(String(err?.message ?? err));
   return [
     'Rue des Bouchers · rapport d’erreur',
-    `Date : ${new Date().toISOString()}`,
-    `Version : ${typeof __BUILD__ !== 'undefined' ? __BUILD__ : 'dev'}`,
-    `Page : ${location.href}`,
-    `Navigateur : ${navigator.userAgent}`,
-    `Sauvegarde : ${saveSummary()}`,
+    `Date : ${new Date().toISOString()}`,
+    `Version : ${typeof __BUILD__ !== 'undefined' ? __BUILD__ : 'dev'}`,
+    `Page : ${location.href}`,
+    `Navigateur : ${navigator.userAgent}`,
+    `Sauvegarde : ${saveSummary()}`,
     '',
     `${e.name}: ${e.message}`,
     e.stack ?? '(pas de pile)',
@@ -47,7 +47,7 @@ function showFatal(err) {
   const box = $('fatal');
   $('fatal-detail').textContent = String(err?.message ?? err).slice(0, 300);
   $('fatal-reload').onclick = () => location.reload();
-  $('fatal-copy').onclick = async () => { $('fatal-copy').textContent = (await copy(report)) ? 'Rapport copié ✓' : 'Copie impossible : voir la console'; };
+  $('fatal-copy').onclick = async () => { $('fatal-copy').textContent = (await copy(report)) ? 'Rapport copié ✓' : 'Copie impossible : voir la console'; };
   box.classList.remove('hidden');
 }
 addEventListener('error', (e) => {
@@ -77,6 +77,6 @@ const CHUNKS = [
 ];
 progress(0.05, 'Chargement…');
 let done = 0;
-await Promise.all(CHUNKS.map(([label, load]) => load().then(() => { done++; progress(0.05 + 0.7 * (done / CHUNKS.length), `Chargement : ${label}…`); })));
+await Promise.all(CHUNKS.map(([label, load]) => load().then(() => { done++; progress(0.05 + 0.7 * (done / CHUNKS.length), `Chargement : ${label}…`); })));
 progress(0.8, 'Construction de la rue…');
 await import('./game.js');
