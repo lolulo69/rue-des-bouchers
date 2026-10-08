@@ -154,7 +154,7 @@ export function buildWorld(scene, opts = {}) {
     mug: { side: 1, at: place(1, -20, 4.6), color: 0xd9a441, sign: 'Mug', lit: true },
     bombance: { side: -1, at: place(-1, -12.5, 7), color: 0x6e3b3b, sign: 'La Bombance', closed: true },
     bloemkool: { side: -1, at: place(-1, 29, 6), color: 0x5f7f5a, sign: 'Bloemkool', lit: true },
-    endroit: { side: -1, at: place(-1, 38.5, 5.5), color: 0x3c3c48, sign: "L'Endroit", lit: true },
+    endroit: { side: -1, at: place(-1, 38.5, 5.5), color: 0x3c3c48, sign: "L’Endroit", lit: true },
   };
 
   const lots = { [-1]: [], [1]: [] };
@@ -253,7 +253,7 @@ export function buildWorld(scene, opts = {}) {
   anchors.jeremieWindow = new THREE.Vector3(-(W - 0.1), winY(2), bz);
 
   // La Ch'tite Bernadette : devanture rouge, store court et très incliné (Pilou doit voir les tables)
-  const bern3 = kit.shopfront(-1, P0, bz + 4.9, 0x8a2b2b, { glass: mats.shopLit, doorAt: 0.1, sign: "Estaminet La Ch'tite Bernadette", signColor: '#5a1414' });
+  const bern3 = kit.shopfront(-1, P0, bz + 4.9, 0x8a2b2b, { glass: mats.shopLit, doorAt: 0.1, sign: "Estaminet La Ch’tite Bernadette", signColor: '#5a1414' });
   anchors.bernadetteDoor = new THREE.Vector3(-(W - 0.4), 0, bern3.door);
   const bs = REST_STYLE.bernadette;
   kit.awning(-1, bern3.bays[1] - 1.1, bz + 4.7, { proj: bs.proj, tilt: bs.tilt, y: 2.7, a: bs.awning[0], b: bs.awning[1] });

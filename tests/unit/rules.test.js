@@ -31,11 +31,11 @@ describe('22:00 : fermeture des terrasses', () => {
     sim.drainEvents();
     const goulot = sim.state.tables.filter((t) => t.restId === 'goulot');
     sim.clearTable(goulot[0], 'resto');
-    expect(sim.drainEvents().map((e) => e.text).filter(Boolean)).toEqual(['Raclement de chaises sur les pavés : Le Goulot rentre une table.']);
+    expect(sim.drainEvents().map((e) => e.text).filter(Boolean)).toEqual(['Raclement de chaises sur les pavés : Le Goulot rentre une table.']);
     goulot.slice(1, -1).forEach((t) => sim.clearTable(t, 'resto'));
     expect(sim.drainEvents().some((e) => e.text?.includes('sa terrasse'))).toBe(false);
     sim.clearTable(goulot.at(-1), 'resto');
-    expect(sim.drainEvents().map((e) => e.text).filter(Boolean)).toEqual(['Raclement de chaises sur les pavés : Le Goulot rentre sa terrasse.']);
+    expect(sim.drainEvents().map((e) => e.text).filter(Boolean)).toEqual(['Raclement de chaises sur les pavés : Le Goulot rentre sa terrasse.']);
   });
 
   it('chaque resto annonce "sa terrasse" une seule fois, quand tout est rentré', () => {

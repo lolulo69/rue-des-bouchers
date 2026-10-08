@@ -36,19 +36,19 @@ export function explain(cond, c) {
   if (cond.day) {
     const [lo, hi] = Array.isArray(cond.day) ? cond.day : [cond.day, cond.day];
     if (S.day < lo) why.push(`À partir du jour ${lo}`);
-    else if (S.day > hi) why.push(`Trop tard (jusqu'au jour ${hi})`);
+    else if (S.day > hi) why.push(`Trop tard (jusqu’au jour ${hi})`);
   }
   for (const f of cond.flags ?? []) {
     if (c.has(f)) continue;
-    why.push(isSpoiler(f) || !FLAGS[f] ? 'Il vous manque encore quelque chose' : `D'abord : ${lowerFirst(FLAGS[f])}`);
+    why.push(isSpoiler(f) || !FLAGS[f] ? 'Il vous manque encore quelque chose' : `D’abord : ${lowerFirst(FLAGS[f])}`);
   }
   if ((cond.notFlags ?? []).some((f) => c.has(f))) why.push('Plus possible, ou déjà fait');
   for (const [k, e] of Object.entries(cond.stats ?? {})) {
     const { op, value } = parseComparison(e);
     const v = Math.round(S.stats[k] ?? 0);
-    if (!c.check({ stats: { [k]: e } }, false)) why.push(`${STAT_NAMES[k] ?? k} ${OP_WORDS[op]} ${value} (vous : ${v})`);
+    if (!c.check({ stats: { [k]: e } }, false)) why.push(`${STAT_NAMES[k] ?? k} ${OP_WORDS[op]} ${value} (vous : ${v})`);
   }
-  if (cond.hidden && !c.check({ hidden: cond.hidden }, false)) why.push("Le moment n'est pas venu");
+  if (cond.hidden && !c.check({ hidden: cond.hidden }, false)) why.push("Le moment n’est pas venu");
   return [...new Set(why)];
 }
 const lowerFirst = (s) => s.charAt(0).toLowerCase() + s.slice(1);

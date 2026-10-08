@@ -44,7 +44,7 @@ function bgTex(group) {
 function character(id) {
   if (!R.chars.has(id)) {
     const make = CAST[id];
-    if (!make) throw new Error(`art.portrait : personnage inconnu « ${id} »`);
+    if (!make) throw new Error(`art.portrait : personnage inconnu « ${id} »`);
     const p = POSE_ARG.has(id) ? make('stand') : make();
     const rig = p.userData.rig;
     rig.still = true; rig.talk = 0;

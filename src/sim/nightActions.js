@@ -32,7 +32,7 @@ export const LOCATIONS = {
   terrace: { label: 'près de la terrasse', pos: (sim) => sim.restCenter(bern(sim)), player: ['street'], range: 8 },
   awning: { label: 'sous le store', pos: (sim) => ({ x: wallX(sim) * 0.8, y: 2.6, z: (bern(sim).z0 + bern(sim).z1) / 2 }), player: ['street'], range: 3 },
   kitchen_door: { label: 'à la porte de service', pos: (sim) => ({ x: wallX(sim), y: 1, z: bern(sim).z0 + 0.5 }), player: ['street'], range: 3 },
-  estaminet: { label: "à l'estaminet", pos: (sim) => ({ x: wallX(sim), y: 1, z: (bern(sim).z0 + bern(sim).z1) / 2 }), player: ['street'], range: 4 },
+  estaminet: { label: "à l’estaminet", pos: (sim) => ({ x: wallX(sim), y: 1, z: (bern(sim).z0 + bern(sim).z1) / 2 }), player: ['street'], range: 4 },
 };
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -72,7 +72,7 @@ export const NIGHT_ACTION_SPECS = {
 
 // Conditions de scène (état de la nuit) + raison affichée quand elle manque
 export const SCENE = {
-  terraceOut: { test: (sim) => sim.state.tables.some((t) => t.out && t.restId === 'bernadette'), reason: "La terrasse de l'estaminet est vide." },
+  terraceOut: { test: (sim) => sim.state.tables.some((t) => t.out && t.restId === 'bernadette'), reason: "La terrasse de l’estaminet est vide." },
   exhaustOn: { test: (sim) => sim.state.min < sim.cfg.NOISE.exhaustOffMinute, reason: 'La gaine est arrêtée.' },
   kitchenOpen: { test: (sim) => sim.state.min < H(23), reason: 'La cuisine est fermée.' },
   waiterOnDuty: { test: (sim) => sim.waiterOnDuty(), reason: 'Le serveur est parti.' },
@@ -124,7 +124,7 @@ function blocked(sim, a, spec, player) {
   if (player) {
     const loc = LOCATIONS[spec.at];
     if (!loc.player.includes(player.where)) return `Il faut être ${loc.label}.`;
-    if (loc.range && player.pos && dist2(player.pos, loc.pos(sim, player)) > loc.range) return `Approchez-vous : il faut être ${loc.label}.`;
+    if (loc.range && player.pos && dist2(player.pos, loc.pos(sim, player)) > loc.range) return `Approchez-vous : il faut être ${loc.label}.`;
   }
   return null;
 }
@@ -223,7 +223,7 @@ export function performNightAction(sim, c, id, player) {
     c.note('witness', { act: id, by: seen.map((w) => w.id), night: true });
     applyEffects(sim, c, { ...we, risk: undefined, asso: undefined }, 'witnessed', id);
   } else if (risky) {
-    sim.log('Personne n\'a rien vu… a priori.', 'good');
+    sim.log('Personne n’a rien vu… a priori.', 'good');
   }
 
   const simResult = spec.simEffect ? SIM_EFFECTS[spec.simEffect](sim) : {};

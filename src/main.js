@@ -34,7 +34,7 @@ function narrator(kind, s, a) {
     case 'waiter': return narrative.pickNightLine('waiter', s, narrRng, { result: a.result, metWaiter: !!campaign?.has('met_waiter') });
     case 'witness': return narrative.pickNightLine('witness', s, narrRng, a.witness ? { witness: a.witness } : {});
     case 'end': return narrative.pickNightLine('end', s, narrRng, { reason: a.reason });
-    case 'klaas': { const e = narrative.klaasEntry(a.event, a.detection, narrRng); return e ? `📓 Carnet de Klaas : ${e.text}` : null; }
+    case 'klaas': { const e = narrative.klaasEntry(a.event, a.detection, narrRng); return e ? `📓 Carnet de Klaas : ${e.text}` : null; }
     default: return null;
   }
 }
@@ -181,7 +181,7 @@ function updateHud() {
   if (it?.label === 'Monter chez Pilou') tuto('near_door');
   if (it?.label?.startsWith('Essayer de dormir')) tuto('bed');
   if (nearWindow()) { tuto('at_window'); if (S.min >= CLOSE) tuto('near_bucket'); }
-  if (nearWindow() && !S.sleeping) hints.push('[P] photo · [F] seau d\'eau (illégal)');
+  if (nearWindow() && !S.sleeping) hints.push('[P] photo · [F] seau d’eau (illégal)');
   $('prompt').textContent = hints.join('   ');
   // À la fenêtre : qui pourrait me voir ?
   let wit = '';
@@ -190,7 +190,7 @@ function updateHud() {
     const named = [...new Set(ws.filter((w) => w.kind !== 'customers').map((w) => w.name))];
     const groups = ws.filter((w) => w.kind === 'customers').length;
     if (groups) named.push(`${groups} groupe(s) de clients`);
-    wit = named.length ? `👁 Témoins possibles : ${named.join(', ')}` : '👁 Personne ne regarde.';
+    wit = named.length ? `👁 Témoins possibles : ${named.join(', ')}` : '👁 Personne ne regarde.';
   }
   $('witness').textContent = wit;
 }
@@ -199,7 +199,7 @@ function updateHud() {
 const raycaster = new THREE.Raycaster();
 const CENTER = new THREE.Vector2(0, 0);
 function photo() {
-  if (player.loc === 'apt' && !nearWindow()) return log('Depuis l\'appartement, il faut être à la fenêtre.');
+  if (player.loc === 'apt' && !nearWindow()) return log('Depuis l’appartement, il faut être à la fenêtre.');
   flash();
   syncCamera();
   scene.updateMatrixWorld();
@@ -255,7 +255,7 @@ function openOverlay(name) {
     const status = P ? `Patrouille ${P.phase === 'pending' ? 'en route' : 'sur place'} (appel de ${fmt(P.calledAt)})` : `${S.calls} appel(s) à la police ce soir`;
     // Klaas a déduit le planning des patrouilles de son carnet (roster_known) : qui est de service ce soir
     const roster = campaign?.has('roster_known')
-      ? ` · Carnet de Klaas : ${(cfg.POLICE.roster[sim.weekday] ?? []).map((id, i) => `${cfg.POLICE.patrols[id].name} ${i ? 'après' : 'avant'} ${fmt(cfg.POLICE.shiftChange)}`).join(', ')}`
+      ? ` · Carnet de Klaas : ${(cfg.POLICE.roster[sim.weekday] ?? []).map((id, i) => `${cfg.POLICE.patrols[id].name} ${i ? 'après' : 'avant'} ${fmt(cfg.POLICE.shiftChange)}`).join(', ')}`
       : '';
     $('phone-status').textContent = status + roster;
   }
@@ -274,8 +274,8 @@ function lock() {
 const qualityLabel = (q) => (q >= 0.85 ? 'nette' : q >= 0.6 ? 'correcte' : 'floue');
 function renderDossier() {
   const items = S.evidence.map((e) => `<li><b>${fmt(e.time)}</b> ${e.text} <span class="q">· ${e.type === 'photo' ? `photo ${qualityLabel(e.quality)}` : 'pièce'}${e.legal ? ' · légale' : ' · illégale'}${e.shared ? ' · partagée' : ''}</span></li>`);
-  $('dossier-list').innerHTML = items.length ? items.join('') : '<li>Rien pour l\'instant. Visez une table et appuyez sur P.</li>';
-  $('dossier-score').textContent = `Score : ${sim.dossierScore().toFixed(1)} / ${EVIDENCE.dossierTarget} · ${S.evidence.length} pièce(s)`;
+  $('dossier-list').innerHTML = items.length ? items.join('') : '<li>Rien pour l’instant. Visez une table et appuyez sur P.</li>';
+  $('dossier-score').textContent = `Score : ${sim.dossierScore().toFixed(1)} / ${EVIDENCE.dossierTarget} · ${S.evidence.length} pièce(s)`;
 }
 document.querySelector('#phone [data-call=asso]').textContent = `💬 Groupe WhatsApp « ${WHATSAPP_GROUP} »`;
 for (const b of document.querySelectorAll('#phone button')) {
@@ -369,7 +369,7 @@ addEventListener('keydown', (e) => {
   else if (e.code === 'KeyP') photo();
   else if (e.code === 'KeyB') sim.act({ type: 'db', noiseDb, fromWindow: player.loc === 'apt' });
   else if (e.code === 'KeyF') {
-    if (!nearWindow()) log('Le seau, c\'est depuis la fenêtre.');
+    if (!nearWindow()) log('Le seau, c’est depuis la fenêtre.');
     else sim.act({ type: 'bucket' });
   }
   drainSim();
@@ -439,7 +439,7 @@ function renderNightMenu() {
   const list = $('nightmenu-list');
   list.innerHTML = '';
   const acts = nightActionsHere();
-  if (!acts.length) list.innerHTML = '<p class="note">Rien à faire ici pour l\'instant.</p>';
+  if (!acts.length) list.innerHTML = '<p class="note">Rien à faire ici pour l’instant.</p>';
   for (const a of acts) {
     const b = document.createElement('button');
     b.textContent = `${a.label}${a.legality === 'illegal' ? ' (illégal)' : a.legality === 'grey' ? ' (limite)' : ''}`;
@@ -456,18 +456,18 @@ function showEnd() {
   const R = sim.summary();
   const titles = { time: `${R.time} · la rue se tait (enfin)`, custody: 'Garde à vue', sleep: 'Pilou craque' };
   const li = (s) => `<li>${s}</li>`;
-  const rest = R.restaurants.map((r) => li(`<b>${r.name}</b> : ${r.onTime}/${r.total} rentrée(s) à l'heure${r.by.length ? ` · ${r.by.map(([k, n]) => `${n} par ${k}`).join(', ')}` : ''}${r.stillOut ? ` · <span class="bad">${r.stillOut} encore dehors</span>` : r.last ? ` · dernière à ${r.last}` : ''}`));
-  const police = R.police.map((p) => li(`Appel ${p.called}${p.asso ? ' (au nom de l\'asso)' : ''}${p.arrived ? ` → ${p.patrol} chez ${p.rest} à ${p.arrived}` : ''} : ${p.outcome}${p.detail ? ` (${p.detail})` : ''}`));
+  const rest = R.restaurants.map((r) => li(`<b>${r.name}</b> : ${r.onTime}/${r.total} rentrée(s) à l’heure${r.by.length ? ` · ${r.by.map(([k, n]) => `${n} par ${k}`).join(', ')}` : ''}${r.stillOut ? ` · <span class="bad">${r.stillOut} encore dehors</span>` : r.last ? ` · dernière à ${r.last}` : ''}`));
+  const police = R.police.map((p) => li(`Appel ${p.called}${p.asso ? ' (au nom de l’asso)' : ''}${p.arrived ? ` → ${p.patrol} chez ${p.rest} à ${p.arrived}` : ''} : ${p.outcome}${p.detail ? ` (${p.detail})` : ''}`));
   const wit = R.witnesses.map((w) => li(`${w.time} · ${w.name} a vu le ${w.act}${w.filmed ? ' (et a filmé)' : ''}`));
   $('end-title').textContent = titles[R.reason];
   $('end-body').innerHTML = `
     <p class="verdict">${R.verdict.join('<br/>')}</p>
     <h3>Pilou</h3>
     <ul>${li(`Sommeil ${R.stats.sleep}/100 · Association ${R.stats.asso}/100 · Risque ${R.stats.risk}/100`)}
-    ${li(`Dossier : ${R.dossier.score.toFixed(1)}/${R.dossier.target} (${R.dossier.pieces} pièce(s))`)}
-    ${li(`Serveur sollicité ${R.waiter.asks} fois (${R.waiter.ok} succès) · Seau d'eau : ${R.bucketUses} · Mairie : ${R.mairie ? 'signalée' : 'non'}`)}</ul>
+    ${li(`Dossier : ${R.dossier.score.toFixed(1)}/${R.dossier.target} (${R.dossier.pieces} pièce(s))`)}
+    ${li(`Serveur sollicité ${R.waiter.asks} fois (${R.waiter.ok} succès) · Seau d’eau : ${R.bucketUses} · Mairie : ${R.mairie ? 'signalée' : 'non'}`)}</ul>
     <h3>Terrasses</h3><ul>${rest.join('')}</ul>
-    <h3>Police municipale</h3><ul>${police.join('') || li('Jamais appelée.')}${li(`<span class="q">De service ce soir : ${R.shifts[0]} jusqu'à ${fmt(POLICE.shiftChange)}, puis ${R.shifts[1]}</span>`)}</ul>
+    <h3>Police municipale</h3><ul>${police.join('') || li('Jamais appelée.')}${li(`<span class="q">De service ce soir : ${R.shifts[0]} jusqu’à ${fmt(POLICE.shiftChange)}, puis ${R.shifts[1]}</span>`)}</ul>
     ${wit.length ? `<h3>Témoins</h3><ul>${wit.join('')}</ul>` : ''}`;
   $('end').classList.remove('hidden');
 }

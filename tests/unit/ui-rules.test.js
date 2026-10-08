@@ -16,10 +16,10 @@ describe('ui/rules : lecture humaine de l’état', () => {
   const c = createCampaign({ seed: 5, content });
 
   it('explique une condition non remplie, sans dévoiler les drapeaux secrets', () => {
-    expect(explain({ stats: { asso: '>=99' } }, c)[0]).toMatch(/^Asso ≥ 99 \(vous : \d+\)$/);
+    expect(explain({ stats: { asso: '>=99' } }, c)[0]).toMatch(/^Asso ≥ 99 \(vous : \d+\)$/);
     expect(explain({ day: [5, 14] }, c)).toEqual(['À partir du jour 5']);
     expect(explain({ flags: ['traitor_known'] }, c)).toEqual(['Il vous manque encore quelque chose']);
-    expect(explain({ flags: ['press_contacted'] }, c)[0]).toMatch(/^D'abord : /);
+    expect(explain({ flags: ['press_contacted'] }, c)[0]).toMatch(/^D’abord : /);
     expect(explain({ stats: { asso: '>=0' } }, c)).toEqual([]);
   });
 

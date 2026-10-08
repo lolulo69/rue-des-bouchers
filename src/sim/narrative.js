@@ -186,7 +186,7 @@ export function klaasEntry(event, detection, rng) {
   if (!pools) return null;
   const precise = detection >= KLAAS_PRECISE_AT;
   const line = pick(precise ? pools.precise : pools.vague, rng);
-  const ctx = event.about === 'bucket' ? { act: 'seau d\'eau', ...event } : event;
+  const ctx = event.about === 'bucket' ? { act: 'seau d’eau', ...event } : event;
   return { text: fill(line, ctx), precise };
 }
 

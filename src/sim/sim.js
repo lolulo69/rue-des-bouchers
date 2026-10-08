@@ -154,10 +154,10 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
       const enfin = sim.isLate() ? '… enfin' : '';
       if (!remaining) {
         S.lastClatterLog[r.id] = S.min;
-        sim.log(`Raclement de chaises sur les pavés : ${r.name} rentre sa terrasse${enfin}.`);
+        sim.log(`Raclement de chaises sur les pavés : ${r.name} rentre sa terrasse${enfin}.`);
       } else if (!(S.lastClatterLog[r.id] > S.min - 5)) {
         S.lastClatterLog[r.id] = S.min;
-        sim.log(`Raclement de chaises sur les pavés : ${r.name} rentre une table${enfin}.`);
+        sim.log(`Raclement de chaises sur les pavés : ${r.name} rentre une table${enfin}.`);
       }
     },
 
@@ -168,7 +168,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
       S.risk = clamp(S.risk + amount, 0, earlyEndings ? 100 : CAMPAIGN.preGate.riskCap);
       sim.note('risk', { amount: S.risk - before, act, witnesses: witnesses.map((w) => w.id) });
       if (before < RISK.warning && S.risk >= RISK.warning) sim.log('Ça circule déjà dans le quartier.', 'bad');
-      if (before < RISK.complaint && S.risk >= RISK.complaint) sim.log('Dédé crie qu\'il va porter plainte. Il le fera.', 'bad');
+      if (before < RISK.complaint && S.risk >= RISK.complaint) sim.log('Dédé crie qu’il va porter plainte. Il le fera.', 'bad');
       if (earlyEndings && S.risk >= RISK.custody) sim.end('custody');
     },
 
@@ -221,7 +221,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
         case 'bucket': return bucket();
         case 'db': return dbReading(a);
         case 'sleep': S.sleeping = !!a.on; return { ok: true };
-        default: throw new Error(`action inconnue : ${a.type}`);
+        default: throw new Error(`action inconnue : ${a.type}`);
       }
     },
 
@@ -249,11 +249,11 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
         sim.klaasNote({ about: 'tipoff', ...tipCtx(tip) }, pos);
         sim.addEvidence({
           type: 'tipoff', restId: r.id, tipoffId: tip.id, quality: 1, value: EVIDENCE.tipoffValue, byKlaas: true, pos,
-          text: `Carnet de Klaas : ${r.name} rentre ses tables à ${fmt(tip.tippedAt)}, police à ${fmt(tip.arrivedAt)}, tout ressort à ${fmt(S.min)}`,
+          text: `Carnet de Klaas : ${r.name} rentre ses tables à ${fmt(tip.tippedAt)}, police à ${fmt(tip.arrivedAt)}, tout ressort à ${fmt(S.min)}`,
         });
         sim.log(`Les tables de ${r.name} ressortent. Klaas a tout noté.`, 'good');
       } else {
-        sim.log(`Les tables de ${r.name} ressortent, comme si de rien n'était.`, 'bad');
+        sim.log(`Les tables de ${r.name} ressortent, comme si de rien n’était.`, 'bad');
       }
     }
   }
@@ -267,14 +267,14 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
       const p = { id: `pipi-${++S.peeCount}`, doorway, start: S.min, end: S.min + pee.duration };
       S.pees.push(p);
       sim.note('pee', { peeId: p.id, pos: { x: doorway.x, z: doorway.z } });
-      if (doorway.pilou) sim.log('Quelqu\'un urine contre votre porte d’entrée. Classique du samedi.', 'bad');
+      if (doorway.pilou) sim.log('Quelqu’un urine contre votre porte d’entrée. Classique du samedi.', 'bad');
       S.nextPeeAt = S.min + rng.range(...pee.interval);
     }
   }
 
   // target : { kind: 'table', id } | { kind: 'pee', id } ; distance en m ; fromWindow : depuis chez Pilou
   function photo({ target, distance = 10, fromWindow = false, noiseDb = S.noiseBed }) {
-    if (!target) { sim.log('Photo… rien d\'exploitable dans le cadre.'); return { ok: false, found: [] }; }
+    if (!target) { sim.log('Photo… rien d’exploitable dans le cadre.'); return { ok: false, found: [] }; }
     const base = EVIDENCE.minQuality + (1 - EVIDENCE.minQuality) * (S.sleep / 100);
     const quality = clamp(base * (distance > EVIDENCE.sharpRange ? 0.75 : 1), EVIDENCE.minQuality, 1);
     const db = Math.round(noiseDb);
@@ -282,36 +282,36 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
     if (target.kind === 'police') return photoPolice(distance, quality);
     if (target.kind === 'pee') {
       const p = S.pees.find((x) => x.id === target.id && S.min < x.end);
-      if (!p || p.photographed) { sim.log('Photo… rien d\'exploitable dans le cadre.'); return { ok: false, found }; }
+      if (!p || p.photographed) { sim.log('Photo… rien d’exploitable dans le cadre.'); return { ok: false, found }; }
       p.photographed = true;
       found.push(sim.addEvidence({ type: 'photo', kind: 'pee', restId: null, peeId: p.id, quality, value: sim.pieceValue(null, 'pee', EVIDENCE.peeValue) * quality, pos: { x: p.doorway.x, z: p.doorway.z }, text: `Un client urine contre ${p.doorway.label}` }));
     } else {
       const t = sim.table(target.id);
-      if (!t || !t.out) { sim.log('Photo… rien d\'exploitable dans le cadre.'); return { ok: false, found }; }
+      if (!t || !t.out) { sim.log('Photo… rien d’exploitable dans le cadre.'); return { ok: false, found }; }
       const max = RULES.maxPeoplePerTable;
       const pos = { x: t.x, z: t.z };
       const add = (kind, text, value, extra = {}) => {
         t.evidence.add(kind);
         found.push(sim.addEvidence({ type: 'photo', kind, restId: t.restId, tableId: t.id, quality, value: sim.pieceValue(t.restId, kind, value) * quality, pos, text, ...extra }));
       };
-      if (t.count > max && !t.evidence.has('over')) add('over', `${t.label} : ${t.count} personnes (max ${max}), ${db} dB`, EVIDENCE.overLimitValue, { count: t.count });
+      if (t.count > max && !t.evidence.has('over')) add('over', `${t.label} : ${t.count} personnes (max ${max}), ${db} dB`, EVIDENCE.overLimitValue, { count: t.count });
       if (sim.isLate() && !t.evidence.has('late')) add('late', `${t.label} encore dehors à ${fmt(S.min)}, ${db} dB`, EVIDENCE.lateValue);
       const enc = sim.encroachment(t);
       if (enc > 0 && !t.evidence.has('corridor')) {
         if (!fromWindow && distance <= EVIDENCE.measureRange) {
           add('corridor', `${t.label} empiète de ${Math.round(enc * 100)} cm sur le passage libre (mesuré)`, EVIDENCE.corridorValue, { encroach: enc });
         } else if (!found.length) {
-          sim.log(`${t.label} déborde sur le passage ? Il faut mesurer : approchez-vous à moins de ${EVIDENCE.measureRange} m, dans la rue.`);
+          sim.log(`${t.label} déborde sur le passage ? Il faut mesurer : approchez-vous à moins de ${EVIDENCE.measureRange} m, dans la rue.`);
           return { ok: false, found };
         }
       }
       if (!found.length) {
-        sim.log(t.evidence.size ? `${t.label} : déjà dans le dossier.` : `${t.label} : rien d'illégal (pour l'instant).`);
+        sim.log(t.evidence.size ? `${t.label} : déjà dans le dossier.` : `${t.label} : rien d’illégal (pour l’instant).`);
         return { ok: false, found };
       }
     }
     const q = quality >= 0.85 ? 'nette' : quality >= 0.6 ? 'correcte' : 'floue';
-    sim.log(`📸 Preuve ajoutée (${q}) : ${found.map((f) => f.text).join(' · ')}`, 'good');
+    sim.log(`📸 Preuve ajoutée (${q}) : ${found.map((f) => f.text).join(' · ')}`, 'good');
     return { ok: true, found };
   }
 
@@ -320,7 +320,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
     if (!S.scandal && police.length >= cfg.POLICE.scandalThreshold) {
       S.scandal = true;
       sim.note('scandal');
-      sim.log('Ça remonte jusqu\'au commissariat. Le commissaire veut voir ça lui-même.', 'good');
+      sim.log('Ça remonte jusqu’au commissariat. Le Commandant Desmet veut voir ça lui-même.', 'good');
     }
   }
 
@@ -328,7 +328,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
     const fresh = S.evidence.filter((e) => !e.shared && e.type !== 'mairie');
     if (!fresh.length) {
       S.asso = clamp(S.asso - ASSO.spamPenalty, 0, 100);
-      sim.log('WhatsApp de l\'asso : « Des photos, Pilou. Des PHOTOS. » 🐈', 'bad');
+      sim.log('WhatsApp de l’asso : « Des photos, Pilou. Des PHOTOS. » 🐈', 'bad');
       return { ok: false };
     }
     fresh.forEach((e) => { e.shared = true; });
@@ -339,13 +339,13 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
     gain = Math.min(gain, Math.max(0, ASSO.nightGainCap - S.assoGainTonight));
     S.assoGainTonight += gain;
     S.asso = clamp(S.asso + gain, 0, 100);
-    sim.log(`WhatsApp : ${fresh.length} pièce(s) partagée(s). Seb : « 😱 On imprime tout pour la commission ! »`, 'good');
+    sim.log(`WhatsApp : ${fresh.length} pièce(s) partagée(s). Seb : « 😱 On imprime tout pour la commission ! »`, 'good');
     checkScandal();
     return { ok: true, shared: fresh.length };
   }
 
   function callMairie() {
-    if (S.mairieSent) { sim.log('Mairie : « Votre signalement est en cours de traitement (délai : 15 jours ouvrés). »'); return { ok: false }; }
+    if (S.mairieSent) { sim.log('Mairie : « Votre signalement est en cours de traitement (délai : 15 jours ouvrés). »'); return { ok: false }; }
     S.mairieSent = true;
     const pieces = S.evidence.filter((e) => e.type !== 'mairie');
     if (!pieces.length) { sim.log('Signalement envoyé sans pièce jointe. Accusé de réception automatique.'); return { ok: true, pieces: 0 }; }
@@ -359,20 +359,20 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
   function askWaiter() {
     const r = sim.rest('bernadette');
     const said = (result, text, cls = '') => { sim.log(sim.say('waiter', { result }, text), cls); return result; };
-    if (S.min < close) return said({ ok: false, reason: 'early' }, `Le serveur : « Il est pas encore ${RULES.terraceCloseHour}h, monsieur. On rentre à ${RULES.terraceCloseHour}h. »`);
+    if (S.min < close) return said({ ok: false, reason: 'early' }, `Le serveur : « Il est pas encore ${RULES.terraceCloseHour}h, monsieur. On rentre à ${RULES.terraceCloseHour}h. »`);
     if (!sim.waiterOnDuty()) return said({ ok: false, reason: 'offduty' }, 'Le serveur est parti. Il ne reste que Dédé, qui fait semblant de ne pas te voir.');
-    if (S.min < S.waiterReadyAt) return said({ ok: false, reason: 'cooldown' }, 'Le serveur : « Je vous ai dit, je vais voir avec le patron… »');
+    if (S.min < S.waiterReadyAt) return said({ ok: false, reason: 'cooldown' }, 'Le serveur : « Je vous ai dit, je vais voir avec le patron… »');
     const out = S.tables.filter((t) => t.restId === r.id && t.out);
-    if (!out.length) return said({ ok: false, reason: 'none' }, 'Le serveur : « C\'est déjà rentré, monsieur. Bonne nuit ! »');
+    if (!out.length) return said({ ok: false, reason: 'none' }, 'Le serveur : « C’est déjà rentré, monsieur. Bonne nuit ! »');
     const p = clamp(WAITER.base + WAITER.complianceWeight * r.compliance + WAITER.assoWeight * (S.asso / 100) - WAITER.hostilityWeight * (S.hostility / 100), 0.05, 0.95);
     const ok = rng.chance(p);
     S.waiterReadyAt = S.min + WAITER.cooldownMinutes;
     S.waiterAsks.push({ time: S.min, ok });
     if (ok) {
       out.forEach((t, i) => { t.clearAt = S.min + 1 + i * 1.5; t.pendingBy = 'waiter'; });
-      return said({ ok }, 'Le serveur soupire : « OK, OK… je rentre tout. » (demande légale et polie)', 'good');
+      return said({ ok }, 'Le serveur soupire : « OK, OK… je rentre tout. » (demande légale et polie)', 'good');
     }
-    return said({ ok }, S.blocKnows ? 'Le serveur, gêné : « Le patron sait que c\'est vous qui appelez la police… »' : 'Le serveur revient : « Le patron dit que les clients finissent leur verre. »', 'bad');
+    return said({ ok }, S.blocKnows ? 'Le serveur, gêné : « Le patron sait que c’est vous qui appelez la police… »' : 'Le serveur revient : « Le patron dit que les clients finissent leur verre. »', 'bad');
   }
 
   function bucket() {
@@ -380,12 +380,12 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
     const win = ANCHORS.pilouWindow;
     const below = S.tables.filter((t) => t.out && Math.sign(t.x) === Math.sign(win.x) && Math.abs(t.z - win.z) < BUCKET.radius);
     // Les témoins sont tirés AVANT d'évacuer les tables : les clients arrosés lèvent la tête.
-    const seen = sim.witnessAct(win, 'seau d\'eau', { wetTableIds: below.map((t) => t.id) });
+    const seen = sim.witnessAct(win, 'seau d’eau', { wetTableIds: below.map((t) => t.id) });
     below.forEach((t) => sim.clearTable(t, 'bucket'));
     S.bucketUses++;
     S.bucketReadyAt = S.min + BUCKET.refillMinutes;
     sim.events.push({ type: 'splash' });
-    sim.log(`SPLASH ! ${below.length} table(s) évacuée(s). (illégal)`, 'bad');
+    sim.log(`SPLASH ! ${below.length} table(s) évacuée(s). (illégal)`, 'bad');
     sim.punish(seen, 'bucket', BUCKET.risk, BUCKET.assoPenalty);
     return { ok: true, seen };
   }
@@ -393,7 +393,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
   // Un acte illégal en `pos` : tire les témoins (aboiement du teckel compris), les mémorise, sans encore punir.
   sim.witnessAct = (pos, label, opts = {}) => {
     const dog = sim.dogActive() && Math.hypot(sim.dogPos().x - pos.x, sim.dogPos().z - pos.z) <= DOG.barkRange;
-    if (dog) { sim.log('Biloute, le teckel de Jérémie, aboie comme un fou ! Toute la rue lève la tête.', 'bad'); sim.klaasAlert(); }
+    if (dog) { sim.log('Biloute, le teckel de Jérémie, aboie comme un fou ! Toute la rue lève la tête.', 'bad'); sim.klaasAlert(); }
     const seen = rollWitnesses(sim, pos, { ...opts, bark: dog ? DOG.barkBonus : 0 });
     for (const w of seen) {
       S.witnessMemories.push({ time: S.min, who: w.id, kind: w.kind, ally: !!w.ally, name: w.name, act: label, filmed: w.filmed });
@@ -404,12 +404,12 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
   };
   // Conséquences d'un acte vu : Risque × poids des témoins (plafonné), Asso si un allié a vu ou si ça a été filmé.
   sim.punish = (seen, act, baseRisk, assoPenalty = 0) => {
-    if (!seen.length) { sim.log(sim.say('witness', {}, 'Personne n\'a rien vu… a priori.'), 'good'); return 0; }
+    if (!seen.length) { sim.log(sim.say('witness', {}, 'Personne n’a rien vu… a priori.'), 'good'); return 0; }
     if (narrator) for (const w of seen) sim.log(sim.say('witness', { witness: w }, null), 'bad');
     const filmed = seen.some((w) => w.filmed);
     const weight = Math.min(WITNESS.riskCap, seen.reduce((s, w) => s + w.weight + (w.filmed ? WITNESS.customers.filmWeight : 0), 0));
     const names = [...new Set(seen.map((w) => (w.kind === 'customers' ? 'des clients' : w.name)))];
-    sim.log(`Vu par : ${names.join(', ')}${filmed ? ' · quelqu\'un a filmé !' : ''}`, 'bad');
+    sim.log(`Vu par : ${names.join(', ')}${filmed ? ' · quelqu’un a filmé !' : ''}`, 'bad');
     if (seen.some((w) => w.kind === 'klaas')) sim.log('Au bout de la rue, Klaas écrit quelque chose dans son carnet…', 'bad');
     if (seen.some((w) => w.ally) || filmed) S.asso = clamp(S.asso - assoPenalty, 0, 100);
     sim.addRisk(baseRisk * weight, act, seen);
@@ -422,7 +422,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
     if (S.min < SLEEP.drainAfter || db < EVIDENCE.dbThreshold) { sim.log(`📟 ${db} dB. ${S.min < SLEEP.drainAfter ? 'Avant 22h, ça ne compte pas.' : 'Pénible, mais pas assez pour un dossier.'}`); return { ok: false, db }; }
     if (S.lastDbAt !== undefined && S.min - S.lastDbAt < EVIDENCE.dbEvery) { sim.log(`📟 ${db} dB. Déjà un relevé il y a moins de ${EVIDENCE.dbEvery} min.`); return { ok: false, db }; }
     S.lastDbAt = S.min;
-    const ev = sim.addEvidence({ type: 'db', kind: 'db', restId: null, quality: 0.8, value: sim.pieceValue(null, 'db', EVIDENCE.dbValue), db, text: `Relevé sonore à ${fmt(S.min)} : ${db} dB${fromWindow ? ' à la fenêtre de Pilou' : ' dans la rue'}` });
+    const ev = sim.addEvidence({ type: 'db', kind: 'db', restId: null, quality: 0.8, value: sim.pieceValue(null, 'db', EVIDENCE.dbValue), db, text: `Relevé sonore à ${fmt(S.min)} : ${db} dB${fromWindow ? ' à la fenêtre de Pilou' : ' dans la rue'}` });
     sim.log(`📟 ${db} dB relevés et horodatés.`, 'good');
     return { ok: true, db, found: [ev] };
   }
@@ -430,15 +430,15 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
   // Photo de la patrouille : le jackpot si l'enveloppe passe à ce moment-là, d'un endroit légal et d'assez près.
   function photoPolice(distance, quality) {
     const b = sim.activeBribe();
-    if (!b) { sim.log('Les agents… rien d\'illégal à photographier. Pour l\'instant.'); return { ok: false, found: [] }; }
-    if (b.photographed) { sim.log('L\'enveloppe est déjà dans le dossier.'); return { ok: false, found: [] }; }
-    if (distance > POLICE.bribePhotoRange) { sim.log('Trop loin : on voit une main, pas une enveloppe. Rapprochez-vous.'); return { ok: false, found: [] }; }
+    if (!b) { sim.log('Les agents… rien d’illégal à photographier. Pour l’instant.'); return { ok: false, found: [] }; }
+    if (b.photographed) { sim.log('L’enveloppe est déjà dans le dossier.'); return { ok: false, found: [] }; }
+    if (distance > POLICE.bribePhotoRange) { sim.log('Trop loin : on voit une main, pas une enveloppe. Rapprochez-vous.'); return { ok: false, found: [] }; }
     b.photographed = true;
     const ev = sim.addEvidence({
       type: 'photo', kind: 'bribe', restId: b.restId, callId: b.callId, bribeId: b.id, quality, value: EVIDENCE.bribeValue * quality,
       text: `${b.patrolName} reçoit une enveloppe de Dédé devant ${sim.rest(b.restId).name}`,
     });
-    sim.log('📸 JACKPOT : l\'enveloppe, en pleine main. (photo légale)', 'good');
+    sim.log('📸 JACKPOT : l’enveloppe, en pleine main. (photo légale)', 'good');
     return { ok: true, found: [ev] };
   }
 
@@ -452,10 +452,10 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
       sim.note('police-scheduled', { reason: 'pilou' });
       sim.note('police-arrive', { visit: true, reason: 'pilou' });
       if (v.enemyMemories > 0) {
-        sim.log('On sonne : la police, pour vous. Plainte du bloc pour « harcèlement ». Rappel à la loi.', 'bad');
+        sim.log('On sonne : la police, pour vous. Plainte du bloc pour « harcèlement ». Rappel à la loi.', 'bad');
         sim.addRisk(POLICE.visitRisk ?? 10, 'plainte', [{ id: 'memoire-ennemie' }]);
       } else {
-        sim.log('On sonne : la police, pour vous. Contrôle d’identité… rien à vous reprocher. Le bloc a essayé.', 'bad');
+        sim.log('On sonne : la police, pour vous. Contrôle d’identité… rien à vous reprocher. Le bloc a essayé.', 'bad');
       }
     } else if (v.phase === 'onsite' && S.min >= v.until) v.phase = 'done';
   }
@@ -469,7 +469,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
       const kinds = sim.tableInfractions(t);
       if (!kinds.length) continue;
       S.dogSpotted[t.restId] = true;
-      sim.addEvidence({ type: 'round', kind: kinds[0], restId: t.restId, tableId: t.id, quality: 0.8, value: sim.pieceValue(t.restId, kinds[0], EVIDENCE.roundValue), pos: { x: t.x, z: t.z }, count: t.count, encroach: sim.encroachment(t), text: `Ronde de Jérémie : ${t.label} (${kinds.join(', ')}). Le teckel grogne.` });
+      sim.addEvidence({ type: 'round', kind: kinds[0], restId: t.restId, tableId: t.id, quality: 0.8, value: sim.pieceValue(t.restId, kinds[0], EVIDENCE.roundValue), pos: { x: t.x, z: t.z }, count: t.count, encroach: sim.encroachment(t), text: `Ronde de Jérémie : ${t.label} (${kinds.join(', ')}). Le teckel grogne.` });
       sim.log(`Jérémie passe avec le teckel et note ${t.label}.`, 'good');
     }
   }

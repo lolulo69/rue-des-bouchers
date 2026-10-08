@@ -249,7 +249,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
       c.note('event', { id: e.id, eventDay: e.day });
       const ch = e.choices?.[i];
       if (ch) {
-        if (!c.check(ch.requires, false)) throw new Error(`choix indisponible : ${e.id}[${i}]`);
+        if (!c.check(ch.requires, false)) throw new Error(`choix indisponible : ${e.id}[${i}]`);
         apply(ch.effects, 'story', `${e.id}#${i}`);
         result = ch.result ?? null;
         c.note('choice', { id: e.id, i });
@@ -370,9 +370,9 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
   c.actionCost = (a) => { const t = a.cost?.time ?? 1; return botHelps(a) ? Math.max(1, t - C.whatsappBot.timeDiscount) : t; };
   c.availableActions = (phase = 'afternoon') => K.ACTIONS.filter((a) => usable(a, phase) && (phase !== 'afternoon' || c.actionCost(a) <= S.timeLeft));
   c.doAction = (id) => {
-    if (S.step !== 'actions') throw new Error(`action hors de l'après-midi (${S.step})`);
+    if (S.step !== 'actions') throw new Error(`action hors de l’après-midi (${S.step})`);
     const a = ACTIONS[id];
-    if (!a || !usable(a, 'afternoon')) throw new Error(`action indisponible : ${id}`);
+    if (!a || !usable(a, 'afternoon')) throw new Error(`action indisponible : ${id}`);
     const cost = c.actionCost(a);
     if (cost > S.timeLeft) throw new Error(`plus assez de temps pour ${id}`);
     S.timeLeft -= cost;
@@ -393,7 +393,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     return { result: a.result ?? null, seen };
   };
   c.endAfternoon = () => {
-    if (S.step !== 'actions') throw new Error(`fin d'après-midi hors de l'après-midi (${S.step})`);
+    if (S.step !== 'actions') throw new Error(`fin d’après-midi hors de l’après-midi (${S.step})`);
     // Tatie hésite (flattée par le bloc) : elle peut laisser fuiter le vrai plan à Colette
     const L = C.tatieLeak;
     if (L && c.has(L.flag) && !c.has('tatie_leaked_plan') && S.hidden.hostility >= L.minHostility && rng.chance(L.chance)) {
@@ -444,7 +444,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
       sim.addEvidence({
         type: 'db', kind: 'db', auto: true, restId: null, quality: C.dbLogger.quality, db,
         value: sim.pieceValue(null, 'db', EVIDENCE.dbValue) * C.dbLogger.valueScale,
-        text: `Démon Rust : ${db} dB à ${fmt(N.min)}, fenêtre de Pilou (relevé automatique)`,
+        text: `Démon Rust : ${db} dB à ${fmt(N.min)}, fenêtre de Pilou (relevé automatique)`,
       });
     };
   }
@@ -497,7 +497,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
       saw_pee: evk('pee'),
       pee_at_door: N.pees.some((p) => p.doorway.pilou),
       bucket_used: N.bucketUses > 0,
-      bucket_witnessed: N.witnessMemories.some((w) => w.act === 'seau d\'eau'),
+      bucket_witnessed: N.witnessMemories.some((w) => w.act === 'seau d’eau'),
       video_viral: N.witnessMemories.some((w) => w.filmed),
       klaas_noted_pilou: N.witnessMemories.some((w) => w.kind === 'klaas'),
       talked_waiter: N.waiterAsks.length > 0,
@@ -556,7 +556,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
       S.police.lemaireTransferred = true;
       setFlag('lemaire_transferred');
       apply({ corruption: C.igpn.transferCorruption }, 'engine', 'igpn');
-      S.cards.push({ type: 'info', id: 'igpn', title: 'Enquête interne', text: 'L’enquête interne est bouclée : le brigadier Lemaire est muté. Au commissariat, on regarde ses chaussures.' });
+      S.cards.push({ type: 'info', id: 'igpn', title: 'Enquête interne', text: 'L’enquête interne est bouclée : le brigadier Lemaire est muté. Au commissariat, on regarde ses chaussures.' });
     }
   }
 

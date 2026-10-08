@@ -236,7 +236,7 @@ describe('preuves : relevé dB, horodatage, légalité', () => {
     const r = sim.act({ type: 'db', noiseDb: 68 });
     expect(r.ok).toBe(true);
     expect(r.found[0]).toMatchObject({ kind: 'db', legal: true, db: 68, time: sim.state.min });
-    expect(r.found[0].text).toMatch(/22:1\d : 68 dB/);
+    expect(r.found[0].text).toMatch(/22:1\d : 68 dB/);
     expect(sim.act({ type: 'db', noiseDb: 70 }).ok).toBe(false); // déjà un relevé dans la demi-heure
   });
 

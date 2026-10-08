@@ -21,7 +21,7 @@ export function legal({ asso = false } = {}) {
   const shoot = every(5);
   const S = { policeCalls: 0, shared: false };
   return {
-    name: asso ? 'légal (au nom de l\'asso)' : 'légal',
+    name: asso ? 'légal (au nom de l’asso)' : 'légal',
     decide(sim) {
       const st = sim.state;
       const acts = [];

@@ -76,7 +76,7 @@ export function createDirector({ scene, world, art, audio }) {
     const has = (f) => flags.includes(f);
     want('banner:balcony', has('banners_up'), () => art.props.place('banner', 'balconyRail', { length: 2.2 }));
     want('banner:pilou', has('banners_up'), () => art.props.place('banner', 'pilouBanner', { length: 1.8 }));
-    want('banner:counter', has('cm_counter_banner'), () => art.props.place('banner', counterBannerAt(), { text: 'ICI ON VIT, HEIN !', length: 3 }));
+    want('banner:counter', has('cm_counter_banner'), () => art.props.place('banner', counterBannerAt(), { text: 'ICI ON VIT, HEIN !', length: 3 }));
     const uri = has('uritrottoir_installed') || has('cm_uritrottoir_terrace');
     const annexed = has('cm_uritrottoir_terrace');
     want(`uritrottoir:${annexed ? 'terrace' : 'street'}`, uri, () => art.props.place('uritrottoir', annexed ? V(-(W - 0.5), 0, A.bernadetteDoor.z - 1.2) : 'uritrottoirSpot'));

@@ -58,7 +58,7 @@ export const RESTAURANTS = [
   // Géographie §1b (z = −45 rue de la Barre → +45 place Maurice-Schumann) : Bernadette (n°10) et les Mal Lunés (n°14)
   // dans le premier tiers côté pair, Le Goulot (n°33) vers la place côté impair. Bloemkool et L'Endroit = décor (world.js).
   // world.js cale l'immeuble de Pilou, le balcon d'en face et les commerces de décor sur ces positions.
-  { id: 'bernadette', name: "Estaminet La Ch'tite Bernadette", side: -1, z0: -30, z1: -18, tables: 6, compliance: 0.2, influence: 0.6, encroachChance: 0.35, lateClear: [23 * 60, 25 * 60 + 15], color: 0x8a2b2b },
+  { id: 'bernadette', name: "Estaminet La Ch’tite Bernadette", side: -1, z0: -30, z1: -18, tables: 6, compliance: 0.2, influence: 0.6, encroachChance: 0.35, lateClear: [23 * 60, 25 * 60 + 15], color: 0x8a2b2b },
   { id: 'goulot', name: 'Le Goulot', side: 1, z0: 22, z1: 32, tables: 4, compliance: 0.6, influence: 0.15, encroachChance: 0.2, lateClear: [22 * 60 + 20, 23 * 60 + 30], color: 0x2b4a8a },
   { id: 'malunes', name: 'Les Bouchers Mal Lunés', side: -1, z0: -15, z1: -5, tables: 4, compliance: 0.45, influence: 0.35, encroachChance: 0.25, lateClear: [22 * 60 + 30, 24 * 60 + 30], color: 0x2b6a3a },
 ];
@@ -78,7 +78,7 @@ export const ANCHORS = {
   doorways: [
     { x: -3.0, z: -18.2, label: 'la porte de Pilou', pilou: true },
     { x: 2.95, z: -36, label: 'une porte cochère en face' },
-    { x: -2.95, z: -4.5, label: 'l\'entrée des Mal Lunés' },
+    { x: -2.95, z: -4.5, label: 'l’entrée des Mal Lunés' },
     { x: 2.95, z: 8, label: 'un porche en face' },
     { x: -2.95, z: 12, label: 'une porte au milieu de la rue' },
   ],
@@ -240,7 +240,7 @@ export const DISGUISE = { disguise_hood: 0.6, disguise_vest: 0.5 };
 // Drapeaux lus par le moteur : le contenu (src/content/flags.js) doit les déclarer s'il les utilise.
 export const ENGINE_FLAGS = {
   disguise_hood: 'Pilou a une capuche (moins reconnaissable)',
-  disguise_vest: 'Pilou a un gilet jaune « livreur » (encore moins reconnaissable)',
+  disguise_vest: 'Pilou a un gilet jaune « livreur » (encore moins reconnaissable)',
   camera_awning: 'Caméra cachée sous le store de Bernadette (filme tout, preuves illégales)',
   igpn_open: 'Enquête interne ouverte (pot-de-vin photographié)',
   lemaire_transferred: 'Le brigadier Lemaire est muté',

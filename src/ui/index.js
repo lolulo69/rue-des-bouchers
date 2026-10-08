@@ -118,7 +118,7 @@ export function mount(engine = {}, opts = {}) {
       case 'night': return nightScreen();
       case 'recap': return recapScreen();
       case 'ended': return endScreen();
-      default: return h('div.ui-card', h('p', `Étape inconnue : ${c.step}`));
+      default: return h('div.ui-card', h('p', `Étape inconnue : ${c.step}`));
     }
   }
 
@@ -131,20 +131,20 @@ export function mount(engine = {}, opts = {}) {
       col.append(h('button.ui-btn', { onclick: continueCampaign, dataset: { testid: 'title-continue' } },
         `Continuer · jour ${existing.state.day}/14, ${WEEKDAYS[existing.weekday()]}`));
     } else if (store.get(SAVE_KEY)) {
-      col.append(h('p.note', 'Votre sauvegarde vient d’une ancienne version du jeu : il faut recommencer.'));
+      col.append(h('p.note', 'Votre sauvegarde vient d’une ancienne version du jeu : il faut recommencer.'));
     }
     const newBtn = h('button.ui-btn' + (existing ? '.ghost' : ''), { dataset: { testid: 'title-new' } }, 'Nouvelle campagne');
     newBtn.onclick = () => {
-      if (existing && !newBtn.dataset.armed) { newBtn.dataset.armed = '1'; newBtn.textContent = 'Écraser la sauvegarde ? Cliquez encore'; return; }
+      if (existing && !newBtn.dataset.armed) { newBtn.dataset.armed = '1'; newBtn.textContent = 'Écraser la sauvegarde ? Cliquez encore'; return; }
       newCampaign();
     };
     col.append(newBtn);
     return h('div.ui-title', h('div',
       h('h1', 'Rue des Bouchers'),
-      h('p.sub', "Vieux-Lille. Quatorze jours avant la commission des terrasses. Pilou habite au-dessus de l'estaminet, la gaine souffle sous sa fenêtre, et les terrasses doivent rentrer à 22h. En théorie."),
+      h('p.sub', "Vieux-Lille. Quatorze jours avant la commission des terrasses. Pilou habite au-dessus de l’estaminet, la gaine souffle sous sa fenêtre, et les terrasses doivent rentrer à 22h. En théorie."),
       col,
       found.size ? endingsGrid(found, null) : null,
-      h('p.note', "Œuvre de fiction. La rue existe ; les personnages, commerces, policiers et élus sont inventés.")));
+      h('p.note', "Œuvre de fiction. La rue existe ; les personnages, commerces, policiers et élus sont inventés.")));
   }
 
   // ── intro (jour 1) ──────────────────────────────────────────────────
@@ -177,7 +177,7 @@ export function mount(engine = {}, opts = {}) {
           h('div.ui-phase', phases.map((p) => h(`span${p === S.phase ? '.on' : ''}`, PHASE_LABELS[p]))),
           h('button.ui-btn.ghost', { onclick: () => { phone.open = !phone.open; render(); }, dataset: { testid: 'phone-open', unread: unread(meta) }, 'aria-label': 'Téléphone' }, '📱', unread(meta) ? h('span.ui-badge', unread(meta)) : null))),
       h('div.ui-cal', Array.from({ length: 14 }, (_, k) => h(`i${k + 1 < S.day ? '.done' : ''}${k + 1 === S.day ? '.now' : ''}${evDays.has(k + 1) ? '.ev' : ''}`, { title: `Jour ${k + 1}` }))),
-      up ? h('div.ui-upcoming', up.day === S.day ? 'Aujourd’hui : ' : `Jour ${up.day} (${WEEKDAYS_SHORT[c.weekday(up.day)]}) : `, h('b', up.title)) : null,
+      up ? h('div.ui-upcoming', up.day === S.day ? 'Aujourd’hui : ' : `Jour ${up.day} (${WEEKDAYS_SHORT[c.weekday(up.day)]}) : `, h('b', up.title)) : null,
       h('div.ui-stats', stats));
   }
 
@@ -234,7 +234,7 @@ export function mount(engine = {}, opts = {}) {
     if (!view.k || view.k.day !== S.day) {
       const opts = c.koddexOptions(); // une seule fois par matinée (tire le gag au sort)
       view.k = { day: S.day, opts, picks: [], log: [], done: false, tuto: tutorial('morning_start') };
-      if (opts.gag) for (const l of opts.gag.lines ?? []) view.k.log.push({ cls: opts.gag.speaker === 'clode' ? 'clode' : 'sys', text: opts.gag.speaker === 'clode' ? l : `${nameOf(opts.gag.speaker)} : ${l}`, fresh: true });
+      if (opts.gag) for (const l of opts.gag.lines ?? []) view.k.log.push({ cls: opts.gag.speaker === 'clode' ? 'clode' : 'sys', text: opts.gag.speaker === 'clode' ? l : `${nameOf(opts.gag.speaker)} : ${l}`, fresh: true });
     }
     const k = view.k;
     const term = h('div.ui-term-body');
@@ -244,7 +244,7 @@ export function mount(engine = {}, opts = {}) {
     const works = workChoices(k);
     const menu = h('div.ui-col', { dataset: { testid: 'koddex-menu' } });
     if (!k.done) {
-      menu.append(h('div.ui-prompts', `Prompts restants : `, Array.from({ length: k.opts.prompts }, (_, i) => h(`i${i < k.picks.length ? '.used' : ''}`))));
+      menu.append(h('div.ui-prompts', `Prompts restants : `, Array.from({ length: k.opts.prompts }, (_, i) => h(`i${i < k.picks.length ? '.used' : ''}`))));
       const w = works[k.picks.length % works.length];
       menu.append(h('button.ui-action', { style: { '--c': 'var(--ui-legal)' }, dataset: { testid: 'koddex-option', id: 'work' }, onclick: () => pick('work', w) },
         h('span.lbl', w ? w.label : 'Faire le vrai travail'), h('span.cost', 'Travail · Job +')));
@@ -297,14 +297,14 @@ export function mount(engine = {}, opts = {}) {
       k.log.push({ cls: 'clode', text: item?.result ?? 'Fait. Avec toutes mes excuses pour le retard de 0,2 seconde.', fresh: true });
       if (item?.once) meta.workDone = [...(meta.workDone ?? []), item.id];
     } else {
-      for (const l of item.lines ?? []) k.log.push({ cls: l.speaker === 'clode' ? 'clode' : l.speaker === 'pilou' ? 'me' : 'sys', text: l.speaker === 'clode' || l.speaker === 'pilou' ? l.text : `${nameOf(l.speaker)} : ${l.text}`, fresh: true });
+      for (const l of item.lines ?? []) k.log.push({ cls: l.speaker === 'clode' ? 'clode' : l.speaker === 'pilou' ? 'me' : 'sys', text: l.speaker === 'clode' || l.speaker === 'pilou' ? l.text : `${nameOf(l.speaker)} : ${l.text}`, fresh: true });
     }
     if (k.picks.length >= k.opts.prompts) {
       const before = statsSnap();
       c.koddex(k.picks);
       for (const pid of k.picks) {
         const p = k.opts.sideProjects.find((x) => x.id === pid);
-        if (p?.result) k.log.push({ cls: 'sys', text: `✔ Livré : ${p.result}`, fresh: true });
+        if (p?.result) k.log.push({ cls: 'sys', text: `✔ Livré : ${p.result}`, fresh: true });
       }
       const dl = deltas(before);
       k.log.push({ cls: 'sys', text: `— Fin de matinée. Job ${dl.job >= 0 ? '+' : ''}${dl.job}${dl.risk ? `, Risque +${dl.risk}` : ''}${c.has('boss_noticed') && dl.risk ? ' (Stéphane a remarqué quelque chose)' : ''}.`, fresh: true });
@@ -334,7 +334,7 @@ export function mount(engine = {}, opts = {}) {
     });
     return [
       tuto,
-      h('div.ui-slots', { dataset: { testid: 'slots', left: S.timeLeft } }, 'Temps libre cet après-midi : ',
+      h('div.ui-slots', { dataset: { testid: 'slots', left: S.timeLeft } }, 'Temps libre cet après-midi : ',
         Array.from({ length: Math.max(S.timeLeft, 0) }, () => h('i')), S.timeLeft ? null : ' plus rien'),
       ...groups,
       h('button.ui-btn.center', { dataset: { testid: 'action-end' }, onclick: () => { c.endAfternoon(); save(); view = {}; render(); } },
@@ -348,7 +348,7 @@ export function mount(engine = {}, opts = {}) {
     save();
     if (c.step === 'ended') recordEnding();
     const seenNode = seen?.length
-      ? h('p', { dataset: { testid: 'seen' } }, '👁 Vu par : ', seen.map((s) => `${witnessName(s.id)}${s.ally ? ' (allié)' : ''}`).join(', '))
+      ? h('p', { dataset: { testid: 'seen' } }, '👁 Vu par : ', seen.map((s) => `${witnessName(s.id)}${s.ally ? ' (allié)' : ''}`).join(', '))
       : (a.legality !== 'legal' ? h('p', '👁 Personne ne semble avoir rien vu.') : null);
     view = { result: { title: a.label, text: result, deltas: deltas(before), seenNode: h('div', seenNode, first ? tutorial('first_afternoon_action') : null) } };
     render();
@@ -376,7 +376,7 @@ export function mount(engine = {}, opts = {}) {
     return h('div.ui-card', { dataset: { testid: 'night' } },
       h('span.ui-kicker', `Nuit ${c.state.day}`),
       h('h2', sat ? 'Samedi soir, sans voitures. La rue est à eux.' : '20h30. Les terrasses se remplissent.'),
-      h('p', "Photos, décibels, appels : tout ce qui se passe ce soir pèsera à la commission. Les nuits ne se rattrapent pas."),
+      h('p', "Photos, décibels, appels : tout ce qui se passe ce soir pèsera à la commission. Les nuits ne se rattrapent pas."),
       go);
   }
 
@@ -395,10 +395,10 @@ export function mount(engine = {}, opts = {}) {
       mood ? h('p.ui-result', mood) : null,
       h('ul.ui-list', (sum.verdict ?? []).map((v) => h('li', v))),
       h('div.ui-fx',
-        h('span', `Pièces cette nuit : ${night.evidence ?? 0}`),
+        h('span', `Pièces cette nuit : ${night.evidence ?? 0}`),
         h('span', `Dossier +${night.gained ?? 0}`),
-        h('span', `Appels police : ${night.police ?? 0}`),
-        night.witnesses ? h('span.down', `Témoins : ${night.witnesses}`) : null),
+        h('span', `Appels police : ${night.police ?? 0}`),
+        night.witnesses ? h('span.down', `Témoins : ${night.witnesses}`) : null),
       (sum.police ?? []).length ? h('div', h('h3', 'Police'), h('ul.ui-list', sum.police.map((p) => h('li', `${p.called} → ${p.arrived ?? '—'} · ${p.outcome ?? ''}`)))) : null,
       h('button.ui-btn.center', { dataset: { testid: 'recap-next' }, onclick: () => { c.nextDay(); save(); if (c.step === 'ended') recordEnding(); view = {}; render(); } },
         last ? 'Le verdict de la commission' : `Jour ${S.day + 1} →`));

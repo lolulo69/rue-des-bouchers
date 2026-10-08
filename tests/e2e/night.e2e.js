@@ -105,7 +105,7 @@ test.describe('nuit : police municipale', () => {
     expect(tip.tippedAt).toBeGreaterThanOrEqual(tip.arrivedAt - 6);
     const log = await page.evaluate(() => window.__rdb.sim.state.policeLog.at(-1));
     expect(log.outcome).toBe('tipoff');
-    await expect(page.locator('#log')).toContainText('Tiens ?');
+    await expect(page.locator('#log')).toContainText('Tiens');
     // Les tables reviennent après le départ de la patrouille (invariant §13.G : seulement après un tuyau)
     await tickTo(page, tip.returnAt + 2);
     const back = await page.evaluate((ids) => ids.filter((id) => window.__rdb.sim.table(id).out).length, tip.tableIds);
