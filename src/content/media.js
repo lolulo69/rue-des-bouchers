@@ -432,13 +432,13 @@ export const MEDIA = {
       id: 'wa_twist_van',
       when: { flags: ['twist_van_corridor'] },
       author: 'nico',
-      text: "Pour le dossier : samedi, une camionnette de fûts garée deux heures dans le couloir, un jour « sans voitures ». J’ai la plaque, l’heure et une poussette qui fait demi-tour. Seb a fait un montage avec de la musique. Je l’ai supprimé.",
+      text: "Pour le dossier : samedi, une camionnette de fûts garée deux heures dans le couloir, un jour « sans voitures ». J’ai la plaque, l’heure et une poussette qui fait demi-tour. Seb en a fait un montage en musique. Supprimé.",
     },
     {
       id: 'wa_twist_regis_party',
       when: { flags: ['twist_regis_party'] },
       author: 'seb',
-      text: "Attends, attends : le bruit d’hier soir, c’était le 27. Le meublé de Régis. Dix-neuf étudiants, deux enceintes. Régis dit que c’était « un groupe calme ». Il a mis « calme » entre guillemets dans son annonce, j’ai vérifié.",
+      text: "Attends, attends : le bruit d’hier soir, c’était le 27. Le meublé de Régis. Dix-neuf étudiants, deux enceintes. Régis dit que c’était « un groupe calme ». Dans son annonce, « calme » est entre guillemets. J’ai vérifié.",
     },
     {
       id: 'wa_twist_fete_voisins',
