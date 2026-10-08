@@ -13,7 +13,7 @@ export function perfHud(force = false) {
     if (acc < 0.5) return;
     const info = renderer?.info.render;
     Object.assign(data, { fps: Math.round(frames / acc), ms: +((acc / frames) * 1000).toFixed(1), worstMs: +(worst * 1000).toFixed(1), calls: info?.calls ?? 0, triangles: info?.triangles ?? 0 });
-    el.textContent = `${data.fps} fps · ${data.ms} ms (pire ${data.worstMs})\n${data.calls} draw calls · ${(data.triangles / 1000).toFixed(0)}k triangles\npersos ${stats.drawn}/${stats.proxies} (${stats.far} de loin)`;
+    el.textContent = `${data.fps} fps · ${data.ms} ms (pire ${data.worstMs})\n${data.calls} draw calls · ${(data.triangles / 1000).toFixed(0)}k triangles\npersos ${stats.drawn}/${stats.proxies} (${stats.far} de loin) · CPU art ${stats.hooksMs.toFixed(1)}+${stats.rigMs.toFixed(1)} ms`;
     frames = 0; acc = 0; worst = 0;
   });
   return data;

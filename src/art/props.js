@@ -28,6 +28,7 @@ defineGeo('chairLo', merged([[new THREE.BoxGeometry(0.4, 0.46, 0.4), 0, 0.23, 0]
 function animChair(rig, t, dt) {
   const st = rig.st;
   st.c = Math.min(1, (st.c ?? 0) + (rig.flags.collapsed ? dt * 4 : -dt * 4));
+  rig.staticPose = st.c <= 0 || st.c >= 1; // chaise intacte ou déjà par terre : matrices en cache
   if (st.c <= 0) { st.c = 0; rig.bones.root.identity(); return; }
   // l'assise tombe, la chaise se couche en arrière, les pieds s'écartent (écrasement)
   const c = smooth(st.c);

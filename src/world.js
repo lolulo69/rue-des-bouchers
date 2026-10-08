@@ -527,6 +527,7 @@ export function buildWorld(scene, opts = {}) {
 // Fusionne toutes les meshes statiques du décor par matériau ET par tronçon de rue (z), pour que le frustum
 // culling écarte les tronçons hors champ. Les matériaux briquetés reçoivent des UV "monde" (taille de brique constante).
 const CHUNK = 22;
+const LIGHT_TRIS = 4000; // en dessous : pas de découpage par tronçon
 function mergeStatic(group) {
   group.updateMatrixWorld(true);
   const byKey = new Map();
@@ -560,8 +561,17 @@ function mergeStatic(group) {
     byKey.get(key).geos.push(g);
     o.parent.remove(o);
   }
-  for (const { m, geos } of byKey.values()) group.add(new THREE.Mesh(mergeGeometries(geos), m));
+  // Matériaux légers (enseignes, petits décors) : un seul mesh pour toute la rue, le découpage ne paierait pas
+  const tris = new Map();
+  for (const { m, geos } of byKey.values()) tris.set(m, (tris.get(m) ?? 0) + geos.reduce((a, g) => a + g.attributes.position.count / 3, 0));
+  const merged = new Map();
+  for (const { m, geos } of byKey.values()) {
+    if (tris.get(m) < LIGHT_TRIS) { if (!merged.has(m)) merged.set(m, []); merged.get(m).push(...geos); }
+    else group.add(new THREE.Mesh(mergeGeometries(geos), m));
+  }
+  for (const [m, geos] of merged) group.add(new THREE.Mesh(mergeGeometries(geos), m));
 }
+
 
 function makeSteam(origin) {
   const N = 60;

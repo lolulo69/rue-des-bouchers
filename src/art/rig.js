@@ -76,6 +76,7 @@ const registry = new Set();
 export function makeRig(parts, { bones = ['root'], animate = null, data = {}, radius = 1.2 } = {}) {
   const proxy = new THREE.Object3D();
   const rig = { parts, animate, bones: {}, boneW: {}, seed: Math.random(), st: {}, radius, ...data };
+  rig.phase3 = Math.floor(rig.seed * 3);
   for (const b of bones) { rig.bones[b] = new THREE.Matrix4(); rig.boneW[b] = new THREE.Matrix4(); }
   proxy.userData.rig = rig;
   proxy.userData.phase = rig.seed * 10;
@@ -115,6 +116,12 @@ class Pool {
     c.toArray(this.mesh.instanceColor.array, this.n * 3);
     this.n++;
   }
+  pushRaw(arr, off, c) {
+    if (this.n >= this.cap) this.alloc(this.cap * 2);
+    this.mesh.instanceMatrix.array.set(arr.subarray(off, off + 16), this.n * 16);
+    c.toArray(this.mesh.instanceColor.array, this.n * 3);
+    this.n++;
+  }
   flush() {
     this.mesh.count = this.n;
     this.mesh.visible = this.n > 0;
@@ -123,6 +130,9 @@ class Pool {
     this.n = 0;
   }
 }
+
+const sameMatrix = (a, b) => { for (let i = 0; i < 16; i++) if (a[i] !== b[i]) return false; return true; };
+const farBones = (rig) => [...new Set(rig.parts.filter((p) => p.farKey).map((p) => p.bone))];
 
 // La scène à laquelle appartient le proxy (null s'il est caché ou détaché)
 function sceneOf(o) {
@@ -137,7 +147,7 @@ const _m = new THREE.Matrix4(), _pm = new THREE.Matrix4(), _fr = new THREE.Frust
 const mainHooks = [];
 // Appelé à chaque frame (dt, t, camera) juste avant le rendu de la scène principale : animations du décor, audio.
 export const onFrame = (fn) => mainHooks.push(fn);
-export const stats = { proxies: 0, drawn: 0, far: 0 };
+export const stats = { proxies: 0, drawn: 0, far: 0, hooksMs: 0, rigMs: 0 };
 // Horloge des animations de l'art (temps réel). Remplaçable pour la QA : timeSource.now = () => tempsVirtuelMs
 export const timeSource = { now: () => performance.now() };
 
@@ -155,6 +165,12 @@ export function attachRigs(scene, { main = false, lod = true } = {}) {
     if (!pl) pools.set(key, (pl = new Pool(root, geo, glow)));
     return pl;
   };
+  // pool mémorisé sur le morceau (une seule scène par rig en pratique)
+  const poolOf = (p, isFar) => {
+    if (p._sc !== scene) { p._sc = scene; p._pn = null; p._pf = null; }
+    return isFar ? (p._pf ??= pool(p.farKey, p.farGeo, p.glow)) : (p._pn ??= pool(p.key, p.geo, p.glow));
+  };
+  let frame = 0;
   const hooks = main ? mainHooks : [];
   let last = timeSource.now();
   const prev = scene.onBeforeRender;
@@ -164,10 +180,13 @@ export function attachRigs(scene, { main = false, lod = true } = {}) {
     const dt = Math.min(0.1, (nowMs - last) / 1000);
     last = nowMs;
     const t = nowMs / 1000;
+    const h0 = performance.now();
     for (const fn of hooks) fn(dt, t, camera, renderer);
+    const h1 = performance.now();
     _fr.setFromProjectionMatrix(_pm.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
     camera.getWorldPosition(_cam);
     let n = 0, drawn = 0, far = 0;
+    frame++;
     for (const proxy of registry) {
       if (sceneOf(proxy) !== sc) continue;
       n++;
@@ -181,17 +200,38 @@ export function attachRigs(scene, { main = false, lod = true } = {}) {
       drawn++;
       const isFar = lod && _sph.center.distanceTo(_cam) > LOD_DIST * Math.max(1, rig.radius);
       if (isFar) far++;
-      if (rig.animate) rig.animate(rig, t, dt, proxy, isFar);
-      for (const b in rig.bones) rig.boneW[b].multiplyMatrices(proxy.matrixWorld, rig.bones[b]);
-      for (const p of rig.parts) {
+      // De loin, on n'anime qu'une frame sur trois (décalées), avec le temps cumulé
+      const st = rig.st;
+      st.acc = (st.acc ?? 0) + dt;
+      if (rig.animate && (!isFar || (frame + rig.phase3) % 3 === 0 || st.acc > 0.2)) { rig.animate(rig, t, st.acc, proxy, isFar); st.acc = 0; }
+      // Pose figée (table, chaise intacte) et proxy immobile : on réutilise les matrices de la frame précédente
+      const parts = rig.parts;
+      if ((!rig.animate || rig.staticPose) && rig._mw && rig._far === isFar && sameMatrix(rig._mw, e)) {
+        const c = rig._cache;
+        for (let i = 0; i < parts.length; i++) {
+          const p = parts[i];
+          if (p.when !== undefined && p.when !== rig.anim && p.when !== rig.held && p.when !== rig.expr && !rig.flags?.[p.when]) continue;
+          const key = isFar ? p.farKey : p.key;
+          if (key) poolOf(p, isFar).pushRaw(c, i * 16, p.c);
+        }
+        continue;
+      }
+      const bones = isFar ? (rig._farBones ??= farBones(rig)) : rig._allBones ??= Object.keys(rig.bones);
+      for (const b of bones) rig.boneW[b].multiplyMatrices(proxy.matrixWorld, rig.bones[b]);
+      const cache = (!rig.animate || rig.staticPose) ? (rig._cache ??= new Float32Array(parts.length * 16)) : null;
+      for (let i = 0; i < parts.length; i++) {
+        const p = parts[i];
         // morceau conditionnel : visible seulement si l'état (anim / objet tenu / drapeau) correspond
         if (p.when !== undefined && p.when !== rig.anim && p.when !== rig.held && p.when !== rig.expr && !rig.flags?.[p.when]) continue;
-        if (isFar) { if (p.farKey) pool(p.farKey, p.farGeo, p.glow).push(_m.multiplyMatrices(rig.boneW[p.bone], p.m), p.c); }
-        else pool(p.key, p.geo, p.glow).push(_m.multiplyMatrices(rig.boneW[p.bone], p.m), p.c);
+        if (isFar && !p.farKey) continue;
+        _m.multiplyMatrices(rig.boneW[p.bone], p.m);
+        if (cache) _m.toArray(cache, i * 16);
+        poolOf(p, isFar).push(_m, p.c);
       }
+      if (cache) { (rig._mw ??= new Float32Array(16)).set(e); rig._far = isFar; } else rig._mw = null;
     }
     for (const pl of pools.values()) pl.flush();
-    if (main) Object.assign(stats, { proxies: n, drawn, far });
+    if (main) Object.assign(stats, { proxies: n, drawn, far, hooksMs: stats.hooksMs * 0.9 + (h1 - h0) * 0.1, rigMs: stats.rigMs * 0.9 + (performance.now() - h1) * 0.1 });
   };
   return { onFrame: (fn) => hooks.push(fn), root };
 }
