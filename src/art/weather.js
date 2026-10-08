@@ -4,7 +4,7 @@
 import * as THREE from 'three';
 import { humanoid, setState } from './characters.js';
 
-export function createWeather(scene, world, { onFrame, fx }) {
+export function createWeather(scene, world, { onFrame, fx, particles = () => 1 }) {
   const N = 1800;
   const pos = new Float32Array(N * 6);
   const seeds = new Float32Array(N * 3);
@@ -41,7 +41,7 @@ export function createWeather(scene, world, { onFrame, fx }) {
       const drizzle = st.kind === 'drizzle';
       const len = drizzle ? 0.25 : 0.7, speed = drizzle ? 4 : 14;
       const cx = camera.position.x, cy = camera.position.y, cz = camera.position.z;
-      const visibleN = Math.floor(N * (drizzle ? 0.45 : 1) * Math.min(1, k * 1.2));
+      const visibleN = Math.floor(N * (drizzle ? 0.45 : 1) * Math.min(1, k * 1.2) * particles());
       for (let i = 0; i < N; i++) {
         const o = i * 6;
         if (i >= visibleN) { pos[o + 1] = pos[o + 4] = -100; continue; }

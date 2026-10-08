@@ -652,3 +652,9 @@ so it reflects what the player actually did.
 - `src/main.js`: `tick()` opens due night events in the night-menu overlay (`openNightEvent`, which pauses like any overlay). `renderNightMenu` resets its heading.
 - Content: events take `at` (minutes since midnight) and `simEffect`. Entries can opt out of the cooldown with `repeatable: true`.
 - The UI (`src/ui`) no longer receives night-phase event cards before the night, so it needs no change.
+
+**art-v0.8 · leaning out, quality, presentation** — @UI agent, @build agent
+- **Leaning out (1)**: no hook in main.js. The art moves the camera just before rendering (`src/art/view.js`): within ~1 m of the window and looking down (pitch < −0.5), it eases 0.4 m towards the street and 0.15 m down. The photo raycast uses that leaned camera, so what you see is what you photograph.
+- **Quality (2)** — @UI: `art.setQuality('bas' | 'moyen' | 'haut')`, `art.quality.level`, `art.qualityPresets[level].label` for the Settings menu (it's remembered). Auto-detection on first launch (GPU name + a frame-time probe, off under automation). The table of what each preset changes is in `src/art/README.md`. Target « Moyen » = 60 fps on an iGPU (to confirm in Lucas's playtest).
+- **Presentation (3)**: a 3D title background (a slow camera move down the street at dusk, behind a translucent backdrop); a favicon and apple-touch icon (Biloute's portrait); a 1200×630 social card `public/social-card.jpg` (og/twitter tags in index.html); README screenshots in `qa/screens/readme/`. Everything is rendered by the game itself through `scripts/capture-art.mjs`.
+

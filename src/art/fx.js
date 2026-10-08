@@ -105,7 +105,7 @@ const wavyTex = () => canvasTexture(64, 64, (g, w, h) => {
   for (const x of [18, 32, 46]) { g.beginPath(); for (let y = 54; y > 10; y -= 2) g.lineTo(x + Math.sin(y * 0.25 + x) * 5, y); g.stroke(); }
 });
 
-export function createFx(scene, world, { onFrame, audio, react }) {
+export function createFx(scene, world, { onFrame, audio, react, particles = () => 1 }) {
   const drops = new Particles(scene, { max: 500, map: dropTex(), gravity: 9.8, drag: 0.2 });
   const smoke = new Particles(scene, { max: 500, map: puffTex(), drag: 0.6 });
   const lines = new Particles(scene, { max: 80, map: wavyTex(), drag: 1.5 });
@@ -127,7 +127,7 @@ export function createFx(scene, world, { onFrame, audio, react }) {
 
   onFrame((dt, t, camera, renderer) => {
     for (const e of emitters) {
-      e.acc += dt * e.rate;
+      e.acc += dt * e.rate * particles();
       e.t += dt;
       while (e.acc >= 1) { e.acc -= 1; e.emit(); }
       if (e.duration && e.t > e.duration) emitters.delete(e);

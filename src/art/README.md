@@ -104,3 +104,24 @@ Everything follows Bernadette's position in `config.js`.
 Off-screen characters are neither animated nor drawn. Beyond 10 m (`LOD_DIST`) they use simplified geometry with no small details.
 The static decor is merged per material **and per 22 m stretch of street**, so frustum culling works.
 Measured (Chrome, Mac): weekday 97–120k triangles, Saturday (≈210 characters) ≤ 148k, 115–270 draw calls.
+
+## Graphics quality (`art.setQuality`)
+`art.setQuality('bas' | 'moyen' | 'haut')` applies a preset immediately and remembers it (`localStorage` `rdb.quality`). `art.quality.level` is the current level, `art.qualityPresets` holds the labels and values (for the Settings menu), and `art.quality.onChange(fn)` notifies on changes.
+On first launch: the level is guessed from the GPU name (software renderer → Bas, integrated Intel/AMD → Moyen, Apple M / NVIDIA / Radeon RX → Haut). A probe of ~120 real frames then drops one level if the average exceeds 21 ms. The probe is off under automation (`?nolock`, `navigator.webdriver`), so tests stay stable.
+
+| | Bas | Moyen | Haut |
+|---|---|---|---|
+| Rendering resolution (pixel ratio) | 0.75 × (max 1) | 1 | up to 1.5 on dense screens |
+| View distance (camera.far) / fog | 60 m / 55 m | 110 m / 95 m | 400 m / 95 m |
+| Simplified characters from | 6 m | 10 m | 14 m |
+| Distant characters animated | every 4th frame | every 3rd | every 2nd |
+| Street point lights | 2 (+ apartment) | 4 | 4 |
+| Particles (smoke, rain, splashes) | 40 % | 75 % | 100 % |
+
+Target: 60 fps on a laptop iGPU at « Moyen ».
+
+## Camera (`art.view`)
+- **Leaning out**: in the apartment, within ~1 m of the window and looking down (pitch < −0.5), the camera eases 0.4 m towards the street and 0.15 m down. `art.view.set({ lean: false })` turns it off.
+- **Title screen**: while `#title` is shown, a slow camera move down the street at dusk, with a more transparent title backdrop (`#title.art-backdrop` class). `art.view.set({ title: false })` turns it off.
+Both are applied right before rendering (the game resets its camera every frame, so nothing accumulates); `main.js` doesn't change.
+

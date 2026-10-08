@@ -9,16 +9,21 @@ import { createProps } from './propkit.js';
 import { createDirector } from './anim.js';
 import { perfHud } from './perf.js';
 import { createWeather } from './weather.js';
+import { createQuality, QUALITY_PRESETS, QUALITY_LEVELS } from './quality.js';
+import { createView } from './view.js';
 import { audio } from '../audio/index.js';
 import { portrait, portraitIds, portraitExpressions } from './portraits.js';
 import { scenes } from './scenes.js';
 
 // portrait et scenes marchent sans la rue (phases de jour) : disponibles dès l'import
-export const art = { portrait, portraitIds, portraitExpressions, scenes, audio };
+export const art = { portrait, portraitIds, portraitExpressions, scenes, audio, qualityPresets: QUALITY_PRESETS, qualityLevels: QUALITY_LEVELS };
 
 export function attachArt(scene, world) {
   let director = null;
-  const fx = createFx(scene, world, { onFrame, audio, react: (...a) => director?.react(...a) });
+  const view = createView(world, { onFrame }); // en premier : les autres crochets voient la caméra finale
+  const quality = createQuality(scene, world, { onFrame });
+  const particles = () => quality.particles;
+  const fx = createFx(scene, world, { onFrame, audio, react: (...a) => director?.react(...a), particles });
   const props = createProps(scene, world, { onFrame });
   director = createDirector(scene, world, { onFrame, audio, fx, props });
   Object.assign(art, {
@@ -37,7 +42,11 @@ export function attachArt(scene, world) {
         return p;
       },
     },
-    weather: createWeather(scene, world, { onFrame, fx }),
+    weather: createWeather(scene, world, { onFrame, fx, particles }),
+    view,
+    quality,
+    // Réglages : art.setQuality('bas' | 'moyen' | 'haut') ; art.quality.level ; art.quality.presets (libellés, effets)
+    setQuality: (level) => quality.set(level),
     terrace: { parasols: director.parasols, collapse: director.collapse, rush: director.rush, film: director.film },
     expressions: Object.keys(EXPRESSIONS),
     audio,

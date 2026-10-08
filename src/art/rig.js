@@ -43,7 +43,9 @@ export const GEO = {
 export const defineGeo = (name, geo) => { GEO[name] = geo; };
 // Géométrie de remplacement au-delà de LOD_DIST (null = morceau omis de loin)
 const FAR = { dot: null, head: 'headLo', sphere: 'ball', hemi: 'hemiLo', limb: 'limbLo', torso: 'torsoLo', cyl: 'cylLo', skirt: 'cylLo', chair: 'chairLo', ball: 'ball', box: 'box', cone: 'cone' };
-export const LOD_DIST = 10;
+export let LOD_DIST = 10;
+export let FAR_ANIM_EVERY = 3; // de loin, une frame d'animation sur N
+export function setRigQuality({ lodDist, farAnimEvery }) { if (lodDist) LOD_DIST = lodDist; if (farAnimEvery) FAR_ANIM_EVERY = farAnimEvery; }
 export const defineFar = (geo, farGeo) => { FAR[geo] = farGeo; };
 
 const MATS = {
@@ -76,7 +78,7 @@ const registry = new Set();
 export function makeRig(parts, { bones = ['root'], animate = null, data = {}, radius = 1.2 } = {}) {
   const proxy = new THREE.Object3D();
   const rig = { parts, animate, bones: {}, boneW: {}, seed: Math.random(), st: {}, radius, ...data };
-  rig.phase3 = Math.floor(rig.seed * 3);
+  rig.phase3 = Math.floor(rig.seed * 12);
   for (const b of bones) { rig.bones[b] = new THREE.Matrix4(); rig.boneW[b] = new THREE.Matrix4(); }
   proxy.userData.rig = rig;
   proxy.userData.phase = rig.seed * 10;
@@ -203,7 +205,7 @@ export function attachRigs(scene, { main = false, lod = true } = {}) {
       // De loin, on n'anime qu'une frame sur trois (décalées), avec le temps cumulé
       const st = rig.st;
       st.acc = (st.acc ?? 0) + dt;
-      if (rig.animate && (!isFar || (frame + rig.phase3) % 3 === 0 || st.acc > 0.2)) { rig.animate(rig, t, st.acc, proxy, isFar); st.acc = 0; }
+      if (rig.animate && (!isFar || (frame + rig.phase3) % FAR_ANIM_EVERY === 0 || st.acc > 0.25)) { rig.animate(rig, t, st.acc, proxy, isFar); st.acc = 0; }
       // Pose figée (table, chaise intacte) et proxy immobile : on réutilise les matrices de la frame précédente
       const parts = rig.parts;
       if ((!rig.animate || rig.staticPose) && rig._mw && rig._far === isFar && sameMatrix(rig._mw, e)) {

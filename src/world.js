@@ -419,6 +419,7 @@ export function buildWorld(scene, opts = {}) {
   const lamps = [];
   for (let z = -HALF + 5, i = 0; z < HALF - 2; z += 9.5, i++) lamps.push(kit.lantern(i % 2 ? 1 : -1, z, 4.3));
   const lit = [];
+  const streetLights = []; // les qualités basses n'en gardent que deux (art/quality.js)
   for (const r of RESTAURANTS.slice(0, 3)) {
     const c = (r.z0 + r.z1) / 2;
     lit.push(new THREE.Vector3(r.side * (W - 1.0), 3.3, c + (r.id === 'bernadette' ? -2.5 : 0)));
@@ -426,6 +427,7 @@ export function buildWorld(scene, opts = {}) {
   lit.push(new THREE.Vector3(1.5, 3.8, sq.z0 + 6));
   for (const p of lit) {
     const pl = new THREE.PointLight(0xffb866, 12, 15, 1.6);
+    streetLights.push(pl);
     pl.position.copy(p);
     city.add(pl);
   }
@@ -528,6 +530,7 @@ export function buildWorld(scene, opts = {}) {
     gameMinutes: null, // le gameplay peut renseigner l'heure ici (sinon lue dans window.__rdb.sim.state.min) : cloche de 22h
     setCatVisible(v) { cast.cat.visible = v; },
     groundMaterials,
+    streetLights,
     standingCrowd: (o) => standingCrowd(scene, o),
   };
   world.audio = audio.attachStreet({ tables, exhaust, steam, apt, getMinutes: () => world.gameMinutes ?? window.__rdb?.sim?.state?.min ?? window.__rdb?.S?.min });
