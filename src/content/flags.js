@@ -206,4 +206,8 @@ export const FLAGS = {
   klaas_log_certified: 'Les carnets de Klaas sont certifiés : tuyaux horodatés, mêmes soirs',
   backroom_caught: "Pilou a été surpris caché dans l’arrière-salle",
   bombance_wait: "Pilou a répondu « un problème à la fois » au projet de bar de La Bombance",
+
+  // ── content-story (transcriptions, passe 2) ──────────────────────────
+  charter_drafted: 'Brouillon de charte négocié avec le bloc (avant la commission)',
+  traitor_public: 'Régis a été dénoncé publiquement sur le groupe WhatsApp',
 };

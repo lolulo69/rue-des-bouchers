@@ -68,7 +68,7 @@ export const EVENTS = [
       {
         label: 'Prévenir le groupe : « Colette est en bas »',
         effects: { asso: +6, setFlags: ['colette_dinner_seen', 'whatsapp_rally'] },
-        result: `Sur « ${WHATSAPP_GROUP} », trente-quatre messages en six minutes. Seb a déjà zoomé sur le dessert. Nico rappelle que « zoomer sur un dessert n’est pas une preuve ». Tatie Bouchon répond : « Je la vois jeudi prochain pour le thé, je lui dirai. » Tout le monde se tait une seconde.`,
+        result: `Sur « ${WHATSAPP_GROUP} », trente-quatre messages en six minutes. Seb a déjà zoomé sur le dessert. Nico rappelle que « zoomer sur un dessert n’est pas une preuve ». Tatie Bouchon répond : « Je la vois bientôt pour le thé, je lui dirai. » Tout le monde se tait une seconde.`,
       },
       {
         label: 'Noter qui est à sa table (avec Klaas)',
@@ -186,7 +186,7 @@ export const EVENTS = [
     speaker: 'delphine',
     title: "J9 · L’inspectrice revient pour la clim",
     text:
-      "La mairie a programmé une contre-visite du groupe de climatisation posé sans autorisation sur la façade du n°10. Tout dépend d’une chose : l’estaminet sait-il qu’elle vient ? Dans ce quartier, une visite annoncée, c’est une visite racontée à Colette, donc à Dédé, donc à la clim, qui se retrouve soudain déguisée en jardinière.",
+      "La mairie a programmé une contre-visite du groupe de climatisation posé sans autorisation sur la façade du n°10. Tout dépend d’une chose : l’estaminet sait-il qu’elle vient ? Dans ce quartier, une visite annoncée, c’est une visite racontée à Colette, donc à Dédé, donc à la clim, qui se retrouve soudain très bien cachée.",
     choices: [
       {
         label: 'Glisser à Delphine que la visite doit rester surprise',
@@ -273,7 +273,7 @@ export const EVENTS = [
         requires: { stats: { asso: '>=40' } },
         effects: { asso: +4, dossier: +5, sleep: -8, setFlags: ['saturday2_done', 'whatsapp_rally'] },
         result:
-          "Douze fenêtres allumées, douze téléphones horodatés. La rue des Bouchers se découvre un service de contrôle citoyen. Dédé lève les yeux, compte les fenêtres, et rentre deux tables à 21h58. Une première.",
+          "Douze fenêtres allumées, douze téléphones horodatés. La rue des Bouchers se découvre un service de contrôle citoyen. Dédé lève les yeux, compte les fenêtres, et rentre deux tables avant la cloche. Ce soir, au moins.",
       },
       {
         label: 'Répondre au lobbying « samedi festif » avec la pétition',
@@ -367,7 +367,7 @@ export const EVENTS = [
       {
         speaker: 'ghislain',
         when: { flags: ['cm_happy_petition'] },
-        text: "« Je verse au dossier une pétition de 412 clients satisfaits, dont plusieurs habitent à Tourcoing, et un à Bruges. Leur attachement à la rue est sincère. »",
+        text: "« Je verse au dossier une pétition de 2 300 clients satisfaits, dont une majorité hors de la métropole, et un certain Jean Bon, de Bruxelles. Leur attachement à la rue est sincère. »",
       },
       {
         speaker: 'ghislain',
@@ -414,7 +414,7 @@ export const EVENTS = [
       {
         speaker: 'delphine',
         when: { flags: ['ac_violation_confirmed'], notFlags: ['conflict_exposed'] },
-        text: "« Pour le service : groupe de climatisation extérieur, posé en façade sans autorisation, constaté au jour 9. L’infraction est caractérisée. Je n’ai pas d’adjectif à ajouter. Le service du patrimoine en a plusieurs. »",
+        text: "« Pour le service : groupe de climatisation extérieur, posé en façade sans autorisation, constaté lors de la contre-visite de mardi. L’infraction est caractérisée. Je n’ai pas d’adjectif à ajouter. Le service du patrimoine en a plusieurs. »",
       },
       {
         speaker: 'delphine',
@@ -424,7 +424,7 @@ export const EVENTS = [
       {
         speaker: 'delphine',
         when: { flags: ['exhaust_meeting_won'] },
-        text: "« Pour mémoire, la réunion technique du jour 11 a acté le déplacement de la gaine d’extraction en toiture. La ville a donc déjà reconnu le problème. »",
+        text: "« Pour mémoire, la réunion technique de jeudi a acté le déplacement de la gaine d’extraction en toiture. La ville a donc déjà reconnu le problème. »",
       },
       {
         speaker: 'delphine',
@@ -460,7 +460,7 @@ export const EVENTS = [
           "Pièce après pièce, horodatée, mesurée, sourcée. Maître Vandamme n’a presque rien à ajouter, ce qui le contrarie. Ghislain ouvre son classeur pour répondre et constate qu’il ne contient que des e-mails « c’est en cours ». La commission suspend l’autorisation de terrasse de l’estaminet.",
       },
       {
-        label: "Plaider la clim : l’infraction est confirmée depuis le J9",
+        label: "Plaider la clim : l’infraction est confirmée depuis mardi",
         requires: { stats: { dossier: '>=50', risk: '<40' }, flags: ['ac_violation_confirmed'] },
         effects: { setFlags: ['commission_done', 'won_legal', 'commission_won'] },
         result:
@@ -471,11 +471,11 @@ export const EVENTS = [
         requires: { stats: { dossier: '>=50', risk: '<40' }, flags: ['exhaust_meeting_won'] },
         effects: { setFlags: ['commission_done', 'won_legal', 'commission_won'] },
         result:
-          "« La ville elle-même a acté le problème de la gaine au J11. Combien de ‹ en cours › faut-il encore ? » Le technicien hoche la tête. Le maire aussi. L’AOT est suspendue en attendant les travaux.",
+          "« La ville elle-même a acté le problème de la gaine jeudi. Combien de ‹ en cours › faut-il encore ? » Le technicien hoche la tête. Le maire aussi. L’AOT est suspendue en attendant les travaux.",
       },
       {
         label: 'Présenter la charte de bon voisinage, signée par les deux camps',
-        requires: { stats: { asso: '>=60' }, hidden: { hostility: '<60' }, flags: ['stance_dialogue'] },
+        requires: { stats: { asso: '>=60' }, hidden: { hostility: '<60' }, flags: ['charter_drafted'] },
         effects: { hostility: -20, setFlags: ['commission_done', 'won_peace', 'commission_won'] },
         result:
           "Jérémie lit la charte : tables rentrées à 22h, couloir dégagé, interlocuteur unique côté bloc, réunion trimestrielle avec tarte de Hilde. Le Goulot a signé en premier, Bloemkool ensuite « pour l’image », et Dédé enfin, la main sur le cœur, sous le regard du maire. Ghislain a archivé sa copie.",
@@ -488,7 +488,7 @@ export const EVENTS = [
           "Vous proposez une charte, là, au micro, sans l’avoir négociée. Silence. Puis Le Goulot dit « moi je signe ». Bloemkool suit pour ne pas être le dernier. Dédé, coincé, signe en riant trop fort. Le maire a l’air sincèrement soulagé.",
       },
       {
-        label: "Brandir La Voix du Nordiste du jour : l’article sur la corruption",
+        label: "Faire sortir l’affaire de corruption le matin même dans La Voix du Nordiste",
         requires: { flags: ['corruption_proof', 'press_contacted'] },
         effects: { hostility: +25, corruption: -40, setFlags: ['commission_done', 'won_scandal', 'commission_won', 'press_scandal'] },
         result:
@@ -619,7 +619,7 @@ export const EVENTS = [
           dossier: +4,
           evidence: { kind: 'photo', quality: 0.75, legal: true, label: '23h40 · 14 personnes sur trois tables collées, après 22h' },
         },
-        result: "Trois tables collées, quatorze convives, 23h40. Ghislain appellera ça « trois tables de 4,67 ». Klaas appellera ça mardi.",
+        result: "Trois tables collées, quatorze convives, 23h40. Ghislain appellera ça « trois tables de 4,67 ». Klaas appellera ça une ligne de plus.",
       },
       {
         label: 'Leur souhaiter un bon mariage depuis la fenêtre',
@@ -658,7 +658,7 @@ export const EVENTS = [
     once: true,
     title: 'Biloute flaire une livraison',
     text:
-      "Pendant la ronde, Biloute s’arrête net devant la porte de service de l’estaminet et grogne. Une camionnette décharge, à 20h45, douze chaises pliantes neuves. *Biloute s’assoit. Biloute fixe les chaises. Biloute juge.*",
+      "Pendant la ronde, Biloute s’arrête net devant la porte de service de l’estaminet et grogne. Une camionnette décharge, en pleine ronde, douze chaises pliantes neuves. *Biloute s’assoit. Biloute fixe les chaises. Biloute juge.*",
     choices: [
       {
         label: 'Photographier la livraison',
@@ -752,7 +752,7 @@ export const EVENTS = [
       },
       {
         label: 'Le balancer sur le groupe',
-        effects: { asso: -5, hostility: +5, setFlags: ['traitor_known'] },
+        effects: { asso: -5, hostility: +5, setFlags: ['traitor_known', 'traitor_public'] },
         result: `Sur « ${WHATSAPP_GROUP} », c’est l’explosion. Régis quitte le groupe, revient « pour clarifier », re-quitte. Tatie : « Les loups ne se mangent pas entre eux, mais ils mangent la carbonnade. »`,
       },
     ],
@@ -783,7 +783,7 @@ export const EVENTS = [
   {
     id: 'r_colette_interview',
     speaker: 'colette',
-    when: { day: [5, 12], phase: 'morning', chance: 0.2 },
+    when: { day: [5, 12], phase: 'morning', notFlags: ['press_article'], chance: 0.2 },
     once: true,
     title: "La Voix du Nordiste : « Colette Verhaeghe : laissez vivre Lille ! »",
     text:
@@ -847,13 +847,13 @@ export const EVENTS = [
     once: true,
     title: '« La rue la plus authentique de Lille »',
     text:
-      "Une influenceuse filme un « vlog Vieux-Lille » au milieu du couloir de passage, ring light allumée. Elle tourne la même prise sept fois : « Ici, c’est vraiment la vraie vie lilloise, les gens sont trop chaleureux. » En arrière-plan de chaque prise : votre porte, et quelqu’un qui l’arrose.",
+      "Une influenceuse filme un « vlog Vieux-Lille » au milieu du couloir de passage, ring light allumée. Elle tourne la même prise sept fois : « Ici, c’est vraiment la vraie vie lilloise, les gens sont trop chaleureux. » En arrière-plan de chaque prise : votre porte, bloquée par une chaise, et la terrasse qui mord sur le couloir.",
     choices: [
       {
         label: 'Récupérer la vidéo publiée, horodatée',
         effects: {
           dossier: +3,
-          evidence: { kind: 'video', quality: 0.6, legal: true, label: 'Vidéo publique : tables dans le couloir et porte arrosée, en fond de vlog' },
+          evidence: { kind: 'video', quality: 0.6, legal: true, label: 'Vidéo publique : tables dans le couloir et porte bloquée, en fond de vlog' },
         },
         result: "Merci, la vraie vie lilloise. Sa vidéo fait 80 000 vues, et elle est datée, géolocalisée et publique. Le meilleur témoin de la rue est une ring light.",
       },
@@ -900,7 +900,7 @@ export const EVENTS = [
       {
         label: "« Et vous, Tatie, vous êtes avec nous ? »",
         effects: { asso: +4, setFlags: ['met_tatie'], clearFlags: ['tatie_wavering'] },
-        result: "« Moi ? Je suis avec la rue. La rue, c’est vous. Sauf le jeudi, le jeudi je prends le thé. » C’est un oui. Avec astérisque.",
+        result: "« Moi ? Je suis avec la rue. La rue, c’est vous. Sauf à l’heure du thé. » C’est un oui. Avec astérisque.",
       },
       {
         label: 'Hocher la tête et filer',
@@ -910,6 +910,29 @@ export const EVENTS = [
     ],
   },
 
+  {
+    id: 'r_charter_talks',
+    speaker: 'jeremie',
+    when: { day: [8, 13], phase: 'afternoon', flags: ['stance_dialogue'], notFlags: ['charter_drafted'], stats: { asso: '>=40' }, chance: 0.6 },
+    once: true,
+    title: "Une table de négociation (sans débord)",
+    text:
+      "L’AG a voté le dialogue, alors Jérémie l’organise. Rendez-vous au Goulot, le plus conciliant du bloc, à 15h, terrasse vide. D’un côté : Jérémie, son classeur, et vous. De l’autre : le patron du Goulot, une serveuse de Bloemkool « pour l’image », et Dédé, qui arrive en retard avec des gaufres. Ghislain a envoyé un e-mail : « Nous prenons note. »",
+    choices: [
+      {
+        label: "Négocier article par article",
+        effects: { asso: +3, hostility: -12, setFlags: ['charter_drafted'] },
+        result:
+          "Deux heures, quatre cafés, une gaufre chacun. Article 1 : tables rentrées à 22h00. Article 2 : couloir libre. Article 3 : une réunion par trimestre. Dédé raye « trimestre » et écrit « quand on veut ». Jérémie le re-raye. Le brouillon de charte existe. Reste à le faire signer devant le maire.",
+      },
+      {
+        label: "Exiger 22h00 pile, sans discussion",
+        effects: { hostility: +6 },
+        result:
+          "Dédé repose sa gaufre. « Alors on n’a rien à se dire, mon biloute. » Le patron du Goulot soupire, la serveuse de Bloemkool regarde son téléphone. La réunion a duré onze minutes. Jérémie range son classeur sans un mot, ce qui, chez lui, est un cri.",
+      },
+    ],
+  },
   {
     id: 'r_bombance_project',
     speaker: 'tatie',
@@ -921,7 +944,7 @@ export const EVENTS = [
     choices: [
       {
         label: "Lancer Hippolyte sur l’angle patrimoine du n°4",
-        requires: { flags: ['heritage_angle'] },
+        requires: { flags: ['hippolyte_room'] },
         effects: { setFlags: ['bombance_bar_project', 'bombance_blocked'] },
         result: "Hippolyte sort un plan de 1730. Le n°4 est en périmètre protégé, la devanture aussi. « Un DJ ici ? Il faudra d’abord passer sur le corps de l’architecte des Bâtiments de France. Il est très vivant. » Projet bloqué.",
       },

@@ -165,7 +165,7 @@ export const MEDIA = {
     },
     {
       id: 'wa_regis_unmasked',
-      when: { flags: ['traitor_known'] },
+      when: { flags: ['traitor_public'] },
       author: 'nico',
       text: "Régis a quitté le groupe. Avant ça, il a fait 37 captures d’écran. J’ai vérifié. Moi aussi, je fais des captures.",
       effects: { asso: +3 },
@@ -202,7 +202,7 @@ export const MEDIA = {
       id: 'wa_tipoff',
       when: { flags: ['seen_tipoff'] },
       author: 'klaas',
-      text: "22h14 : l’estaminet rentre toutes ses tables, sans qu’un seul client soit parti. 22h19 : la police arrive. « Tout est en ordre. » 22h30 : tables ressorties. Je n’interprète pas. Je note.",
+      text: "Hier soir : toutes les tables rentrées d’un coup, sans qu’un seul client soit parti. Cinq minutes plus tard : la police. « Tout est en ordre. » Un quart d’heure après : tables ressorties. Je n’interprète pas. Je note.",
     },
     {
       id: 'wa_benali',
@@ -221,7 +221,7 @@ export const MEDIA = {
       id: 'wa_pee_door',
       when: { flags: ['pee_at_door'] },
       author: 'seb',
-      text: "Pilou, désolé, mais quelqu’un a… ta porte… vers 1h. Nico a la vidéo, je lui ai dit de ne PAS la partager.",
+      text: "Pilou, désolé, mais quelqu’un a… ta porte… hier soir. Nico a la vidéo, je lui ai dit de ne PAS la partager.",
     },
     {
       id: 'wa_bucket',
@@ -298,7 +298,7 @@ export const MEDIA = {
       when: { flags: ['banners_up'] },
       author: 'seb',
       photo: 'Trois balcons, trois draps peints : « LE SOMMEIL EST UN DROIT »',
-      text: "Trois balcons, trois banderoles. Celle de Tatie a une faute (« SOMEIL »). On la garde, c’est authentique.",
+      text: "Six banderoles, dont celle de Tatie, qui a une faute (« SOMEIL »). On la garde, c’est authentique.",
     },
     {
       id: 'wa_petition',
@@ -386,7 +386,7 @@ export const MEDIA = {
       id: 'wa_drache',
       when: { flags: ['random_drache'] },
       author: 'seb',
-      text: "DRACHE ! Terrasse vidée en trois minutes. La pluie a fait en un soir ce que la mairie n’a pas fait en deux ans.",
+      text: "DRACHE ! Terrasse vidée en quatre minutes. La pluie a fait en un soir ce que la mairie n’a pas fait en deux ans.",
     },
     {
       id: 'wa_bombance',

@@ -271,7 +271,7 @@ function finish(c, pickLabel) {
 }
 const ENDING_RUNS = {
   legal_victory: () => finish(toCommission(31, (c) => satisfy(c, { stats: { dossier: '>=90', risk: '<10' }, flags: ['colette_dinner_photo', 'formal_notice', 'bombance_blocked'], notFlags: ['bombance_bar_project'] })), /dossier complet/),
-  negotiated_peace: () => finish(toCommission(32, (c) => satisfy(c, { stats: { asso: '>=90' }, hidden: { hostility: '<10' }, flags: ['stance_dialogue', 'bombance_blocked'], notFlags: ['bombance_bar_project'] })), /charte/),
+  negotiated_peace: () => finish(toCommission(32, (c) => satisfy(c, { stats: { asso: '>=90' }, hidden: { hostility: '<10' }, flags: ['stance_dialogue', 'charter_drafted', 'bombance_blocked'], notFlags: ['bombance_bar_project'] })), /charte/),
   scandal: () => finish(toCommission(33, (c) => satisfy(c, { flags: ['corruption_proof', 'press_contacted', 'bribe_photo', 'bombance_blocked'], notFlags: ['bombance_bar_project'] })), /Voix du Nordiste/),
   turncoat: () => finish(toCommission(34, (c) => satisfy(c, { flags: ['carbonnade_1', 'carbonnade_2', 'carbonnade_3'] })), /habitué/),
   the_return: () => finish(toCommission(35, (c) => satisfy(c, { stats: { dossier: '>=90', risk: '<10' }, flags: ['bombance_rumour', 'bombance_bar_project'], notFlags: ['bombance_blocked'] })), /dossier complet/),

@@ -320,11 +320,11 @@ export const ENDINGS = [
       {
         when: {},
         text:
-          "Pendant une semaine, la rue des Bouchers a été une rue. Puis, un vendredi, l’affiche « BIENTÔT » sur la vitrine de La Bombance est devenue « OPENING ». Néons roses, enceintes sur la façade, carte de cocktails au nom de la rue : le « Bouchers Spritz », le « Canal 1912 ». Le nouveau gérant vous a salué : « Ah, c’est vous le riverain ? On m’a dit que vous étiez très bien. On va s’entendre. »",
+          "Pendant quelques jours, la rue des Bouchers a été une rue. Puis, un vendredi, l’affiche « BIENTÔT » sur la vitrine de La Bombance est devenue « OPENING ». Néons roses, enceintes sur la façade, carte de cocktails au nom de la rue : le « Bouchers Spritz », le « Canal 1912 ». Le nouveau gérant vous a salué : « Ah, c’est vous le riverain ? On m’a dit que vous étiez très bien. On va s’entendre. »",
       },
       {
         when: { flags: ['knows_trou'] },
-        text: "Ils ont appelé le bar « Le Trou ». Vous auriez dû garder ce surnom pour vous.",
+        text: "Ils ont appelé le bar « Le Trou ». Le surnom traînait partout depuis la visite guidée : ils n’ont eu qu’à se baisser.",
       },
       {
         when: { flags: ['bombance_wait'] },
@@ -409,7 +409,7 @@ export const ENDINGS = [
       },
       {
         when: { flags: ['ac_violation_confirmed'] },
-        text: "La clim posée sans autorisation a été démontée. Il reste quatre trous dans la brique de 1729 et une jardinière de géraniums, qui, elle, a été autorisée.",
+        text: "La clim posée sans autorisation a été démontée. Il reste quatre trous dans la brique de 1729, que personne n’a rebouchés.",
       },
       {
         when: { flags: ['colette_dinner_photo'] },

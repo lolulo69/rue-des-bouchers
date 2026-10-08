@@ -249,7 +249,7 @@ export const DIALOGUE = [
     speaker: 'klaas',
     when: { day: [13, 13], flags: ['met_klaas', 'saturday1_done'] },
     lines: [
-      "Samedi dernier : quarante-trois personnes debout, deux qui ont fait pipi contre une porte, une qui a chanté. Faux.",
+      "Samedi dernier : quarante-trois personnes debout, des pipis contre les portes que j’ai arrêté de compter, une qui a chanté. Faux.",
       "Ce soir je prends un carnet neuf. Par précaution.",
     ],
   },
@@ -531,7 +531,7 @@ export const DIALOGUE = [
     speaker: 'tatie',
     when: { flags: ['tatie_wavering'] },
     lines: [
-      "Dédé m’a offert un petit verre de genièvre, hier. Il est moins méchant qu’on le dit, vous savez.",
+      "Dédé m’a offert un petit verre de genièvre, l’autre jour. Il est moins méchant qu’on le dit, vous savez.",
       "Enfin… « Il ne faut pas juger un estaminet à son genièvre. » Non, attendez, je ne sais plus dans quel sens elle va, celle-là.",
     ],
     once: true,
@@ -539,7 +539,7 @@ export const DIALOGUE = [
   {
     id: 'tatie_resist',
     speaker: 'tatie',
-    when: { flags: ['met_tatie'], stats: { asso: '<30' } },
+    when: { flags: ['met_tatie'], notFlags: ['tatie_wavering'], stats: { asso: '<30' } },
     lines: [
       "Les autres se découragent ? Pas moi. « Si vous voulez quelque chose dans la vie, faut résister et se battre pour. »",
       "Je l’ai brodée sur un coussin. Le coussin résiste très bien.",
@@ -605,8 +605,8 @@ export const DIALOGUE = [
     speaker: 'seb',
     when: { notFlags: ['met_seb_nico'] },
     lines: [
-      "Pilou ! Enfin ! Attends, attends : on te voit tous les soirs à ta fenêtre avec ton sonomètre, on se demandait quand tu traverserais.",
-      `Je t’ajoute à « ${WHATSAPP_GROUP} ». Désactive les notifs, sinon tu ne dormiras pas mieux.`,
+      "Pilou ! Enfin ! Attends, attends : on te voit tous les soirs à ta fenêtre, on se demandait quand tu traverserais.",
+      `Tu es bien dans « ${WHATSAPP_GROUP} » ? Désactive les notifs, sinon tu ne dormiras pas mieux.`,
     ],
     effects: { setFlags: ['met_seb_nico'] },
     once: true,
@@ -616,7 +616,7 @@ export const DIALOGUE = [
     speaker: 'seb',
     when: { flags: ['met_seb_nico'], phase: 'night', chance: 0.5 },
     lines: [
-      `Il y a eu quarante-deux messages sur « ${WHATSAPP_GROUP} » depuis 22h. Dont trente-neuf photos de la même table.`,
+      `Il y a eu quarante-deux messages sur « ${WHATSAPP_GROUP} » hier soir, entre 22h et minuit. Dont trente-neuf photos de la même table.`,
       "C’est la table qui a changé, attends, regarde : ils ont rajouté une chaise pliante.",
     ],
   },
@@ -652,7 +652,7 @@ export const DIALOGUE = [
     speaker: 'seb',
     when: { flags: ['seen_tipoff', 'met_seb_nico'] },
     lines: [
-      "Tu as vu ? Les tables rentrées à 22h38, la police arrive à 22h43. Cinq minutes pile.",
+      "Tu as vu ? Les tables rentrent toutes d’un coup, et la police arrive cinq minutes après. Cinq minutes pile.",
       "Quelqu’un a un coup de fil d’avance, et c’est pas la météo.",
     ],
     once: true,
@@ -660,7 +660,7 @@ export const DIALOGUE = [
   {
     id: 'seb_traitor',
     speaker: 'seb',
-    when: { flags: ['traitor_known', 'met_seb_nico'] },
+    when: { flags: ['traitor_known', 'met_seb_nico'], notFlags: ['traitor_public'] },
     lines: [
       "Régis. RÉGIS. Celui qui « comprend les deux côtés ». Il comprenait surtout la carte des desserts.",
       "Nico veut le retirer du groupe. Moi je veux qu’il reste, pour voir sa tête quand on parle de lui.",
@@ -855,7 +855,7 @@ export const DIALOGUE = [
     when: { notFlags: ['met_hippolyte'] },
     lines: [
       "Monsieur Dubeton. Entrez, je vous prie. Attention aux pavés de la cour : ils ont vu passer des calèches avant de voir passer des trottinettes.",
-      "Ma famille fabrique ici depuis 1832. Nous avons survécu à deux guerres et au canal. Nous survivrons à une terrasse.",
+      "Ma famille fabrique ici depuis 1827. Nous avons survécu à deux guerres et au canal. Nous survivrons à une terrasse.",
     ],
     effects: { setFlags: ['met_hippolyte'] },
     once: true,
@@ -1120,7 +1120,7 @@ export const DIALOGUE = [
   {
     id: 'lemaire_order',
     speaker: 'lemaire',
-    when: { phase: 'night', flags: ['called_police'] },
+    when: { phase: 'night', flags: ['called_police'], notFlags: ['lemaire_transferred'] },
     lines: [
       "Tout est en ordre, monsieur. Les tables sont rentrées. Si elles étaient dehors avant, nous n’étions pas là pour le voir.",
     ],
@@ -1128,7 +1128,7 @@ export const DIALOGUE = [
   {
     id: 'lemaire_priorities',
     speaker: 'lemaire',
-    when: { phase: 'night', flags: ['called_police'], chance: 0.5 },
+    when: { phase: 'night', flags: ['called_police'], notFlags: ['lemaire_transferred'], chance: 0.5 },
     lines: [
       "Vous savez, monsieur, on a d’autres priorités. Des vraies. Avec des gens qui crient, pas avec des chaises.",
     ],
@@ -1256,7 +1256,7 @@ export const DIALOGUE = [
   {
     id: 'delphine_ac',
     speaker: 'delphine',
-    when: { flags: ['emailed_inspector'] },
+    when: { flags: ['emailed_inspector'], notFlags: ['ac_violation_confirmed'] },
     lines: [
       "J’ai bien reçu votre e-mail. Les photos sont nettes, les dates aussi. C’est rare. Merci.",
       "Je ne vous promets rien. Je ne promets jamais rien. Mais je lis tout.",
@@ -1498,7 +1498,7 @@ export const DIALOGUE = [
     speaker: 'regis',
     when: { flags: ['traitor_known'], chance: 0.3 },
     lines: [
-      "Vous ne me dites plus bonjour dans l’escalier. Je le comprends. Je comprends tout, moi. C’est mon drame.",
+      "Vous ne me dites plus bonjour dans la rue. Je le comprends. Je comprends tout, moi. C’est mon drame.",
     ],
   },
 
@@ -1623,7 +1623,7 @@ export const DIALOGUE = [
   {
     id: 'biloute_stairs',
     speaker: 'biloute',
-    when: { flags: ['met_jeremie'], chance: 0.3 },
+    when: { flags: ['met_jeremie', 'carbonnade_1'], chance: 0.3 },
     lines: [
       "*Renifle vos chaussures dans l’escalier. Conclut « carbonnade ». Vous regarde avec reproche.*",
     ],

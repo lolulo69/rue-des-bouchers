@@ -64,7 +64,7 @@ export const NIGHT_ACTION_SPECS = {
   night_sabotage_locks: { at: 'terrace', window: [H(24), H(25, 30)] },
   night_bribe_waiter: { at: 'terrace', window: [H(20, 30), H(25)], needs: 'waiterOnDuty', art: { anim: ['serveur', 'give'] } },
   night_backroom_photo: { at: 'estaminet', window: [H(20, 30), H(24, 30)], needs: 'policeOnsite', art: { anim: ['dede', 'give'] } },
-  night_bribe_photo_window: { at: 'window', window: [H(20, 30), H(24, 30)] },
+  night_bribe_photo_window: { at: 'window', window: [H(20, 30), H(24, 30)], needs: 'policeOnsite' }, // pas d'enveloppe sans patrouille
   night_eat_carbonnade_1: { at: 'estaminet', window: [H(20, 30), H(22, 30)], needs: 'kitchenOpen', art: { anim: ['pilou', 'eat'] } },
   night_eat_carbonnade_2: { at: 'estaminet', window: [H(20, 30), H(22, 30)], needs: 'kitchenOpen', art: { anim: ['pilou', 'eat'] } },
   night_eat_carbonnade_3: { at: 'estaminet', window: [H(20, 30), H(22, 30)], needs: 'kitchenOpen', art: { anim: ['pilou', 'eat'] } },

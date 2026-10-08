@@ -187,7 +187,7 @@ export const KODDEX = {
       lines: [
         { speaker: 'clode', text: "J’ai choisi un bleu apaisant pour les courbes. Les pics après 22h sont en rouge. Il y en a beaucoup. Toutes mes excuses." },
       ],
-      result: "Un PDF de six pages, un graphe par nuit. Jérémie l’imprime en trois exemplaires et le range dans une pochette plastique. Chez lui, c’est une marque d’amour.",
+      result: "Un PDF, un graphe par nuit. Jérémie l’imprime en trois exemplaires et le range dans une pochette plastique. Chez lui, c’est une marque d’amour.",
     },
     {
       id: 'side_whatsapp_bot',
@@ -342,14 +342,14 @@ export const KODDEX = {
       id: 'clode_db_logger_pride',
       speaker: 'clode',
       when: { flags: ['proj_db_logger'] },
-      lines: ["Le démon de décibels a tourné toute la nuit sans incident. Il a relevé 81 dB à 0h12. J’ai pris la liberté de lui dire bravo."],
+      lines: ["Le démon de décibels a tourné toute la nuit sans incident. Il a tout relevé, même ce que j’aurais préféré ne pas entendre. J’ai pris la liberté de lui dire bravo."],
     },
     {
       id: 'clode_scraper_find',
       speaker: 'clode',
       when: { flags: ['scraper_boasts'] },
       once: true,
-      lines: ["Nouvel avis cette nuit : « Terrasse à 1h, le voisin du 2e a crié, trop drôle 😂 ». Je pense qu’il parle de vous. Je suis navré qu’on vous trouve drôle."],
+      lines: ["Nouvel avis cette nuit : « Dernière tournée à minuit et demi, en terrasse, sous les étoiles 🌙 ». Je pense qu’il parle de vous. Je suis navré qu’on vous trouve drôle."],
     },
 
     // ── L'appli de to-do de Stéphane ────────────────────────────────────────
@@ -376,7 +376,7 @@ export const KODDEX = {
     {
       id: 'standup_three',
       speaker: 'stephane',
-      lines: ["Tour de table : Pilou, ta vibe du jour ? Clode, ta vibe du jour ? … Clode a répondu « Reconnaissant ». Pilou, tu as répondu « 82 dB ». On va creuser ça en one-to-one."],
+      lines: ["Tour de table : Pilou, ta vibe du jour ? Clode, ta vibe du jour ? … Clode a répondu « Reconnaissant ». Pilou, tu as répondu « décibels ». On va creuser ça en one-to-one."],
     },
     {
       id: 'standup_remote',

@@ -198,6 +198,15 @@ const OUTCOME_OF = (label = '') => (label.startsWith('PV') ? 'act' : label.start
 
 // Mesures de la nuit pour RECAP_HEADLINES.when, depuis sim.summary() (ou c.state.lastNight).
 // simState (facultatif, sim.state) affine : scandal, blocKnows, pees, outcomes exacts.
+const NIGHT_ACTION_KINDS = {
+  stink: ['night_stink_bomb'],
+  kitchen: ['night_saboter_cuisine', 'night_laxatif_carbonnade'],
+  sabotage: ['night_sabotage_chairs', 'night_sabotage_parasols', 'night_sabotage_locks'],
+};
+function nightActionCounts(simState) {
+  const done = (simState?.journal ?? []).filter((e) => e.type === 'night-action').map((e) => e.id);
+  return Object.fromEntries(Object.entries(NIGHT_ACTION_KINDS).map(([k, ids]) => [k, done.filter((id) => ids.includes(id)).length]));
+}
 export function recapMetrics(summary, simState) {
   const outcomes = simState ? simState.policeLog.map((p) => p.outcome) : (summary.police ?? []).map((p) => OUTCOME_OF(p.outcome));
   const count = (o) => outcomes.filter((x) => x === o).length;
@@ -208,6 +217,8 @@ export function recapMetrics(summary, simState) {
     ratio: summary.dossier?.target ? summary.dossier.score / summary.dossier.target : 0,
     acts: count('act'), complaisance: count('complaisance'), tipoffs: count('tipoff'), ignored: count('ignored'),
     pees: simState ? simState.pees.length : 0,
+    // Actions de nuit du contenu (nightActions.js), seulement si sim.state est fourni
+    ...nightActionCounts(simState),
     bucket: summary.bucketUses ?? 0,
     pieces: summary.dossier?.pieces ?? 0,
     witnesses: (summary.witnesses ?? []).length,

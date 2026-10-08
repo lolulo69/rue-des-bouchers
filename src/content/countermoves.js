@@ -139,7 +139,7 @@ export const COUNTERMOVES = [
     when: { phase: 'afternoon', flags: ['cm_table_dance'], hidden: { hostility: '>=30' }, chance: 0.3 },
     text: "Rebelote : 21h59, rentrées. 22h17, ressorties. Le chorégraphe progresse, il a gagné trois minutes.",
     effects: { sleep: -4, dossier: +1 },
-    once: false,
+    once: true, // une reprise, pas un feuilleton quotidien (transcriptions : 3 jours de suite)
   },
   {
     id: 'cm_smokers',
@@ -234,7 +234,7 @@ export const COUNTERMOVES = [
     id: 'cm_regis_leak_petition',
     title: 'Coup de vitesse',
     speaker: 'seb',
-    when: { phase: 'afternoon', flags: ['traitor_recruited', 'petition_started'], notFlags: ['regis_leak_petition'] },
+    when: { phase: 'afternoon', flags: ['traitor_recruited', 'petition_started'], notFlags: ['regis_leak_petition', 'petition_delivered'] },
     text: "Une heure avant que votre pétition soit imprimée, chaque table du bloc avait déjà sa pile de cartes « Soutenez votre estaminet ». « Attends, attends », dit Seb. « On n’en avait parlé qu’à la réunion. À douze. Portes fermées. »",
     effects: { asso: -3, hostility: +5, setFlags: ['regis_leak_petition'] },
     once: true,

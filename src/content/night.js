@@ -146,10 +146,10 @@ export const POLICE_LINES = {
     ],
     tipoff: [
       'Lemaire devant {rest} : « Tout est en ordre ici, monsieur. » Comme par hasard, les tables viennent d’être rentrées.',
-      'Lemaire arrive dans une rue d’une sagesse exemplaire. Il s’en étonne à peine.',
+      'Lemaire arrive devant {rest}, d’une sagesse exemplaire. Il s’en étonne à peine.',
     ],
     nothing: [
-      'Lemaire : « Je ne vois rien d’anormal, monsieur. » Pour une fois, c’est vrai.',
+      'Lemaire, devant {rest} : « Je ne vois rien d’anormal, monsieur. » Pour une fois, c’est vrai.',
       'Lemaire : « Tout est en ordre. Vous devriez dormir, vous. »',
     ],
     never_came: [
@@ -178,7 +178,7 @@ export const POLICE_LINES = {
     tipoff: [
       'Benali trouve la terrasse de {rest} vide et regarde l’heure. « Intéressant. » Il le note. Ça ne servira à rien, mais il le note.',
     ],
-    nothing: ['Benali : « Rien à constater, monsieur. Rappelez si ça reprend. » Il le pense vraiment.'],
+    nothing: ['Benali, devant {rest} : « Rien à constater ici, monsieur. Rappelez si ça reprend. » Il le pense vraiment.'],
     never_came: ['Benali n’est pas venu. On l’a envoyé ailleurs. Il n’a pas choisi.'],
     for_pilou: [
       'Benali, sur votre palier, très poli : « Monsieur Dubeton, une plainte a été déposée à votre encontre. Je dois vous entendre. » Il a l’air désolé. Il le fera quand même.',
@@ -204,7 +204,7 @@ export const POLICE_LINES = {
   // Issues communes, quelle que soit la patrouille
   ignored: [
     'Police : « Ah, c’est encore vous… On note, monsieur. » Personne ne viendra.',
-    'Police : « Monsieur, c’est votre {calls}e appel. On a d’autres priorités. » Personne ne viendra.',
+    'Police : « Monsieur, encore vous ? On a d’autres priorités. » Personne ne viendra.',
     'Le standard soupire avant de décrocher. Vous l’avez entendu soupirer. Personne ne viendra.',
   ],
   busy: [
@@ -283,7 +283,7 @@ export const BARKS = {
     '« Attends, je mets une story. »',
     '« C’est le plus vieux quartier, ici, non ? Tout est vieux. »',
     '« Les gens qui se plaignent du bruit, ils ont qu’à habiter à la campagne. »',
-    '« Il a dit que les tables rentraient à 22h ? Il est 22h10, c’est pareil. »',
+    '« Il a dit que les tables rentraient à quelle heure ? Bah, on verra. »',
     '« Une dernière, une vraie dernière. »',
     '« J’adore cette rue, elle est vivante. »',
     '« Tu sens la friture ? J’adore cette odeur. »',
@@ -382,7 +382,12 @@ export const WAITER_LINES = {
   // Variantes une fois `met_waiter` (le moteur peut les préférer)
   theo: {
     ok: ['Théo : « Pour toi, je rentre. Mais tu m’as pas vu, hein. »'],
-    refused: ['Théo : « Pas ce soir, Pilou. Dédé est sur les nerfs. Demain, peut-être. »'],
+    refused: [
+      'Théo : « Pas ce soir, Pilou. Dédé est sur les nerfs. Demain, peut-être. »',
+      'Théo, sans s’arrêter : « J’ai six tables et un patron. Plus tard. »',
+      'Théo hausse les épaules vers la vitrine, où Dédé le regarde. Ça veut dire non.',
+      'Théo : « Je te jure, j’ai essayé. Il m’a répondu « encore une tournée ». »',
+    ],
   },
 };
 
@@ -390,7 +395,7 @@ export const WAITER_LINES = {
 // BILAN DE NUIT : manchettes façon La Voix du Nordiste
 // when (conditions sur le bilan de nuit, toutes facultatives, en ET) :
 //   reason: 'time'|'sleep'|'custody' · saturday: bool · ratio: '>=0.75' (dossierScore / target)
-//   acts, complaisance, tipoffs, ignored, pees, bucket, pieces, witnesses : comparaisons numériques ('>=1')
+//   acts, complaisance, tipoffs, ignored, pees, bucket, pieces, witnesses, stink, kitchen, sabotage : comparaisons numériques ('>=1')
 //   scandal, blocKnows, allOnTime : bool
 // Le moteur affiche la manchette de plus haute `priority` qui correspond, puis éventuellement une seconde ligne.
 // ════════════════════════════════════════════════════════════════════════════
@@ -399,10 +404,14 @@ export const RECAP_HEADLINES = [
   { id: 'h_sleep', priority: 95, when: { reason: 'sleep' }, text: 'TÉMOIGNAGE · « Je ne dors plus » : un habitant de la rue des Bouchers jette l’éponge' },
   { id: 'h_scandal', priority: 90, when: { scandal: true }, text: 'POLICE MUNICIPALE · La hiérarchie de la police municipale s’intéresse aux cafés offerts rue des Bouchers' },
   { id: 'h_tipoff_complaisance', priority: 80, when: { tipoffs: '>=1', complaisance: '>=1' }, text: 'RUE DES BOUCHERS · Les tables rentrent avant la police, ressortent après le café' },
-  { id: 'h_tipoff', priority: 75, when: { tipoffs: '>=1' }, text: 'COÏNCIDENCE · Les terrasses se rangent cinq minutes avant chaque patrouille' },
+  { id: 'h_tipoff', priority: 75, when: { tipoffs: '>=1' }, text: 'COÏNCIDENCE · Une terrasse se range cinq minutes avant la patrouille' },
   { id: 'h_complaisance', priority: 70, when: { complaisance: '>=1' }, text: 'CONVIVIALITÉ · Contrôle de terrasse : un café, zéro procès-verbal' },
   { id: 'h_bucket_seen', priority: 68, when: { bucket: '>=1', witnesses: '>=1' }, text: 'FAITS DIVERS · Une terrasse arrosée depuis un deuxième étage, des témoins parlent' },
   { id: 'h_bucket_unseen', priority: 66, when: { bucket: '>=1', witnesses: '<1' }, text: 'MYSTÈRE · Une averse localisée sur une seule terrasse, les météorologues perplexes' },
+  // Actions de nuit du contenu (journal « night-action » de nightActions.js, via recapMetrics(summary, sim.state))
+  { id: 'h_kitchen', priority: 69, when: { kitchen: '>=1' }, text: 'GASTRONOMIE · Soirée « salé-sucré » involontaire dans un estaminet du Vieux-Lille' },
+  { id: 'h_stink', priority: 67, when: { stink: '>=1' }, text: 'FAITS DIVERS · Une odeur suspecte vide une terrasse du Vieux-Lille' },
+  { id: 'h_sabotage', priority: 65, when: { sabotage: '>=1' }, text: 'MYSTÈRE · Chaises dévissées, parasols envolés : une terrasse se réveille sabotée' },
   { id: 'h_act', priority: 60, when: { acts: '>=1' }, text: 'ÉVÉNEMENT · Un procès-verbal dressé rue des Bouchers, les anciens n’en reviennent pas' },
   { id: 'h_ignored', priority: 55, when: { ignored: '>=1' }, text: 'SERVICE PUBLIC · « C’est encore vous » : la police municipale ne décroche plus pour la rue des Bouchers' },
   { id: 'h_saturday_pee', priority: 50, when: { saturday: true, pees: '>=3' }, text: 'SAMEDI PIÉTON · Les porches du Vieux-Lille transformés en sanitaires publics' },
@@ -410,7 +419,7 @@ export const RECAP_HEADLINES = [
   { id: 'h_all_on_time', priority: 40, when: { allOnTime: true }, text: 'INSOLITE · Toutes les terrasses rentrées à 22h, les riverains soupçonnent un piège' },
   { id: 'h_strong_dossier', priority: 35, when: { ratio: '>=0.75' }, text: 'DOSSIER · Les riverains de la rue des Bouchers affûtent leurs arguments avant la commission' },
   { id: 'h_bloc_knows', priority: 30, when: { blocKnows: true }, text: 'TENSIONS · Le bloc des restaurateurs sait désormais qui appelle' },
-  { id: 'h_quiet_pieces', priority: 20, when: { pieces: '>=1' }, text: 'RUE DES BOUCHERS · Une nuit ordinaire, quelques photos de plus' },
+  { id: 'h_quiet_pieces', priority: 20, when: { pieces: '>=1' }, text: 'RUE DES BOUCHERS · Une nuit ordinaire. Le dossier s’épaissit quand même.' },
   { id: 'h_default', priority: 0, when: {}, text: 'RUE DES BOUCHERS · Une nuit comme les autres. C’est bien le problème.' },
 ];
 

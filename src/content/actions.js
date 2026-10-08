@@ -42,7 +42,7 @@ export const ACTIONS = [
     cost: { minutes: 20 },
     requires: { stats: { asso: '>=30' } },
     effects: { setFlags: ['joined_rounds'], asso: +3, dossier: +1, sleep: -3 },
-    result: "Jérémie compte les tables à voix haute, Biloute renifle chaque pied de chaise, vous notez. À 22h04, trois terrasses sont encore dehors. Biloute aboie sur la troisième. Personne ne sait pourquoi, mais il a raison.",
+    result: "Jérémie compte les tables à voix haute, Biloute renifle chaque pied de chaise, vous notez. Biloute s’arrête net devant chaque table qui déborde et la fixe, comme un huissier. Personne ne sait comment il fait, mais il a raison.",
   },
   {
     id: 'night_police_asso',
@@ -142,7 +142,7 @@ export const ACTIONS = [
     sim: 'bucket',
     cost: { minutes: 2 },
     effects: {},
-    witnessed: { exposure: 0.6, by: ['klaas', 'seb_nico', 'waiter', 'customers'], effects: { setFlags: ['klaas_noted_pilou'] } },
+    witnessed: { exposure: 0.6, by: ['klaas', 'seb_nico', 'waiter', 'customers'], effects: {} },
     result: "Splatch. La terrasse se lève d’un bloc, comme pour une ola. Une méthode ancestrale, déjà pratiquée dans cette rue en 1729.",
   },
   {
@@ -158,7 +158,7 @@ export const ACTIONS = [
       dossier: +3,
       evidence: { kind: 'camera', quality: 0.7, legal: false, label: "Caméra sous le store : la terrasse vue d’en haut, toute la nuit" },
     },
-    witnessed: { exposure: 0.5, by: ['klaas', 'seb_nico', 'waiter', 'dede', 'ghislain', 'customers', 'biloute'], effects: { risk: +20, setFlags: ['klaas_noted_pilou'] } },
+    witnessed: { exposure: 0.5, by: ['klaas', 'seb_nico', 'waiter', 'dede', 'ghislain', 'customers', 'biloute'], effects: { risk: +20 } },
     result: "Un petit œil noir entre deux franges du store. Il voit tout : les tables, les chaises, et Ghislain qui se recoiffe dans la vitrine.",
   },
   {
@@ -170,7 +170,7 @@ export const ACTIONS = [
     cost: { minutes: 10 },
     requires: { flags: ['camera_awning'], notFlags: ['power_stolen', 'camera_found'] },
     effects: { setFlags: ['power_stolen'], dossier: +1 },
-    witnessed: { exposure: 0.4, by: ['klaas', 'seb_nico', 'waiter', 'ghislain'], effects: { risk: +15, setFlags: ['klaas_noted_pilou'] } },
+    witnessed: { exposure: 0.4, by: ['klaas', 'seb_nico', 'waiter', 'ghislain'], effects: { risk: +15 } },
     result: "La caméra ne tombera plus jamais en panne de batterie. L’estaminet paie désormais pour se faire filmer. Il y a une forme de justice là-dedans, que le Code pénal ne partage pas.",
   },
   {
@@ -193,7 +193,7 @@ export const ACTIONS = [
     cost: { minutes: 8 },
     requires: { day: [2, 14], notFlags: ['exhaust_meeting_won'] },
     effects: { setFlags: ['cardboard_exhaust'], sleep: +10, hostility: +15 },
-    witnessed: { exposure: 0.5, by: ['klaas', 'seb_nico', 'waiter', 'ghislain', 'biloute'], effects: { risk: +25, asso: -5, setFlags: ['klaas_noted_pilou'] } },
+    witnessed: { exposure: 0.5, by: ['klaas', 'seb_nico', 'waiter', 'ghislain', 'biloute'], effects: { risk: +25, asso: -5 } },
     result: "Pour la première fois depuis des mois, ça ne sent pas la friture sous votre fenêtre. En bas, la cuisine ouvre toutes ses fenêtres et ça sent la friture partout ailleurs. Le lendemain, Ghislain fait le tour de la façade avec un mètre et un air de procès-verbal.",
   },
   {
@@ -203,8 +203,8 @@ export const ACTIONS = [
     legality: 'illegal',
     cost: { minutes: 3 },
     effects: { setFlags: ['stink_bomb'], hostility: +10 },
-    witnessed: { exposure: 0.45, by: ['klaas', 'seb_nico', 'waiter', 'customers', 'biloute'], effects: { risk: +12, asso: -3, setFlags: ['klaas_noted_pilou'] } },
-    result: "La terrasse se vide en quatre minutes, un record. Un client accuse la carbonnade. Dédé accuse le canal d’avant 1912. Personne n’accuse le farceur de la boutique de farces et attrapes.",
+    witnessed: { exposure: 0.45, by: ['klaas', 'seb_nico', 'waiter', 'customers', 'biloute'], effects: { risk: +12, asso: -3 } },
+    result: "La terrasse se vide en quatre minutes. Un client accuse la carbonnade. Dédé accuse le canal d’avant 1912. Personne n’a de preuve : seulement des soupçons, et le nez qui pique.",
   },
   {
     id: 'night_saboter_cuisine',
@@ -238,7 +238,7 @@ export const ACTIONS = [
     cost: { minutes: 12 },
     requires: { notFlags: ['sabotage_chairs'] },
     effects: { setFlags: ['sabotage_chairs'], hostility: +10 },
-    witnessed: { exposure: 0.4, by: ['klaas', 'seb_nico', 'waiter', 'biloute'], effects: { risk: +15, setFlags: ['klaas_noted_pilou'] } },
+    witnessed: { exposure: 0.4, by: ['klaas', 'seb_nico', 'waiter', 'biloute'], effects: { risk: +15 } },
     result: "Demain, les chaises auront un léger tangage. La terrasse ressemblera à un ferry pour Douvres. Le mal de mer, c’est quand même mieux que le tapage.",
   },
   {
@@ -249,7 +249,7 @@ export const ACTIONS = [
     cost: { minutes: 10 },
     requires: { notFlags: ['sabotage_parasols'] },
     effects: { setFlags: ['sabotage_parasols'], hostility: +12 },
-    witnessed: { exposure: 0.5, by: ['klaas', 'seb_nico', 'waiter', 'customers', 'biloute'], effects: { risk: +20, asso: -3, setFlags: ['klaas_noted_pilou'] } },
+    witnessed: { exposure: 0.5, by: ['klaas', 'seb_nico', 'waiter', 'customers', 'biloute'], effects: { risk: +20, asso: -3 } },
     result: "Trois parasols en moins. Vous avez maintenant trois parasols dans votre salon et aucun endroit où les mettre. Le vol, c’est d’abord un problème de rangement.",
   },
   {
@@ -260,7 +260,7 @@ export const ACTIONS = [
     cost: { minutes: 5 },
     requires: { notFlags: ['sabotage_locks'] },
     effects: { setFlags: ['sabotage_locks'], hostility: +8 },
-    witnessed: { exposure: 0.35, by: ['klaas', 'seb_nico', 'biloute'], effects: { risk: +12, setFlags: ['klaas_noted_pilou'] } },
+    witnessed: { exposure: 0.35, by: ['klaas', 'seb_nico', 'biloute'], effects: { risk: +12 } },
     result: "Demain midi, Dédé passera une heure à jurer sur un cadenas. Une heure sans terrasse. Une heure de paix, achetée au prix d’une dégradation de bien d’autrui.",
   },
   {
@@ -598,7 +598,7 @@ export const ACTIONS = [
     cost: { time: 1 },
     requires: { stats: { dossier: '>=8' } },
     effects: { setFlags: ['press_contacted'] },
-    result: "Anne-Sophie Lepoutre rappelle dans l’heure. « Des terrasses, de la clim sans permis, une ex-maire ? Vous avez des photos ? »",
+    result: "Anne-Sophie Lepoutre rappelle dans l’heure. « Des terrasses, de la clim sans permis ? Vous avez des photos ? »",
   },
   {
     id: 'pm_press_article',
