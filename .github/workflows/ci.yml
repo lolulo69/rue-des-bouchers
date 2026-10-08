@@ -4,10 +4,11 @@ on:
   push:
   pull_request:
 
-# Many agents push to main: only the newest commit per branch needs a verdict.
+# Many agents push to main: let the running build finish (so main always gets a full verdict),
+# and keep only the newest commit waiting behind it (GitHub drops older pending runs in the group).
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   test:
