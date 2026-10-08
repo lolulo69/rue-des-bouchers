@@ -44,3 +44,4 @@ kbd { background: #ffffff1a; border: 1px solid #ffffff33; border-radius: 4px; pa
 .verdict { font-size: 18px; }
 .bad { color: #ff8a75; }
 #dossier-list .q { opacity: .6; font-size: 13px; }
+.disclaimer { max-width: 560px; line-height: 1.45; }
