@@ -63,7 +63,9 @@ export function goToWindow(page) {
     player.pos.set(world.apt.x1 - 0.5, world.apt.floor, w.z);
     player.yaw = -Math.PI / 2;
     player.pitch = -0.6;
-    step(2);
+    // 4 frames de 1/30 s > 0,1 s : au moins un rafraîchissement du HUD (#witness, #prompt) sans attendre une vraie frame
+    // requestAnimationFrame, qui peut dépasser 5 s sur SwiftShader en CI (rouge sur main à 6d65513).
+    step(4);
   });
 }
 
