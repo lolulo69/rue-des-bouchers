@@ -76,7 +76,7 @@ where his job amounts to prompting **Clode Kode** all day and building silly sid
 | **Klaas** | Elderly, Santa Claus look (big, not fat, white beard). **Sees everything, writes everything down.** | Passive **evidence engine**: his notebook logs infractions automatically. **Double-edged**: he also writes down what *Pilou* does. Only a lie or a bribe keeps an illegal act out of his notebook. |
 | **Hilde**, Klaas's wife | Very kind | Brings food and tisane → restores Sleep and morale. Calms Klaas. |
 | **Tatie Bouchon** | Old lady in the middle of the street who hands out wisdom: *« Si vous voulez quelque chose dans la vie, faut résister et se battre pour. »* Emails Bernadette about the smell. They always answer "it's being fixed"; she doesn't believe it. Also chats with **Martine Aubrac**. | Email thread = running gag and evidence ("promise #14 that it's fixed"). Her Martine connection makes her an unreliable channel: she can open a door at the mayor's office or leak your plan. |
-| **The Gaystapo** (WhatsApp group of the gay members, across the street, facing Pilou) **Seb & Nico** | Talk a lot. Their **cat** sits on the balcony | The **WhatsApp group** is the association's nervous system: rally the troops, share photos, gossip. **Cat on the balcony = they are home and watching**: allies witness legal actions (+evidence) but also see illegal ones. |
+| **Seb & Nico** (couple across the street, facing Pilou) | Know all the gossip, talk a lot, run the association's WhatsApp group (**« Radio Balcon »**, provisional name, one constant in `src/content/characters.js`). Their **cat** sits on the balcony. Written by their *role*: no humour based on orientation | The **WhatsApp group** is the association's nervous system: rally the troops, share photos, gossip. **Cat on the balcony = they are home and watching**: allies witness legal actions (+evidence) but also see illegal ones. |
 | **Hippolyte** | Owns an old building where **carriages (calèches)** were made since the 1800s | Old money, knows the old families and the city's heritage department. Late game: heritage-protection angle (exhaust and AC on a historic façade), a meeting room in the former carriage workshop. |
 
 ### The restaurants ("restaurants vs residents")
@@ -106,7 +106,7 @@ Each **day** = 3 phases:
 1. **Koddex (morning, 2D/menu, short)**. Pilou has 3 "prompts" a day to give Clode Kode. Options: real work
    (keeps the job), or secretly building side projects that help the fight:
    - a Rust dB-meter daemon → **automatic noise logging** (passive evidence);
-   - a WhatsApp bot for the Gaystapo → association mobilisation costs less;
+   - a WhatsApp bot for Radio Balcon → association mobilisation costs less;
    - a review scraper → finds customers boasting about "terrace until 1am at Bernadette's 🍻";
    - a deepfake / fake reviews → **illegal**, big Risk.
    The boss notices if work output drops (Job meter). Gags: Clode Kode replies too politely, and it rewrote
@@ -128,7 +128,7 @@ Each **day** = 3 phases:
 |---|---|
 | **Sleep** | Drained by noise and the exhaust after 22:00. Low Sleep = blurry photos, irritable dialogue, Koddex mistakes. |
 | **Dossier** | Evidence. Each piece has a **quality** (timestamp, dB, headcount, witnesses) and a **legality** (illegally obtained = unusable officially, but usable for the press). |
-| **Association** | Members' support. Some actions shock some members (Hilde doesn't like violence, the Gaystapo love drama, Tatie Bouchon is a fence-sitter). |
+| **Association** | Members' support. Some actions shock some members (Hilde doesn't like violence, Seb & Nico love drama, Tatie Bouchon is a fence-sitter). |
 | **Risk** | Pilou's legal exposure. Grows with *witnessed* illegal acts. Thresholds: warning → complaint → police custody → trial. |
 | **Job** | Koddex. Too low = fired (bad ending, or a twist: unemployed = free all day to fight). |
 | **Bloc hostility** (hidden) | How much the restaurants target Pilou. |
@@ -136,7 +136,7 @@ Each **day** = 3 phases:
 
 ## 5. Stealth: illegal = OK if no one sees you
 Every illegal act checks for **witnesses** in line of sight + hearing:
-- **Klaas** (window, almost always there; asleep ~01:00–05:00), the **Gaystapo** (cat on the balcony = present),
+- **Klaas** (window, almost always there; asleep ~01:00–05:00), **Seb & Nico** (cat on the balcony = present),
   the **waiter/owners**, **customers** (may film → viral video), Jérémie's **dachshund** (barks if you're nearby and nervous),
   **no CCTV on the street** (confirmed): the only cameras are the ones Pilou installs himself.
 - Modifiers: darkness, time (after 01:00 the street is empty), disguise (hood, hi-vis vest = "looks like a delivery guy"),
@@ -223,7 +223,7 @@ Tunable rules live in `src/config.js`.
 ## 12. Roadmap
 | Milestone | Content |
 |---|---|
-| **v0.2: core tension** | Sim logic split out of rendering + tests. Witnesses and line-of-sight stealth (Klaas, the Gaystapo + cat, waiter, customers filming). Police patrols with personalities, tip-off, "c'est encore vous", complaisance logging. Terrace zone + passage corridor evidence. Saturday variant (crowd, standing drinkers, peeing). |
+| **v0.2: core tension** | Sim logic split out of rendering + tests. Witnesses and line-of-sight stealth (Klaas, Seb & Nico + cat, waiter, customers filming). Police patrols with personalities, tip-off, "c'est encore vous", complaisance logging. Terrace zone + passage corridor evidence. Saturday variant (crowd, standing drinkers, peeing). |
 | **v0.3: art pass** | Cute low-poly restyle: characters (Pilou, the association, Dédé & Ghislain, the waiter, police, customers), stepped gables, the cat, the dachshund, animations, ambient audio (WebAudio: crowd murmur, chairs on cobbles, the exhaust hum). |
 | **v0.4: campaign** | The 14-day calendar, day phase (Koddex / Clode Kode prompts, afternoon association actions), save in localStorage, scripted events (Martine's dinner, general meeting, inspector, exhaust meeting, commission), bloc counter-moves, dialogue system with the association members. |
 | **v0.5: dirty tricks** | Hidden cameras + electricity/wifi hijack, cardboard on the exhaust, stink bomb, laxatives, fake reviews, sabotage, bribing the waiter, photographing the bribe. Risk thresholds → complaint, custody, trial. |
