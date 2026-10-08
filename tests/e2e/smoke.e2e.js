@@ -78,3 +78,16 @@ test('samedi : la foule se charge sans erreur', async ({ page }) => {
   await page.screenshot({ path: 'test-results/saturday.png', timeout: 60_000 });
   expect(errors).toEqual([]);
 });
+
+test('nuit libre : ?day= accepte les 7 jours (libellé et roster de police du jour)', async ({ page }) => {
+  const errors = watchErrors(page);
+  for (const [day, label, weekday] of [['tue', 'Mardi', 'tue'], ['dimanche', 'Dimanche', 'sun'], ['xyz', 'Lundi', 'mon']]) {
+    await page.goto(`/?nolock=1&seed=4&day=${day}`);
+    await page.click('#start');
+    const s = await page.evaluate(() => ({ label: document.getElementById('day').textContent, weekday: window.__rdb.sim.weekday, variant: window.__rdb.sim.day.key }));
+    expect(s.label).toContain(label);
+    expect(s.weekday).toBe(weekday);
+    expect(s.variant).toBe('mon');
+  }
+  expect(errors).toEqual([]);
+});

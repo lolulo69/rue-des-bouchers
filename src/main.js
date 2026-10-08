@@ -43,7 +43,15 @@ let campaign = null;
   const saved = loadSave();
   if (params.get('mode') === 'night' && saved?.step === 'night') campaign = openCampaign(saved);
 }
-const sim = campaign ? campaign.createNight({ narrator }) : createSim({ seed: SEED, day: params.get('day') || 'mon', cfg, narrator });
+// Nuit libre : ?day= accepte les 7 jours (mon…sun, ou lundi…dimanche). Le jour choisit le roster de police ;
+// le samedi joue la variante « sans voitures ».
+const FREE_DAY = (() => {
+  const d = (params.get('day') || 'mon').toLowerCase();
+  const fr = { lundi: 'mon', mardi: 'tue', mercredi: 'wed', jeudi: 'thu', vendredi: 'fri', samedi: 'sat', dimanche: 'sun' };
+  const k = fr[d] ?? d;
+  return cfg.CAMPAIGN.weekdays.includes(k) ? k : 'mon';
+})();
+const sim = campaign ? campaign.createNight({ narrator }) : createSim({ seed: SEED, day: FREE_DAY === 'sat' ? 'sat' : 'mon', weekday: FREE_DAY, cfg, narrator });
 const S = sim.state;
 const CLOSE = sim.close;
 const W = STREET.halfWidth;
@@ -293,7 +301,10 @@ for (const b of document.querySelectorAll('#phone button')) {
 
 // ---------- Entrées ----------
 const WEEKDAY = { mon: 'lundi', tue: 'mardi', wed: 'mercredi', thu: 'jeudi', fri: 'vendredi', sat: 'samedi', sun: 'dimanche' };
-const nightLabel = () => (campaign ? `Jour ${campaign.state.day} · ${WEEKDAY[campaign.weekday()]}${campaign.isSaturday() ? ' (sans voitures)' : ''}` : sim.day.label);
+const cap = (s) => s[0].toUpperCase() + s.slice(1);
+const nightLabel = () => (campaign
+  ? `Jour ${campaign.state.day} · ${WEEKDAY[campaign.weekday()]}${campaign.isSaturday() ? ' (sans voitures)' : ''}`
+  : `${cap(WEEKDAY[sim.weekday])} · nuit libre${sim.day.key === 'sat' ? ' (sans voitures)' : ''}`);
 $('day').textContent = nightLabel();
 function startNight() {
   $('title').classList.add('hidden');
@@ -494,7 +505,8 @@ function syncCamera() {
 
 function frame(ts) {
   timer.update(ts);
-  tick(Math.min(timer.getDelta(), 0.1));
+  const d = timer.getDelta();
+  tick(Number.isFinite(d) ? Math.min(Math.max(d, 0), 0.1) : 0); // 1re frame : delta parfois NaN
   requestAnimationFrame(frame);
 }
 function tick(dt) {
@@ -505,7 +517,8 @@ function tick(dt) {
   syncCamera();
   updateSky();
   hudTimer -= dt;
-  if (hudTimer <= 0 && started && !S.ended) { updateHud(); hudTimer = 0.1; }
+  // !(> 0) plutôt que <= 0 : un NaN accidentel ne doit pas figer le HUD pour toute la nuit
+  if (!(hudTimer > 0) && started && !S.ended) { updateHud(); hudTimer = 0.1; }
   renderer.render(scene, camera);
 }
 
