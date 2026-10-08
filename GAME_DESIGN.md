@@ -172,7 +172,7 @@ Every illegal act checks for **witnesses** in line of sight + hearing:
 - **Bribe the waiter** to rat out the owners.
 - **Hidden cameras**: there's no CCTV, so Pilou installs his own. Filming the public street from private property is
   already not allowed in France (CNIL), so a camera at his window = grey; one hidden on the street/awning = illegal.
-  Footage = continuous evidence, **unusable in court** but gold for the press, the internal police investigation (IGPN) and blackmail. If discovered → complaint.
+  Footage = continuous evidence, **unusable in court** but gold for the press, the internal investigation (municipal police: the mayor's office + the préfet; IGPN only covers the national police) and blackmail. If discovered → complaint.
   - **Power**: plug it into **Bernadette's electricity** (outdoor socket under the awning, the AC unit's line) = electricity theft.
   - **Network**: crack **Bernadette's wifi** (the Rust dev wink: a Koddex side project) = unauthorized system access, art. 323-1 of the penal code.
     Bonus: on their network you can read the reservations book (over-capacity proof), the "it's being fixed" emails, and the real exhaust quotes they never signed.
@@ -187,7 +187,7 @@ Outcome depends on: patrol on duty, time, how often you've called, whether you m
 - **"Ah, it's you again"**: after too many calls, Pilou is flagged as a **serial complainer** → lower priority.
 - **The reversal**: the police come... for Pilou (a bloc complaint about "harassment", or Pilou doing something stupid).
 - **The bribe itself**: Dédé slips an envelope / invites them to eat. Catching it on camera = **jackpot evidence**, but only if
-  you have a clean shot from a legal spot. Leads to an internal investigation (IGPN) → Lemaire transferred → Corruption drops.
+  you have a clean shot from a legal spot. Leads to an administrative inquiry (« enquête interne », ordered by the mayor / the préfet; not the IGPN, which covers the national police) → Lemaire transferred → Corruption drops.
 - **The mayor's office comes too**: an inspector visit is announced → the restaurants are perfect that night (tip-off via Colette).
   A surprise visit requires the Delphine channel or Hippolyte.
 
