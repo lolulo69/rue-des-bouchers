@@ -2,57 +2,87 @@
 // la légalité et les effets des actions / choix et les notent selon leurs poids. Interface :
 //   { name, morning(c, opts) → picks[], afternoon(c, actions) → id | null, choose(c, card, choices) → i,
 //     night(c, sim) → politique de nuit { decide(sim), content(sim, c) }, continueAfterFired?(c) }
+// `weights` peut être une fonction de la campagne (le bot change d'avis en cours de route, ex. le diplomate qui craque).
 import { POLICIES } from './policies.js';
+import { availableNightActions, LOCATIONS, NIGHT_ACTION_SPECS } from './nightActions.js';
 
 const STATS = ['sleep', 'asso', 'risk', 'job', 'dossier', 'hostility', 'corruption'];
 
-// Note d'un bloc d'effets (+ effets si vu, pondérés par l'exposition) selon les poids du bot
-function score(effects = {}, w, witnessed) {
+// Note d'un bloc d'effets (+ effets si vu, pondérés par l'exposition) selon les poids du bot.
+// Avec la campagne `c`, le bot compte le gain réel : échelle de la config et marge restante (l'Asso à 100 ne monte plus).
+function score(effects = {}, w, witnessed, c) {
   let s = 0;
-  for (const k of STATS) s += (effects[k] ?? 0) * (w[k] ?? 0);
-  for (const f of effects.setFlags ?? []) s += w.flags?.[f] ?? (w.anyFlag ?? 0.5);
+  for (const k of STATS) s += gain(k, effects[k] ?? 0, c) * (w[k] ?? 0);
+  for (const f of effects.setFlags ?? []) if (!c?.has(f)) s += w.flags?.[f] ?? (w.anyFlag ?? 0.5); // un drapeau déjà posé ne rapporte plus
   if (effects.evidence) s += (effects.evidence.legal === false ? w.illegalEvidence ?? 1 : w.legalEvidence ?? 4) * (effects.evidence.quality ?? 1);
-  if (witnessed) s += score(witnessed.effects, w) * (witnessed.exposure ?? 0.4) * (w.caution ?? 1);
+  if (witnessed) s += score(witnessed.effects, w, null, c) * (witnessed.exposure ?? 0.4) * (w.caution ?? 1);
   return s;
 }
+function gain(k, v, c) {
+  if (!c || !v) return v;
+  const C = c.cfg.CAMPAIGN;
+  const scaled = v > 0 && k === 'dossier' ? v * (C.contentDossierScale ?? 1) : v > 0 && k === 'asso' ? v * (C.contentAssoScale ?? 1) : v;
+  const cur = c.state.stats[k] ?? c.state.hidden[k] ?? 0;
+  return Math.max(-cur, Math.min(100 - cur, scaled));
+}
 
-// Valeurs communes : gagner la commission, prouver la corruption, bloquer le bar de La Bombance ; ne pas devenir un habitué
+// Valeurs communes : gagner la commission (de préférence par le dossier), prouver la corruption, bloquer le bar de La Bombance ; ne pas devenir un habitué
 const flagWeights = (prefix) => ({
-  won_legal: 50, won_peace: 50, won_scandal: 50, commission_won: 30, corruption_proof: 15, press_contacted: 10, bombance_blocked: 30,
-  carbonnade_1: -20, carbonnade_2: -30, carbonnade_3: -60, ...prefix,
+  won_legal: 60, won_peace: 55, won_scandal: 40, commission_won: 30, // dans l'ordre des fins (ENDING_SCORE) corruption_proof: 15, press_contacted: 10, bombance_blocked: 30,
+  carbonnade_1: -20, carbonnade_2: -30, carbonnade_3: -60, commission_lost: -20, ...prefix,
 });
 
-function make({ name, weights, legality, sideProjects = 1, nightPolicy, nightContent, maxRisk = 100, continueFired = false }) {
-  const allowed = (a, c) => legality.includes(a.legality ?? 'legal') && (a.legality === 'legal' || c.state.stats.risk < maxRisk);
+function make({ name, weights: w, legality, sideProjects = 1, jobFloor = 35, naps = () => 0, nightPolicy, nightContent, maxRisk = 100, continueFired = false, alsoLegal = [] }) {
+  const W = (c) => (typeof w === 'function' ? w(c) : w);
+  const allowed = (a, c) => (legality.includes(a.legality ?? 'legal') || alsoLegal.includes(a.id)) && (a.legality === 'legal' || c.state.stats.risk < maxRisk);
   return {
     name,
     morning(c, o) {
+      const weights = W(c);
       const picks = [];
       const projects = o.sideProjects.filter((p) => p.available && (p.risk ?? 0) <= (legality.includes('illegal') ? 100 : 0))
-        .sort((a, b) => score(b.effects, weights) - score(a.effects, weights));
-      for (let i = 0; i < o.prompts; i++) picks.push(i < sideProjects && projects[i] && c.state.stats.job > 35 ? projects[i].id : 'work');
+        .map((p) => ({ p, s: score({ ...p.effects, setFlags: [...(p.effects?.setFlags ?? []), ...(p.unlocks ? [p.unlocks] : [])] }, weights, null, c) }))
+        .sort((a, b) => b.s - a.s).map((x) => x.p);
+      for (let i = 0; i < o.prompts; i++) picks.push(i < sideProjects && projects[i] && c.state.stats.job > jobFloor ? projects[i].id : 'work');
+      // La sieste pendant que Clode Kode « réfléchit » (work_nap) : du Sommeil contre du Job
+      const nap = o.work.find((x) => x.id === 'work_nap');
+      for (let i = picks.length - 1, n = nap ? naps(c) : 0; i >= 0 && n > 0; i--) if (picks[i] === 'work') { picks[i] = nap.id; n--; }
       return picks;
     },
     afternoon(c, actions) {
+      const weights = W(c);
       // Rendements décroissants : une action déjà faite intéresse moins (sinon le bot répète la même tous les jours)
       const done = (id) => c.state.counts.actions[id] ?? 0;
       const best = actions.filter((a) => allowed(a, c))
-        .map((a) => ({ a, s: score(a.effects, weights, a.witnessed) / (a.cost?.time ?? 1) / (1 + done(a.id)) }))
+        .map((a) => ({ a, s: score(a.effects, weights, a.witnessed, c) / (a.cost?.time ?? 1) / (1 + done(a.id)) }))
         .filter((x) => x.s > 0)
         .sort((x, y) => y.s - x.s)[0];
       return best?.a.id ?? null;
     },
     choose(c, card, choices) {
+      const weights = W(c);
       const data = card.data?.choices ?? [];
-      return choices.map((ch) => ({ i: ch.i, s: score(data[ch.i]?.effects, weights) }))
+      return choices.map((ch) => ({ i: ch.i, s: score(data[ch.i]?.effects, weights, null, c) }))
         .sort((x, y) => y.s - x.s)[0].i;
     },
     night(c, sim) {
-      const base = nightPolicy();
+      const nightScore = (a, camp) => {
+        const weights = W(camp);
+        const sc = score(a.effects, weights, a.witnessed, camp);
+        return a.legality === 'legal' ? sc : sc / (1 + (camp.state.counts.actions[a.id] ?? 0)) - 1;
+      };
+      const base = nightPolicy(c);
       return {
         decide: (s) => base.decide(s),
-        // Actions de nuit du contenu : seulement celles qui valent quelque chose pour ce bot (pas la carbonnade, etc.)
-        content: (s, camp) => (nightContent ? camp.nightActions(s).filter((a) => allowed(a, camp) && score(a.effects, weights, a.witnessed) > 0 && nightContent(s, a, camp)).map((a) => a.id) : []),
+        // Actions de nuit du contenu : seulement celles qui valent quelque chose pour ce bot (pas la carbonnade, etc.) ;
+        // un acte gris / illégal déjà commis intéresse moins (rendements décroissants, comme l'après-midi)
+        // Seulement ce qui est faisable ici et maintenant (créneau, scène), et `nightContent(sim, a, c, entrée du menu)`
+        content: (s, camp) => {
+          if (!nightContent || s.state.sleeping) return [];
+          const ACT = Object.fromEntries(camp.content.ACTIONS.map((a) => [a.id, a]));
+          return availableNightActions(s, camp).filter((x) => x.available).map((x) => [ACT[x.id], x])
+            .filter(([a, x]) => allowed(a, camp) && nightScore(a, camp) > 0 && nightContent(s, a, camp, x)).map(([a]) => a.id);
+        },
       };
     },
     continueAfterFired: () => continueFired,
@@ -60,14 +90,19 @@ function make({ name, weights, legality, sideProjects = 1, nightPolicy, nightCon
 }
 
 // Politique de nuit légale + relevés en dB + photo du pot-de-vin
-function legalNight({ asso = false, bedAt = 24.25 * 60 } = {}) {
-  return () => {
+// maxCalls : appels à la police par nuit (le diplomate rationne : chaque PV agace le bloc)
+// tiredBedAt : si le Sommeil de campagne est bas (< tiredBelow), Pilou se couche plus tôt
+function legalNight({ asso = false, bedAt = 24.25 * 60, maxCalls = Infinity, tiredBelow = 0, tiredBedAt = bedAt } = {}) {
+  return (c) => {
+    const bed = c && c.state.stats.sleep < tiredBelow ? tiredBedAt : bedAt;
     const p = POLICIES[asso ? 'legalAsso' : 'legal']();
     let lastDb = -Infinity;
+    let calls = 0;
     return {
       decide(sim) {
         const st = sim.state;
-        const acts = st.min >= bedAt ? [{ type: 'sleep', on: true }] : p.decide(sim);
+        const acts = (st.min >= bed ? [{ type: 'sleep', on: true }] : p.decide(sim))
+          .filter((a) => a.type !== 'police' || calls++ < maxCalls);
         const b = sim.activeBribe();
         if (b && !b.photographed && !st.sleeping) acts.push({ type: 'photo', target: { kind: 'police' }, distance: 8 });
         if (!st.sleeping && st.min >= 22 * 60 + 30 && st.min - lastDb >= 30) { lastDb = st.min; acts.push({ type: 'db', fromWindow: true }); }
@@ -76,7 +111,63 @@ function legalNight({ asso = false, bedAt = 24.25 * 60 } = {}) {
     };
   };
 }
-const stealthyOk = (sim) => !sim.potentialWitnesses(sim.cfg.ANCHORS.pilouWindow).some((w) => w.kind !== 'customers');
+// Illégal et discret : debout pour un seul appel à la police en début de soirée (de quoi provoquer la complaisance,
+// filmée par la caméra du store ou photographiée en douce), au lit de 23:15 à 00:50, puis le seau quand il n'y a plus
+// de témoin (Klaas dort à 01:00, le serveur est parti, le chat est rentré).
+function stealthyNight() {
+  return (c) => {
+    const bucket = POLICIES.stealthy();
+    const needComplaisance = !c.has('seen_complaisance');
+    const needWaiter = !c.has('asked_waiter');
+    let called = false;
+    let asked = false;
+    return {
+      decide(sim) {
+        const st = sim.state;
+        const m = st.min;
+        if (m >= 23.25 * 60 && m < 24.83 * 60) return st.sleeping ? [] : [{ type: 'sleep', on: true }];
+        if (m >= 24.83 * 60 && st.sleeping) return [{ type: 'sleep', on: false }];
+        if (needComplaisance && !called && m >= 22.25 * 60 && !st.police && sim.restaurants.some((r) => sim.infractions(r.id).length)) {
+          called = true;
+          return [{ type: 'police' }];
+        }
+        if (needWaiter && !asked && sim.isLate() && m >= st.waiterReadyAt && sim.infractions('bernadette').length) {
+          asked = true;
+          return [{ type: 'waiter' }];
+        }
+        return m >= 24.83 * 60 ? bucket.decide(sim) : [];
+      },
+    };
+  };
+}
+// Imprudent : le seau dès que possible, et il demande au serveur (pour pouvoir le soudoyer ensuite)
+function recklessNight() {
+  return (c) => {
+    const bucket = POLICIES.reckless();
+    let asked = c.has('asked_waiter');
+    return {
+      decide(sim) {
+        const st = sim.state;
+        if (!asked && sim.isLate() && st.min >= st.waiterReadyAt && sim.infractions('bernadette').length) { asked = true; return [{ type: 'waiter' }]; }
+        return bucket.decide(sim);
+      },
+    };
+  };
+}
+
+const DIPLOMAT = { asso: 3, hostility: -1.5, dossier: 1, sleep: 0.5, risk: -5, flags: flagWeights({ stance_dialogue: 30, won_peace: 80 }) };
+const DIPLOMAT_TURNCOAT = { ...DIPLOMAT, asso: 0, flags: flagWeights({ carbonnade_1: 40, carbonnade_2: 40, carbonnade_3: 40, won_scandal: 0, commission_won: 0 }) };
+const diplomatNight = legalNight({ bedAt: 23 * 60, maxCalls: 1 });
+const diplomatGaveUp = (c) => c.has('carbonnade_1') || (c.state.day >= 8 && c.state.hidden.hostility >= 80);
+
+// Aucun des témoins que l'acte redoute (`witnessed.by`) ne peut voir l'endroit, sauf des clients
+// (le serveur ne « témoigne » pas du pot-de-vin qu'il reçoit ; Dédé / Ghislain restent un aléa qu'on ne voit pas venir)
+const SIM_KIND = { klaas: 'klaas', seb_nico: 'seb_nico', waiter: 'waiter', customers: 'customers', biloute: 'jeremie', jeremie: 'jeremie' };
+function unseen(sim, a) {
+  const kinds = new Set((a.witnessed?.by ?? Object.keys(SIM_KIND)).map((w) => SIM_KIND[w]).filter(Boolean));
+  const pos = LOCATIONS[(NIGHT_ACTION_SPECS[a.id] ?? { at: 'street' }).at].pos(sim);
+  return !sim.potentialWitnesses(pos).some((w) => kinds.has(w.kind) && w.kind !== 'customers');
+}
 
 export const CAMPAIGN_BOTS = {
   passive: () => make({
@@ -85,33 +176,43 @@ export const CAMPAIGN_BOTS = {
   }),
   legal: () => make({
     name: 'légal prudent', legality: ['legal'],
-    weights: { dossier: 3, asso: 1.5, sleep: 0.5, risk: -5, hostility: -0.2, job: 0.3, legalEvidence: 6, flags: flagWeights({ stance_legal: 20 }) },
-    nightPolicy: legalNight(), nightContent: () => true,
+    weights: { dossier: 3, asso: 1.5, sleep: 0.5, risk: -5, hostility: -0.2, job: 0.3, legalEvidence: 6, flags: flagWeights({ stance_legal: 20, lawyer_hired: 8, formal_notice: 8, lescaut_requested: 6, lescaut_meeting: 8, lescaut_ally: 8, inquiry_open: 10, lemaire_transferred: 10 }) },
+    nightPolicy: legalNight({ asso: true }), nightContent: () => true,
   }),
   reckless: () => make({
     name: 'illégal imprudent', legality: ['illegal', 'grey'], sideProjects: 3,
-    weights: { dossier: 1, risk: 0, hostility: 0.5, illegalEvidence: 3, anyFlag: 2, flags: flagWeights({ stance_direct: 20 }), caution: 0 },
-    nightPolicy: () => POLICIES.reckless(), nightContent: () => true,
+    weights: { dossier: 1, risk: 0, hostility: 0.5, illegalEvidence: 3, anyFlag: 2, flags: flagWeights({ stance_direct: 20, waiter_bribed: 10, waiter_informant: 10 }), caution: 0 },
+    nightPolicy: recklessNight(), nightContent: () => true,
   }),
   stealthy: () => make({
     name: 'illégal discret', legality: ['illegal', 'grey'], sideProjects: 2, maxRisk: 60,
-    weights: { dossier: 1, risk: -2, hostility: 0.3, illegalEvidence: 3, anyFlag: 2, flags: flagWeights({ stance_direct: 15, disguise_hood: 20, disguise_vest: 20 }), caution: 2 },
-    nightPolicy: () => POLICIES.stealthy(), nightContent: (sim) => stealthyOk(sim),
+    weights: { dossier: 1, risk: -2, hostility: 0.3, illegalEvidence: 3, anyFlag: 2, flags: flagWeights({ stance_direct: 15, disguise_hood: 20, disguise_vest: 20, waiter_bribed: 15, waiter_informant: 15, proj_wifi_cracker: 15, wifi_cracked: 15 }), caution: 2 },
+    nightPolicy: stealthyNight(), nightContent: (sim, a) => unseen(sim, a),
+    alsoLegal: ['pm_press_contact', 'pm_waiter_testimony'], // marchepieds légaux du plan illégal (la presse pour le scandale, le serveur retourné)
   }),
   mixed: () => make({
     name: 'mixte malin', legality: ['legal', 'grey', 'illegal'], sideProjects: 1, maxRisk: 40,
-    weights: { dossier: 3, asso: 1.5, sleep: 0.5, risk: -3, hostility: -0.1, legalEvidence: 6, illegalEvidence: 2, flags: flagWeights({ stance_legal: 10 }), caution: 2 },
-    nightPolicy: legalNight({ asso: true }), nightContent: (sim, a, camp) => camp.state.stats.risk < 30 && stealthyOk(sim),
+    weights: { dossier: 5, asso: 1.5, sleep: 0.5, risk: -3, hostility: -0.2, job: 0.3, legalEvidence: 8, illegalEvidence: 2, flags: flagWeights({ stance_legal: 20, tatie_fake_leak: 3, bloc_fooled: 5 }), caution: 2 },
+    naps: (c) => (c.state.stats.sleep < 35 && c.state.stats.job > 45 ? 1 : 0),
+    nightPolicy: legalNight({ asso: true }), nightContent: (sim, a, camp, x) => a.legality === 'legal' || (camp.state.stats.risk < 30 && unseen(sim, a)),
     continueFired: true,
   }),
   diplomat: () => make({
     name: 'diplomate', legality: ['legal'],
-    weights: { asso: 3, hostility: -1.5, dossier: 1, sleep: 0.5, risk: -5, flags: flagWeights({ stance_dialogue: 30, won_peace: 80 }) },
-    nightPolicy: legalNight({ bedAt: 23 * 60 }), nightContent: () => true,
+    // La paix devient impossible (bloc trop hostile, tard dans la campagne) : il craque et passe à table, pour de bon
+    weights: (c) => (diplomatGaveUp(c) ? DIPLOMAT_TURNCOAT : DIPLOMAT),
+    // …et, passé de l'autre côté, il ne documente plus rien la nuit (il dîne)
+    nightPolicy: (c) => (diplomatGaveUp(c) ? POLICIES.passive() : diplomatNight(c)), nightContent: () => true,
+  }),
+  // Tire-au-flanc : tout Koddex part en side projects, le boulot attend. Ne prend pas le rebond « au chômage ».
+  slacker: () => make({
+    name: 'tire-au-flanc', legality: ['legal'], sideProjects: 3, jobFloor: -Infinity, naps: () => 3,
+    weights: { dossier: 3, asso: 1.5, sleep: 0.5, risk: -5, legalEvidence: 6, flags: flagWeights({ stance_legal: 20 }) },
+    nightPolicy: legalNight({ bedAt: 23.5 * 60 }), nightContent: () => true,
   }),
 };
 
-// Cibles §13.H, exprimées en part de campagnes par fin (ids canoniques de CONFIG.CAMPAIGN.endings)
+// Cibles §13.H, exprimées en part de campagnes par fin (ids canoniques de CONFIG.CAMPAIGN.endings ; « le retour » compté via baseEnding)
 export const TARGETS = {
   passive: [{ label: '≥ 90 % déménagement / défaite', ok: (d) => (d.moving_out ?? 0) + (d.fired ?? 0) + (d.custody ?? 0) + (d.none ?? 0) >= 0.9 }],
   legal: [
@@ -125,7 +226,16 @@ export const TARGETS = {
   ],
   mixed: [{ label: 'meilleur score moyen', ok: (d, all, name) => Object.entries(all).every(([k, v]) => k === name || v.score <= all[name].score) }],
   diplomat: [{ label: 'paix négociée ≥ 40 %', ok: (d) => (d.negotiated_peace ?? 0) >= 0.4 }],
+  slacker: [{ label: 'licenciement atteignable (≥ 2 %, §13.F)', ok: (d) => (d.fired ?? 0) >= 0.02 }],
 };
+
+// « Le retour » (La Bombance rouvre en bar) se pose sur une victoire à la commission : pour les cibles et le score,
+// il compte comme la victoire qu'il prolonge (won_legal / won_peace / won_scandal).
+export function baseEnding(S) {
+  const id = S.ending?.id ?? 'none';
+  if (id !== 'the_return') return id;
+  return S.flags.includes('won_legal') ? 'legal_victory' : S.flags.includes('won_peace') ? 'negotiated_peace' : S.flags.includes('won_scandal') ? 'scandal' : id;
+}
 
 // Score de fin (pour "meilleur score moyen") : les bonnes fins valent plus
 export const ENDING_SCORE = { legal_victory: 100, negotiated_peace: 90, scandal: 70, the_return: 60, turncoat: 20, fired: 10, moving_out: 0, custody: -20, none: 0 };

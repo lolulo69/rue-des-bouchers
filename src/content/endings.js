@@ -5,7 +5,9 @@
 //   • Fins d'échec anticipées (garde à vue, licenciement, déménagement) : possibles dès la nuit 5 (`day: [5, 14]`).
 //   • Les autres se décident à la commission du J14 (drapeaux `won_*`, `commission_won`, `commission_lost`,
 //     posés par le choix du joueur dans l'événement `d14_commission`, cf. events.js).
-//   • « Le retour » et « Le transfuge » priment sur une victoire : elles la détournent.
+//   • « Le retour » se pose sur une victoire (La Bombance rouvre en bar) : il la prolonge, le simulateur la compte comme
+//     la victoire qu'elle prolonge. « Le transfuge » est délibéré et rare : trois carbonnades, venir à la commission
+//     « en habitué » (ni gagnée ni perdue) et une Asso au plus bas.
 // Épilogue : toutes les parties dont `when` correspond, dans l'ordre. `when: {}` = toujours affichée.
 // Ton : la satire vise les institutions, les manœuvres du bloc et Pilou lui-même, jamais les riverains.
 // Tous les personnages et commerces sont fictifs (GAME_DESIGN §0).
@@ -220,7 +222,7 @@ export const ENDINGS = [
     title: 'Le transfuge',
     priority: 85,
     secret: true,
-    when: { flags: ['carbonnade_3', 'commission_done'] },
+    when: { flags: ['carbonnade_3', 'commission_done'], notFlags: ['commission_won', 'commission_lost'], stats: { asso: '<60' } },
     epilogue: [
       {
         when: {},
@@ -259,7 +261,8 @@ export const ENDINGS = [
     title: 'Déménagement à Wazemmes',
     priority: 80,
     when: { day: [5, 14] },
-    whenAny: [{ stats: { sleep: '<=0' } }, { flags: ['commission_lost'] }],
+    // Venu « en habitué » à la commission avec une Asso encore solide : pas un vrai transfuge, juste une commission perdue
+    whenAny: [{ stats: { sleep: '<=0' } }, { flags: ['commission_lost'] }, { flags: ['commission_done'], notFlags: ['commission_won'], stats: { asso: '>=60' } }],
     epilogue: [
       {
         when: { stats: { sleep: '<=0' } },

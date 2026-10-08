@@ -47,3 +47,59 @@ Never reached: endings **fired, scandal, negotiated_peace**. 9/64 actions (the w
 
 Diagnosis to confirm: dossier/asso still saturate (see the night baseline findings 1–2); "the return" should be an epilogue variant of a win, not an outcome that competes with it; the turncoat condition is too loose for a *secret* ending; the peace/scandal conditions are unreachable; the Tatie email triggers never match.
 → Assigned to the balance agent.
+
+## 2026-10-08 · balance pass 1 (balance agent) · all §13.H targets met, all 8 endings reached
+`npm run sim -- --runs 1000 --detail` on the sim box (CT 106), 1000 campaigns × 7 bots in 92 s. Invariants: ✅ no violation.
+« le retour » is counted as the win it sits on (`baseEnding`): its column shows the twist; the score and targets use the underlying win.
+
+| bot | custody | fired | legal_victory | moving_out | negotiated_peace | scandal | the_return | turncoat | score | sommeil | asso | risque | job | dossier | garde à vue (nuit méd.) | cibles §13.H |
+| passif | · | · | · | 100% | · | · | · | · | 0 | 10 | 40 | 0 | 100 | 11 | – | ✅ ≥ 90 % déménagement / défaite |
+| légal prudent | · | · | 50% | 4% | · | 47% | · | · | 82 | 43 | 100 | 0 | 92 | 51 | – | ✅ victoire légale 35–60 %<br>✅ jamais de garde à vue |
+| illégal imprudent | 100% | · | · | · | · | · | · | · | -20 | 77 | 1 | 95 | 32 | 14 | 5 | ✅ ≥ 70 % garde à vue / procès |
+| illégal discret | 1% | · | · | 97% | · | 1% | 1% | · | 1 | 0 | 13 | 27 | 53 | 21 | 9 | ✅ ≤ 40 % garde à vue<br>✅ scandale atteignable |
+| mixte malin | · | · | 75% | 6% | · | 20% | · | · | 89 | 30 | 100 | 1 | 58 | 55 | – | ✅ meilleur score moyen |
+| diplomate | · | · | · | 14% | 20% | 12% | 48% | 5% | 67 | 61 | 87 | 2 | 88 | 33 | – | ✅ paix négociée ≥ 40 % |
+| tire-au-flanc | · | 100% | · | · | · | · | · | · | 10 | 99 | 74 | 0 | 0 | 21 | – | ✅ licenciement atteignable (≥ 2 %, §13.F) |
+
+Commission choice (p10/50/90 dossier · asso · hostility at the end):
+| bot | commission | dossier | asso | hostility |
+|---|---|---|---|---|
+| legal | #1 AC plea 50 %, #5 scandal 47 %, #7 improvise 4 % | 46/51/56 | 100/100/100 | 100/100/100 |
+| mixed | #1 75 %, #5 20 %, #7 3 % | 49/55/60 | 100/100/100 | 100/100/100 |
+| diplomat | #3 charter 50 %, #5 scandal 31 %, #6 « en habitué » 5 %, #7 14 % | 29/33/38 | 75/96/100 | 23/62/95 |
+
+**§13.F (each ending ≥ 2 % of 1000 runs of its target strategy)**: legal victory 50 % (legal) · negotiated peace 20 % + 48 % with the Bombance twist (diplomat) ·
+scandal 20 % (mixed), 47 % (legal) · custody 100 % (reckless) · moving out 100 % (passive) · fired 100 % (slacker) · turncoat 5 % (diplomat) · the return 48 % (diplomat). ✅
+
+**§13.H no dominant action** (`--ablate mixed`, 1000 campaigns, win = legal / peace / scandal / return, base 95 %): biggest shifts
+`pm_klaas_roster` −17, `pm_klaas_notebook` −15, `night_bribe_photo_window` −6, `pm_press_contact` −6, everything else ≤ 2. Max 17 < 25. ✅
+(Before the bot fixes below, the 22:00 round alone was −33: mixed's dossier median sat exactly on the commission's ≥ 50 bar.)
+
+### Knobs changed and why
+| knob | was | now | why |
+|---|---|---|---|
+| `CAMPAIGN.nightEvidenceScale` | 1.2 | 0.065 | ~15 dossier points a night, every night, for any legal bot (the same infractions are re-photographed nightly): dossier 100 by night 4. Tuned so the careful legal bot's median lands on the commission's ≥ 50 bar (AC plea; its heritage route to `ac_violation_confirmed` is nearly always open). 0.07 → 59 %, 0.065 → 50 %. |
+| `CAMPAIGN.contentDossierScale` (new) | – (1) | 0.3 | Content alone (`dossier: +N` on events, actions, Koddex) gave ~50 points: the commission bar was met without a single night. |
+| `CAMPAIGN.contentAssoScale` (new) | – (1) | 0.5 | Asso hit 100 by night 3 from afternoon actions. |
+| `CAMPAIGN.assoDecayPerDay` (new) | – (0) | 4 | Support erodes towards `start.asso` if not fed. |
+| `ASSO.nightGainCap` | 8 | 4 | Same (finding #1). |
+| `POLICE.fineHostility` (new) | – (0) | 11 | The diplomat ended at hostility 15 ± 2, so the charter (hostility < 60) was a sure thing and nothing else mattered. A PV after a call now angers the bloc, and whether a call ends in a PV depends on which patrol comes: the peace route gets real variance (hostility p10/50/90 23/62/95, peace ≈ 68 %). Earlier sweep, with an older diplomat bot: 4 → charter chosen in 87 % of runs, 13 → 33 %. |
+| ending `turncoat` | `carbonnade_3` + `commission_done` | + not won, not lost (the « en habitué » choice) + `asso < 60` | Rare and deliberate (95 % of mixed runs before). Moving out got the matching habitué-with-asso-≥-60 branch, otherwise the engine fallback (lowest priority = peace) handed out a free win. |
+
+### Engine / tooling (small diffs, see Build notes)
+- Morning counter-moves were never built (all 12 Tatie emails, `cm_bins`): fixed in `buildCards`.
+- `scripts/sim.js`: `--set`, `--detail`, `--ablate`; the_return scored as its win.
+
+### Bots (they play their strategy competently, no cheating)
+Scoring counts the real gain (config scale, headroom), only new flags score, and the win flags are weighted in ending order. Night content goes through `availableNightActions`, and illegal acts happen only when the act's own witnesses can't see.
+Stealthy: sleeps 23:15–00:50, one police call, asks the waiter, uses press contact + waiter testimony as legal stepping stones.
+Mixed = legal + naps when tired + safe grey/illegal + dossier focus. Diplomat: one call a night, gives up and changes sides if peace is out of reach late.
+New **slacker** bot (side projects + naps) → fired.
+
+### Still open
+- **Asso still sits at 100** for legal / mixed / diplomat (finding #1 only half fixed). Lower asso (cap 2–3, decay 6–8) makes the police and the waiter less effective, so sleep collapses and every legal-ish bot moves out. The asso economy needs a design look (what asso *buys* beyond the peace charter), not just smaller numbers.
+- **Legal bot: 47 % scandal**: when its dossier misses the bar, the careful legal player brings the press article (corruption proof via Klaas's notebook / the window photo is legal). §13.H says "otherwise peace or defeat"; scandal isn't custody, but if it should stay out of a careful legal run, `pm_klaas_notebook` / `pm_press_scandal` are the levers.
+- **The return is common** (48 % of diplomat runs): the diplomat never gets the heritage angle or a lawyer, so it can't block the bar project. It's a twist on a win and scores as one, but as a "wink" it's frequent.
+- **Stealthy moves out 97 %**: illegal-only has no tool against noise apart from the one-off cardboard. Its targets are met (custody 1 %, scandal reachable), but it's a weak strategy.
+- **The legal win is a cliff** (dossier p10–p90 spans ~10 points around the bar): new content that adds or removes ~3 dossier points moves the legal rate by ~10 points. Re-run `npm run sim -- --runs 1000` after content changes.
+- Never used: `night_saboter_cuisine`, `night_laxatif_carbonnade`, `night_backroom_photo`, `pm_bloc_fooled` (+3 counter-moves that follow them); `r_aot_pdf` can't fire (content condition, see Build notes).
