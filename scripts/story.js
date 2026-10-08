@@ -11,6 +11,7 @@ import { createRng } from '../src/sim/rng.js';
 import { fmt } from '../src/sim/time.js';
 import * as narrative from '../src/sim/narrative.js';
 import { CHARACTERS, PLACES } from '../src/content/characters.js';
+import { TWISTS } from '../src/content/twists.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const argv = process.argv.slice(2);
@@ -89,12 +90,32 @@ function cards() {
 }
 
 const NATIVE = { police: 'appelle la police municipale', waiter: 'demande au serveur de rentrer les tables', bucket: 'vide un seau d’eau par la fenêtre', asso: 'partage ses pièces sur le groupe WhatsApp', mairie: 'envoie un signalement à la mairie' };
+// Rebondissement de la nuit (§12b) : le moteur (src/sim/twists.js) les applique quand il existe ;
+// en attendant, la transcription les choisit avec la même règle (fixe : première variante qui colle ; sinon tirage
+// seedé dans le réservoir, jamais deux fois) et en montre le texte. Les effets `sim` ne s'appliquent qu'avec le moteur.
+let twistRng = null;
+let twistsUsed = new Set();
+function pickTwist() {
+  if (c.twistFor) return c.twistFor(c.state.day);
+  const fixed = TWISTS.filter((t) => t.day === c.state.day && c.check(t.when, false));
+  if (fixed.length) return fixed[0];
+  const pool = TWISTS.filter((t) => t.pool && !twistsUsed.has(t.id) && c.check(t.when, false));
+  return pool.length ? twistRng.pick(pool) : null;
+}
 function night() {
+  const twist = pickTwist();
+  if (twist) twistsUsed.add(twist.id);
   const sim = c.createNight({ narrator });
   const policy = bot.night(c, sim);
-  w(`### 🌙 Nuit ${c.state.day} (${sim.day.key === 'sat' ? 'samedi, foule' : 'semaine'})`);
+  w(`### 🌙 Nuit ${c.state.day} (${sim.day.key === 'sat' ? 'samedi, foule' : 'semaine'})${twist ? ` · ✨ ${twist.title} \`${twist.id}\`` : ''}`);
+  if (twist) { w(`> ${twist.intro}`); if (!c.twistFor) w('> _(effets sur la nuit : appliqués par le moteur src/sim/twists.js quand il sera branché)_'); w(); }
   const log = [];
   const say = (min, text) => log.push(`- \`${fmt(min)}\` ${text}`);
+  if (twist) {
+    for (const e of twist.sim.events ?? []) say(e.at, `✨ ${e.text}`);
+    if (twist.lines.barks?.length) say(21 * 60 + 20, `🍻 ${narrRng.pick(twist.lines.barks)}`);
+    if (twist.lines.klaas?.length) say(22 * 60 + 40, `📓 Carnet de Klaas : ${narrRng.pick(twist.lines.klaas)}`);
+  }
   let outAt22 = null, nextContent = -Infinity, barks = 0, nextBark = 20 * 60 + 45;
   const bells = { [21 * 60 + 55]: 'bell:before', [22 * 60]: 'bell:strike', [22 * 60 + 5]: 'bell:after' };
   while (!sim.state.ended) {
@@ -132,11 +153,14 @@ function night() {
     sim.tick(1);
   }
   for (const e of sim.drainEvents()) if (e.type === 'log') say(e.min, e.text);
-  out.push(...log.map((l, i) => [l, i]).sort((a, b) => (a[0].slice(3, 8) < b[0].slice(3, 8) && a[0].slice(3, 5) >= '20') - 0 || 0).map(([l]) => l));
+  // Tri stable par heure de jeu (après minuit = 24h+), pour que rebondissements, actions et narration soient dans l'ordre
+  const minOf = (l) => { const [hh, mm] = l.slice(3, 8).split(':').map(Number); return (hh < 12 ? hh + 24 : hh) * 60 + mm; };
+  out.push(...log.map((l, i) => [l, i]).sort((a, b) => minOf(a[0]) - minOf(b[0]) || a[1] - b[1]).map(([l]) => l));
   const summary = c.finishNight(sim);
   w();
   const h = narrative.recapHeadline(c.state.lastNight ?? summary, sim.state);
   w(`**📰 ${h.text}**`);
+  if (twist?.lines.recap?.length) w(`_✨ ${narrRng.pick(twist.lines.recap)}_`);
   for (const v of (c.state.lastNight ?? summary)?.verdict ?? []) w(`- ${v}`);
   w();
 }
@@ -156,7 +180,7 @@ function phone() {
 }
 
 function tell({ botName, seed, steerWith = null, title = null }) {
-  out = []; day = 0; steer = steerWith;
+  out = []; day = 0; steer = steerWith; twistsUsed = new Set(); twistRng = createRng((seed ^ 0x7f4a7c15) >>> 0);
   bot = CAMPAIGN_BOTS[botName]();
   c = createCampaign({ seed, content: K, narrative });
   narrRng = createRng((seed ^ 0x5bd1e995) >>> 0);

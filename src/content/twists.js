@@ -411,7 +411,7 @@ export const TWISTS = [
     id: 'fete_voisins',
     title: 'La fête des voisins',
     pool: true,
-    when: { stats: { asso: '>=40' } },
+    when: { day: [3, 13], stats: { asso: '>=40' } },
     intro: "L’association contre-programme : « fête des voisins », place Maurice-Schumann. Une table à tréteaux, la tarte de Hilde, les guirlandes de Seb. Déclarée en mairie, finie à 22h. Le bloc regarde de loin, vexé.",
     sim: {
       crowd: 1.05,
