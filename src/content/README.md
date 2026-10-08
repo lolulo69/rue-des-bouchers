@@ -22,6 +22,11 @@ This file records the writing decisions so that every text stays consistent. Rea
 - Seb & Nico are defined by their **role**: the couple across the street, the gossip, the admins of the WhatsApp group. No humour about who they are.
 - Work of fiction (§0): no real people, no real businesses. Kitchen sabotage has two tiers: the salt/sugar swap (« carbonnade sucrée », police court) and, darkest, a laxative in the carbonnade (comedic in play, treated as poisoning if caught → criminal court, the association disowns Pilou). Game level only: no product, no dose, no method.
 
+## Typography (checked by `tests/unit/typography.test.js`)
+French typography in every displayed string: apostrophe **’** (never `'` between letters); guillemets **« … »** with a no-break space (U+00A0) inside;
+a narrow no-break space (U+202F) before **; ! ?** and a no-break space (U+00A0) before **:**; ellipsis **…** (never `...`).
+Inner quotes inside « » use ‹ › . Code strings (ids, conditions, `{placeholders}`) are untouched.
+
 ## Cast quick reference
 | id | Who | Where (§1b) |
 |---|---|---|

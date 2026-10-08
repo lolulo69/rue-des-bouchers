@@ -17,8 +17,8 @@ export const DIALOGUE = [
     speaker: 'jeremie',
     when: { day: [1, 2], notFlags: ['met_jeremie'] },
     lines: [
-      "Pilou ! Le voisin du deuxième. Jérémie, troisième étage, président de l'Association de la rue des Bouchers.",
-      "On se croise dans l'escalier depuis deux ans, il était temps qu'on se parle autrement qu'en s'excusant pour le teckel.",
+      "Pilou ! Le voisin du deuxième. Jérémie, troisième étage, président de l’Association de la rue des Bouchers.",
+      "On se croise dans l’escalier depuis deux ans, il était temps qu’on se parle autrement qu’en s’excusant pour le teckel.",
     ],
     effects: { setFlags: ['met_jeremie'] },
     once: true,
@@ -28,8 +28,8 @@ export const DIALOGUE = [
     speaker: 'jeremie',
     when: { phase: 'night', flags: ['met_jeremie'] },
     lines: [
-      "Vingt-deux heures, rue des Bouchers. Pas vingt-deux heures quinze, pas « le temps que les clients finissent leur verre ».",
-      "C'est l'arrêté. Je l'ai imprimé, plastifié, et il est dans la poche de la laisse de Biloute.",
+      "Vingt-deux heures, rue des Bouchers. Pas vingt-deux heures quinze, pas « le temps que les clients finissent leur verre ».",
+      "C’est l’arrêté. Je l’ai imprimé, plastifié, et il est dans la poche de la laisse de Biloute.",
     ],
   },
   {
@@ -37,8 +37,8 @@ export const DIALOGUE = [
     speaker: 'jeremie',
     when: { phase: 'night', flags: ['met_jeremie'], chance: 0.5 },
     lines: [
-      "Six par table. Compte avec moi : un, deux, trois… huit. Et la poussette, je ne la compte même pas.",
-      "On ne s'énerve pas, on note. Un dossier, c'est des chiffres, pas des cris.",
+      "Six par table. Compte avec moi : un, deux, trois… huit. Et la poussette, je ne la compte même pas.",
+      "On ne s’énerve pas, on note. Un dossier, c’est des chiffres, pas des cris.",
     ],
   },
   {
@@ -46,8 +46,8 @@ export const DIALOGUE = [
     speaker: 'jeremie',
     when: { day: [1, 5], phase: 'night', flags: ['met_jeremie'], notFlags: ['joined_rounds'] },
     lines: [
-      "Tous les soirs à 22h, je sors Biloute. Officiellement, c'est une promenade hygiénique.",
-      "Officieusement, c'est une ronde. Allez, viens. Le chien a le flair, moi j'ai le règlement, toi tu as le téléphone.",
+      "Tous les soirs à 22h, je sors Biloute. Officiellement, c’est une promenade hygiénique.",
+      "Officieusement, c’est une ronde. Allez, viens. Le chien a le flair, moi j’ai le règlement, toi tu as le téléphone.",
     ],
     effects: { setFlags: ['joined_rounds'] },
     once: true,
@@ -57,8 +57,8 @@ export const DIALOGUE = [
     speaker: 'jeremie',
     when: { phase: 'night', flags: ['joined_rounds'], chance: 0.4 },
     lines: [
-      "Biloute s'est arrêté devant le pied de parasol de l'estaminet. Il le renifle toujours au même endroit.",
-      "Je ne dis pas que c'est une preuve. Je dis que ce chien a de l'instinct juridique.",
+      "Biloute s’est arrêté devant le pied de parasol de l’estaminet. Il le renifle toujours au même endroit.",
+      "Je ne dis pas que c’est une preuve. Je dis que ce chien a de l’instinct juridique.",
     ],
   },
   {
@@ -66,7 +66,7 @@ export const DIALOGUE = [
     speaker: 'jeremie',
     when: { day: [6, 6], phase: 'afternoon', flags: ['met_jeremie'] },
     lines: [
-      "Samedi. Pas de voitures, donc tout le monde dans la rue, debout, un verre à la main. Le couloir de passage devient une fosse d'orchestre.",
+      "Samedi. Pas de voitures, donc tout le monde dans la rue, debout, un verre à la main. Le couloir de passage devient une fosse d’orchestre.",
       "Ce soir, on reste groupés, on photographie, et on ne répond à aucune provocation. Même pas à un enterrement de vie de garçon.",
     ],
   },
@@ -75,8 +75,8 @@ export const DIALOGUE = [
     speaker: 'jeremie',
     when: { flags: ['met_jeremie'], stats: { dossier: '>=40' } },
     lines: [
-      "J'ai relu le dossier hier soir. Il commence à ressembler à quelque chose. Il a même une table des matières.",
-      "Un dossier solide, c'est ce qui fait la différence entre « des riverains qui râlent » et « des riverains qui ont raison ».",
+      "J’ai relu le dossier hier soir. Il commence à ressembler à quelque chose. Il a même une table des matières.",
+      "Un dossier solide, c’est ce qui fait la différence entre « des riverains qui râlent » et « des riverains qui ont raison ».",
     ],
   },
   {
@@ -84,7 +84,7 @@ export const DIALOGUE = [
     speaker: 'jeremie',
     when: { day: [8, 13], flags: ['met_jeremie'], stats: { dossier: '<20' } },
     lines: [
-      "Je ne veux pas t'alarmer, mais pour la commission on a trois photos floues et un relevé de décibels pris pendant que Biloute aboyait.",
+      "Je ne veux pas t’alarmer, mais pour la commission on a trois photos floues et un relevé de décibels pris pendant que Biloute aboyait.",
       "Il nous faut du propre. Horodaté. Avec des chaises dedans.",
     ],
   },
@@ -93,8 +93,8 @@ export const DIALOGUE = [
     speaker: 'jeremie',
     when: { flags: ['met_jeremie'], stats: { sleep: '<25' } },
     lines: [
-      "Tu as une tête de dossier classé sans suite. Tu as dormi combien ?",
-      "Va te coucher. L'arrêté sera encore là demain. Les chaises aussi, malheureusement.",
+      "Tu as une tête de dossier classé sans suite. Tu as dormi combien ?",
+      "Va te coucher. L’arrêté sera encore là demain. Les chaises aussi, malheureusement.",
     ],
   },
   {
@@ -102,8 +102,8 @@ export const DIALOGUE = [
     speaker: 'jeremie',
     when: { flags: ['called_as_asso'] },
     lines: [
-      "Tu as appelé la police au nom de l'association ? Ça marche, ils viennent plus vite.",
-      "Mais maintenant le bloc sait d'où viennent les appels. On a gagné du temps et perdu l'effet de surprise.",
+      "Tu as appelé la police au nom de l’association ? Ça marche, ils viennent plus vite.",
+      "Mais maintenant le bloc sait d’où viennent les appels. On a gagné du temps et perdu l’effet de surprise.",
     ],
     once: true,
   },
@@ -112,7 +112,7 @@ export const DIALOGUE = [
     speaker: 'jeremie',
     when: { day: [5, 6], phase: 'afternoon', flags: ['met_jeremie'] },
     lines: [
-      "L'assemblée générale, c'est dimanche. J'ai préparé l'ordre du jour, les procurations, et un gâteau de Hilde au cas où ça dégénère.",
+      "L’assemblée générale, c’est dimanche. J’ai préparé l’ordre du jour, les procurations, et un gâteau de Hilde au cas où ça dégénère.",
     ],
   },
   {
@@ -120,8 +120,8 @@ export const DIALOGUE = [
     speaker: 'jeremie',
     when: { flags: ['stance_direct'] },
     lines: [
-      "L'AG a voté « action directe ». En tant que président, je prends acte.",
-      "En tant que voisin, je te demande juste une chose : que rien ne me retombe sur la tête quand je sors le chien.",
+      "L’AG a voté « action directe ». En tant que président, je prends acte.",
+      "En tant que voisin, je te demande juste une chose : que rien ne me retombe sur la tête quand je sors le chien.",
     ],
     once: true,
   },
@@ -130,8 +130,8 @@ export const DIALOGUE = [
     speaker: 'jeremie',
     when: { flags: ['klaas_noted_pilou', 'met_jeremie'] },
     lines: [
-      "Klaas m'a lu une ligne de son carnet. Une ligne avec ton nom dedans.",
-      "Je ne veux pas savoir. Vraiment. Mais si le bloc l'apprend, c'est toute l'association qui passe pour une bande de voyous.",
+      "Klaas m’a lu une ligne de son carnet. Une ligne avec ton nom dedans.",
+      "Je ne veux pas savoir. Vraiment. Mais si le bloc l’apprend, c’est toute l’association qui passe pour une bande de voyous.",
     ],
     effects: { asso: -3 },
     once: true,
@@ -141,8 +141,8 @@ export const DIALOGUE = [
     speaker: 'jeremie',
     when: { day: [13, 13], flags: ['met_jeremie'] },
     lines: [
-      "Demain, la commission. J'ai repassé ma chemise et classé les pièces par ordre chronologique, puis par ordre de gravité, puis de nouveau chronologique.",
-      "Quoi qu'il arrive, on aura essayé. Proprement. Enfin, le plus proprement possible.",
+      "Demain, la commission. J’ai repassé ma chemise et classé les pièces par ordre chronologique, puis par ordre de gravité, puis de nouveau chronologique.",
+      "Quoi qu’il arrive, on aura essayé. Proprement. Enfin, le plus proprement possible.",
     ],
   },
 
@@ -152,7 +152,7 @@ export const DIALOGUE = [
     when: { flags: ['asso_meeting'] },
     lines: [
       "Belle réunion. Quatorze présents, onze chaises, un teckel. On a voté trois motions et mangé deux tartes.",
-      "Le compte rendu part ce soir. Je l'ai déjà rédigé, en fait. Avant la réunion. Par efficacité.",
+      "Le compte rendu part ce soir. Je l’ai déjà rédigé, en fait. Avant la réunion. Par efficacité.",
     ],
     once: true,
   },
@@ -161,8 +161,8 @@ export const DIALOGUE = [
     speaker: 'jeremie',
     when: { flags: ['reported_mairie'] },
     lines: [
-      "Ton signalement est parti à la mairie. Accusé de réception automatique : « Votre demande sera traitée dans les meilleurs délais. »",
-      "Les meilleurs délais, en mairie, c'est une unité de mesure à part entière. Mais c'est daté, et c'est ce qui compte.",
+      "Ton signalement est parti à la mairie. Accusé de réception automatique : « Votre demande sera traitée dans les meilleurs délais. »",
+      "Les meilleurs délais, en mairie, c’est une unité de mesure à part entière. Mais c’est daté, et c’est ce qui compte.",
     ],
     once: true,
   },
@@ -171,7 +171,7 @@ export const DIALOGUE = [
     speaker: 'jeremie',
     when: { flags: ['stance_legal'] },
     lines: [
-      "L'AG a voté la voie légale. Je ne vais pas mentir : j'ai failli pleurer. Des procédures, des pièces, des dates. Mon terrain.",
+      "L’AG a voté la voie légale. Je ne vais pas mentir : j’ai failli pleurer. Des procédures, des pièces, des dates. Mon terrain.",
     ],
     once: true,
   },
@@ -180,8 +180,8 @@ export const DIALOGUE = [
     speaker: 'jeremie',
     when: { flags: ['police_flooded', 'met_jeremie'] },
     lines: [
-      "Le standard de la police municipale m'a appelé. Moi. Pour me demander si l'association pouvait « calmer un de ses membres ».",
-      "Un appel, c'est un signalement. Trente, c'est un fan-club. On revient au dossier, d'accord ?",
+      "Le standard de la police municipale m’a appelé. Moi. Pour me demander si l’association pouvait « calmer un de ses membres ».",
+      "Un appel, c’est un signalement. Trente, c’est un fan-club. On revient au dossier, d’accord ?",
     ],
     effects: { asso: -2 },
     once: true,
@@ -191,7 +191,7 @@ export const DIALOGUE = [
     speaker: 'jeremie',
     when: { flags: ['exhaust_meeting_lost'] },
     lines: [
-      "Statu quo sur la gaine. La ville « prend acte des positions de chacun ». J'ai pris acte aussi. Dans le classeur rouge.",
+      "Statu quo sur la gaine. La ville « prend acte des positions de chacun ». J’ai pris acte aussi. Dans le classeur rouge.",
     ],
     once: true,
   },
@@ -205,7 +205,7 @@ export const DIALOGUE = [
     when: { notFlags: ['met_klaas'] },
     lines: [
       "Ja. Vous êtes le jeune homme du numéro 10, deuxième étage. Lumière éteinte à 1h47 hier. Rallumée à 1h52.",
-      "Je ne vous espionne pas. Je regarde par la fenêtre. Ce n'est pas pareil.",
+      "Je ne vous espionne pas. Je regarde par la fenêtre. Ce n’est pas pareil.",
     ],
     effects: { setFlags: ['met_klaas'] },
     once: true,
@@ -215,8 +215,8 @@ export const DIALOGUE = [
     speaker: 'klaas',
     when: { phase: 'night', flags: ['met_klaas'], chance: 0.5 },
     lines: [
-      "22h04. Estaminet : terrasse dehors. 22h11 : toujours dehors. 22h19 : on apporte des frites.",
-      "Les frites, je les note aussi. Ça montre l'intention.",
+      "22h04. Estaminet : terrasse dehors. 22h11 : toujours dehors. 22h19 : on apporte des frites.",
+      "Les frites, je les note aussi. Ça montre l’intention.",
     ],
   },
   {
@@ -224,7 +224,7 @@ export const DIALOGUE = [
     speaker: 'klaas',
     when: { flags: ['met_klaas'], day: [3, 14] },
     lines: [
-      "Carnet numéro 3. Le numéro 1 est plein, le numéro 2 est chez Hilde, sous la boîte à biscuits. Elle dit qu'il prend de la place.",
+      "Carnet numéro 3. Le numéro 1 est plein, le numéro 2 est chez Hilde, sous la boîte à biscuits. Elle dit qu’il prend de la place.",
     ],
   },
   {
@@ -232,8 +232,8 @@ export const DIALOGUE = [
     speaker: 'klaas',
     when: { phase: 'night', flags: ['met_klaas'], chance: 0.4 },
     lines: [
-      "D'ici je vois toute la rue. Mais de loin. Après 23h, sans les jumelles, une chaise et un client, c'est la même chose.",
-      "Les jumelles étaient à mon père. Il comptait les bateaux sur l'Escaut. Moi je compte les tables. Allee.",
+      "D’ici je vois toute la rue. Mais de loin. Après 23h, sans les jumelles, une chaise et un client, c’est la même chose.",
+      "Les jumelles étaient à mon père. Il comptait les bateaux sur l’Escaut. Moi je compte les tables. Allee.",
     ],
   },
   {
@@ -241,7 +241,7 @@ export const DIALOGUE = [
     speaker: 'klaas',
     when: { phase: 'night', flags: ['met_klaas'], chance: 0.4 },
     lines: [
-      "Table du fond, estaminet. Neuf personnes. J'ai compté deux fois. La deuxième fois, il y en avait dix.",
+      "Table du fond, estaminet. Neuf personnes. J’ai compté deux fois. La deuxième fois, il y en avait dix.",
     ],
   },
   {
@@ -249,7 +249,7 @@ export const DIALOGUE = [
     speaker: 'klaas',
     when: { day: [13, 13], flags: ['met_klaas', 'saturday1_done'] },
     lines: [
-      "Samedi dernier : quarante-trois personnes debout, deux qui ont fait pipi contre une porte, une qui a chanté. Faux.",
+      "Samedi dernier : quarante-trois personnes debout, deux qui ont fait pipi contre une porte, une qui a chanté. Faux.",
       "Ce soir je prends un carnet neuf. Par précaution.",
     ],
   },
@@ -258,8 +258,8 @@ export const DIALOGUE = [
     speaker: 'klaas',
     when: { flags: ['roster_known'] },
     lines: [
-      "J'ai relu mes carnets. Le mardi et le vendredi, c'est toujours la même patrouille. Celle qui ne verbalise jamais.",
-      "Je ne dis pas que c'est suspect. Je dis que c'est régulier. Ce qui est régulier, on peut l'écrire.",
+      "J’ai relu mes carnets. Le mardi et le vendredi, c’est toujours la même patrouille. Celle qui ne verbalise jamais.",
+      "Je ne dis pas que c’est suspect. Je dis que c’est régulier. Ce qui est régulier, on peut l’écrire.",
     ],
   },
   {
@@ -267,8 +267,8 @@ export const DIALOGUE = [
     speaker: 'klaas',
     when: { flags: ['seen_complaisance', 'met_klaas'] },
     lines: [
-      "22h40. Voiture de police devant l'estaminet. 22h41 : un café. 22h55 : un deuxième café. 23h10 : départ. Procès-verbaux : zéro.",
-      "C'est la première fois que je souligne une ligne deux fois.",
+      "22h40. Voiture de police devant l’estaminet. 22h41 : un café. 22h55 : un deuxième café. 23h10 : départ. Procès-verbaux : zéro.",
+      "C’est la première fois que je souligne une ligne deux fois.",
     ],
     once: true,
   },
@@ -277,8 +277,8 @@ export const DIALOGUE = [
     speaker: 'klaas',
     when: { flags: ['klaas_noted_pilou'], notFlags: ['klaas_persuaded'] },
     lines: [
-      "Je vous ai vu. Je l'ai noté. Avec l'heure.",
-      "Je note tout le monde, jongen. C'est pour ça qu'on me croit.",
+      "Je vous ai vu. Je l’ai noté. Avec l’heure.",
+      "Je note tout le monde, jongen. C’est pour ça qu’on me croit.",
     ],
     once: true,
   },
@@ -287,8 +287,8 @@ export const DIALOGUE = [
     speaker: 'klaas',
     when: { flags: ['klaas_persuaded'] },
     lines: [
-      "Hier soir, entre 23h et minuit, j'ai… nettoyé mes lunettes. Longtemps.",
-      "Hilde dit que ça arrive à tout le monde. Je ne suis pas d'accord, mais c'est noté nulle part.",
+      "Hier soir, entre 23h et minuit, j’ai… nettoyé mes lunettes. Longtemps.",
+      "Hilde dit que ça arrive à tout le monde. Je ne suis pas d’accord, mais c’est noté nulle part.",
     ],
     once: true,
   },
@@ -297,7 +297,7 @@ export const DIALOGUE = [
     speaker: 'klaas',
     when: { phase: 'afternoon', flags: ['met_klaas'], stats: { sleep: '<30' } },
     lines: [
-      "Vous avez les mêmes yeux que moi après la fête de la musique 2019. Je l'avais noté aussi.",
+      "Vous avez les mêmes yeux que moi après la fête de la musique 2019. Je l’avais noté aussi.",
     ],
   },
   {
@@ -305,7 +305,7 @@ export const DIALOGUE = [
     speaker: 'klaas',
     when: { flags: ['met_klaas'], chance: 0.3 },
     lines: [
-      "Même d'ici, quand le vent vient du sud, je sens la friture. Hilde a ouvert la fenêtre hier. Elle l'a refermée.",
+      "Même d’ici, quand le vent vient du sud, je sens la friture. Hilde a ouvert la fenêtre hier. Elle l’a refermée.",
     ],
   },
 
@@ -314,7 +314,7 @@ export const DIALOGUE = [
     speaker: 'klaas',
     when: { flags: ['proj_klaas_ocr'] },
     lines: [
-      "Vous avez mis mes carnets dans l'ordinateur ? Tout ? Même le chapitre sur le pigeon de 2021 ?",
+      "Vous avez mis mes carnets dans l’ordinateur ? Tout ? Même le chapitre sur le pigeon de 2021 ?",
       "Ja. Le tableur ne fait pas de fautes. Moi non plus. Nous allons bien nous entendre.",
     ],
     once: true,
@@ -324,8 +324,8 @@ export const DIALOGUE = [
     speaker: 'klaas',
     when: { flags: ['saturday2_done', 'met_klaas'] },
     lines: [
-      "Deux samedis. J'ai fait la moyenne : quarante et une personnes debout, deux portes arrosées, zéro procès-verbal.",
-      "La moyenne, c'est la seule chose dans cette rue qui ne déborde pas.",
+      "Deux samedis. J’ai fait la moyenne : quarante et une personnes debout, deux portes arrosées, zéro procès-verbal.",
+      "La moyenne, c’est la seule chose dans cette rue qui ne déborde pas.",
     ],
     once: true,
   },
@@ -334,8 +334,8 @@ export const DIALOGUE = [
     speaker: 'klaas',
     when: { flags: ['cardboard_exhaust', 'met_klaas'] },
     lines: [
-      "7h10, sortie de l'extraction : un carton. Je l'ai noté. Qui l'a posé, je ne l'ai pas vu.",
-      "Je l'ai écrit comme ça : « pas vu ». C'est la vérité. Ce n'est pas toute la vérité, mais c'est la mienne.",
+      "7h10, sortie de l’extraction : un carton. Je l’ai noté. Qui l’a posé, je ne l’ai pas vu.",
+      "Je l’ai écrit comme ça : « pas vu ». C’est la vérité. Ce n’est pas toute la vérité, mais c’est la mienne.",
     ],
     once: true,
   },
@@ -348,7 +348,7 @@ export const DIALOGUE = [
     speaker: 'hilde',
     when: { notFlags: ['met_hilde'] },
     lines: [
-      "Vous êtes Pilou ? Klaas m'a parlé de vous. Enfin, il m'a lu ce qu'il a écrit sur vous. C'est gentil, rassurez-vous.",
+      "Vous êtes Pilou ? Klaas m’a parlé de vous. Enfin, il m’a lu ce qu’il a écrit sur vous. C’est gentil, rassurez-vous.",
       "Prenez une part de tarte au sucre. On ne se bat pas le ventre vide.",
     ],
     effects: { setFlags: ['met_hilde'] },
@@ -360,7 +360,7 @@ export const DIALOGUE = [
     when: { flags: ['met_hilde'], notFlags: ['hilde_tisane'], stats: { sleep: '<40' } },
     lines: [
       "Tenez, une tisane. Tilleul, verveine, et un petit secret de ma grand-mère.",
-      "Le secret, c'est le miel. Mais ne le dites pas, ça casse la magie.",
+      "Le secret, c’est le miel. Mais ne le dites pas, ça casse la magie.",
     ],
     effects: { sleep: +10, setFlags: ['hilde_tisane'] },
     once: true,
@@ -380,7 +380,7 @@ export const DIALOGUE = [
     when: { flags: ['met_hilde', 'met_klaas'], chance: 0.5 },
     lines: [
       "Klaas a encore passé la soirée à la fenêtre. Je lui ai mis un coussin sur le rebord, au moins il ne se fait plus mal aux coudes.",
-      "Il dit qu'il veille sur la rue. Moi je veille sur lui. Quelqu'un doit bien le faire.",
+      "Il dit qu’il veille sur la rue. Moi je veille sur lui. Quelqu’un doit bien le faire.",
     ],
   },
   {
@@ -396,8 +396,8 @@ export const DIALOGUE = [
     speaker: 'hilde',
     when: { flags: ['met_hilde'], chance: 0.3 },
     lines: [
-      "Le petit serveur, en bas de chez vous, il a l'air si fatigué. Je lui apporterais bien une soupe, à lui aussi.",
-      "Ce n'est pas lui qui a décidé de la terrasse. Il ne faut pas se tromper de colère.",
+      "Le petit serveur, en bas de chez vous, il a l’air si fatigué. Je lui apporterais bien une soupe, à lui aussi.",
+      "Ce n’est pas lui qui a décidé de la terrasse. Il ne faut pas se tromper de colère.",
     ],
   },
   {
@@ -405,8 +405,8 @@ export const DIALOGUE = [
     speaker: 'hilde',
     when: { flags: ['bucket_witnessed', 'met_hilde'] },
     lines: [
-      "On m'a parlé d'un seau. Je n'ai pas voulu entendre la suite.",
-      "L'eau, Pilou, c'est pour la tisane.",
+      "On m’a parlé d’un seau. Je n’ai pas voulu entendre la suite.",
+      "L’eau, Pilou, c’est pour la tisane.",
     ],
     effects: { asso: -2 },
     once: true,
@@ -416,8 +416,8 @@ export const DIALOGUE = [
     speaker: 'hilde',
     when: { flags: ['kitchen_sabotaged', 'met_hilde'] },
     lines: [
-      "On dit que la carbonnade de l'estaminet avait un drôle de goût hier. Klaas a ri. Moi pas.",
-      "On ne joue pas avec l'assiette des gens. Même celle de Dédé.",
+      "On dit que la carbonnade de l’estaminet avait un drôle de goût hier. Klaas a ri. Moi pas.",
+      "On ne joue pas avec l’assiette des gens. Même celle de Dédé.",
     ],
     once: true,
   },
@@ -426,7 +426,7 @@ export const DIALOGUE = [
     speaker: 'hilde',
     when: { flags: ['met_hilde'], stats: { risk: '>=60' } },
     lines: [
-      "Vous avez l'air de quelqu'un qui regarde par-dessus son épaule. Klaas fait pareil, mais lui c'est pour voir.",
+      "Vous avez l’air de quelqu’un qui regarde par-dessus son épaule. Klaas fait pareil, mais lui c’est pour voir.",
       "Promettez-moi de ne rien faire de bête. Ou au moins de manger avant.",
     ],
   },
@@ -435,7 +435,7 @@ export const DIALOGUE = [
     speaker: 'hilde',
     when: { day: [7, 7], flags: ['met_hilde'] },
     lines: [
-      "J'ai fait deux gâteaux pour l'assemblée générale. Un pour ceux qui gagnent le vote, un pour consoler les autres.",
+      "J’ai fait deux gâteaux pour l’assemblée générale. Un pour ceux qui gagnent le vote, un pour consoler les autres.",
     ],
   },
 
@@ -444,7 +444,7 @@ export const DIALOGUE = [
     speaker: 'hilde',
     when: { flags: ['complaint_filed', 'met_hilde'] },
     lines: [
-      "Une plainte contre vous ? Mon Dieu. Je vous ai fait un gratin.",
+      "Une plainte contre vous ? Mon Dieu. Je vous ai fait un gratin.",
       "Au commissariat on mange mal, tout le monde le sait. Gardez-en un peu, au cas où.",
     ],
     once: true,
@@ -467,8 +467,8 @@ export const DIALOGUE = [
     speaker: 'tatie',
     when: { notFlags: ['met_tatie'] },
     lines: [
-      "Ah, le petit du numéro 10 ! Asseyez-vous. Je vais vous dire une chose que la vie m'a apprise.",
-      "« Si vous voulez quelque chose dans la vie, faut résister et se battre pour. » Voilà. Un biscuit ?",
+      "Ah, le petit du numéro 10 ! Asseyez-vous. Je vais vous dire une chose que la vie m’a apprise.",
+      "« Si vous voulez quelque chose dans la vie, faut résister et se battre pour. » Voilà. Un biscuit ?",
     ],
     effects: { setFlags: ['met_tatie'] },
     once: true,
@@ -478,7 +478,7 @@ export const DIALOGUE = [
     speaker: 'tatie',
     when: { flags: ['met_tatie'], chance: 0.5 },
     lines: [
-      "J'ai encore écrit à l'estaminet pour l'odeur de friture. Réponse dans l'heure : « c'est en cours de résolution ».",
+      "J’ai encore écrit à l’estaminet pour l’odeur de friture. Réponse dans l’heure : « c’est en cours de résolution ».",
       "En cours depuis trois ans. À ce rythme-là, je serai résolue avant eux.",
     ],
   },
@@ -487,7 +487,7 @@ export const DIALOGUE = [
     speaker: 'tatie',
     when: { flags: ['tatie_mail_3'] },
     lines: [
-      "Troisième promesse. Je les imprime, vous savez. Je les range dans une boîte à chaussures. Elle s'appelle « En cours ».",
+      "Troisième promesse. Je les imprime, vous savez. Je les range dans une boîte à chaussures. Elle s’appelle « En cours ».",
     ],
     once: true,
   },
@@ -496,8 +496,8 @@ export const DIALOGUE = [
     speaker: 'tatie',
     when: { flags: ['tatie_mail_7'] },
     lines: [
-      "Sept promesses, sept fois « c'est en cours ». Même ma machine à laver a un programme plus court.",
-      "« Promesse qui traîne ne vaut pas le papier de l'imprimante. » C'est de moi, celle-là.",
+      "Sept promesses, sept fois « c’est en cours ». Même ma machine à laver a un programme plus court.",
+      "« Promesse qui traîne ne vaut pas le papier de l’imprimante. » C’est de moi, celle-là.",
     ],
     once: true,
   },
@@ -506,7 +506,7 @@ export const DIALOGUE = [
     speaker: 'tatie',
     when: { flags: ['met_tatie'], stats: { sleep: '<35' } },
     lines: [
-      "Vous avez une mine… « Qui dort dîne », qu'on dit. Mais qui dîne en terrasse ne laisse dormir personne.",
+      "Vous avez une mine… « Qui dort dîne », qu’on dit. Mais qui dîne en terrasse ne laisse dormir personne.",
     ],
   },
   {
@@ -514,7 +514,7 @@ export const DIALOGUE = [
     speaker: 'tatie',
     when: { flags: ['met_tatie'], stats: { dossier: '>=30' } },
     lines: [
-      "« Petit à petit, l'oiseau fait son dossier. » Continuez comme ça, mon petit. Et mettez des dates, la mairie adore les dates.",
+      "« Petit à petit, l’oiseau fait son dossier. » Continuez comme ça, mon petit. Et mettez des dates, la mairie adore les dates.",
     ],
   },
   {
@@ -522,8 +522,8 @@ export const DIALOGUE = [
     speaker: 'tatie',
     when: { flags: ['met_tatie'], chance: 0.4 },
     lines: [
-      "J'ai pris le thé avec Colette, mardi. Une femme charmante. Elle dit que la convivialité, c'est l'âme de Lille.",
-      "Moi je dis que l'âme de Lille, elle aimerait bien dormir aussi. Mais je l'ai dit gentiment, on était sur ses biscuits.",
+      "J’ai pris le thé avec Colette, mardi. Une femme charmante. Elle dit que la convivialité, c’est l’âme de Lille.",
+      "Moi je dis que l’âme de Lille, elle aimerait bien dormir aussi. Mais je l’ai dit gentiment, on était sur ses biscuits.",
     ],
   },
   {
@@ -531,8 +531,8 @@ export const DIALOGUE = [
     speaker: 'tatie',
     when: { flags: ['tatie_wavering'] },
     lines: [
-      "Dédé m'a offert un petit verre de genièvre, hier. Il est moins méchant qu'on le dit, vous savez.",
-      "Enfin… « Il ne faut pas juger un estaminet à son genièvre. » Non, attendez, je ne sais plus dans quel sens elle va, celle-là.",
+      "Dédé m’a offert un petit verre de genièvre, hier. Il est moins méchant qu’on le dit, vous savez.",
+      "Enfin… « Il ne faut pas juger un estaminet à son genièvre. » Non, attendez, je ne sais plus dans quel sens elle va, celle-là.",
     ],
     once: true,
   },
@@ -541,8 +541,8 @@ export const DIALOGUE = [
     speaker: 'tatie',
     when: { flags: ['met_tatie'], stats: { asso: '<30' } },
     lines: [
-      "Les autres se découragent ? Pas moi. « Si vous voulez quelque chose dans la vie, faut résister et se battre pour. »",
-      "Je l'ai brodée sur un coussin. Le coussin résiste très bien.",
+      "Les autres se découragent ? Pas moi. « Si vous voulez quelque chose dans la vie, faut résister et se battre pour. »",
+      "Je l’ai brodée sur un coussin. Le coussin résiste très bien.",
     ],
   },
   {
@@ -550,8 +550,8 @@ export const DIALOGUE = [
     speaker: 'tatie',
     when: { flags: ['tatie_emails_shared'] },
     lines: [
-      "J'ai tout donné à Jérémie, la boîte à chaussures entière. Il a fait des photocopies. Il avait les larmes aux yeux.",
-      "Trois ans d'« en cours », ça finit par peser lourd. Au sens propre : il a fallu un cabas.",
+      "J’ai tout donné à Jérémie, la boîte à chaussures entière. Il a fait des photocopies. Il avait les larmes aux yeux.",
+      "Trois ans d’« en cours », ça finit par peser lourd. Au sens propre : il a fallu un cabas.",
     ],
     once: true,
   },
@@ -560,8 +560,8 @@ export const DIALOGUE = [
     speaker: 'tatie',
     when: { flags: ['stink_bomb', 'met_tatie'] },
     lines: [
-      "Il paraît qu'il y a eu une odeur pire que la friture, hier soir. Je ne pensais pas que c'était possible.",
-      "« Ce n'est pas en ajoutant de l'odeur qu'on enlève l'odeur. » Retenez bien celle-là.",
+      "Il paraît qu’il y a eu une odeur pire que la friture, hier soir. Je ne pensais pas que c’était possible.",
+      "« Ce n’est pas en ajoutant de l’odeur qu’on enlève l’odeur. » Retenez bien celle-là.",
     ],
     once: true,
   },
@@ -571,8 +571,8 @@ export const DIALOGUE = [
     speaker: 'tatie',
     when: { flags: ['tatie_mail_12'] },
     lines: [
-      "Douze. La dernière, c'est une réponse automatique. Même leur ordinateur me dit que c'est en cours.",
-      "« Quand la machine répond à la place de l'homme, c'est que l'homme n'a plus rien à dire. » Je l'imprime aussi, celle-là.",
+      "Douze. La dernière, c’est une réponse automatique. Même leur ordinateur me dit que c’est en cours.",
+      "« Quand la machine répond à la place de l’homme, c’est que l’homme n’a plus rien à dire. » Je l’imprime aussi, celle-là.",
     ],
     once: true,
   },
@@ -581,8 +581,8 @@ export const DIALOGUE = [
     speaker: 'tatie',
     when: { flags: ['bloc_fooled', 'met_tatie'] },
     lines: [
-      "J'ai raconté à Colette le plan que vous m'aviez confié. Il paraît qu'en bas, ils ont tout rangé pour rien toute la soirée.",
-      "« Qui sème le vent récolte des chaises vides. » Je ne me sens pas du tout coupable. Un peu fière, même.",
+      "J’ai raconté à Colette le plan que vous m’aviez confié. Il paraît qu’en bas, ils ont tout rangé pour rien toute la soirée.",
+      "« Qui sème le vent récolte des chaises vides. » Je ne me sens pas du tout coupable. Un peu fière, même.",
     ],
     once: true,
   },
@@ -591,7 +591,7 @@ export const DIALOGUE = [
     speaker: 'tatie',
     when: { flags: ['hygiene_visit', 'met_tatie'] },
     lines: [
-      "Le service d'hygiène est venu à l'estaminet ! Ghislain m'a écrit que c'était « une visite de courtoisie ».",
+      "Le service d’hygiène est venu à l’estaminet ! Ghislain m’a écrit que c’était « une visite de courtoisie ».",
       "De la courtoisie avec des gants en latex et une lampe torche. Je veux bien la même chez moi.",
     ],
     once: true,
@@ -605,8 +605,8 @@ export const DIALOGUE = [
     speaker: 'seb',
     when: { notFlags: ['met_seb_nico'] },
     lines: [
-      "Pilou ! Enfin ! Attends, attends : on te voit tous les soirs à ta fenêtre avec ton sonomètre, on se demandait quand tu traverserais.",
-      `Je t'ajoute à « ${WHATSAPP_GROUP} ». Désactive les notifs, sinon tu ne dormiras pas mieux.`,
+      "Pilou ! Enfin ! Attends, attends : on te voit tous les soirs à ta fenêtre avec ton sonomètre, on se demandait quand tu traverserais.",
+      `Je t’ajoute à « ${WHATSAPP_GROUP} ». Désactive les notifs, sinon tu ne dormiras pas mieux.`,
     ],
     effects: { setFlags: ['met_seb_nico'] },
     once: true,
@@ -616,8 +616,8 @@ export const DIALOGUE = [
     speaker: 'seb',
     when: { flags: ['met_seb_nico'], phase: 'night', chance: 0.5 },
     lines: [
-      `Il y a eu quarante-deux messages sur « ${WHATSAPP_GROUP} » depuis 22h. Dont trente-neuf photos de la même table.`,
-      "C'est la table qui a changé, attends, regarde : ils ont rajouté une chaise pliante.",
+      `Il y a eu quarante-deux messages sur « ${WHATSAPP_GROUP} » depuis 22h. Dont trente-neuf photos de la même table.`,
+      "C’est la table qui a changé, attends, regarde : ils ont rajouté une chaise pliante.",
     ],
   },
   {
@@ -625,7 +625,7 @@ export const DIALOGUE = [
     speaker: 'seb',
     when: { flags: ['met_seb_nico'], phase: 'night', chance: 0.4 },
     lines: [
-      "Gaufre est rentrée à 23h12. C'est notre indicateur : quand la chatte en a marre du bruit, c'est qu'on dépasse les bornes.",
+      "Gaufre est rentrée à 23h12. C’est notre indicateur : quand la chatte en a marre du bruit, c’est qu’on dépasse les bornes.",
     ],
   },
   {
@@ -634,7 +634,7 @@ export const DIALOGUE = [
     when: { day: [6, 6], phase: 'night', flags: ['met_seb_nico'] },
     lines: [
       "Attends, attends. Il y a un enterrement de vie de garçon en costumes de banane. Six bananes à une table. Non, huit. Il en arrive encore.",
-      "Je filme ou je compte ? Les deux ? Les deux.",
+      "Je filme ou je compte ? Les deux ? Les deux.",
     ],
   },
   {
@@ -642,8 +642,8 @@ export const DIALOGUE = [
     speaker: 'seb',
     when: { flags: ['pee_at_door', 'met_seb_nico'] },
     lines: [
-      "Pilou. Je l'ai vu depuis le balcon. Contre TA porte. Gaufre a détourné le regard, c'est dire.",
-      "J'ai la photo. De dos, rassure-toi. Nico l'a déjà archivée dans « Captures ».",
+      "Pilou. Je l’ai vu depuis le balcon. Contre TA porte. Gaufre a détourné le regard, c’est dire.",
+      "J’ai la photo. De dos, rassure-toi. Nico l’a déjà archivée dans « Captures ».",
     ],
     once: true,
   },
@@ -652,8 +652,8 @@ export const DIALOGUE = [
     speaker: 'seb',
     when: { flags: ['seen_tipoff', 'met_seb_nico'] },
     lines: [
-      "Tu as vu ? Les tables rentrées à 22h38, la police arrive à 22h43. Cinq minutes pile.",
-      "Quelqu'un a un coup de fil d'avance, et c'est pas la météo.",
+      "Tu as vu ? Les tables rentrées à 22h38, la police arrive à 22h43. Cinq minutes pile.",
+      "Quelqu’un a un coup de fil d’avance, et c’est pas la météo.",
     ],
     once: true,
   },
@@ -662,8 +662,8 @@ export const DIALOGUE = [
     speaker: 'seb',
     when: { flags: ['traitor_known', 'met_seb_nico'] },
     lines: [
-      "Régis. RÉGIS. Celui qui « comprend les deux côtés ». Il comprenait surtout la carte des desserts.",
-      "Nico veut le retirer du groupe. Moi je veux qu'il reste, pour voir sa tête quand on parle de lui.",
+      "Régis. RÉGIS. Celui qui « comprend les deux côtés ». Il comprenait surtout la carte des desserts.",
+      "Nico veut le retirer du groupe. Moi je veux qu’il reste, pour voir sa tête quand on parle de lui.",
     ],
     once: true,
   },
@@ -672,8 +672,8 @@ export const DIALOGUE = [
     speaker: 'seb',
     when: { flags: ['bucket_witnessed', 'met_seb_nico'] },
     lines: [
-      "Attends. ATTENDS. C'était toi, le seau ?! Gaufre est rentrée en courant, j'ai cru qu'il pleuvait d'un seul côté de la rue.",
-      "Je n'ai rien posté. Pour l'instant. Tu me dois une histoire.",
+      "Attends. ATTENDS. C’était toi, le seau ?! Gaufre est rentrée en courant, j’ai cru qu’il pleuvait d’un seul côté de la rue.",
+      "Je n’ai rien posté. Pour l’instant. Tu me dois une histoire.",
     ],
     once: true,
   },
@@ -682,7 +682,7 @@ export const DIALOGUE = [
     speaker: 'seb',
     when: { flags: ['video_viral'] },
     lines: [
-      "Pilou… tu es sur TikTok. Pas dans le bon sens. Ma cousine de Roubaix me l'a envoyé.",
+      "Pilou… tu es sur TikTok. Pas dans le bon sens. Ma cousine de Roubaix me l’a envoyé.",
     ],
     effects: { asso: -2 },
     once: true,
@@ -692,8 +692,8 @@ export const DIALOGUE = [
     speaker: 'seb',
     when: { flags: ['banners_up', 'met_seb_nico'] },
     lines: [
-      "« LE SOMMEIL EST UN DROIT », en lettres de quarante centimètres. On l'a vue depuis la place. Les clients prennent des selfies devant.",
-      "On est devenus une attraction. C'était pas le plan, mais j'adore.",
+      "« LE SOMMEIL EST UN DROIT », en lettres de quarante centimètres. On l’a vue depuis la place. Les clients prennent des selfies devant.",
+      "On est devenus une attraction. C’était pas le plan, mais j’adore.",
     ],
     once: true,
   },
@@ -703,8 +703,8 @@ export const DIALOGUE = [
     speaker: 'seb',
     when: { flags: ['colette_dinner_ignored', 'met_seb_nico'] },
     lines: [
-      "Colette Verhaeghe a dîné EN BAS DE CHEZ TOI et tu n'as même pas ouvert la fenêtre ?!",
-      "J'ai dû tout raconter dans le groupe tout seul. Avec des photos de travers. Tu me dois un feuilleton.",
+      "Colette Verhaeghe a dîné EN BAS DE CHEZ TOI et tu n’as même pas ouvert la fenêtre ?!",
+      "J’ai dû tout raconter dans le groupe tout seul. Avec des photos de travers. Tu me dois un feuilleton.",
     ],
     once: true,
   },
@@ -713,7 +713,7 @@ export const DIALOGUE = [
     speaker: 'seb',
     when: { flags: ['inspector_surprise', 'met_seb_nico'] },
     lines: [
-      "Attends, attends. L'inspectrice est arrivée à pied, sans prévenir, avec un mètre laser. Ghislain a lâché son classeur.",
+      "Attends, attends. L’inspectrice est arrivée à pied, sans prévenir, avec un mètre laser. Ghislain a lâché son classeur.",
       "Le chignon a bougé. Je te jure. Il a BOUGÉ.",
     ],
     once: true,
@@ -723,8 +723,8 @@ export const DIALOGUE = [
     speaker: 'seb',
     when: { flags: ['read_reservations', 'met_seb_nico'] },
     lines: [
-      "Attends. Tu SAIS combien de couverts ils ont pris samedi ? Non. Je veux pas savoir comment. Si, je veux savoir. Non.",
-      "Bon. Je n'ai rien entendu. Mais je n'ai rien entendu très attentivement.",
+      "Attends. Tu SAIS combien de couverts ils ont pris samedi ? Non. Je veux pas savoir comment. Si, je veux savoir. Non.",
+      "Bon. Je n’ai rien entendu. Mais je n’ai rien entendu très attentivement.",
     ],
     once: true,
   },
@@ -737,8 +737,8 @@ export const DIALOGUE = [
     speaker: 'nico',
     when: { flags: ['met_seb_nico'], notFlags: ['joined_whatsapp'] },
     lines: [
-      "Règle du groupe : pas de photos de visages, pas d'insultes, pas d'audios de plus d'une minute.",
-      "Seb enfreint la troisième tous les jours. On l'aime quand même.",
+      "Règle du groupe : pas de photos de visages, pas d’insultes, pas d’audios de plus d’une minute.",
+      "Seb enfreint la troisième tous les jours. On l’aime quand même.",
     ],
   },
   {
@@ -746,7 +746,7 @@ export const DIALOGUE = [
     speaker: 'nico',
     when: { flags: ['met_seb_nico'], chance: 0.4 },
     lines: [
-      "J'ai un dossier « Captures » sur le téléphone. Deux mille quatre cents images. Dont quatre de vacances.",
+      "J’ai un dossier « Captures » sur le téléphone. Deux mille quatre cents images. Dont quatre de vacances.",
     ],
   },
   {
@@ -754,8 +754,8 @@ export const DIALOGUE = [
     speaker: 'nico',
     when: { phase: 'night', flags: ['met_seb_nico'], chance: 0.4 },
     lines: [
-      "Question bête : le couloir de passage, il fait combien de large ? Parce qu'une poussette vient de faire demi-tour.",
-      "Seb dit qu'elle allait dans l'autre sens. Elle n'allait pas dans l'autre sens.",
+      "Question bête : le couloir de passage, il fait combien de large ? Parce qu’une poussette vient de faire demi-tour.",
+      "Seb dit qu’elle allait dans l’autre sens. Elle n’allait pas dans l’autre sens.",
     ],
   },
   {
@@ -763,7 +763,7 @@ export const DIALOGUE = [
     speaker: 'nico',
     when: { flags: ['legal_view', 'met_seb_nico'] },
     lines: [
-      "Tu as le plan des zones ? Montre. … Ah. Donc les trois tables collées à notre porte d'entrée sont, techniquement, chez nous.",
+      "Tu as le plan des zones ? Montre. … Ah. Donc les trois tables collées à notre porte d’entrée sont, techniquement, chez nous.",
       "Je vais imprimer ça en A3. Pour le frigo.",
     ],
     once: true,
@@ -773,7 +773,7 @@ export const DIALOGUE = [
     speaker: 'nico',
     when: { flags: ['whatsapp_rally'] },
     lines: [
-      "Ton message de mobilisation a eu dix-sept pouces levés et un « je peux pas ce soir, j'ai yoga ». C'est un record.",
+      "Ton message de mobilisation a eu dix-sept pouces levés et un « je peux pas ce soir, j’ai yoga ». C’est un record.",
     ],
     once: true,
   },
@@ -782,8 +782,8 @@ export const DIALOGUE = [
     speaker: 'nico',
     when: { flags: ['met_seb_nico'], stats: { risk: '>=50' } },
     lines: [
-      "Je pose la question parce que personne ne la pose : si la police sonne chez toi demain, on dit quoi dans le groupe ?",
-      "Moi je dis rien. J'archive.",
+      "Je pose la question parce que personne ne la pose : si la police sonne chez toi demain, on dit quoi dans le groupe ?",
+      "Moi je dis rien. J’archive.",
     ],
   },
   {
@@ -791,7 +791,7 @@ export const DIALOGUE = [
     speaker: 'nico',
     when: { flags: ['fake_reviews_traced'] },
     lines: [
-      "Les faux avis. Ils sont remontés jusqu'à toi. J'ai supprimé trois messages du groupe ce matin, juste au cas où.",
+      "Les faux avis. Ils sont remontés jusqu’à toi. J’ai supprimé trois messages du groupe ce matin, juste au cas où.",
       "Ne me remercie pas. Ne me raconte rien non plus.",
     ],
     once: true,
@@ -801,7 +801,7 @@ export const DIALOGUE = [
     speaker: 'nico',
     when: { flags: ['cm_fake_post'] },
     lines: [
-      "Le post « Bernadette harcelée » tourne partout. Des milliers de partages. Bernadette n'existe pas, mais elle a déjà un comité de soutien.",
+      "Le post « Bernadette harcelée » tourne partout. Des milliers de partages. Bernadette n’existe pas, mais elle a déjà un comité de soutien.",
       "Ne réponds pas à chaud. Réponds bien, ou ne réponds pas.",
     ],
     once: true,
@@ -811,7 +811,7 @@ export const DIALOGUE = [
     speaker: 'nico',
     when: { flags: ['met_seb_nico'], stats: { sleep: '<25' } },
     lines: [
-      "Tu as envoyé un message à 4h12 dans le groupe. Il disait juste « chaise ». On s'inquiète.",
+      "Tu as envoyé un message à 4h12 dans le groupe. Il disait juste « chaise ». On s’inquiète.",
     ],
   },
 
@@ -821,7 +821,7 @@ export const DIALOGUE = [
     when: { flags: ['filmed_faces', 'met_seb_nico'] },
     lines: [
       "Tu as filmé des clients à visage découvert. Règle numéro un du groupe. Je ne poste pas ça.",
-      "Floute, ou garde-le pour toi. Une vidéo de visages, c'est une plainte qui attend son tour.",
+      "Floute, ou garde-le pour toi. Une vidéo de visages, c’est une plainte qui attend son tour.",
     ],
     once: true,
   },
@@ -830,8 +830,8 @@ export const DIALOGUE = [
     speaker: 'nico',
     when: { flags: ['read_emails', 'met_seb_nico'] },
     lines: [
-      "Tu as des e-mails de l'estaminet. Je ne te demande pas d'où ils sortent.",
-      "Je constate juste qu'on ne pourra jamais les montrer à la commission. Ce sont les preuves les plus inutiles et les plus savoureuses de l'année.",
+      "Tu as des e-mails de l’estaminet. Je ne te demande pas d’où ils sortent.",
+      "Je constate juste qu’on ne pourra jamais les montrer à la commission. Ce sont les preuves les plus inutiles et les plus savoureuses de l’année.",
     ],
     once: true,
   },
@@ -840,8 +840,8 @@ export const DIALOGUE = [
     speaker: 'nico',
     when: { flags: ['fake_reviews', 'met_seb_nico'], notFlags: ['fake_reviews_traced'] },
     lines: [
-      "Quarante avis une étoile sur l'estaminet depuis hier. Tous avec la même virgule mal placée.",
-      "Moi, j'ai rien vu. J'archive, c'est tout. Et j'archive ça très loin.",
+      "Quarante avis une étoile sur l’estaminet depuis hier. Tous avec la même virgule mal placée.",
+      "Moi, j’ai rien vu. J’archive, c’est tout. Et j’archive ça très loin.",
     ],
     once: true,
   },
@@ -854,7 +854,7 @@ export const DIALOGUE = [
     speaker: 'hippolyte',
     when: { notFlags: ['met_hippolyte'] },
     lines: [
-      "Monsieur Dubeton. Entrez, je vous prie. Attention aux pavés de la cour : ils ont vu passer des calèches avant de voir passer des trottinettes.",
+      "Monsieur Dubeton. Entrez, je vous prie. Attention aux pavés de la cour : ils ont vu passer des calèches avant de voir passer des trottinettes.",
       "Ma famille fabrique ici depuis 1832. Nous avons survécu à deux guerres et au canal. Nous survivrons à une terrasse.",
     ],
     effects: { setFlags: ['met_hippolyte'] },
@@ -865,8 +865,8 @@ export const DIALOGUE = [
     speaker: 'hippolyte',
     when: { flags: ['met_hippolyte'], notFlags: ['knows_trou'] },
     lines: [
-      "Savez-vous comment on appelait la rue des Bouchers, pendant des siècles ? « Le Trou ». Tant elle était sale.",
-      "Les restaurateurs disent que c'est une rue de fête depuis toujours. Je leur réponds que c'est surtout un trou depuis toujours.",
+      "Savez-vous comment on appelait la rue des Bouchers, pendant des siècles ? « Le Trou ». Tant elle était sale.",
+      "Les restaurateurs disent que c’est une rue de fête depuis toujours. Je leur réponds que c’est surtout un trou depuis toujours.",
     ],
     effects: { setFlags: ['knows_trou'] },
     once: true,
@@ -876,7 +876,7 @@ export const DIALOGUE = [
     speaker: 'hippolyte',
     when: { flags: ['met_hippolyte'], chance: 0.4 },
     lines: [
-      "Jusqu'en 1912, un canal coulait sous la rue. On l'a couvert. On aurait pu, dans un élan d'audace, y verser les chaises.",
+      "Jusqu’en 1912, un canal coulait sous la rue. On l’a couvert. On aurait pu, dans un élan d’audace, y verser les chaises.",
       "Je plaisante, naturellement. Le patrimoine ne mérite pas ça.",
     ],
   },
@@ -885,8 +885,8 @@ export const DIALOGUE = [
     speaker: 'hippolyte',
     when: { flags: ['met_hippolyte'], chance: 0.5 },
     lines: [
-      "Une climatisation posée sur une façade de 1729, sans autorisation. C'est comme coller un autocollant sur un Rubens.",
-      "Le service du patrimoine n'aime pas les autocollants. Je connais personnellement trois personnes qui n'aiment pas les autocollants.",
+      "Une climatisation posée sur une façade de 1729, sans autorisation. C’est comme coller un autocollant sur un Rubens.",
+      "Le service du patrimoine n’aime pas les autocollants. Je connais personnellement trois personnes qui n’aiment pas les autocollants.",
     ],
   },
   {
@@ -894,7 +894,7 @@ export const DIALOGUE = [
     speaker: 'hippolyte',
     when: { flags: ['heritage_angle'] },
     lines: [
-      "J'ai écrit au service du patrimoine. Sur papier à en-tête, à la plume. Ils m'ont répondu sous huit jours. Personne n'a jamais vu ça.",
+      "J’ai écrit au service du patrimoine. Sur papier à en-tête, à la plume. Ils m’ont répondu sous huit jours. Personne n’a jamais vu ça.",
     ],
     once: true,
   },
@@ -903,7 +903,7 @@ export const DIALOGUE = [
     speaker: 'hippolyte',
     when: { flags: ['hippolyte_room'] },
     lines: [
-      "L'atelier est à vous. Le chauffage date de 1954, le café de ce matin. Ne vous asseyez pas sur la banquette du landau, elle est classée dans mon cœur.",
+      "L’atelier est à vous. Le chauffage date de 1954, le café de ce matin. Ne vous asseyez pas sur la banquette du landau, elle est classée dans mon cœur.",
     ],
     once: true,
   },
@@ -920,7 +920,7 @@ export const DIALOGUE = [
     speaker: 'hippolyte',
     when: { flags: ['sabotage_parasols', 'met_hippolyte'] },
     lines: [
-      "J'apprends que des parasols ont disparu. Je ne pose aucune question. Je remarque simplement que la discrétion est une vertu ancienne.",
+      "J’apprends que des parasols ont disparu. Je ne pose aucune question. Je remarque simplement que la discrétion est une vertu ancienne.",
       "Une vertu que La Voix du Nordiste, en revanche, ne pratique guère.",
     ],
     once: true,
@@ -930,7 +930,7 @@ export const DIALOGUE = [
     speaker: 'hippolyte',
     when: { flags: ['bombance_rumour', 'met_hippolyte'] },
     lines: [
-      "La Bombance, au numéro 4. Un bar voudrait s'y installer. Ce local était une sellerie en 1880. J'ai les plans.",
+      "La Bombance, au numéro 4. Un bar voudrait s’y installer. Ce local était une sellerie en 1880. J’ai les plans.",
       "Les plans sont une arme élégante, monsieur Dubeton. Ils ne font aucun bruit.",
     ],
     once: true,
@@ -941,7 +941,7 @@ export const DIALOGUE = [
     speaker: 'hippolyte',
     when: { flags: ['ac_case_stalled', 'met_hippolyte'] },
     lines: [
-      "Le dossier de la climatisation s'enlise. Comme le canal avant qu'on le couvre, en 1912.",
+      "Le dossier de la climatisation s’enlise. Comme le canal avant qu’on le couvre, en 1912.",
       "Je vais écrire au patrimoine une seconde fois. Sur un papier plus épais.",
     ],
     once: true,
@@ -951,8 +951,8 @@ export const DIALOGUE = [
     speaker: 'hippolyte',
     when: { flags: ['inspector_announced', 'met_hippolyte'] },
     lines: [
-      "Une visite annoncée trois jours à l'avance. Et, par un heureux hasard, la climatisation s'était déguisée en jardinière la veille.",
-      "Mon arrière-grand-père appelait cela « recevoir ». Moi, j'appelle cela « prévenir ».",
+      "Une visite annoncée trois jours à l’avance. Et, par un heureux hasard, la climatisation s’était déguisée en jardinière la veille.",
+      "Mon arrière-grand-père appelait cela « recevoir ». Moi, j’appelle cela « prévenir ».",
     ],
     once: true,
   },
@@ -965,8 +965,8 @@ export const DIALOGUE = [
     speaker: 'dede',
     when: { day: [1, 5] },
     lines: [
-      "Ah, le voisin du dessus ! Allez va, descends boire un coup, c'est la maison qui offre. On est voisins, on est une famille !",
-      "Une famille où il y en a un qui dort, et l'autre qui travaille. Hé hé.",
+      "Ah, le voisin du dessus ! Allez va, descends boire un coup, c’est la maison qui offre. On est voisins, on est une famille !",
+      "Une famille où il y en a un qui dort, et l’autre qui travaille. Hé hé.",
     ],
   },
   {
@@ -974,7 +974,7 @@ export const DIALOGUE = [
     speaker: 'dede',
     when: { phase: 'night', chance: 0.4 },
     lines: [
-      "Vingt-deux heures ? Rue de Gand, ils ferment à minuit ! Minuit, mon biloute ! Et personne ne meurt, rue de Gand.",
+      "Vingt-deux heures ? Rue de Gand, ils ferment à minuit ! Minuit, mon biloute ! Et personne ne meurt, rue de Gand.",
     ],
   },
   {
@@ -982,8 +982,8 @@ export const DIALOGUE = [
     speaker: 'dede',
     when: { hidden: { hostility: '>=50' } },
     lines: [
-      "Tu sais ce que j'aime dans cette rue ? Tout le monde se connaît. Tout le monde sait où tout le monde habite.",
-      "C'est convivial, hein. Allez, bonne soirée.",
+      "Tu sais ce que j’aime dans cette rue ? Tout le monde se connaît. Tout le monde sait où tout le monde habite.",
+      "C’est convivial, hein. Allez, bonne soirée.",
     ],
   },
   {
@@ -991,7 +991,7 @@ export const DIALOGUE = [
     speaker: 'dede',
     when: { flags: ['carbonnade_1'] },
     lines: [
-      "Alors, cette carbonnade ? Hein ? Avoue. Avoue qu'elle est bonne. Klaas te regarde, mais avoue quand même.",
+      "Alors, cette carbonnade ? Hein ? Avoue. Avoue qu’elle est bonne. Klaas te regarde, mais avoue quand même.",
     ],
     once: true,
   },
@@ -1012,7 +1012,7 @@ export const DIALOGUE = [
     when: { flags: ['met_tatie'] },
     lines: [
       "Nous prenons bonne note de votre remarque concernant les nuisances olfactives. Le dossier est en cours de résolution.",
-      "Je vous remercie pour votre patience, qui est, je n'en doute pas, inépuisable. Bien cordialement.",
+      "Je vous remercie pour votre patience, qui est, je n’en doute pas, inépuisable. Bien cordialement.",
     ],
   },
   {
@@ -1020,7 +1020,7 @@ export const DIALOGUE = [
     speaker: 'ghislain',
     when: { chance: 0.4 },
     lines: [
-      "Notre autorisation d'occupation temporaire est parfaitement en règle. Je l'ai sous les yeux. Non, vous ne pouvez pas la voir.",
+      "Notre autorisation d’occupation temporaire est parfaitement en règle. Je l’ai sous les yeux. Non, vous ne pouvez pas la voir.",
     ],
   },
   {
@@ -1028,7 +1028,7 @@ export const DIALOGUE = [
     speaker: 'ghislain',
     when: { day: [8, 10] },
     lines: [
-      "La climatisation fait l'objet d'une régularisation administrative. C'est un mot long, qui veut dire que c'est en cours.",
+      "La climatisation fait l’objet d’une régularisation administrative. C’est un mot long, qui veut dire que c’est en cours.",
     ],
   },
   {
@@ -1036,7 +1036,7 @@ export const DIALOGUE = [
     speaker: 'ghislain',
     when: { flags: ['formal_notice'] },
     lines: [
-      "Nous avons reçu votre mise en demeure. Elle est très bien rédigée. Je l'ai classée avec les autres. Le classeur est vert.",
+      "Nous avons reçu votre mise en demeure. Elle est très bien rédigée. Je l’ai classée avec les autres. Le classeur est vert.",
     ],
     once: true,
   },
@@ -1045,7 +1045,7 @@ export const DIALOGUE = [
     speaker: 'ghislain',
     when: { flags: ['camera_found'] },
     lines: [
-      "Nous avons trouvé un objet qui n'était pas à nous sous notre store. Nous avons ouvert un dossier. Il est déjà très épais.",
+      "Nous avons trouvé un objet qui n’était pas à nous sous notre store. Nous avons ouvert un dossier. Il est déjà très épais.",
     ],
     effects: { hostility: +5 },
     once: true,
@@ -1063,7 +1063,7 @@ export const DIALOGUE = [
     speaker: 'serveur',
     when: { phase: 'night', flags: ['asked_waiter'] },
     lines: [
-      "Je sais, il est 22h. Je sais. Moi je rentrerais tout. Mais c'est pas moi qui décide, c'est le monsieur au chignon.",
+      "Je sais, il est 22h. Je sais. Moi je rentrerais tout. Mais c’est pas moi qui décide, c’est le monsieur au chignon.",
     ],
   },
   {
@@ -1071,7 +1071,7 @@ export const DIALOGUE = [
     speaker: 'serveur',
     when: { flags: ['met_waiter'], phase: 'night', chance: 0.4 },
     lines: [
-      "Tu m'appelles Théo maintenant ? Ça fait bizarre. Ici on m'appelle « s'il vous plaît », « hep » ou « garçon ».",
+      "Tu m’appelles Théo maintenant ? Ça fait bizarre. Ici on m’appelle « s’il vous plaît », « hep » ou « garçon ».",
     ],
   },
   {
@@ -1080,7 +1080,7 @@ export const DIALOGUE = [
     when: { flags: ['sabotage_chairs'] },
     lines: [
       "Trois chaises qui lâchent dans la même soirée. Dédé a regardé toutes les fenêtres de la rue. Surtout la tienne.",
-      "Moi j'ai rien vu. Mais à ta place, je descendrais pas l'escalier en sifflant.",
+      "Moi j’ai rien vu. Mais à ta place, je descendrais pas l’escalier en sifflant.",
     ],
     once: true,
   },
@@ -1089,7 +1089,7 @@ export const DIALOGUE = [
     speaker: 'serveur',
     when: { flags: ['waiter_fired'] },
     lines: [
-      "Ils m'ont viré. Bon. Au moins je vais pouvoir dormir. Ça, je te l'envie pas, toi.",
+      "Ils m’ont viré. Bon. Au moins je vais pouvoir dormir. Ça, je te l’envie pas, toi.",
     ],
     once: true,
   },
@@ -1099,7 +1099,7 @@ export const DIALOGUE = [
     speaker: 'ghislain',
     when: { flags: ['hygiene_visit'] },
     lines: [
-      "Le service d'hygiène nous a rendu une visite de courtoisie. Nous avons apprécié leur courtoisie. Nous avons noté le nom de chacun.",
+      "Le service d’hygiène nous a rendu une visite de courtoisie. Nous avons apprécié leur courtoisie. Nous avons noté le nom de chacun.",
     ],
     effects: { hostility: +3 },
     once: true,
@@ -1122,7 +1122,7 @@ export const DIALOGUE = [
     speaker: 'lemaire',
     when: { phase: 'night', flags: ['called_police'] },
     lines: [
-      "Tout est en ordre, monsieur. Les tables sont rentrées. Si elles étaient dehors avant, nous n'étions pas là pour le voir.",
+      "Tout est en ordre, monsieur. Les tables sont rentrées. Si elles étaient dehors avant, nous n’étions pas là pour le voir.",
     ],
   },
   {
@@ -1130,7 +1130,7 @@ export const DIALOGUE = [
     speaker: 'lemaire',
     when: { phase: 'night', flags: ['called_police'], chance: 0.5 },
     lines: [
-      "Vous savez, monsieur, on a d'autres priorités. Des vraies. Avec des gens qui crient, pas avec des chaises.",
+      "Vous savez, monsieur, on a d’autres priorités. Des vraies. Avec des gens qui crient, pas avec des chaises.",
     ],
   },
   {
@@ -1138,7 +1138,7 @@ export const DIALOGUE = [
     speaker: 'lemaire',
     when: { flags: ['serial_caller'] },
     lines: [
-      "C'est encore vous. On commence à reconnaître votre numéro au standard. Il y a un petit dessin à côté.",
+      "C’est encore vous. On commence à reconnaître votre numéro au standard. Il y a un petit dessin à côté.",
     ],
   },
   {
@@ -1146,7 +1146,7 @@ export const DIALOGUE = [
     speaker: 'lemaire',
     when: { flags: ['seen_complaisance'] },
     lines: [
-      "Un café, ce n'est pas un pot-de-vin, monsieur. C'est un geste. Deux cafés, c'est de la politesse. Le waterzooi… c'est de la gastronomie.",
+      "Un café, ce n’est pas un pot-de-vin, monsieur. C’est un geste. Deux cafés, c’est de la politesse. Le waterzooi… c’est de la gastronomie.",
     ],
   },
   {
@@ -1154,7 +1154,7 @@ export const DIALOGUE = [
     speaker: 'lemaire',
     when: { flags: ['lemaire_transferred'] },
     lines: [
-      "Muté à la fourrière. Vous êtes content ? Là-bas, personne ne m'offre rien. Même pas un sourire.",
+      "Muté à la fourrière. Vous êtes content ? Là-bas, personne ne m’offre rien. Même pas un sourire.",
     ],
     once: true,
   },
@@ -1163,7 +1163,7 @@ export const DIALOGUE = [
     speaker: 'benali',
     when: { phase: 'night', flags: ['called_police'] },
     lines: [
-      "Bonsoir monsieur. Agent Benali. J'ai constaté sept tables en terrasse à 22h26, en infraction à l'arrêté municipal. Je verbalise.",
+      "Bonsoir monsieur. Agent Benali. J’ai constaté sept tables en terrasse à 22h26, en infraction à l’arrêté municipal. Je verbalise.",
       "Oui, même celle-là. Oui, même avec le dessert.",
     ],
   },
@@ -1181,7 +1181,7 @@ export const DIALOGUE = [
     speaker: 'benali',
     when: { flags: ['benali_fined'], chance: 0.4 },
     lines: [
-      "On m'a demandé en réunion si je ne verbalisais pas « un peu trop ». J'ai demandé combien, c'était « assez ». Pas de réponse.",
+      "On m’a demandé en réunion si je ne verbalisais pas « un peu trop ». J’ai demandé combien, c’était « assez ». Pas de réponse.",
     ],
   },
   {
@@ -1189,7 +1189,7 @@ export const DIALOGUE = [
     speaker: 'benali',
     when: { flags: ['benali_transferred'] },
     lines: [
-      "Je suis muté à Lomme. Excès de zèle, c'est écrit noir sur blanc. Je vais encadrer le courrier.",
+      "Je suis muté à Lomme. Excès de zèle, c’est écrit noir sur blanc. Je vais encadrer le courrier.",
       "Bon courage, monsieur. Vraiment.",
     ],
     once: true,
@@ -1199,7 +1199,7 @@ export const DIALOGUE = [
     speaker: 'chef',
     when: { flags: ['chief_came'] },
     lines: [
-      "Nous prenons cette affaire très au sérieux. Très. Au sérieux. Je l'ai dit deux fois, vous pouvez le noter.",
+      "Nous prenons cette affaire très au sérieux. Très. Au sérieux. Je l’ai dit deux fois, vous pouvez le noter.",
     ],
     once: true,
   },
@@ -1208,7 +1208,7 @@ export const DIALOGUE = [
     speaker: 'chef',
     when: { flags: ['press_article'] },
     lines: [
-      "J'ai lu l'article de La Voix du Nordiste. Le photographe a pris mon mauvais profil. Pour le reste, une enquête est en cours.",
+      "J’ai lu l’article de La Voix du Nordiste. Le photographe a pris mon mauvais profil. Pour le reste, une enquête est en cours.",
     ],
     once: true,
   },
@@ -1217,7 +1217,7 @@ export const DIALOGUE = [
     speaker: 'chef',
     when: { flags: ['igpn_open'] },
     lines: [
-      "Une enquête interne est ouverte. Je n'ai aucun commentaire, sauf celui-ci : la police municipale de Lille est exemplaire. Globalement.",
+      "Une enquête interne est ouverte. Je n’ai aucun commentaire, sauf celui-ci : la police municipale de Lille est exemplaire. Globalement.",
     ],
     once: true,
   },
@@ -1236,7 +1236,7 @@ export const DIALOGUE = [
     when: { flags: ['complaint_filed'] },
     lines: [
       "Monsieur Dubeton. Commandant Desmet. Une plainte a été déposée à votre encontre. Je vous en informe avec le plus grand sérieux.",
-      "Je ne me déplace pas, d'habitude. Considérez cela comme un honneur. Un honneur administratif.",
+      "Je ne me déplace pas, d’habitude. Considérez cela comme un honneur. Un honneur administratif.",
     ],
     once: true,
   },
@@ -1245,7 +1245,7 @@ export const DIALOGUE = [
     speaker: 'chef',
     when: { flags: ['police_flooded'] },
     lines: [
-      "Le standard m'informe d'un volume d'appels inhabituel en provenance d'un même numéro. Nous prenons cela très au sérieux. Le standardiste aussi : il a demandé un congé.",
+      "Le standard m’informe d’un volume d’appels inhabituel en provenance d’un même numéro. Nous prenons cela très au sérieux. Le standardiste aussi : il a demandé un congé.",
     ],
     once: true,
   },
@@ -1258,7 +1258,7 @@ export const DIALOGUE = [
     speaker: 'delphine',
     when: { flags: ['emailed_inspector'] },
     lines: [
-      "J'ai bien reçu votre e-mail. Les photos sont nettes, les dates aussi. C'est rare. Merci.",
+      "J’ai bien reçu votre e-mail. Les photos sont nettes, les dates aussi. C’est rare. Merci.",
       "Je ne vous promets rien. Je ne promets jamais rien. Mais je lis tout.",
     ],
     once: true,
@@ -1268,8 +1268,8 @@ export const DIALOGUE = [
     speaker: 'delphine',
     when: { flags: ['delphine_dinner'] },
     lines: [
-      "Stéphane m'a dit que vous étiez « le Rust guy ». Il dit ça de tout le monde, je crois.",
-      "On ne parlera pas du dossier ce soir. Le mot « arrangement » me donne de l'urticaire.",
+      "Stéphane m’a dit que vous étiez « le Rust guy ». Il dit ça de tout le monde, je crois.",
+      "On ne parlera pas du dossier ce soir. Le mot « arrangement » me donne de l’urticaire.",
     ],
     once: true,
   },
@@ -1278,8 +1278,8 @@ export const DIALOGUE = [
     speaker: 'delphine',
     when: { flags: ['ac_violation_confirmed'] },
     lines: [
-      "Unité extérieure, quatre-vingts centimètres sur soixante, fixée à une façade ancienne. Autorisation : aucune. Excuse : « c'est en cours ».",
-      "J'ai entendu « c'est en cours » onze fois cette année. Je commence à le prendre personnellement.",
+      "Unité extérieure, quatre-vingts centimètres sur soixante, fixée à une façade ancienne. Autorisation : aucune. Excuse : « c’est en cours ».",
+      "J’ai entendu « c’est en cours » onze fois cette année. Je commence à le prendre personnellement.",
     ],
     once: true,
   },
@@ -1288,8 +1288,8 @@ export const DIALOGUE = [
     speaker: 'delphine',
     when: { flags: ['conflict_exposed'] },
     lines: [
-      "On me demande si j'ai été influencée par un dîner. Je mange chez moi tous les soirs, monsieur Dubeton. C'était chez moi.",
-      "Ça ne va pas m'aider. Et vous non plus.",
+      "On me demande si j’ai été influencée par un dîner. Je mange chez moi tous les soirs, monsieur Dubeton. C’était chez moi.",
+      "Ça ne va pas m’aider. Et vous non plus.",
     ],
     once: true,
   },
@@ -1298,8 +1298,8 @@ export const DIALOGUE = [
     speaker: 'colette',
     when: { day: [3, 14] },
     lines: [
-      "Mes chers amis, la convivialité, c'est l'ADN de Lille. Les terrasses, c'est le cœur qui bat de la ville.",
-      "Un cœur qui bat jusqu'à minuit, comme partout ailleurs. On va regarder ça.",
+      "Mes chers amis, la convivialité, c’est l’ADN de Lille. Les terrasses, c’est le cœur qui bat de la ville.",
+      "Un cœur qui bat jusqu’à minuit, comme partout ailleurs. On va regarder ça.",
     ],
   },
   {
@@ -1307,8 +1307,8 @@ export const DIALOGUE = [
     speaker: 'colette',
     when: { flags: ['colette_dinner_seen'] },
     lines: [
-      "J'étais simplement venue goûter la carbonnade. Une ancienne maire a bien le droit de dîner, non ?",
-      "Et de saluer quelques amis. On a encore le droit d'avoir des amis, à Lille.",
+      "J’étais simplement venue goûter la carbonnade. Une ancienne maire a bien le droit de dîner, non ?",
+      "Et de saluer quelques amis. On a encore le droit d’avoir des amis, à Lille.",
     ],
     once: true,
   },
@@ -1317,7 +1317,7 @@ export const DIALOGUE = [
     speaker: 'colette',
     when: { flags: ['met_tatie'], chance: 0.3 },
     lines: [
-      "Votre voisine, Tatie Bouchon, est un trésor. Elle me raconte tout. Absolument tout. Je l'adore.",
+      "Votre voisine, Tatie Bouchon, est un trésor. Elle me raconte tout. Absolument tout. Je l’adore.",
     ],
   },
   {
@@ -1325,7 +1325,7 @@ export const DIALOGUE = [
     speaker: 'colette',
     when: { flags: ['press_scandal'] },
     lines: [
-      "Je découvre cette affaire dans la presse, comme tout le monde. Je n'ai jamais rien su. Je ne connais personne. On va regarder ça.",
+      "Je découvre cette affaire dans la presse, comme tout le monde. Je n’ai jamais rien su. Je ne connais personne. On va regarder ça.",
     ],
     once: true,
   },
@@ -1334,7 +1334,7 @@ export const DIALOGUE = [
     speaker: 'lescaut',
     when: { flags: ['lescaut_meeting'] },
     lines: [
-      "Monsieur Dubeton. Je vous entends. J'ai mis en place les 22h, vous savez. On me l'a beaucoup reproché, dans certains salons.",
+      "Monsieur Dubeton. Je vous entends. J’ai mis en place les 22h, vous savez. On me l’a beaucoup reproché, dans certains salons.",
       "Apportez-moi du solide. Pas de rancœur, pas de surprises dans la presse. Du solide.",
     ],
     once: true,
@@ -1352,7 +1352,7 @@ export const DIALOGUE = [
     speaker: 'lescaut',
     when: { flags: ['petition_delivered', 'met_lescaut'] },
     lines: [
-      "Votre pétition est sur mon bureau. Elle a plus de signatures que celle des « clients heureux ». Et moins de fautes d'orthographe.",
+      "Votre pétition est sur mon bureau. Elle a plus de signatures que celle des « clients heureux ». Et moins de fautes d’orthographe.",
     ],
     once: true,
   },
@@ -1361,7 +1361,7 @@ export const DIALOGUE = [
     speaker: 'lescaut',
     when: { flags: ['press_scandal', 'met_lescaut'] },
     lines: [
-      "Je déteste les surprises dans la presse. Celle-là, je dois l'avouer, je la déteste un peu moins.",
+      "Je déteste les surprises dans la presse. Celle-là, je dois l’avouer, je la déteste un peu moins.",
     ],
     once: true,
   },
@@ -1370,7 +1370,7 @@ export const DIALOGUE = [
     speaker: 'stephane',
     when: { phase: 'morning', chance: 0.4 },
     lines: [
-      "Pilou, ma team ! Je suis à Lisbonne pour un off-site, mais je sens les vibes d'ici. Elles sont bonnes. Enfin, moyennes.",
+      "Pilou, ma team ! Je suis à Lisbonne pour un off-site, mais je sens les vibes d’ici. Elles sont bonnes. Enfin, moyennes.",
     ],
   },
   {
@@ -1378,7 +1378,7 @@ export const DIALOGUE = [
     speaker: 'stephane',
     when: { phase: 'morning', stats: { sleep: '<30' } },
     lines: [
-      "T'as l'air cramé, bro. Tu devrais essayer le cold plunge. Ou dormir. Mais surtout le cold plunge.",
+      "T’as l’air cramé, bro. Tu devrais essayer le cold plunge. Ou dormir. Mais surtout le cold plunge.",
     ],
   },
   {
@@ -1394,7 +1394,7 @@ export const DIALOGUE = [
     speaker: 'stephane',
     when: { flags: ['todo_app_rust'] },
     lines: [
-      "Mon app de to-do est encore en Rust ? Elle démarre en deux millisecondes maintenant. Je n'ai plus le temps de prendre un café.",
+      "Mon app de to-do est encore en Rust ? Elle démarre en deux millisecondes maintenant. Je n’ai plus le temps de prendre un café.",
     ],
     once: true,
   },
@@ -1411,7 +1411,7 @@ export const DIALOGUE = [
     speaker: 'delphine',
     when: { flags: ['met_delphine'], phase: 'afternoon', chance: 0.3 },
     lines: [
-      "On s'est vus chez moi, monsieur Dubeton. Ici, on est à la mairie. Je vous vouvoie, et je relis tout deux fois.",
+      "On s’est vus chez moi, monsieur Dubeton. Ici, on est à la mairie. Je vous vouvoie, et je relis tout deux fois.",
     ],
   },
   {
@@ -1419,8 +1419,8 @@ export const DIALOGUE = [
     speaker: 'stephane',
     when: { flags: ['proj_db_report'] },
     lines: [
-      "C'est quoi ces graphes de décibels dans le drive partagé ? Des courbes, des PDF, un logo ? C'est un side project ?",
-      "J'adore. On pivote ? « Koddex, the noise company. » Non ? Je laisse mûrir.",
+      "C’est quoi ces graphes de décibels dans le drive partagé ? Des courbes, des PDF, un logo ? C’est un side project ?",
+      "J’adore. On pivote ? « Koddex, the noise company. » Non ? Je laisse mûrir.",
     ],
     once: true,
   },
@@ -1433,8 +1433,8 @@ export const DIALOGUE = [
     speaker: 'regis',
     when: { day: [1, 8], notFlags: ['traitor_known'] },
     lines: [
-      "Régis, numéro 27. Membre de l'association depuis le début. Moi, je comprends les deux côtés, hein.",
-      "Le sommeil, c'est important. L'ambiance aussi. Il faut trouver un équilibre. Dans la nuance.",
+      "Régis, numéro 27. Membre de l’association depuis le début. Moi, je comprends les deux côtés, hein.",
+      "Le sommeil, c’est important. L’ambiance aussi. Il faut trouver un équilibre. Dans la nuance.",
     ],
     once: true,
   },
@@ -1443,7 +1443,7 @@ export const DIALOGUE = [
     speaker: 'regis',
     when: { notFlags: ['traitor_known'], chance: 0.4 },
     lines: [
-      "Mes locataires adorent l'ambiance. Cinq étoiles, à chaque fois. Bon, ils dorment avec des bouchons d'oreilles, mais avec le sourire.",
+      "Mes locataires adorent l’ambiance. Cinq étoiles, à chaque fois. Bon, ils dorment avec des bouchons d’oreilles, mais avec le sourire.",
     ],
   },
   {
@@ -1451,7 +1451,7 @@ export const DIALOGUE = [
     speaker: 'regis',
     when: { phase: 'night', notFlags: ['traitor_known'], chance: 0.3 },
     lines: [
-      "Vingt-deux heures, c'est bien. Vingt-deux heures trente, ce serait bien aussi. Je dis ça, je ne dis rien.",
+      "Vingt-deux heures, c’est bien. Vingt-deux heures trente, ce serait bien aussi. Je dis ça, je ne dis rien.",
     ],
   },
   {
@@ -1468,8 +1468,8 @@ export const DIALOGUE = [
     speaker: 'regis',
     when: { flags: ['regis_courted'], notFlags: ['traitor_known'] },
     lines: [
-      "Moi, à l'estaminet ? Une fois. Bon, deux. Pour observer. De l'intérieur. Pour l'association.",
-      "Klaas a noté ? Il note tout, Klaas. Même les gens qui n'ont rien fait. Enfin, rien de grave.",
+      "Moi, à l’estaminet ? Une fois. Bon, deux. Pour observer. De l’intérieur. Pour l’association.",
+      "Klaas a noté ? Il note tout, Klaas. Même les gens qui n’ont rien fait. Enfin, rien de grave.",
     ],
     once: true,
   },
@@ -1479,7 +1479,7 @@ export const DIALOGUE = [
     when: { flags: ['traitor_known'] },
     lines: [
       "Traître, traître… Tout de suite les grands mots. Je faisais de la médiation. En amont.",
-      "Je comprends les deux côtés. C'est juste que l'un des deux côtés offre le dessert.",
+      "Je comprends les deux côtés. C’est juste que l’un des deux côtés offre le dessert.",
     ],
     once: true,
   },
@@ -1488,7 +1488,7 @@ export const DIALOGUE = [
     speaker: 'regis',
     when: { flags: ['traitor_known'], chance: 0.3 },
     lines: [
-      "Vous ne me dites plus bonjour dans l'escalier. Je le comprends. Je comprends tout, moi. C'est mon drame.",
+      "Vous ne me dites plus bonjour dans l’escalier. Je le comprends. Je comprends tout, moi. C’est mon drame.",
     ],
   },
 
@@ -1500,8 +1500,8 @@ export const DIALOGUE = [
     speaker: 'journaliste',
     when: { flags: ['press_contacted'], notFlags: ['press_article'] },
     lines: [
-      "Vous avez des éléments ? Des photos, des PV, des dates ?",
-      "Parce que « mon voisin fait du bruit », j'en reçois quarante par semaine. Je les classe par arrondissement.",
+      "Vous avez des éléments ? Des photos, des PV, des dates ?",
+      "Parce que « mon voisin fait du bruit », j’en reçois quarante par semaine. Je les classe par arrondissement.",
     ],
     once: true,
   },
@@ -1518,7 +1518,7 @@ export const DIALOGUE = [
     speaker: 'journaliste',
     when: { flags: ['press_contacted'], stats: { dossier: '>=40' } },
     lines: [
-      "Ça, c'est un dossier. Horodaté, chiffré, recoupé. Je le montre au rédac' chef avant le bouclage. Ne parlez à personne d'autre.",
+      "Ça, c’est un dossier. Horodaté, chiffré, recoupé. Je le montre au rédac' chef avant le bouclage. Ne parlez à personne d’autre.",
     ],
     once: true,
   },
@@ -1527,7 +1527,7 @@ export const DIALOGUE = [
     speaker: 'journaliste',
     when: { flags: ['press_article'] },
     lines: [
-      "L'article est sorti, page 7. Pas la une : il y avait la braderie. Mais page 7, dans le Vieux-Lille, tout le monde la lit en attendant son café.",
+      "L’article est sorti, page 7. Pas la une : il y avait la braderie. Mais page 7, dans le Vieux-Lille, tout le monde la lit en attendant son café.",
     ],
     once: true,
   },
@@ -1546,7 +1546,7 @@ export const DIALOGUE = [
     speaker: 'journaliste',
     when: { flags: ['press_scandal'] },
     lines: [
-      "La police municipale, un estaminet, des cafés offerts. Mon rédac' chef a dit « enfin ». Il ne dit jamais « enfin ».",
+      "La police municipale, un estaminet, des cafés offerts. Mon rédac' chef a dit « enfin ». Il ne dit jamais « enfin ».",
     ],
     once: true,
   },
@@ -1555,7 +1555,7 @@ export const DIALOGUE = [
     speaker: 'avocat',
     when: { flags: ['lawyer_hired'] },
     lines: [
-      "En l'état du dossier, j'ai trois remarques et une facture. Commençons par la facture, c'est la plus courte.",
+      "En l’état du dossier, j’ai trois remarques et une facture. Commençons par la facture, c’est la plus courte.",
     ],
     once: true,
   },
@@ -1564,7 +1564,7 @@ export const DIALOGUE = [
     speaker: 'avocat',
     when: { flags: ['formal_notice'] },
     lines: [
-      "La mise en demeure est partie en recommandé. Je l'ai rédigée avec une politesse qui devrait les empêcher de dormir.",
+      "La mise en demeure est partie en recommandé. Je l’ai rédigée avec une politesse qui devrait les empêcher de dormir.",
       "Une forme de réciprocité, en somme.",
     ],
     once: true,
@@ -1574,7 +1574,7 @@ export const DIALOGUE = [
     speaker: 'avocat',
     when: { flags: ['cm_lawyer_reply', 'lawyer_hired'] },
     lines: [
-      "Leur conseil répond que la terrasse « participe à l'animation du quartier ». C'est joli. En droit, cela ne veut strictement rien dire.",
+      "Leur conseil répond que la terrasse « participe à l’animation du quartier ». C’est joli. En droit, cela ne veut strictement rien dire.",
     ],
     once: true,
   },
@@ -1583,7 +1583,7 @@ export const DIALOGUE = [
     speaker: 'avocat',
     when: { flags: ['lawyer_hired', 'camera_awning'] },
     lines: [
-      "Une caméra sous le store d'un tiers ? En l'état du dossier, cette vidéo n'existe pas.",
+      "Une caméra sous le store d’un tiers ? En l’état du dossier, cette vidéo n’existe pas.",
       "Je vous conseille vivement de faire comme elle.",
     ],
     once: true,
@@ -1593,7 +1593,7 @@ export const DIALOGUE = [
     speaker: 'avocat',
     when: { flags: ['lawyer_hired', 'complaint_filed'] },
     lines: [
-      "Une plainte contre vous. Je vous facture l'heure entamée pour vous dire ceci : ne dites plus rien. À personne. Surtout pas sur WhatsApp.",
+      "Une plainte contre vous. Je vous facture l’heure entamée pour vous dire ceci : ne dites plus rien. À personne. Surtout pas sur WhatsApp.",
     ],
     once: true,
   },
@@ -1602,7 +1602,7 @@ export const DIALOGUE = [
     speaker: 'avocat',
     when: { flags: ['lawyer_hired'], stats: { dossier: '>=50' } },
     lines: [
-      "Des preuves licites, horodatées, recoupées. Je n'ai rien à redire. C'est extrêmement désagréable pour un avocat.",
+      "Des preuves licites, horodatées, recoupées. Je n’ai rien à redire. C’est extrêmement désagréable pour un avocat.",
     ],
     once: true,
   },
@@ -1615,7 +1615,7 @@ export const DIALOGUE = [
     speaker: 'biloute',
     when: { flags: ['met_jeremie'], chance: 0.3 },
     lines: [
-      "*Renifle tes chaussures dans l'escalier. Conclut « carbonnade ». Te regarde avec reproche.*",
+      "*Renifle tes chaussures dans l’escalier. Conclut « carbonnade ». Te regarde avec reproche.*",
     ],
   },
   {
@@ -1623,7 +1623,7 @@ export const DIALOGUE = [
     speaker: 'biloute',
     when: { phase: 'night', flags: ['joined_rounds'], chance: 0.4 },
     lines: [
-      "Ouaf ! *S'arrête net devant une chaise qui mord sur le couloir de passage. Ne bouge plus.* Ouaf.",
+      "Ouaf ! *S’arrête net devant une chaise qui mord sur le couloir de passage. Ne bouge plus.* Ouaf.",
     ],
   },
   {
@@ -1639,7 +1639,7 @@ export const DIALOGUE = [
     speaker: 'biloute',
     when: { phase: 'night', flags: ['joined_rounds'], chance: 0.3 },
     lines: [
-      "*22h00. Les chaises raclent les pavés. Grogne en direction de l'estaminet. Jérémie murmure « bon chien ».*",
+      "*22h00. Les chaises raclent les pavés. Grogne en direction de l’estaminet. Jérémie murmure « bon chien ».*",
     ],
   },
   {
@@ -1656,7 +1656,7 @@ export const DIALOGUE = [
     speaker: 'biloute',
     when: { phase: 'night', flags: ['joined_rounds'], stats: { risk: '>=40' } },
     lines: [
-      "OUAF ! OUAF ! *Au pire moment, évidemment. Jérémie fait semblant de chercher ses clés.*",
+      "OUAF ! OUAF ! *Au pire moment, évidemment. Jérémie fait semblant de chercher ses clés.*",
     ],
   },
   {
@@ -1672,7 +1672,7 @@ export const DIALOGUE = [
     speaker: 'gaufre',
     when: { phase: 'night', chance: 0.25 },
     lines: [
-      "*Se lève, s'étire, tourne le dos à la rue et rentre. Même elle en a assez.*",
+      "*Se lève, s’étire, tourne le dos à la rue et rentre. Même elle en a assez.*",
     ],
   },
   {
@@ -1680,7 +1680,7 @@ export const DIALOGUE = [
     speaker: 'gaufre',
     when: { day: [13, 13], phase: 'night' },
     lines: [
-      "*N'est pas sortie du tout. Samedi : trop de monde, trop de bruit. Elle a raison.*",
+      "*N’est pas sortie du tout. Samedi : trop de monde, trop de bruit. Elle a raison.*",
     ],
     once: true,
   },
@@ -1689,7 +1689,7 @@ export const DIALOGUE = [
     speaker: 'gaufre',
     when: { flags: ['pee_at_door'] },
     lines: [
-      "*Fixe ta porte d'entrée. Puis toi. Ne dit rien. N'en pense pas moins.*",
+      "*Fixe ta porte d’entrée. Puis toi. Ne dit rien. N’en pense pas moins.*",
     ],
     once: true,
   },
@@ -1707,7 +1707,7 @@ export const DIALOGUE = [
     speaker: 'nico',
     when: { flags: ['hate_wave_answered'] },
     lines: [
-      "Ta réponse a été partagée plus que leur post. Trois photos, une date, zéro insulte. J'en ai fait une capture pour l'encadrer.",
+      "Ta réponse a été partagée plus que leur post. Trois photos, une date, zéro insulte. J’en ai fait une capture pour l’encadrer.",
     ],
     once: true,
   },
@@ -1717,7 +1717,7 @@ export const DIALOGUE = [
     when: { flags: ['klaas_log_certified'] },
     lines: [
       "Mes carnets ont un tampon, maintenant. Hilde dit que je marche plus droit depuis.",
-      "Ce n'est pas pour le tampon. C'est que quelqu'un les a enfin lus jusqu'au bout.",
+      "Ce n’est pas pour le tampon. C’est que quelqu’un les a enfin lus jusqu’au bout.",
     ],
     once: true,
   },
@@ -1726,7 +1726,7 @@ export const DIALOGUE = [
     speaker: 'serveur',
     when: { flags: ['waiter_testimony'] },
     lines: [
-      "J'ai signé. Ma mère dit que je suis courageux. Mon banquier dit que je suis au chômage. Les deux ont raison.",
+      "J’ai signé. Ma mère dit que je suis courageux. Mon banquier dit que je suis au chômage. Les deux ont raison.",
     ],
     once: true,
   },
@@ -1735,8 +1735,8 @@ export const DIALOGUE = [
     speaker: 'hilde',
     when: { flags: ['laxative_done', 'met_hilde'] },
     lines: [
-      "Des clients malades, à la terrasse d'en bas. Klaas dit qu'on ne sait pas qui. Je ne veux pas le savoir.",
-      "Si c'était quelqu'un de chez nous, Pilou, ce n'est plus une querelle de voisins. C'est autre chose. Quelque chose de grave.",
+      "Des clients malades, à la terrasse d’en bas. Klaas dit qu’on ne sait pas qui. Je ne veux pas le savoir.",
+      "Si c’était quelqu’un de chez nous, Pilou, ce n’est plus une querelle de voisins. C’est autre chose. Quelque chose de grave.",
     ],
     effects: { asso: -3 },
     once: true,
@@ -1746,7 +1746,7 @@ export const DIALOGUE = [
     speaker: 'avocat',
     when: { flags: ['backroom_caught', 'lawyer_hired'] },
     lines: [
-      "Dans l'arrière-salle. Entre les fûts. En l'état du dossier, je vais avoir besoin d'un café. Et vous, d'un très bon souvenir de la loi.",
+      "Dans l’arrière-salle. Entre les fûts. En l’état du dossier, je vais avoir besoin d’un café. Et vous, d’un très bon souvenir de la loi.",
     ],
     once: true,
   },
@@ -1755,7 +1755,7 @@ export const DIALOGUE = [
     speaker: 'serveur',
     when: { flags: ['backroom_sneak'], notFlags: ['backroom_caught'] },
     lines: [
-      "Quelqu'un a bougé deux fûts dans l'arrière-salle, hier soir. Dédé croit aux fantômes. Moi, je crois pas aux fantômes. Je crois que je vais rien dire.",
+      "Quelqu’un a bougé deux fûts dans l’arrière-salle, hier soir. Dédé croit aux fantômes. Moi, je crois pas aux fantômes. Je crois que je vais rien dire.",
     ],
     once: true,
   },
