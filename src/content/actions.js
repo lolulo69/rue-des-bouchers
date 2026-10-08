@@ -91,7 +91,7 @@ export const ACTIONS = [
     effects: {
       setFlags: ['camera_window'],
       dossier: +2,
-      evidence: { kind: 'camera', quality: 2, legal: false, label: 'Images en continu de la terrasse (caméra fenêtre)' },
+      evidence: { kind: 'camera', quality: 0.5, legal: false, label: 'Images en continu de la terrasse (caméra fenêtre)' },
     },
     witnessed: { exposure: 0.2, by: ['seb_nico', 'waiter', 'ghislain'], effects: { hostility: +10 } },
     result: "La caméra filme la rue jour et nuit. La CNIL n'aimerait pas ça, le tribunal n'en voudra pas, mais La Voix du Nordiste, elle, adorerait.",
@@ -105,7 +105,7 @@ export const ACTIONS = [
     effects: {
       setFlags: ['filmed_faces'],
       dossier: +1,
-      evidence: { kind: 'video', quality: 2, legal: false, label: 'Vidéo : tablée de neuf, visages compris' },
+      evidence: { kind: 'video', quality: 0.5, legal: false, label: 'Vidéo : tablée de neuf, visages compris' },
     },
     witnessed: { exposure: 0.5, by: ['customers', 'waiter', 'dede'], effects: { hostility: +10, risk: +5 } },
     result: "Un client lève son verre à la caméra. Un autre lève autre chose. Juridiquement, ni l'un ni l'autre n'a donné son accord.",
@@ -146,7 +146,7 @@ export const ACTIONS = [
     effects: {
       setFlags: ['camera_awning'],
       dossier: +3,
-      evidence: { kind: 'camera', quality: 3, legal: false, label: "Caméra sous le store : la terrasse vue d'en haut, toute la nuit" },
+      evidence: { kind: 'camera', quality: 0.7, legal: false, label: "Caméra sous le store : la terrasse vue d'en haut, toute la nuit" },
     },
     witnessed: { exposure: 0.5, by: ['klaas', 'seb_nico', 'waiter', 'dede', 'ghislain', 'customers', 'biloute'], effects: { risk: +20, setFlags: ['klaas_noted_pilou'] } },
     result: "Un petit œil noir entre deux franges du store. Il voit tout : les tables, les chaises, et Ghislain qui se recoiffe dans la vitrine.",
@@ -264,7 +264,7 @@ export const ACTIONS = [
     effects: {
       setFlags: ['backroom_sneak', 'bribe_photo_illegal', 'corruption_proof'],
       dossier: +4,
-      evidence: { kind: 'bribe', quality: 4, legal: false, label: "Enveloppe de Dédé au brigadier, vue de l'arrière-salle" },
+      evidence: { kind: 'bribe', quality: 0.9, legal: false, label: "Enveloppe de Dédé au brigadier, vue de l'arrière-salle" },
     },
     witnessed: { exposure: 0.5, by: ['dede', 'ghislain', 'waiter', 'police'], effects: { risk: +40, setFlags: ['complaint_filed'] } },
     result: "Entre deux fûts de bière, vous retenez votre souffle. Dédé tend une enveloppe et un waterzooi « offert ». Clic. Inutilisable au tribunal, inestimable dans un journal.",
@@ -279,7 +279,7 @@ export const ACTIONS = [
     effects: {
       setFlags: ['bribe_photo', 'corruption_proof'],
       dossier: +5,
-      evidence: { kind: 'bribe', quality: 3, legal: true, label: "Repas offert et enveloppe à la patrouille, photographiés depuis la fenêtre" },
+      evidence: { kind: 'bribe', quality: 0.7, legal: true, label: "Repas offert et enveloppe à la patrouille, photographiés depuis la fenêtre" },
     },
     result: "Trois quarts d'heure à la fenêtre, et la voilà : l'assiette « offerte », l'enveloppe sous la serviette. Une photo prise de chez vous, sur la voie publique. Maître Vandamme va pleurer de joie.",
   },
@@ -555,11 +555,11 @@ export const ACTIONS = [
     legality: 'legal',
     once: true,
     cost: { time: 1 },
-    requires: { stats: { asso: '>=15' } },
+    requires: { flags: ['tatie_mail_3'] },
     effects: {
       setFlags: ['tatie_emails_shared', 'met_tatie'],
       dossier: +3,
-      evidence: { kind: 'emails', quality: 3, legal: true, label: "Fil de Tatie : les promesses « c'est en cours », numérotées" },
+      evidence: { kind: 'emails', quality: 0.7, legal: true, label: "Fil de Tatie : les promesses « c'est en cours », numérotées" },
     },
     result: "Tatie imprime tout, agrafe tout, et vous tend la liasse. « Si vous voulez quelque chose dans la vie, faut résister et se battre pour. Et garder ses e-mails. »",
   },
@@ -716,7 +716,7 @@ export const ACTIONS = [
     effects: {
       setFlags: ['read_reservations'],
       dossier: +2,
-      evidence: { kind: 'reservations', quality: 3, legal: false, label: 'Réservations : 9 couverts par table, « terrasse jusqu’à 1h »' },
+      evidence: { kind: 'reservations', quality: 0.7, legal: false, label: 'Réservations : 9 couverts par table, « terrasse jusqu’à 1h »' },
     },
     result: "Samedi, table 4 : « 11 pers., terrasse, NE PAS RENTRER avant 1h ». C'est écrit noir sur blanc, en Comic Sans.",
   },
@@ -731,7 +731,7 @@ export const ACTIONS = [
     effects: {
       setFlags: ['read_emails'],
       dossier: +2,
-      evidence: { kind: 'emails', quality: 3, legal: false, label: 'Brouillons de Ghislain : « répondre à la vieille que c’est en cours »' },
+      evidence: { kind: 'emails', quality: 0.7, legal: false, label: 'Brouillons de Ghislain : « répondre à la vieille que c’est en cours »' },
     },
     result: "Dossier « Brouillons » : un modèle de réponse nommé « TATIE_v7_final_FINAL.docx ». Ce n'est pas en cours. Ça n'a jamais été en cours.",
   },
@@ -746,7 +746,7 @@ export const ACTIONS = [
     effects: {
       setFlags: ['read_quotes'],
       dossier: +3,
-      evidence: { kind: 'quotes', quality: 4, legal: false, label: 'Trois devis pour déplacer la gaine, jamais signés (2023–2025)' },
+      evidence: { kind: 'quotes', quality: 0.9, legal: false, label: 'Trois devis pour déplacer la gaine, jamais signés (2023–2025)' },
     },
     result: "Trois devis pour déplacer la gaine. Le moins cher coûte moins que la clim installée sans permis. Aucun n'est signé. Tous sont annotés « bof ».",
   },

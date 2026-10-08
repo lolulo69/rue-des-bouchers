@@ -183,4 +183,20 @@ export const FLAGS = {
   // ── content-koddex (koddex.js) ──────────────────────────────────────────
   proj_db_report: 'Relevés dB mis en forme pour la mairie (graphes + PDF)',
   proj_klaas_ocr: 'Carnet de Klaas numérisé (tableur horodaté)',
+
+  // ── content-countermoves (countermoves.js) ──────────────────────────────
+  tatie_mail_8: 'Fil Tatie : promesse n°8 reçue (la gaine de Roubaix)',
+  tatie_mail_9: 'Fil Tatie : promesse n°9 reçue (patrimoine immatériel)',
+  tatie_mail_10: 'Fil Tatie : promesse n°10 reçue (« c’est réparé »)',
+  tatie_mail_11: 'Fil Tatie : promesse n°11 reçue (rédigée par Clode Kode)',
+  tatie_mail_12: 'Fil Tatie : promesse n°12 reçue (réponse automatique)',
+  regis_courted: "Un membre de l'association dîne gratis à l'estaminet (Klaas l'a noté)",
+  regis_leak_petition: 'Le bloc a devancé la pétition grâce à une fuite',
+  regis_leak_lawyer: "Le bloc a su pour l'avocat avant l'envoi",
+  cm_regis_nuance: 'Régis démasqué propose une « médiation »',
+  cm_counter_banner: 'Contre-banderole « ICI ON VIT, HEIN ! » sur la façade',
+  cm_lawyer_reply: "L'avocat de l'estaminet a répondu à la mise en demeure",
+  cm_air_freshener: 'Diffuseur « parfum frites fraîches » sous le store',
+  cm_sugar_blame: 'Dédé a accusé la rue de Gand pour la carbonnade sucrée',
+  cm_uritrottoir_terrace: "Dédé a annexé l'uritrottoir à sa terrasse",
 };
