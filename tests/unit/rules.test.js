@@ -23,7 +23,7 @@ describe('22:00 : fermeture des terrasses', () => {
     const sim = simAt(H(22, 30), { cfg: { RESTAURANTS: restaurants({ compliance: 1 }) } });
     const r = sim.act({ type: 'photo', target: { kind: 'table', id: sim.state.tables[0].id }, distance: 3 });
     expect(r.ok).toBe(false);
-    expect(sim.state.evidence).toHaveLength(0);
+    expect(sim.state.evidence.filter((e) => e.type === 'photo')).toHaveLength(0);
   });
 
   it('raclement de chaises : "une table" tant qu\'il en reste, "sa terrasse" pour la dernière', () => {

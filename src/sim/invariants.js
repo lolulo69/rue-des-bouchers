@@ -12,6 +12,7 @@ export function checkInvariants(sim) {
   // 1. La police n'arrive qu'après un appel (et une seule fois par appel).
   const calls = new Map();
   const arrived = new Set();
+  let scheduled = 0;
   // 2. Une table rentrée ne ressort qu'après un tuyau.
   const tipped = new Map(); // tableId -> tipoffId
   const tableOut = new Map(S.tables.map((t) => [t.id, true]));
@@ -21,7 +22,10 @@ export function checkInvariants(sim) {
   for (const e of J) {
     switch (e.type) {
       case 'call': calls.set(e.callId, e); break;
+      case 'police-scheduled': scheduled++; break;
       case 'police-arrive':
+        // Visite planifiée (la police vient pour Pilou) : pas d'appel, mais une planification juste avant
+        if (e.visit) { if (scheduled-- <= 0) fail('visite de police non planifiée', e); break; }
         if (!calls.has(e.callId) || calls.get(e.callId).ignored) fail('police sans appel', e);
         if (arrived.has(e.callId)) fail('police arrivée deux fois pour le même appel', e);
         arrived.add(e.callId);
@@ -47,7 +51,7 @@ export function checkInvariants(sim) {
         break;
       case 'klaas-note':
         if (e.t >= WITNESS.klaas.sleepAt) fail('Klaas note en dormant', e);
-        if (!lineOfSight(ANCHORS.klaasWindow, e.pos, STREET.halfWidth) || dist3(ANCHORS.klaasWindow, e.pos) > Math.max(...WITNESS.klaas.far)) fail('Klaas note ce qu\'il ne peut pas voir', e);
+        if (!lineOfSight(ANCHORS.klaasWindow, e.pos, STREET.halfWidth) || dist3(ANCHORS.klaasWindow, e.pos) > Math.max(...WITNESS.klaas.far, WITNESS.klaas.binoculars.far)) fail('Klaas note ce qu\'il ne peut pas voir', e);
         break;
       case 'evidence': {
         // 3. Une preuve renvoie à un fait réel.
@@ -69,6 +73,6 @@ export function checkInvariants(sim) {
     if (ev.kind === 'over' && !(ev.count > RULES.maxPeoplePerTable)) fail(`preuve "plus de ${RULES.maxPeoplePerTable}" sans dépassement`, { t: ev.time, ...ev });
     if (ev.kind === 'corridor' && !(ev.encroach > 0)) fail('preuve de débordement sans débordement', { t: ev.time, ...ev });
   }
-  if (S.risk > 0 && !J.some((e) => e.type === 'risk')) fail('Risque non nul sans acte vu', null);
+  if (S.risk > (S.riskStart ?? 0) && !J.some((e) => e.type === 'risk')) fail('Risque en hausse sans acte vu', null);
   return errors;
 }

@@ -39,7 +39,7 @@ describe('police municipale', () => {
     sim.act({ type: 'sleep', on: true });
     untilGone(sim);
     expect(sim.state.policeLog[0].outcome).toBe('complaisance');
-    expect(sim.state.evidence).toHaveLength(0);
+    expect(sim.state.evidence.filter((e) => e.type === 'complaisance')).toHaveLength(0);
   });
 
   it('le tuyau : tables rentrées juste avant l\'arrivée, ressorties après, et Klaas note tout', () => {

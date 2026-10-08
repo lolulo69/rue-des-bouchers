@@ -33,13 +33,25 @@ describe('témoins du seau d\'eau', () => {
     expect(night.potentialWitnesses(night.cfg.ANCHORS.pilouWindow).some((w) => w.kind === 'klaas')).toBe(false);
   });
 
-  it('Klaas, au bout de la rue : plus c\'est loin et plus il fait nuit, moins il distingue', () => {
-    const dusk = simAt(H(20, 31));
-    const night = simAt(H(23));
+  it('Klaas, au fond de la place : à l\'œil nu de près seulement, aux jumelles toute la rue', () => {
+    const naked = { WITNESS: { klaas: { binoculars: { every: [999, 999] } } } };
+    const dusk = simAt(H(20, 31), { cfg: naked });
+    const night = simAt(H(23), { cfg: naked });
     const k = (s, z) => s.potentialWitnesses({ x: -3.4, y: 8, z }).find((w) => w.kind === 'klaas')?.p ?? 0;
     expect(k(dusk, 0)).toBeGreaterThan(k(night, 0));
     expect(k(night, 30)).toBeGreaterThan(k(night, 0));
-    expect(k(night, -40)).toBe(0);
+    expect(k(night, -24)).toBe(0); // la fenêtre de Pilou, de nuit, à l'œil nu : trop loin
+    night.klaasAlert(); // grabuge → jumelles
+    expect(night.klaasWatching()).toBe(true);
+    expect(k(night, -24)).toBeGreaterThan(0.5);
+    expect(night.potentialWitnesses({ x: -3.4, y: 8, z: -24 }).find((w) => w.kind === 'klaas').name).toContain('jumelles');
+  });
+
+  it('la police dans la rue ou le fracas des chaises font sortir les jumelles', () => {
+    const sim = simAt(H(21), { cfg: { WITNESS: { klaas: { binoculars: { every: [999, 999] } } } } });
+    expect(sim.klaasWatching()).toBe(false);
+    sim.clearTable(sim.state.tables[0], 'resto');
+    expect(sim.klaasWatching()).toBe(true);
   });
 
   it('le chat sur le balcon = Seb & Nico sont là ; chat rentré = personne', () => {

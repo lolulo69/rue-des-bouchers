@@ -1,0 +1,569 @@
+// Moteur de campagne (§3, §14) : 14 jours × matin (Koddex) → après-midi → nuit (sim.js), pur et déterministe.
+// Le contenu narratif (src/content) est de la donnée : ce module l'évalue (conditions, effets), le joue dans l'ordre
+// du calendrier et tient un journal vérifié par campaignInvariants.js. Tout l'état est sérialisable (JSON).
+//
+// Pas à pas (UI ou bot) :
+//   c.card()                 → carte en attente (événement / dialogue / contre-offensive / info) ou null
+//   c.resolveCard(i)         → choix i d'un événement (ou "OK")
+//   c.step                   → 'cards' | 'koddex' | 'actions' | 'night' | 'recap' | 'ended'
+//   matin     : c.koddexOptions(), c.koddex(['work', 'proj_db_logger', 'work'])
+//   après-midi: c.availableActions(), c.doAction(id), c.endAfternoon()
+//   nuit      : c.createNight() → sim ; (jouer la nuit) ; c.nightActions(sim), c.doNightAction(sim, id) ; c.finishNight(sim)
+//   récap     : c.nextDay()
+import { CONFIG } from '../config.js';
+import { createRng } from './rng.js';
+import { createSim } from './sim.js';
+import { evalCondition, STAT_KEYS, HIDDEN_KEYS } from './conditions.js';
+import { normalizeContent } from './content.js';
+
+export const SAVE_VERSION = 1;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+// Correspondance entre les témoins nommés par le contenu (witnessed.by) et ceux de la nuit simulée
+const NIGHT_WITNESS = { klaas: 'klaas', seb_nico: 'gaystapo', waiter: 'waiter', customers: 'customers', biloute: 'jeremie', jeremie: 'jeremie' };
+const ALLIES = new Set(['klaas', 'seb_nico', 'biloute', 'jeremie', 'hilde', 'tatie']);
+// Présence en journée (actions de l'après-midi) des témoins nommés par le contenu
+const DAY_PRESENCE = { klaas: 0.8, seb_nico: 0.6, waiter: 0.7, customers: 0.8, biloute: 0.3, jeremie: 0.3, dede: 0.6, ghislain: 0.5, police: 0.1 };
+
+export function initialState(seed, cfg = CONFIG) {
+  const C = cfg.CAMPAIGN;
+  return {
+    version: SAVE_VERSION,
+    seed,
+    rng: seed >>> 0,
+    day: 1,
+    phase: 'morning',
+    step: 'cards',
+    stats: Object.fromEntries(STAT_KEYS.map((k) => [k, C.start[k] ?? 0])),
+    hidden: Object.fromEntries(HIDDEN_KEYS.map((k) => [k, C.start[k] ?? 0])),
+    flags: [],
+    evidence: [],
+    witnessMemories: [],
+    police: { fatigue: 0, serialComplainer: false, benaliTransferred: false, lemaireTransferred: false },
+    igpn: null,
+    seen: { events: [], dialogue: [], countermoves: [], actions: [] },
+    counts: { actions: {}, events: {}, dialogue: {}, countermoves: {}, koddex: {} },
+    cards: [],
+    lastCard: null,
+    timeLeft: 0,
+    koddexDone: false,
+    nightCount: 0,
+    nights: [],
+    pendingEnding: null,
+    ending: null,
+    epilogue: [],
+    journal: [],
+  };
+}
+
+export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null } = {}) {
+  const K = normalizeContent(content ?? {});
+  const C = cfg.CAMPAIGN;
+  const S = save ? structuredClone(save) : initialState(seed, cfg);
+  if (S.version !== SAVE_VERSION) throw new Error(`sauvegarde v${S.version} incompatible (attendu v${SAVE_VERSION})`);
+  const rng = createRng(1);
+  rng.setState(S.rng);
+  const flags = () => new Set(S.flags);
+  const byId = (list) => Object.fromEntries(list.map((x) => [x.id, x]));
+  const EVENTS = byId(K.EVENTS), ACTIONS = byId(K.ACTIONS), DIALOGUE = byId(K.DIALOGUE), CMS = byId(K.COUNTERMOVES), ENDINGS = byId(K.ENDINGS);
+
+  const c = {
+    state: S, content: K, cfg, rng,
+    get step() { return S.step; },
+    get ended() { return S.step === 'ended'; },
+    ctx: () => ({ day: S.day, phase: S.phase, flags: flags(), stats: S.stats, hidden: S.hidden }),
+    check: (cond, useChance = true) => evalCondition(cond, c.ctx(), useChance ? rng : null),
+    has: (f) => S.flags.includes(f),
+    weekday: (day = S.day) => C.weekdays[(day - 1) % 7],
+    isSaturday: (day = S.day) => C.saturdays.includes(day),
+    gateOpen: () => S.day >= C.earlyFromDay,
+    note(type, data = {}) { S.journal.push({ day: S.day, phase: S.phase, type, ...data }); },
+    save() { S.rng = rng.getState(); return structuredClone(S); },
+    // Le dossier de campagne : pièces légales (le reste ne sert qu'à la presse / l'IGPN)
+    pressFile: () => S.evidence.reduce((s, e) => s + e.value, 0),
+  };
+
+  // ---------- effets ----------
+  // cause : 'action' | 'witnessed' | 'story' (événement, contre-offensive, dialogue) | 'koddex' | 'night' | 'engine'
+  function apply(effects, cause, source) {
+    if (!effects) return;
+    const deltas = {};
+    for (const k of STAT_KEYS) {
+      if (typeof effects[k] !== 'number') continue;
+      deltas[k] = setStat(k, S.stats[k] + effects[k]);
+    }
+    for (const k of HIDDEN_KEYS) {
+      if (typeof effects[k] !== 'number') continue;
+      const before = S.hidden[k];
+      S.hidden[k] = clamp(before + effects[k], 0, 100);
+      deltas[k] = S.hidden[k] - before;
+    }
+    for (const f of effects.setFlags ?? []) setFlag(f);
+    for (const f of effects.clearFlags ?? []) S.flags = S.flags.filter((x) => x !== f);
+    if (effects.evidence) addEvidence({ ...effects.evidence, source });
+    if (effects.ending) {
+      // Une fin anticipée demandée avant la nuit 5 est ignorée (on frôle, on ne tombe pas)
+      const e = ENDINGS[effects.ending];
+      if (e && isEarly(e) && !c.gateOpen()) c.note('ending-gated', { id: e.id });
+      else S.pendingEnding = effects.ending;
+    }
+    c.note('effects', { cause, source, deltas });
+  }
+  function setStat(k, v) {
+    const before = S.stats[k];
+    let lo = 0;
+    let hi = 100;
+    // Avant la nuit 5, on frôle la catastrophe sans y tomber (fins anticipées verrouillées)
+    if (!c.gateOpen()) {
+      if (k === 'risk') hi = C.preGate.riskCap;
+      if (k === 'sleep') lo = C.preGate.sleepFloor;
+      if (k === 'job' && !c.has('unemployed')) lo = C.preGate.jobFloor;
+    }
+    S.stats[k] = clamp(v, lo, hi);
+    return S.stats[k] - before;
+  }
+  function setFlag(f) { if (!S.flags.includes(f)) S.flags.push(f); }
+  function addEvidence(e) {
+    const legal = e.legal !== false;
+    const quality = e.quality ?? 1;
+    const value = e.value ?? C.contentEvidenceValue * quality;
+    const ev = { id: S.evidence.length + 1, day: S.day, kind: e.kind ?? 'piece', label: e.label ?? e.text ?? '', quality, legal, value, source: e.source };
+    S.evidence.push(ev);
+    if (legal) setStat('dossier', S.stats.dossier + value);
+    c.note('evidence', { evidenceId: ev.id, kind: ev.kind, legal, source: e.source });
+    return ev;
+  }
+  c.apply = apply;
+
+  // Témoins d'une action de jour (abstraits : présence × exposition × déguisement pour les non-alliés)
+  function dayWitnesses(w, legality) {
+    const by = w.by ?? ['customers', 'waiter'];
+    const exposure = w.exposure ?? C.dayWitness[legality] ?? 0.3;
+    const disguise = Math.min(1, ...Object.entries(cfg.DISGUISE).filter(([f]) => c.has(f)).map(([, m]) => m));
+    const crowd = c.isSaturday() ? cfg.WITNESS.saturdayCover : 1;
+    return by.filter((id) => rng.chance(DAY_PRESENCE[id] ?? 0.5))
+      .filter((id) => rng.chance(exposure * (ALLIES.has(id) ? 1 : disguise * crowd)))
+      .map((id) => ({ id, ally: ALLIES.has(id) }));
+  }
+  function witnessed(action, seen) {
+    if (!seen.length) return;
+    for (const w of seen) {
+      S.witnessMemories.push({ day: S.day, who: w.id, ally: !!w.ally, act: action.id });
+      if (w.id === 'klaas') setFlag('klaas_noted_pilou');
+    }
+    c.note('witness', { act: action.id, by: seen.map((w) => w.id) });
+    apply(action.witnessed?.effects, 'witnessed', action.id);
+  }
+
+  // ---------- cartes (événements, dialogues, contre-offensives) ----------
+  function buildCards() {
+    const cards = [];
+    const ph = S.phase;
+    // Événements fixes du jour, puis aléatoires (sans `day`, avec `when`)
+    for (const e of K.EVENTS) {
+      if (e.day === undefined || e.day !== S.day || (e.phase ?? 'afternoon') !== ph) continue;
+      if (S.seen.events.includes(e.id) || !c.check(e.when)) continue;
+      cards.push({ type: 'event', id: e.id });
+    }
+    let random = 0;
+    for (const e of K.EVENTS) {
+      if (e.day !== undefined || random >= C.randomEventsPerPhase) continue;
+      if (![e.phase ?? e.when?.phase ?? 'afternoon'].flat().includes(ph)) continue;
+      if (e.once !== false && S.seen.events.includes(e.id)) continue;
+      if (!c.check(e.when)) continue;
+      cards.push({ type: 'event', id: e.id });
+      random++;
+    }
+    if (ph === 'afternoon') {
+      // Contre-offensives du bloc révélées l'après-midi (§3)
+      let n = 0;
+      for (const m of K.COUNTERMOVES) {
+        if (n >= C.maxCountermovesPerDay) break;
+        if (m.once !== false && S.seen.countermoves.includes(m.id)) continue;
+        if (!c.check(m.when)) continue;
+        cards.push({ type: 'countermove', id: m.id });
+        n++;
+      }
+    }
+    // Dialogues (par défaut l'après-midi, ou la phase de leur `when`)
+    let d = 0;
+    for (const x of K.DIALOGUE) {
+      if (d >= C.maxDialoguesPerPhase) break;
+      const phase = x.when?.phase ?? 'afternoon';
+      if (![phase].flat().includes(ph)) continue;
+      if (x.once !== false && S.seen.dialogue.includes(x.id)) continue;
+      if (!c.check(x.when)) continue;
+      cards.push({ type: 'dialogue', id: x.id });
+      d++;
+    }
+    return cards;
+  }
+
+  c.card = () => {
+    const card = S.cards[0];
+    if (!card) return null;
+    const src = { event: EVENTS, dialogue: DIALOGUE, countermove: CMS }[card.type]?.[card.id];
+    if (card.type === 'info') return { ...card, choices: [{ i: 0, label: 'OK', available: true }] };
+    const choices = card.type === 'event' && src.choices?.length
+      ? src.choices.map((ch, i) => ({ i, label: ch.label, available: c.check(ch.requires, false) }))
+      : [{ i: 0, label: 'OK', available: true }];
+    return { ...card, data: src, choices };
+  };
+
+  c.resolveCard = (i = 0) => {
+    const card = c.card();
+    if (!card) return null;
+    S.cards.shift();
+    let result = null;
+    if (card.type === 'event') {
+      const e = card.data;
+      S.seen.events.push(e.id);
+      S.counts.events[e.id] = (S.counts.events[e.id] ?? 0) + 1;
+      c.note('event', { id: e.id, eventDay: e.day });
+      const ch = e.choices?.[i];
+      if (ch) {
+        if (!c.check(ch.requires, false)) throw new Error(`choix indisponible : ${e.id}[${i}]`);
+        apply(ch.effects, 'story', `${e.id}#${i}`);
+        result = ch.result ?? null;
+        c.note('choice', { id: e.id, i });
+      }
+      apply(e.effects, 'story', e.id);
+    } else if (card.type === 'dialogue') {
+      S.seen.dialogue.push(card.id);
+      S.counts.dialogue[card.id] = (S.counts.dialogue[card.id] ?? 0) + 1;
+      apply(card.data.effects, 'story', card.id);
+    } else if (card.type === 'countermove') {
+      S.seen.countermoves.push(card.id);
+      S.counts.countermoves[card.id] = (S.counts.countermoves[card.id] ?? 0) + 1;
+      c.note('countermove', { id: card.id });
+      apply(card.data.effects, 'story', card.id);
+    }
+    S.lastCard = { ...card, data: undefined, result };
+    checkEarlyEnding();
+    if (!S.cards.length && S.step === 'cards') afterCards();
+    return result;
+  };
+
+  // ---------- phases ----------
+  function beginPhase(phase) {
+    S.phase = phase;
+    c.note('phase', { phase });
+    S.cards = [...S.cards.filter((x) => x.type === 'info'), ...buildCards()];
+    S.step = 'cards';
+    if (!S.cards.length) afterCards();
+  }
+  function afterCards() {
+    if (S.step === 'ended') return;
+    if (S.phase === 'morning') {
+      // Viré : plus de Koddex, l'après-midi s'allonge
+      if (c.has('unemployed')) { S.koddexDone = true; beginPhase('afternoon'); return; }
+      S.step = 'koddex';
+    } else if (S.phase === 'afternoon') {
+      S.timeLeft = C.afternoonTime + (c.has('unemployed') ? C.unemployedBonusTime : 0);
+      S.step = 'actions';
+    } else {
+      S.step = 'night';
+    }
+  }
+
+  // Début de journée : décroissances lentes, puis cartes du matin
+  function beginDay() {
+    c.note('day', {});
+    setStat('risk', S.stats.risk - C.riskDecayPerDay);
+    if (!c.has('unemployed')) setStat('job', S.stats.job - C.jobDecayPerDay);
+    S.police.fatigue = Math.max(0, S.police.fatigue - C.policeFatigueDecay);
+    updateIgpn();
+    S.koddexDone = false;
+    beginPhase('morning');
+    checkEarlyEnding();
+  }
+
+  // ---------- matin : Koddex ----------
+  c.koddexOptions = () => ({
+    prompts: C.prompts,
+    work: K.KODDEX.work,
+    sideProjects: K.KODDEX.sideProjects.map((p) => ({ ...p, available: !(p.unlocks && c.has(p.unlocks)) && c.check(p.requires, false) })),
+    gag: K.KODDEX.gags.length ? K.KODDEX.gags[rng.int(0, K.KODDEX.gags.length - 1)] : null,
+  });
+  c.koddex = (picks) => {
+    if (S.step !== 'koddex') throw new Error(`koddex hors du matin (${S.step})`);
+    const chosen = picks.slice(0, C.prompts);
+    while (chosen.length < C.prompts) chosen.push('work');
+    const lines = [];
+    for (const id of chosen) {
+      S.counts.koddex[id] = (S.counts.koddex[id] ?? 0) + 1;
+      if (id === 'work') { setStat('job', S.stats.job + C.workJob); c.note('koddex', { id }); continue; }
+      const p = K.KODDEX.sideProjects.find((x) => x.id === id);
+      if (!p || (p.unlocks && c.has(p.unlocks))) { setStat('job', S.stats.job + C.workJob); continue; }
+      setStat('job', S.stats.job + (p.job ?? -10));
+      if (p.unlocks) setFlag(p.unlocks);
+      apply(p.effects, 'koddex', id);
+      c.note('koddex', { id });
+      lines.push(...(p.lines ?? []));
+      // Le risque d'un side project ne compte que si quelqu'un le remarque (Stéphane, un collègue, Clode Kode qui bavarde)
+      if (p.risk > 0 && rng.chance(C.sideProjectDiscovery)) {
+        c.note('witness', { act: id, by: ['koddex'] });
+        const d = setStat('risk', S.stats.risk + p.risk);
+        c.note('effects', { cause: 'witnessed', source: id, deltas: { risk: d } });
+        setFlag('boss_noticed');
+      }
+    }
+    S.koddexDone = true;
+    checkEarlyEnding();
+    if (S.step !== 'ended') beginPhase('afternoon');
+    return lines;
+  };
+
+  // ---------- après-midi : actions ----------
+  const usable = (a, phase) => (a.phase ?? 'afternoon') === phase
+    && !(a.once && S.seen.actions.includes(a.id))
+    && c.check(a.requires, false);
+  c.availableActions = (phase = 'afternoon') => K.ACTIONS.filter((a) => usable(a, phase) && (phase !== 'afternoon' || (a.cost?.time ?? 1) <= S.timeLeft));
+  c.doAction = (id) => {
+    if (S.step !== 'actions') throw new Error(`action hors de l'après-midi (${S.step})`);
+    const a = ACTIONS[id];
+    if (!a || !usable(a, 'afternoon')) throw new Error(`action indisponible : ${id}`);
+    const cost = a.cost?.time ?? 1;
+    if (cost > S.timeLeft) throw new Error(`plus assez de temps pour ${id}`);
+    S.timeLeft -= cost;
+    S.seen.actions.push(a.id);
+    S.counts.actions[a.id] = (S.counts.actions[a.id] ?? 0) + 1;
+    c.note('action', { id: a.id, legality: a.legality });
+    // Un Risque écrit dans `effects` est une exposition : il ne compte que si l'acte est remarqué (§4, §13.G)
+    const { risk: exposedRisk = 0, ...effects } = a.effects ?? {};
+    apply(effects, 'action', a.id);
+    let seen = [];
+    if (a.witnessed || exposedRisk > 0) {
+      seen = dayWitnesses(a.witnessed ?? {}, a.legality);
+      witnessed(a, seen);
+      if (seen.length && exposedRisk > 0) apply({ risk: exposedRisk }, 'witnessed', a.id);
+    }
+    checkEarlyEnding();
+    return { result: a.result ?? null, seen };
+  };
+  c.endAfternoon = () => {
+    if (S.step !== 'actions') throw new Error(`fin d'après-midi hors de l'après-midi (${S.step})`);
+    beginPhase('night');
+  };
+
+  // ---------- nuit ----------
+  function enemyMemories() { return S.witnessMemories.filter((m) => !m.ally && S.day - m.day <= 7).length; }
+  c.createNight = () => {
+    if (S.step !== 'night') throw new Error(`nuit hors de la nuit (${S.step})`);
+    const reversal = S.hidden.hostility >= C.reversal.minHostility && rng.chance(C.reversal.chance);
+    const sim = createSim({
+      seed: rng.int(1, 2 ** 31 - 2),
+      day: c.isSaturday() ? 'sat' : 'mon',
+      weekday: c.weekday(),
+      cfg,
+      carry: {
+        asso: S.stats.asso, risk: S.stats.risk, hostility: S.hidden.hostility, corruption: S.hidden.corruption,
+        calls: S.police.fatigue, serialComplainer: S.police.serialComplainer,
+        benaliTransferred: S.police.benaliTransferred, lemaireTransferred: S.police.lemaireTransferred,
+        flags: S.flags, earlyEndings: c.gateOpen(), reversal, enemyMemories: enemyMemories(),
+      },
+    });
+    sim.campaignDay = S.day;
+    sim.contentActions = [];
+    c.note('night-start', { reversal });
+    return sim;
+  };
+  c.nightActions = (sim) => K.ACTIONS.filter((a) => (a.phase ?? 'afternoon') === 'night' && !a.sim && usable(a, 'night') && !sim.contentActions.includes(a.id));
+  // Action de nuit du contenu (hors actions natives de la sim) : témoins tirés par la sim de nuit, à la position `at`
+  c.doNightAction = (sim, id) => {
+    const a = ACTIONS[id];
+    if (!a || !c.nightActions(sim).includes(a)) return { ok: false, reason: 'indisponible' };
+    sim.contentActions.push(a.id);
+    S.seen.actions.push(a.id);
+    S.counts.actions[a.id] = (S.counts.actions[a.id] ?? 0) + 1;
+    c.note('action', { id: a.id, legality: a.legality, night: true });
+    sim.note('content-action', { id: a.id });
+    applyNight(sim, a.effects, 'action', a.id);
+    let seen = [];
+    if (a.witnessed || (a.effects?.risk ?? 0) > 0) {
+      const anchors = sim.cfg.ANCHORS;
+      const pos = anchors[a.at] ?? (a.at === 'street' || !a.at ? sim.restCenter(sim.rest('bernadette')) : anchors.pilouWindow);
+      const kinds = (a.witnessed?.by ?? Object.keys(NIGHT_WITNESS)).map((w) => NIGHT_WITNESS[w]).filter(Boolean);
+      seen = sim.witnessAct(pos, a.label, { exposure: a.witnessed?.exposure ?? C.dayWitness[a.legality], kinds });
+      if (seen.length) {
+        const we = a.witnessed?.effects ?? {};
+        // Risque et Asso passent par la nuit (Risque × poids des témoins), le reste par la campagne
+        sim.punish(seen, a.id, (we.risk ?? 0) + Math.max(0, a.effects?.risk ?? 0), -(we.asso ?? 0));
+        for (const w of seen) {
+          S.witnessMemories.push({ day: S.day, who: w.kind === 'gaystapo' ? 'seb_nico' : w.kind, ally: !!w.ally, act: a.id, night: true });
+          if (w.kind === 'klaas') setFlag('klaas_noted_pilou');
+        }
+        c.note('witness', { act: a.id, by: seen.map((w) => w.id), night: true });
+        applyNight(sim, { ...we, risk: undefined, asso: undefined }, 'witnessed', a.id);
+      } else sim.log('Personne n\'a rien vu… a priori.', 'good');
+    }
+    if (a.result) sim.log(a.result, a.legality === 'legal' ? 'good' : 'bad');
+    return { ok: true, seen };
+  };
+
+  // Pendant la nuit, Asso / Sommeil vivent dans la sim (rapatriés à la fin) : on les y applique.
+  function applyNight(sim, effects, cause, source) {
+    if (!effects) return;
+    const N = sim.state;
+    if (typeof effects.asso === 'number') N.asso = clamp(N.asso + effects.asso, 0, 100);
+    if (typeof effects.sleep === 'number') N.sleep = clamp(N.sleep + effects.sleep, 0, 100);
+    if (typeof effects.risk === 'number' && effects.risk > 0) c.note('effects', { cause, source, ignoredRisk: effects.risk });
+    apply({ ...effects, asso: undefined, sleep: undefined, risk: undefined }, cause, source);
+  }
+
+  // Fin de nuit : on rapatrie stats, preuves, police, témoins ; drapeaux moteur ; fins anticipées.
+  c.finishNight = (sim) => {
+    if (S.step !== 'night') throw new Error(`fin de nuit hors de la nuit (${S.step})`);
+    const N = sim.state;
+    S.nightCount++;
+    const sleepDelta = (N.sleep - C.sleepNeutral) * C.sleepCarry;
+    setStat('sleep', S.stats.sleep + sleepDelta);
+    setStat('asso', N.asso);
+    const riskBefore = S.stats.risk;
+    setStat('risk', N.risk);
+    if (S.stats.risk > riskBefore) c.note('effects', { cause: 'witnessed', source: 'nuit', deltas: { risk: S.stats.risk - riskBefore }, nightRisk: N.journal.filter((e) => e.type === 'risk').length });
+    S.hidden.hostility = clamp(N.hostility, 0, 100);
+    S.police.fatigue = N.calls;
+    S.police.serialComplainer = N.serialComplainer;
+    S.police.benaliTransferred = N.benaliTransferred;
+    // Preuves de la nuit → dossier (légales) ou dossier presse/IGPN (illégales)
+    let gained = 0;
+    for (const e of N.evidence) {
+      const value = e.legal ? e.value * C.nightEvidenceScale : 0;
+      const ev = { id: S.evidence.length + 1, day: S.day, kind: e.kind ?? e.type, label: e.text, quality: e.quality, legal: e.legal, value, source: `nuit:${e.id}`, nightType: e.type };
+      S.evidence.push(ev);
+      c.note('evidence', { evidenceId: ev.id, kind: ev.kind, legal: ev.legal, source: ev.source, night: true });
+      if (e.legal) gained += value;
+    }
+    setStat('dossier', S.stats.dossier + gained);
+    for (const m of N.witnessMemories) S.witnessMemories.push({ day: S.day, who: m.who, ally: m.ally, act: m.act, filmed: m.filmed });
+    // Drapeaux posés par le moteur (premier bloc de src/content/flags.js)
+    const J = N.journal;
+    const evk = (k) => N.evidence.some((e) => e.kind === k || e.type === k);
+    const engineFlags = {
+      night_photo: N.evidence.some((e) => e.type === 'photo'),
+      night_db: evk('db'),
+      corridor_measured: evk('corridor'),
+      called_police: J.some((e) => e.type === 'call'),
+      called_as_asso: J.some((e) => e.type === 'call' && e.asso),
+      seen_complaisance: evk('complaisance'),
+      seen_tipoff: evk('tipoff'),
+      serial_caller: N.serialComplainer,
+      benali_fined: N.policeLog.some((p) => p.patrolId === 'benali' && p.outcome === 'act'),
+      benali_transferred: N.benaliTransferred,
+      chief_came: N.policeLog.some((p) => p.patrolId === 'chief'),
+      saw_pee: evk('pee'),
+      pee_at_door: N.pees.some((p) => p.doorway.pilou),
+      bucket_used: N.bucketUses > 0,
+      bucket_witnessed: N.witnessMemories.some((w) => w.act === 'seau d\'eau'),
+      video_viral: N.witnessMemories.some((w) => w.filmed),
+      klaas_noted_pilou: N.witnessMemories.some((w) => w.kind === 'klaas'),
+      talked_waiter: N.waiterAsks.length > 0,
+      bribe_photo: N.evidence.some((e) => e.kind === 'bribe' && e.legal),
+      bribe_photo_illegal: N.evidence.some((e) => e.kind === 'bribe' && !e.legal),
+    };
+    for (const [f, on] of Object.entries(engineFlags)) if (on) setFlag(f);
+    // Preuve de corruption : l'enveloppe, ou (complaisance + tuyau) au carnet de Klaas
+    const klaasPolice = S.evidence.filter((e) => ['complaisance', 'tipoff'].includes(e.nightType));
+    if (engineFlags.bribe_photo || engineFlags.bribe_photo_illegal || (klaasPolice.some((e) => e.nightType === 'tipoff') && klaasPolice.some((e) => e.nightType === 'complaisance'))) setFlag('corruption_proof');
+    // Chaîne IGPN : un pot-de-vin documenté et transmis (mairie, ou partagé → presse) ouvre l'enquête
+    const bribeSent = N.evidence.some((e) => e.kind === 'bribe' && (e.shared || !e.legal));
+    if (bribeSent && !S.igpn) {
+      S.igpn = { openedDay: S.day };
+      setFlag('igpn_open');
+      apply({ corruption: C.igpn.openCorruption }, 'engine', 'igpn');
+    }
+    // Contenu : actions natives de la sim (sim: 'photo' | 'db' | 'police' | …) → effets en bonus, une fois par nuit
+    const native = new Set(J.filter((e) => e.type === 'action').map((e) => e.action));
+    for (const a of K.ACTIONS) if (a.sim && native.has(a.sim) && usable(a, a.phase ?? 'night')) { apply(a.effects, 'action', a.id); S.counts.actions[a.id] = (S.counts.actions[a.id] ?? 0) + 1; }
+    const summary = sim.summary();
+    S.nights.push({ day: S.day, reason: N.endReason, sleep: Math.round(N.sleep), risk: Math.round(N.risk), evidence: N.evidence.length, gained: Math.round(gained * 10) / 10, police: summary.police.length, witnesses: N.witnessMemories.length });
+    S.lastNight = summary;
+    c.note('night-end', { reason: N.endReason, evidence: N.evidence.length });
+    if (c.isSaturday()) setFlag(S.day === 6 ? 'saturday1_done' : 'saturday2_done');
+    if (N.endReason === 'custody' && c.gateOpen()) { setFlag('custody'); S.pendingEnding = S.pendingEnding ?? 'custody'; }
+    if (N.endReason === 'sleep' && c.gateOpen()) S.pendingEnding = S.pendingEnding ?? 'moving_out';
+    checkEarlyEnding();
+    if (S.step === 'ended') return summary;
+    S.step = 'recap';
+    return summary;
+  };
+
+  function updateIgpn() {
+    if (!S.igpn || S.igpn.transferred) return;
+    if (S.day - S.igpn.openedDay >= C.igpn.transferAfterDays) {
+      S.igpn.transferred = S.day;
+      S.police.lemaireTransferred = true;
+      setFlag('lemaire_transferred');
+      apply({ corruption: C.igpn.transferCorruption }, 'engine', 'igpn');
+      S.cards.push({ type: 'info', id: 'igpn', title: 'Enquête interne', text: 'L\'IGPN a bouclé son enquête : le brigadier Lemaire est muté. Au commissariat, on regarde ses chaussures.' });
+    }
+  }
+
+  c.nextDay = () => {
+    if (S.step !== 'recap') throw new Error(`jour suivant hors du récap (${S.step})`);
+    if (S.day >= C.days) return finalResolution();
+    S.day++;
+    beginDay();
+  };
+
+  // ---------- fins ----------
+  const isEarly = (e) => e.early || C.earlyEndings.includes(e.id);
+  const matches = (e) => c.check(e.when, false) && (!e.whenAny || e.whenAny.some((w) => c.check(w, false)));
+  function checkEarlyEnding() {
+    if (S.step === 'ended' || !c.gateOpen()) return;
+    // Une fin anticipée s'applique si sa condition est vraie (ou si un effet l'a demandée)
+    const cands = K.ENDINGS.filter((e) => isEarly(e) && (matches(e) || S.pendingEnding === e.id));
+    if (!cands.length) return;
+    const e = cands.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))[0];
+    if (e.continue && c.has('unemployed')) return; // déjà choisi de continuer
+    endWith(e, 'early');
+  }
+  function finalResolution() {
+    // La commission du jour 14 a eu lieu (événement du contenu) : on prend la fin de plus haute priorité qui colle.
+    const cands = K.ENDINGS.filter((e) => matches(e) || S.pendingEnding === e.id);
+    const fallback = [...K.ENDINGS].sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0))[0];
+    const e = cands.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))[0] ?? fallback;
+    if (!e) { S.step = 'ended'; S.ending = { id: 'none', title: 'Fin', early: false }; return S.ending; }
+    return endWith(e, 'final');
+  }
+  function endWith(e, how) {
+    S.resumeStep = S.step;
+    S.ending = { id: e.id, title: e.title, early: how === 'early', day: S.day, canContinue: !!e.continue && !c.has('unemployed'), continueLabel: e.continue?.label };
+    S.epilogue = (e.epilogue ?? []).filter((p) => c.check(p.when, false)).map((p) => fill(p.text));
+    S.counts.endings = { [e.id]: 1 };
+    c.note('ending', { id: e.id, early: how === 'early' });
+    S.step = 'ended';
+    return S.ending;
+  }
+  // Fin "virée" avec rebond : on continue au chômage, à plein temps dans la lutte
+  c.continueAfterEnding = () => {
+    const e = ENDINGS[S.ending?.id];
+    if (!S.ending?.canContinue || !e?.continue) return false;
+    apply(e.continue.effects, 'story', `${e.id}:continue`);
+    setFlag('unemployed');
+    c.note('continue', { id: e.id });
+    S.ending = null;
+    S.epilogue = [];
+    S.pendingEnding = null;
+    // On reprend là où la fin nous avait arrêtés ; plus de Koddex le matin
+    S.step = S.resumeStep ?? 'recap';
+    if (S.step === 'koddex' || (S.step === 'cards' && !S.cards.length)) { S.step = 'cards'; afterCards(); }
+    return true;
+  };
+
+  // Variables d'épilogue : {dossier}, {asso}, {risk}, {sleep}, {job}, {pieces}, {nights}, {best}, {calls}, {buckets}
+  function fill(text) {
+    const best = [...S.evidence].filter((e) => e.legal).sort((a, b) => b.value - a.value)[0];
+    const vars = {
+      ...Object.fromEntries(STAT_KEYS.map((k) => [k, Math.round(S.stats[k])])),
+      pieces: S.evidence.length, nights: S.nightCount, best: best?.label ?? 'rien de bien solide',
+      calls: S.journal.filter((e) => e.type === 'night-end').length, buckets: S.flags.includes('bucket_used') ? 'oui' : 'non',
+    };
+    return String(text).replace(/\{(\w+)\}/g, (m, k) => (k in vars ? String(vars[k]) : m));
+  }
+
+  // ---------- démarrage ----------
+  if (!save) beginDay();
+  return c;
+}

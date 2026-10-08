@@ -5,9 +5,12 @@ export function patrolOnDuty(sim) {
   const { POLICE } = sim.cfg;
   const S = sim.state;
   if (S.scandal) return 'chief';
-  const shift = POLICE.roster[sim.day.key] ?? POLICE.roster.mon;
+  const shift = POLICE.roster[sim.weekday] ?? POLICE.roster.mon;
   const id = shift[S.min < POLICE.shiftChange ? 0 : 1];
-  return id === 'benali' && S.benaliTransferred ? 'lemaire' : id;
+  // Mutations : Benali trop zélé → Lemaire le remplace ; Lemaire muté (IGPN) → Benali le remplace
+  if (id === 'lemaire' && S.lemaireTransferred) return 'benali';
+  if (id === 'benali' && S.benaliTransferred) return S.lemaireTransferred ? 'chief' : 'lemaire';
+  return id;
 }
 
 export function callPolice(sim, { asso = false } = {}) {
@@ -86,7 +89,8 @@ function resolve(sim, P) {
   }
   const p = clamp(
     POLICE.patrols[P.patrolId].actBase + POLICE.dossierWeight * sim.dossierScore(rest.id) + POLICE.assoWeight * (S.asso / 100)
-      - POLICE.influenceWeight * rest.influence - POLICE.fatiguePerCall * (S.calls - 1),
+      - POLICE.influenceWeight * rest.influence - POLICE.fatiguePerCall * (S.calls - 1)
+      - POLICE.corruptionWeight * ((S.corruption - 50) / 100),
     POLICE.minAct, POLICE.maxAct,
   );
   entry.pAct = p;
@@ -122,6 +126,22 @@ function resolve(sim, P) {
       sim.log(`${P.patrolName} prend un café chez ${rest.name}… et personne n'était là pour le noter.`, 'bad');
     }
   }
+  // Lemaire + café offert : parfois Dédé glisse une enveloppe. Photographiable quelques minutes (sim.photo police) ;
+  // la caméra cachée sous le store de Bernadette, elle, filme tout (preuve illégale, mais bonne pour l'IGPN et la presse).
+  if (entry.outcome === 'complaisance' && P.patrolId === 'lemaire' && sim.rng.chance(POLICE.bribeChance)) {
+    const b = { id: S.bribes.length + 1, callId: P.callId, restId: rest.id, patrolName: P.patrolName, from: S.min, until: S.min + POLICE.bribeMinutes, photographed: false };
+    S.bribes.push(b);
+    entry.bribe = true;
+    sim.note('bribe', { bribeId: b.id, callId: P.callId, restId: rest.id });
+    sim.log(`Dédé serre la main de ${P.patrolName}… avec une enveloppe dedans. Vite, une photo !`, 'bad');
+    if (rest.id === 'bernadette' && sim.flags.has('camera_awning')) {
+      b.photographed = true;
+      sim.addEvidence({
+        type: 'camera', kind: 'bribe', restId: rest.id, callId: P.callId, bribeId: b.id, legal: false, quality: 0.7, value: 0,
+        text: `Caméra du store : ${P.patrolName} empoche une enveloppe de Dédé (illégale : inutilisable au tribunal)`,
+      });
+    }
+  }
   return entry;
 }
 
@@ -136,6 +156,7 @@ export function updatePolice(sim) {
   }
   if (P.phase === 'pending' && S.min >= P.enterAt) {
     P.phase = 'walking';
+    sim.klaasAlert(); // une patrouille dans la rue : Klaas prend ses jumelles
     sim.log('Une patrouille entre dans la rue.');
   }
   if (P.phase === 'walking' && S.min >= P.arriveAt) {

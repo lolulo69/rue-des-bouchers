@@ -55,31 +55,34 @@ export const RESTAURANTS = [
   // influence  : capacité à "arranger" les choses avec la police municipale
   // lateClear  : fenêtre [min, max] où une terrasse non conforme finit par rentrer
   // encroachChance : probabilité qu'une table déborde sur le couloir
-  { id: 'bernadette', name: "Estaminet La Ch'tite Bernadette", side: -1, z0: -6, z1: 6, tables: 6, compliance: 0.2, influence: 0.6, encroachChance: 0.35, lateClear: [23 * 60, 25 * 60 + 15], color: 0x8a2b2b },
-  { id: 'goulot', name: 'Le Goulot', side: 1, z0: -4, z1: 6, tables: 4, compliance: 0.6, influence: 0.15, encroachChance: 0.2, lateClear: [22 * 60 + 20, 23 * 60 + 30], color: 0x2b4a8a },
-  { id: 'malunes', name: 'Les Bouchers Mal Lunés', side: -1, z0: 14, z1: 24, tables: 4, compliance: 0.45, influence: 0.35, encroachChance: 0.25, lateClear: [22 * 60 + 30, 24 * 60 + 30], color: 0x2b6a3a },
+  // Géographie §1b (z = −45 rue de la Barre → +45 place Maurice-Schumann) : Bernadette (n°10) et les Mal Lunés (n°14)
+  // dans le premier tiers côté pair, Le Goulot (n°33) vers la place côté impair. Bloemkool et L'Endroit = décor (world.js).
+  // world.js cale l'immeuble de Pilou, le balcon d'en face et les commerces de décor sur ces positions.
+  { id: 'bernadette', name: "Estaminet La Ch'tite Bernadette", side: -1, z0: -30, z1: -18, tables: 6, compliance: 0.2, influence: 0.6, encroachChance: 0.35, lateClear: [23 * 60, 25 * 60 + 15], color: 0x8a2b2b },
+  { id: 'goulot', name: 'Le Goulot', side: 1, z0: 22, z1: 32, tables: 4, compliance: 0.6, influence: 0.15, encroachChance: 0.2, lateClear: [22 * 60 + 20, 23 * 60 + 30], color: 0x2b4a8a },
+  { id: 'malunes', name: 'Les Bouchers Mal Lunés', side: -1, z0: -15, z1: -5, tables: 4, compliance: 0.45, influence: 0.35, encroachChance: 0.25, lateClear: [22 * 60 + 30, 24 * 60 + 30], color: 0x2b6a3a },
 ];
 
 // Points du décor dont la simulation a besoin (géographie §1b : z < 0 = côté rue de la Barre, z > 0 = place
 // Maurice-Schumann). Dans le navigateur, main.js écrase pilouWindow / streetDoor / bed / exhaust avec les valeurs
 // renvoyées par buildWorld() (world.js, passe art) ; ces valeurs-ci servent aux tests et au simulateur headless.
 export const ANCHORS = {
-  pilouWindow: { x: -3.4, y: 8.4, z: 0 },    // 2e étage au-dessus de Bernadette
-  streetDoor: { x: -2.6, y: 0, z: 5.8 },     // devant la porte de l'immeuble de Pilou
-  bed: { x: -8.2, y: 7.8, z: -1.6 },         // oreille de Pilou au lit
-  exhaust: { x: -2.9, y: 7.0, z: 1.0 },      // la gaine monte jusque sous sa fenêtre
-  klaasWindow: { x: 0, y: 9, z: 48 },        // au bout de la rue, sur la place Maurice-Schumann, face à la rue
-  balcony: { x: 3.0, y: 7.9, z: 1.5 },       // Seb & Nico, juste en face de Pilou
-  waiter: { x: -0.7, z: -0.5, amplitude: 6, speed: 0.24 }, // va-et-vient devant la terrasse
-  policeSpawn: { x: 0, z: -43 },
+  pilouWindow: { x: -3.4, y: 8.4, z: -24 },  // 2e étage au-dessus de Bernadette (aplomb du milieu de sa terrasse)
+  streetDoor: { x: -2.6, y: 0, z: -18.2 },   // devant la porte de l'immeuble de Pilou
+  bed: { x: -8.2, y: 7.8, z: -25.6 },        // oreille de Pilou au lit
+  exhaust: { x: -2.9, y: 7.0, z: -23 },      // la gaine monte jusque sous sa fenêtre
+  klaasWindow: { x: 0, y: 5.7, z: 67.6 },    // au fond de la place Maurice-Schumann, en enfilade sur toute la rue
+  balcony: { x: 3.0, y: 7.8, z: -22.5 },     // Seb & Nico, juste en face de Pilou
+  waiter: { x: -0.7, z: -24.5, amplitude: 6, speed: 0.24 }, // va-et-vient devant la terrasse
+  policeSpawn: { x: 0, z: -43 },             // le commissariat est côté rue de la Barre
   doorways: [
-    { x: -3.0, z: 5.8, label: 'la porte de Pilou', pilou: true },
-    { x: 2.95, z: -12, label: 'une porte cochère en face' },
-    { x: -2.95, z: 18, label: 'l\'entrée des Mal Lunés' },
-    { x: 2.95, z: 11, label: 'un porche en face' },
-    { x: -2.95, z: -14, label: 'la vitrine de La Bombance (fermée)' },
+    { x: -3.0, z: -18.2, label: 'la porte de Pilou', pilou: true },
+    { x: 2.95, z: -36, label: 'une porte cochère en face' },
+    { x: -2.95, z: -4.5, label: 'l\'entrée des Mal Lunés' },
+    { x: 2.95, z: 8, label: 'un porche en face' },
+    { x: -2.95, z: 12, label: 'une porte au milieu de la rue' },
   ],
-  standingSpots: [-10, -7, 8, 10, 12, 26, 29],  // z où se forment les groupes debout (samedi)
+  standingSpots: [-36, -33, -12, -9, -2, 18, 35], // z où se forment les groupes debout (samedi)
 };
 
 // Portées d'interaction : la même valeur sert pour l'invite [E] et pour l'action.
@@ -122,6 +125,12 @@ export const EVIDENCE = {
   peeValue: 0.5,
   complaisanceValue: 2,
   tipoffValue: 2.5,              // carnet de Klaas : tables rentrées juste avant la police, ressorties après
+  dbValue: 0.6,                  // relevé sonore horodaté (sonomètre du téléphone, ou le démon Rust de Pilou)
+  dbThreshold: 55,               // au-dessus, après 22:00 : tapage nocturne documenté
+  dbEvery: 30,                   // un relevé utile par demi-heure
+  bribeValue: 5,                 // l'enveloppe de Dédé photographiée : le jackpot
+  roundValue: 0.5,               // infraction repérée pendant la ronde de Jérémie et du teckel
+  repeatFactor: 0.2,             // même resto + même type d'infraction, même nuit : la 2e pièce et les suivantes comptent ×0.2 (QA balance #2)
   mairieValue: 0.5,
   dossierTarget: 14,
   minQuality: 0.4,
@@ -145,6 +154,12 @@ export const POLICE = {
   minAct: 0.03,
   maxAct: 0.97,
   complianceAfterAct: 1,         // le resto se tient à carreau après un PV
+  corruptionWeight: 0.4,         // corruption (cachée, 0–100) : −0.4 × (corruption − 50) / 100 sur la probabilité de verbaliser
+  bribeChance: 0.5,              // Lemaire + café offert : Dédé glisse une enveloppe…
+  bribeMinutes: 3,               // …pendant 3 minutes, photographiable
+  bribePhotoRange: 15,           // une photo nette depuis un endroit légal (rue ou fenêtre)
+  visitMinutes: 6,               // la police vient pour Pilou (plainte du bloc) : durée de la visite
+  visitRisk: 10,                 // …et s'il y a des témoins ennemis d'actes passés : rappel à la loi
   scandalThreshold: 2,           // pièces "police" (complaisance, tuyau) diffusées → scandale → le commissaire
   shiftChange: 23 * 60,
   roster: {
@@ -177,18 +192,24 @@ export const WITNESS = {
   sightNight: 26,
   // Klaas voit toute la rue depuis la place, mais de loin : sa détection baisse avec la distance (pleine jusqu'à near,
   // nulle au-delà de far), et la nuit il lui faut ses jumelles (portées réduites). [crépuscule, nuit]
-  klaas: { name: 'Klaas (place Maurice-Schumann)', p: 0.9, weight: 0.5, ally: true, sleepAt: 25 * 60, near: [35, 15], far: [130, 75] },
+  // Klaas regarde la rue en enfilade depuis la place (~90 m de Pilou). À l'œil nu il distingue peu de chose de loin,
+  // surtout la nuit ; quand il a ses jumelles (de temps en temps, et dès qu'il entend du grabuge), il voit tout.
+  klaas: {
+    name: 'Klaas (place Maurice-Schumann)', p: 0.9, weight: 0.5, ally: true, sleepAt: 25 * 60, near: [35, 15], far: [130, 75],
+    binoculars: { p: 0.95, near: 80, far: 170, every: [12, 25], duration: [4, 8], react: 8 },
+  },
   gaystapo: { name: 'Seb & Nico (balcon)', p: 0.7, weight: 0.3, ally: true, catLeave: [23 * 60, 24 * 60 + 30] },
   waiter: { name: 'le serveur', p: 0.6, weight: 1, ally: false },
   customers: { name: 'des clients', p: 0.25, weight: 0.8, ally: false, filmChance: 0.35, filmWeight: 0.5, wetBonus: 0.3 },
   darkFactor: 0.5,              // la nuit, dans la rue, on distingue mal une fenêtre éteinte (serveur, clients)
-  saturdayCover: 0.7,            // la foule du samedi couvre : chaque client remarque moins
+  saturdayCover: 0.7,
+  jeremie: { name: 'Jérémie et son teckel', p: 0.8, weight: 0.3, ally: true },            // la foule du samedi couvre : chaque client remarque moins
   riskCap: 1.6,                  // plafond de la somme des poids
 };
 
 export const BUCKET = {
   radius: 3.5,
-  risk: 45,
+  risk: 20,                      // ×poids des témoins (≤1.6) : ~32 par seau vu ; le Risque s'accumule sur la campagne (QA balance #3)
   assoPenalty: 20,               // seulement si un allié a vu ou si une vidéo circule
   refillMinutes: 15,
 };
@@ -198,7 +219,63 @@ export const RISK = { start: 0, warning: 30, complaint: 60, custody: 90 };
 export const ASSO = {
   start: 50,
   shareGainPerPiece: 3,
+  shareDecay: 0.7,               // rendements décroissants : chaque pièce partagée le même soir vaut ×0.7 de la précédente
+  nightGainCap: 8,               // gain d'Asso max par nuit (QA balance #1)
   spamPenalty: 3,
 };
 
-export const CONFIG = { RULES, DAYS, SKY, STREET, ZONES, RESTAURANTS, ANCHORS, INTERACT, NOISE, SLEEP, EVIDENCE, POLICE, WAITER, WITNESS, BUCKET, RISK, ASSO };
+// La ronde du soir de Jérémie et de son teckel : il repère des infractions (preuve), voit ce qui se passe (allié),
+// et aboie si Pilou fait quelque chose d'illégal à proximité (tous les témoins de la rue remarquent davantage).
+export const DOG = {
+  start: 21 * 60 + 30, end: 22 * 60 + 30,
+  x: 0.8, z0: -42, z1: 42,
+  spotRange: 2.5,
+  barkRange: 10,
+  barkBonus: 0.25,
+};
+
+// Déguisements (drapeaux de campagne) : multiplicateur sur la probabilité que des non-alliés reconnaissent Pilou.
+export const DISGUISE = { disguise_hood: 0.6, disguise_vest: 0.5 };
+
+// Drapeaux lus par le moteur : le contenu (src/content/flags.js) doit les déclarer s'il les utilise.
+export const ENGINE_FLAGS = {
+  disguise_hood: 'Pilou a une capuche (moins reconnaissable)',
+  disguise_vest: 'Pilou a un gilet jaune "livreur" (encore moins reconnaissable)',
+  camera_awning: 'Caméra cachée sous le store de Bernadette (filme tout, preuves illégales)',
+  igpn_open: 'Enquête de l\'IGPN ouverte (pot-de-vin photographié)',
+  lemaire_transferred: 'Le brigadier Lemaire est muté',
+  unemployed: 'Pilou est viré de Koddex et continue la lutte à plein temps',
+};
+
+// Campagne de 14 jours (§3). Les identifiants de fins sont ceux attendus dans src/content/endings.js.
+export const CAMPAIGN = {
+  days: 14,
+  weekdays: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'], // le jour 1 est un lundi
+  saturdays: [6, 13],
+  start: { sleep: 70, asso: 40, risk: 0, job: 70, dossier: 0, hostility: 20, corruption: 60 },
+  endings: ['legal_victory', 'peace', 'scandal', 'custody', 'moving_out', 'fired', 'turncoat', 'return'],
+  earlyEndings: ['custody', 'fired', 'moving_out'], // ou `early: true` sur la fin
+  earlyFromDay: 5,               // aucune fin anticipée avant la nuit 5
+  preGate: { riskCap: 89, sleepFloor: 5, jobFloor: 5 }, // avant la nuit 5 : on frôle, on ne tombe pas
+  riskDecayPerDay: 5,            // le Risque persiste et ne baisse que lentement (QA balance #3)
+  sleepNeutral: 60,              // une nuit qui finit au-dessus repose Pilou, en dessous elle l'use
+  sleepCarry: 0.5,
+  jobDecayPerDay: 6,
+  workJob: 5,                    // un prompt de vrai travail
+  sideProjectDiscovery: 0.5,     // le risque d'un side project ne compte que si Stéphane / Clode Kode le remarque
+  prompts: 3,
+  afternoonTime: 3,              // créneaux d'actions l'après-midi
+  unemployedBonusTime: 2,
+  nightEvidenceScale: 1.2,       // pièce légale de la nuit → points de dossier de campagne
+  contentEvidenceValue: 3,       // effet { evidence } du contenu : valeur × qualité
+  dossierTarget: 100,            // ~8–10 bonnes nuits (QA balance #2)
+  maxCountermovesPerDay: 2,
+  maxDialoguesPerPhase: 2,
+  randomEventsPerPhase: 1,
+  policeFatigueDecay: 1,         // les appels de la veille comptent encore ("c'est encore vous"), −1 par jour
+  dayWitness: { grey: 0.25, illegal: 0.45 }, // actions de jour : chance d'être vu (avant déguisement)
+  reversal: { minHostility: 60, chance: 0.35, window: [22 * 60, 24 * 60] }, // la police vient pour Pilou
+  igpn: { openCorruption: -15, transferAfterDays: 3, transferCorruption: -25 },
+};
+
+export const CONFIG = { RULES, DAYS, SKY, STREET, ZONES, RESTAURANTS, ANCHORS, INTERACT, NOISE, SLEEP, EVIDENCE, POLICE, WAITER, WITNESS, BUCKET, RISK, ASSO, DOG, DISGUISE, ENGINE_FLAGS, CAMPAIGN };

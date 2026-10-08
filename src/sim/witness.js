@@ -8,6 +8,10 @@ export function nightFactor(sim) {
 // Probabilité que Klaas distingue un acte à `d` mètres : pleine jusqu'à near, nulle au-delà de far.
 export function klaasDetection(sim, d) {
   const k = sim.cfg.WITNESS.klaas;
+  if (sim.klaasWatching()) {
+    const b = k.binoculars;
+    return b.p * Math.min(1, Math.max(0, (b.far - d) / (b.far - b.near)));
+  }
   const n = nightFactor(sim);
   const near = k.near[0] + (k.near[1] - k.near[0]) * n;
   const far = k.far[0] + (k.far[1] - k.far[0]) * n;
@@ -26,15 +30,18 @@ export function potentialWitnesses(sim, pos) {
   const out = [];
   const add = (id, kind, def, at, extra = {}) => {
     if (dist3(at, pos) > range || !lineOfSight(at, pos, W)) return;
-    const p = def.p * (kind === 'waiter' || kind === 'customers' ? dark : 1);
-    out.push({ id, kind, name: def.name, pos: at, p, weight: def.weight, ally: def.ally, ...extra });
+    // Obscurité : les gens de la rue ; déguisement : tous ceux qui ne sont pas des alliés (ils ne reconnaissent pas Pilou)
+    const p = def.p * (kind === 'waiter' || kind === 'customers' || kind === 'jeremie' ? dark : 1) * (def.ally ? 1 : sim.disguise);
+    out.push({ id, kind, name: def.name, pos: at, p, baseP: def.p, weight: def.weight, ally: def.ally, ...extra });
   };
   // Klaas : pas de portée générique, mais une détection qui baisse avec la distance (jumelles la nuit)
   if (sim.klaasAwake() && lineOfSight(ANCHORS.klaasWindow, pos, W)) {
     const p = klaasDetection(sim, dist3(ANCHORS.klaasWindow, pos));
-    if (p > 0) out.push({ id: 'klaas', kind: 'klaas', name: WITNESS.klaas.name, pos: ANCHORS.klaasWindow, p, weight: WITNESS.klaas.weight, ally: true });
+    const name = sim.klaasWatching() ? `${WITNESS.klaas.name.split(' (')[0]} (jumelles)` : WITNESS.klaas.name;
+    if (p > 0) out.push({ id: 'klaas', kind: 'klaas', name, pos: ANCHORS.klaasWindow, p, baseP: WITNESS.klaas.p, weight: WITNESS.klaas.weight, ally: true });
   }
   if (sim.catPresent()) add('gaystapo', 'gaystapo', WITNESS.gaystapo, ANCHORS.balcony);
+  if (sim.dogActive()) add('jeremie', 'jeremie', WITNESS.jeremie, { ...sim.dogPos(), y: 1.6 });
   if (sim.waiterOnDuty()) add('waiter', 'waiter', WITNESS.waiter, { ...sim.waiterPos(), y: 1.6 });
   const cover = sim.day.key === 'sat' ? WITNESS.saturdayCover : 1;
   const c = WITNESS.customers;
@@ -48,11 +55,16 @@ export function potentialWitnesses(sim, pos) {
 }
 
 // Tire au sort qui a effectivement vu. wetTableIds : tables arrosées (elles lèvent la tête).
-export function rollWitnesses(sim, pos, { wetTableIds = [] } = {}) {
+// bark : bonus d'attention pour les gens de la rue quand le teckel aboie.
+// exposure / kinds (actions du contenu) : probabilité de base de l'acte (remplace celle du témoin, modulée pareil), témoins possibles.
+export function rollWitnesses(sim, pos, { wetTableIds = [], bark = 0, exposure, kinds } = {}) {
   const c = sim.cfg.WITNESS.customers;
   const seen = [];
   for (const w of potentialWitnesses(sim, pos)) {
-    const p = w.p + (w.tableId && wetTableIds.includes(w.tableId) ? c.wetBonus * (w.p / c.p) : 0);
+    if (kinds && !kinds.includes(w.kind)) continue;
+    const street = w.kind === 'customers' || w.kind === 'waiter';
+    const base = exposure !== undefined ? exposure * (w.p / w.baseP) : w.p;
+    const p = base + (w.tableId && wetTableIds.includes(w.tableId) ? c.wetBonus * (w.p / c.p) : 0) + (street ? bark * sim.disguise : 0);
     if (!sim.rng.chance(Math.min(1, p))) continue;
     const filmed = w.kind === 'customers' && sim.rng.chance(c.filmChance);
     seen.push({ ...w, filmed });
