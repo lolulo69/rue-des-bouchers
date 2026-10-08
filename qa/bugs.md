@@ -21,13 +21,20 @@ When a bug is fixed, remove the `fixme` (the test then guards against regression
 - **Actual**: the engine prepared **10** speeches for this run; **0** appear on screen. The player goes straight from the intro paragraph to the choice buttons, so the commission, the climax of §3, is a menu.
 - **Owner guess**: build agent (src/ui): render `card.scene` as a sequence of `ui-dialogue` bubbles (portrait + name + text), one « Suivant » per speech or all at once, before the choices.
 
+### BUG-004 · The last card of a phase loses its result text
+- **Test**: `tests/e2e/fullrun.e2e.js` › « BUG-004 · le résultat de la dernière carte d’une phase est affiché » (reads the full runs' logs).
+- **Files**: `src/ui/index.js` › `choose()` sets `view.result` then `render()`; when that card was the last of the phase, `c.step` is already `koddex`/`actions`/`night`, and `screen()` draws that step's screen, which ignores `view.result`. Same root cause as BUG-002.
+- **Steps**: « légal prudent » full run (seed 101): `d1_monday` (day 1, morning → Koddex), `r_colette_interview` (day 5 → Koddex), `r_fire_brigade` (day 10 → night). Diplomat run (seed 303): 3 more. Reckless: none before custody.
+- **Expected**: the choice's `result` card (« Continuer ») shows before the next phase.
+- **Actual**: the screen jumps to the next phase; the result text (and the stat chips) are never seen. On day 1 that's the very first choice of the game.
+- **Owner guess**: build agent (src/ui): in `render()`, show `resultCard(view.result)` first whenever `view.result` is set, whatever `c.step`; fixes BUG-002 too if the Koddex end-of-morning uses the same path.
+
 ## Notes (not bugs, for the design agent)
 - **`?day=` only knows `mon` and `sat`** in the standalone night (`DAYS` in `src/config.js`); any other value silently plays Monday. Fine while the campaign passes the weekday itself, but a QA URL like `?day=tue` misleads (it still shows « Lundi »). The police roster is per weekday, so test tip-offs on Monday after 23:00 (Lemaire's shift).
 - **Window view**: standing at the window, the sill and Bernadette's awning hide the tables right below. Leaning out (forward to the window frame) shows them (`qa/screens/03b-window-lean.jpg`), and a photo of the nearest Bernadette table from the window works. The raycast ignores the awning, so the photo works even when the table looks hidden. Worth a look in the art pass.
 - **Campaign UI** landed (aaa8b88): `tests/e2e/campaign-flow.e2e.js` drives it through the real UI (`data-testid` hooks) and plays nights headless through `c.createNight()` for the 14-day end-screen test.
 - **Perf locally** is meaningless at the moment (the Mac mini is overloaded, SwiftShader: 0.3 fps, 133 draw calls, 186k triangles in the Saturday street view). CI's `npm run test:perf` is the reference; the 60 fps budget is a warning there unless `PERF_STRICT=1`.
 
-- **To verify (possible BUG-004)**: in the full runs, 3 event results per 14-day campaign are never shown. The chosen option has a `result`, but the step moves on (same mechanism as BUG-002: `render()` dispatches on `c.step`). See `log.lostResults` in `test-results/fullrun/*.json`.
 - **Duration (§13.A)**: see `qa/duration.md`. Both full campaigns land at ~3h05 (target 2h30–4h); the custody run stops at day 5 (1h16), as expected for an early ending.
 
 ## Fixed

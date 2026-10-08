@@ -318,3 +318,11 @@ for (const [key, style] of Object.entries(STYLES)) {
   const { log } = JSON.parse(readFileSync(f, 'utf8'));
   expect(log.commission.shownSpeeches).toBe(log.commission.sceneFromEngine);
 });
+
+// BUG-004 (qa/bugs.md) : le résultat de la dernière carte d'une phase n'est jamais affiché (l'écran passe à la phase suivante).
+(process.env.QA_RUN_FIXME ? test : test.fixme)('BUG-004 · le résultat de la dernière carte d’une phase est affiché', async () => {
+  const files = existsSync(OUT) ? readdirSync(OUT).filter((f) => f.endsWith('.json')) : [];
+  test.skip(!files.length, 'lancer d’abord les campagnes complètes');
+  const lost = files.flatMap((f) => JSON.parse(readFileSync(`${OUT}/${f}`, 'utf8')).log.lostResults);
+  expect(lost).toEqual([]);
+});
