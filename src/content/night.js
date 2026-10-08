@@ -178,6 +178,10 @@ export const POLICE_LINES = {
     tipoff: [
       'Benali trouve la terrasse de {rest} vide et regarde l’heure. « Intéressant. » Il le note. Ça ne servira à rien, mais il le note.',
     ],
+    warning: [
+      'Benali, devant {rest} : « Je repasse dans une demi-heure. Je préfère ne pas avoir à sortir le carnet. » Il regarde sa montre. Le serveur aussi.',
+      'Benali sermonne {rest}, calmement, article par article. Pas de PV ce soir. « Ce soir. » Il insiste sur « ce soir ».',
+    ],
     nothing: ['Benali, devant {rest} : « Rien à constater ici, monsieur. Rappelez si ça reprend. » Il le pense vraiment.'],
     never_came: ['Benali n’est pas venu. On l’a envoyé ailleurs. Il n’a pas choisi.'],
     for_pilou: [
