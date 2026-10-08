@@ -44,7 +44,7 @@ test('campagne : titre → interface de jour → nuit 3D → bilan → jour 2, s
     for (let i = 0; !sim.state.ended && i < 2000; i++) { sim.tick(0.5); if (i % 60 === 0) step(1); }
     step(2);
   });
-  await expect(page.locator('[data-testid=recap]')).toBeVisible();
+  await expect(page.locator('[data-testid=recap]')).toBeVisible({ timeout: 30_000 }); // import de l'UI + montage après la nuit : lent sur SwiftShader (CI)
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem(window.__rdb.saveKey)));
   expect(saved.step).toBe('recap');
   expect(saved.nights).toHaveLength(1);
