@@ -68,7 +68,7 @@ export const EVENTS = [
       {
         label: 'Prévenir le groupe : « Colette est en bas »',
         effects: { asso: +6, setFlags: ['colette_dinner_seen', 'whatsapp_rally'] },
-        result: `Sur « ${WHATSAPP_GROUP} », trente-quatre messages en six minutes. Seb a déjà zoomé sur le dessert. Nico rappelle que « zoomer sur un dessert n'est pas une preuve ». Tatie Bouchon répond : « Je la vois jeudi pour le thé, je lui dirai. » Tout le monde se tait une seconde.`,
+        result: `Sur « ${WHATSAPP_GROUP} », trente-quatre messages en six minutes. Seb a déjà zoomé sur le dessert. Nico rappelle que « zoomer sur un dessert n'est pas une preuve ». Tatie Bouchon répond : « Je la vois jeudi prochain pour le thé, je lui dirai. » Tout le monde se tait une seconde.`,
       },
       {
         label: 'Noter qui est à sa table (avec Klaas)',
@@ -226,7 +226,7 @@ export const EVENTS = [
     speaker: 'ghislain',
     title: "J11 · Réunion « gaine d'extraction », salle 3B, mairie annexe",
     text:
-      "Autour de la table : un technicien de la ville, un représentant de l'hygiène, Ghislain avec un classeur de 400 pages intitulé « Démarches en cours », et vous. Ghislain ouvre : « Nous tenons à rappeler que la situation est en cours de résolution depuis 2019. » Le technicien se tourne vers vous : « Qu'avez-vous comme éléments ? »",
+      "Autour de la table : un technicien de la ville, un représentant de l'hygiène, Ghislain avec un classeur de 400 pages intitulé « Démarches en cours », et vous. Ghislain ouvre : « Nous tenons à rappeler que la situation est en cours de résolution depuis 2023. » Le technicien se tourne vers vous : « Qu'avez-vous comme éléments ? »",
     choices: [
       {
         label: "Poser les mesures, la plainte à l'ARS et l'avis du patrimoine",
@@ -543,8 +543,7 @@ export const EVENTS = [
     id: 'r_suitcases',
     when: { phase: 'night', day: [3, 13], chance: 0.15 },
     once: true,
-    speaker: 'regis',
-    title: '2h07 : roulettes sur pavés',
+    title: '1h07 : roulettes sur pavés',
     text:
       "Une valise à roulettes sur des pavés de 1729, c'est un concert de batterie lent. Deux, c'est un orchestre. Un groupe de touristes cherche « le n°27, l'appart avec la terrasse en bas ». Ils sonnent chez vous. Deux fois.",
     choices: [
@@ -556,7 +555,7 @@ export const EVENTS = [
       {
         label: 'Noter l\'heure et le numéro',
         effects: { sleep: -6, dossier: +1 },
-        result: "2h07, n°27, 78 dB de roulettes. Ce n'est pas une infraction. C'est une information.",
+        result: "1h07, n°27, 78 dB de roulettes. Ce n'est pas une infraction. C'est une information.",
       },
     ],
   },
@@ -685,7 +684,7 @@ export const EVENTS = [
     once: true,
     title: 'Le carnet de Klaas, page 41',
     text:
-      "Klaas vous montre une page couverte de colonnes au crayon. « Ja. Mardi, vendredi : moustache. Lent. Café. Lundi, mercredi : le jeune. Rapide. Carnet de PV. Le reste : je ne sais pas encore. » Il a déduit le planning de la police municipale avec une précision que la police municipale n'a pas.",
+      "Klaas vous montre une page couverte de colonnes au crayon. « Ja. Mardi, vendredi : moustache. Lent. Lundi, mercredi : le jeune. Rapide. Carnet de PV. Le reste : je ne sais pas encore. » Il a déduit le planning de la police municipale avec une précision que la police municipale n'a pas.",
     choices: [
       {
         label: 'Recopier le planning',
@@ -784,7 +783,7 @@ export const EVENTS = [
   {
     id: 'r_colette_interview',
     speaker: 'colette',
-    when: { day: [5, 12], chance: 0.2 },
+    when: { day: [5, 12], phase: 'morning', chance: 0.2 },
     once: true,
     title: "La Voix du Nordiste : « Colette Verhaeghe : laissez vivre Lille ! »",
     text:
@@ -934,7 +933,7 @@ export const EVENTS = [
       },
       {
         label: "On verra après la commission",
-        effects: { setFlags: ['bombance_bar_project'] },
+        effects: { setFlags: ['bombance_bar_project', 'bombance_wait'] },
         result: "Après la commission. Bien sûr. Le panneau blanc, lui, n'attend personne.",
       },
     ],

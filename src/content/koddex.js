@@ -28,7 +28,7 @@ export const KODDEX = {
       label: "Corriger une faute de frappe dans l'appli de to-do",
       job: +4,
       requires: { flags: ['todo_app_rust'] },
-      result: "Une faute de frappe, une réécriture. La cinquième version compile en 0,3 seconde et s'excuse en 14 langues. Stéphane trouve qu'elle « a perdu son âme ».",
+      result: "Une faute de frappe, une réécriture. L'énième version compile en 0,3 seconde et s'excuse en 14 langues. Stéphane trouve qu'elle « a perdu son âme ».",
     },
     {
       id: 'work_pitch_deck',

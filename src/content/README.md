@@ -61,8 +61,11 @@ A line may only mention a fact once the player has unlocked it. Pilou knows from
 - **The traitor** (§8 "recruiting a resident") is **Régis Dewaele**, n°27, an association member who rents two holiday flats. His guests like the terraces, and the bloc courts him with free meals.
 - **The chief** of the municipal police is **Commandant Desmet**.
 - **The waiter** is **Théo**; text says « le serveur » until `met_waiter`.
-- **Tatie's email thread**: Ghislain's answers are numbered promises (#1 → #7), driven by `tatie_mail_N` flags, each more absurd. She keeps every one; `tatie_emails_shared` turns the thread into evidence.
-- **Scandal proof**: any police-corruption proof sets the summary flag `corruption_proof` (the bribe photo, Klaas's complaisance log + tip-off, the waiter's testimony…). The scandal path needs it plus `press_contacted`.
+- **Tatie's email thread**: Ghislain's answers are numbered promises (#1 → #12, one per morning at most; #12 is an auto-reply and the last), driven by `tatie_mail_N` flags, each more absurd. Never write a fixed count (« sept promesses ») in text that can show later: say « toutes les promesses ». She keeps every one; `tatie_emails_shared` turns the thread into evidence.
+- **Scandal proof**: any police-corruption proof sets the summary flag `corruption_proof`. Four routes: the bribe photo from the window (`night_bribe_photo_window`, legal), the back-room photo (`night_backroom_photo`, illegal), Théo's signed testimony (`pm_waiter_testimony` → `waiter_testimony`, needs `waiter_informant`), and Klaas's certified notebooks (`pm_klaas_notebook` → `klaas_log_certified`, needs `met_klaas` + `roster_known` + `seen_tipoff`). The scandal path needs it plus `press_contacted`.
+- **Clode Kode never does illegal work.** He refuses politely (article 323-1, a « vrai avis honnête » instead) and Pilou finishes alone. Results of illegal actions say so.
+- **« le Trou »** is a discovery (`knows_trou`), never stated in the intro.
+- **Back room**: `backroom_sneak` = the sneak happened; `backroom_caught` = Pilou was caught there (custody epilogue).
 - **Commission (D14)**: the player picks their pitch; each pitch's `requires` encodes the thresholds. Pitches set `won_*` + `commission_won`, or `commission_lost`. Endings then read these flags, so « The return » (La Bombance) and « Turncoat » can override a win.
 - **Moving out** is both the Sleep-0 early ending and the "lost commission" ending (`whenAny`).
 - **Turncoat** = eating the carbonnade three times (`carbonnade_1..3`). Klaas writes each one down.

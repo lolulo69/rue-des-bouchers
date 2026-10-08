@@ -182,7 +182,7 @@ export const ACTIONS = [
     cost: { minutes: 20 },
     requires: { flags: ['proj_wifi_cracker'], notFlags: ['wifi_cracked'] },
     effects: { setFlags: ['wifi_cracked'], risk: +5 },
-    result: "Clode Kode a fini le programme en s'excusant onze fois et en rappelant l'article 323-1 du Code pénal. Le réseau « BERNADETTE_INVITES » vous accueille. Vous n'êtes pas invité.",
+    result: "Le programme que vous avez fini seul tourne vingt minutes. Clode Kode, qui a refusé d'y toucher, vous envoie l'article 323-1 du Code pénal en PDF, avec un smiley inquiet. Le réseau « BERNADETTE_INVITES » vous accueille. Vous n'êtes pas invité.",
   },
   {
     id: 'night_cardboard_exhaust',
@@ -194,7 +194,7 @@ export const ACTIONS = [
     requires: { day: [2, 14], notFlags: ['exhaust_meeting_won'] },
     effects: { setFlags: ['cardboard_exhaust'], sleep: +10, hostility: +15 },
     witnessed: { exposure: 0.5, by: ['klaas', 'seb_nico', 'waiter', 'ghislain', 'biloute'], effects: { risk: +25, asso: -5, setFlags: ['klaas_noted_pilou'] } },
-    result: "Pour la première fois depuis des mois, ça ne sent pas la friture sous votre fenêtre. En bas, ça sent la friture partout ailleurs, et la cuisine tousse. Les pompiers sont souvent plus rapides que la police : c'est le problème.",
+    result: "Pour la première fois depuis des mois, ça ne sent pas la friture sous votre fenêtre. En bas, la cuisine ouvre toutes ses fenêtres et ça sent la friture partout ailleurs. Le lendemain, Ghislain fait le tour de la façade avec un mètre et un air de procès-verbal.",
   },
   {
     id: 'night_stink_bomb',
@@ -288,7 +288,7 @@ export const ACTIONS = [
       dossier: +4,
       evidence: { kind: 'bribe', quality: 0.9, legal: false, label: "Enveloppe de Dédé au brigadier, vue de l'arrière-salle" },
     },
-    witnessed: { exposure: 0.5, by: ['dede', 'ghislain', 'waiter', 'police'], effects: { risk: +40, setFlags: ['complaint_filed'] } },
+    witnessed: { exposure: 0.5, by: ['dede', 'ghislain', 'waiter', 'police'], effects: { risk: +40, setFlags: ['complaint_filed', 'backroom_caught'] } },
     result: "Entre deux fûts de bière, vous retenez votre souffle. Dédé tend une enveloppe et un waterzooi « offert ». Clic. Inutilisable au tribunal, inestimable dans un journal.",
   },
   {
@@ -459,7 +459,7 @@ export const ACTIONS = [
     cost: { time: 2 },
     requires: { flags: ['corruption_proof'] },
     effects: { setFlags: ['igpn_open'], corruption: -20, hostility: +20 },
-    result: "Enquête interne ouverte. Le brigadier Lemaire découvre qu'un waterzooi peut coûter très cher. Pour la preuve prise depuis l'arrière-salle, on vous demandera d'où elle vient. Préparez une réponse.",
+    result: "Enquête interne ouverte. Le brigadier Lemaire découvre qu'un waterzooi peut coûter très cher. Les enquêteurs vous demanderont d'où vient chaque pièce, et à quelle heure. Préparez des réponses.",
   },
   {
     id: 'pm_lemaire_transfer',
@@ -481,7 +481,7 @@ export const ACTIONS = [
     cost: { time: 1 },
     requires: { flags: ['called_police'] },
     effects: { setFlags: ['roster_known', 'met_klaas'] },
-    result: "Klaas feuillette, compte, entoure. « Mardi et vendredi, c'est Lemaire. Ja. Le café, c'est toujours les mêmes jours. »",
+    result: "Klaas feuillette, compte, entoure. « Mardi et vendredi, c'est Lemaire. Ja. Même voiture, même heure, même lenteur. »",
   },
 
   // ════════════════════════════════════════════════════════════════════════
@@ -620,7 +620,7 @@ export const ACTIONS = [
     cost: { time: 2 },
     requires: { flags: ['press_contacted', 'corruption_proof'] },
     effects: { setFlags: ['press_scandal'], corruption: -30, hostility: +30, asso: +5 },
-    result: "Une : « WATERZOOI-GATE ». La photo de l'enveloppe, le carnet de Klaas en fac-similé. Colette Verhaeghe « ne commente pas ». Le téléphone de Dédé ne s'arrête plus.",
+    result: "Une : « WATERZOOI-GATE ». Les photos, les dates, les heures, les cafés. Colette Verhaeghe « ne commente pas ». Le téléphone de Dédé ne s'arrête plus.",
   },
   {
     id: 'pm_lawyer_hire',
@@ -666,7 +666,7 @@ export const ACTIONS = [
     legality: 'grey',
     once: true,
     cost: { time: 1 },
-    requires: { flags: ['delphine_dinner'] },
+    requires: { flags: ['delphine_dinner'], notFlags: ['inspector_announced', 'inspector_surprise'] },
     effects: { setFlags: ['delphine_channel'], corruption: -5, risk: +5 },
     witnessed: { exposure: 0.25, by: ['ghislain'], effects: { setFlags: ['conflict_exposed'], risk: +10 } },
     result: "Un SMS de Delphine : « Je verrai ce que je peux faire. Pas un mot à Stéphane. » La mairie vient de gagner un effet de surprise, et vous un secret.",
@@ -725,7 +725,7 @@ export const ACTIONS = [
     requires: { flags: ['proj_fake_reviews'], notFlags: ['fake_reviews_traced'] },
     effects: { setFlags: ['fake_reviews'], hostility: +10, risk: +5 },
     witnessed: { exposure: 0.3, by: ['ghislain'], effects: { setFlags: ['fake_reviews_traced'], risk: +20, hostility: +15 } },
-    result: "« Une étoile. Le serveur était aimable, mais le voisin du dessus avait l'air épuisé. » Douze comptes, douze styles. Clode Kode a ajouté des fautes pour faire vrai, en s'excusant.",
+    result: "« Une étoile. Le serveur était aimable, mais le voisin du dessus avait l'air épuisé. » Douze comptes, douze styles, et les fautes d'orthographe, c'est vous qui les avez ajoutées. Clode Kode propose, à la place, « un avis sincère et nuancé sur la cuisson des frites ». Vous fermez l'onglet.",
   },
   {
     id: 'pm_read_reservations',
@@ -738,7 +738,7 @@ export const ACTIONS = [
     effects: {
       setFlags: ['read_reservations'],
       dossier: +2,
-      evidence: { kind: 'reservations', quality: 0.7, legal: false, label: 'Réservations : 9 couverts par table, « terrasse jusqu’à 1h »' },
+      evidence: { kind: 'reservations', quality: 0.7, legal: false, label: 'Réservations : jusqu’à 11 couverts par table, « terrasse jusqu’à 1h »' },
     },
     result: "Samedi, table 4 : « 11 pers., terrasse, NE PAS RENTRER avant 1h ». C'est écrit noir sur blanc, en Comic Sans.",
   },
@@ -779,8 +779,51 @@ export const ACTIONS = [
     legality: 'illegal',
     cost: { time: 1 },
     requires: { flags: ['waiter_bribed'], notFlags: ['waiter_fired', 'waiter_informant'] },
-    effects: { setFlags: ['waiter_informant'], dossier: +2 },
+    effects: { setFlags: ['waiter_informant', 'seen_complaisance'], dossier: +2 },
     witnessed: { exposure: 0.2, by: ['dede'], effects: { setFlags: ['waiter_fired'], hostility: +10 } },
     result: "Au comptoir d'un café de la place, Théo parle bas : les jours où « le brigadier mange », les soirs où la cuisine ferme tôt, qui ment à qui. Il a l'air soulagé.",
+  },
+  // ── content-fixes : routes du scandal (README « Scandal proof ») ─────────
+  {
+    id: 'pm_waiter_testimony',
+    label: 'Convaincre Théo de témoigner par écrit',
+    phase: 'afternoon',
+    legality: 'legal',
+    once: true,
+    cost: { time: 1 },
+    requires: { flags: ['waiter_informant'], notFlags: ['waiter_fired', 'waiter_testimony'] },
+    effects: {
+      setFlags: ['waiter_testimony', 'seen_complaisance', 'corruption_proof'],
+      dossier: +4,
+      evidence: { kind: 'testimony', quality: 0.75, legal: true, label: 'Attestation du serveur : repas offerts à la patrouille, coups de fil avant les passages' },
+    },
+    witnessed: { exposure: 0.3, by: ['dede'], effects: { setFlags: ['waiter_fired'], hostility: +10 } },
+    result: "Théo relit trois fois, signe, et pose le stylo comme on pose une grenade. « Je fais que mon taf, moi. Mais mon taf, c'est pas de servir des cafés à la police pour qu'elle regarde ailleurs. » Maître Vandamme appellera ça « une pièce ». Théo appelle ça « ma démission, en avance ».",
+  },
+  {
+    id: 'pm_klaas_notebook',
+    label: 'Faire certifier les carnets de Klaas (tuyaux horodatés)',
+    phase: 'afternoon',
+    legality: 'legal',
+    once: true,
+    cost: { time: 2 },
+    requires: { flags: ['met_klaas', 'roster_known', 'seen_tipoff'], notFlags: ['klaas_log_certified'] },
+    effects: {
+      setFlags: ['klaas_log_certified', 'corruption_proof'],
+      dossier: +4,
+      evidence: { kind: 'notebook', quality: 0.8, legal: true, label: 'Carnets de Klaas : tables rentrées cinq minutes avant chaque patrouille, toujours les mêmes soirs' },
+    },
+    result: "Klaas recopie, date et signe chaque page : « Klaas, témoin, lunettes propres. » Jérémie tamponne au nom de l'association. Mis bout à bout, les tuyaux dessinent un horaire de bus : mêmes soirs, même voiture, cinq minutes d'avance. « Ja. Ce qui est régulier, on peut l'écrire. »",
+  },
+  {
+    id: 'pm_answer_hate_wave',
+    label: '« Bernadette harcelée » : répondre calmement, preuves à l’appui',
+    phase: 'afternoon',
+    legality: 'legal',
+    once: true,
+    cost: { time: 1 },
+    requires: { flags: ['cm_fake_post'], notFlags: ['hate_wave_answered'] },
+    effects: { setFlags: ['hate_wave_answered'], asso: +3 },
+    result: "Pas d'insulte, pas de majuscules : trois photos horodatées, l'arrêté du 22h, et « Bernadette n'existe pas, mais nos nuits, si ». Nico relit, valide, publie. Les commentaires se calment. Un seul demande encore « vous fermez à quelle heure ? ». Vous répondez : 22h.",
   },
 ];

@@ -64,7 +64,7 @@ export const KLAAS_NOTEBOOK = {
   complaisance: {
     precise: [
       '{time}. {patrol} chez {rest}. Café. Deux sucres. Zéro PV. Tables : inchangées.',
-      '{time}. {patrol} arrive. Dédé serre la main. Assiette offerte. {patrol} repart. Tables : toujours là.',
+      '{time}. {patrol} arrive. Le patron serre la main. Assiette offerte. {patrol} repart. Tables : toujours là.',
       '{time}. Contrôle de {rest} par {patrol}. Durée : un café. Résultat : un café.',
     ],
     vague: [
@@ -90,7 +90,7 @@ export const KLAAS_NOTEBOOK = {
   pee: {
     precise: [
       '{time}. Un client contre {door}. Durée : longue. Je ne note pas le visage. Je note la porte.',
-      '{time}. {door}. Encore. Troisième depuis le début de soirée.',
+      '{time}. {door}. Encore un. Je ne tiens plus le compte, je tiens le carnet.',
     ],
     vague: ['{time}. Un homme immobile contre une façade, côté {door}. Je préfère croire qu\'il réfléchit.'],
   },
@@ -101,10 +101,10 @@ export const KLAAS_NOTEBOOK = {
   // Pilou lui-même (seulement si Klaas voit l'acte, cf. witness). Klaas ne juge pas : il horodate.
   pilou: {
     precise: [
-      '{time}. Fenêtre du deuxième, n°10. Pilou. {act}. Je note. Je note tout.',
+      '{time}. Côté n°10. Pilou. {act}. Je note. Je note tout.',
       '{time}. Pilou, {act}. Hilde dirait que ce n\'est pas bien. Je l\'écris, elle le dira.',
     ],
-    vague: ['{time}. Mouvement à la fenêtre du n°10. Ça ressemblait à Pilou. Ça ressemblait à : {act}.'],
+    vague: ['{time}. Mouvement du côté du n°10. Ça ressemblait à Pilou. Ça ressemblait à : {act}.'],
   },
   // Dernière ligne avant que Klaas aille dormir (~01:00).
   bedtime: [
@@ -127,17 +127,17 @@ export const POLICE_LINES = {
     ],
     asso: [
       'Police : « Ah, pour l\'Association… On fait au plus vite. » (Le bloc saura qui a appelé.)',
-      'Police : « L\'Association de la rue des Bouchers, très bien. Une patrouille part. » Quelque part, un téléphone vibre chez Dédé.',
+      'Police : « L\'Association de la rue des Bouchers, très bien. Une patrouille part. »',
     ],
   },
   lemaire: {
     arrive: [
       'Le brigadier Lemaire remonte la rue sans se presser, les mains dans le dos.',
-      'Lemaire arrive, salue Dédé de loin avant de saluer qui que ce soit d\'autre.',
+      'Lemaire arrive, salue les terrasses de loin avant de saluer qui que ce soit d\'autre.',
     ],
     act: [
       'Lemaire, l\'air de quelqu\'un qu\'on dérange : « Bon. Allez, on rentre ça. » PV pour {rest} : {detail}.',
-      'Contre toute attente, Lemaire sort son carnet. Dédé le regarde comme on regarde un ami qui vous trahit. PV : {detail}.',
+      'Contre toute attente, Lemaire sort son carnet. Le patron le regarde comme on regarde un ami qui vous trahit. PV : {detail}.',
     ],
     complaisance: [
       'Lemaire chez {rest} : un café, une tape dans le dos, « bonne soirée messieurs-dames ». 0 PV.',
@@ -154,11 +154,11 @@ export const POLICE_LINES = {
     ],
     never_came: [
       'Lemaire n\'est jamais arrivé. Le standard parle d\'une « intervention prioritaire ». Rue de Gand, peut-être.',
-      'Pas de Lemaire ce soir. Klaas suppose qu\'il dîne. Klaas suppose rarement au hasard.',
+      'Pas de Lemaire ce soir. Klaas note l\'absence. Il note aussi l\'heure de l\'absence.',
     ],
     for_pilou: [
       'On sonne. C\'est Lemaire, avec un sourire triste : « Monsieur Dubeton ? On a reçu une plainte. Vous. »',
-      'Lemaire, sur votre palier, carnet ouvert pour la première fois de la semaine : « On va discuter un peu, monsieur. »',
+      'Lemaire, sur votre palier, carnet ouvert, pour une fois : « On va discuter un peu, monsieur. »',
     ],
   },
   benali: {
@@ -167,8 +167,8 @@ export const POLICE_LINES = {
       'Benali arrive vite. Il regarde les tables avant de regarder les gens.',
     ],
     act: [
-      'Benali : « Arrêté municipal, fermeture à 22h00. Vous êtes en infraction. » PV pour {rest} : {detail}.',
-      'Benali verbalise {rest} sans hausser le ton : {detail}. Dédé appelle quelqu\'un en s\'éloignant.',
+      'Benali : « Arrêté municipal. Vous êtes en infraction. » PV pour {rest} : {detail}.',
+      'Benali verbalise {rest} sans hausser le ton : {detail}. Le patron appelle quelqu\'un en s\'éloignant.',
       'Benali mesure, compte, écrit. {detail}. Le serveur l\'aide à rentrer les tables, presque soulagé.',
     ],
     complaisance: [
@@ -191,7 +191,7 @@ export const POLICE_LINES = {
     ],
     act: [
       'Le Commandant Desmet : « Nous prenons cette affaire très au sérieux. » PV pour {rest} : {detail}. Il regarde s\'il y a un photographe.',
-      'Desmet fait tout rentrer, tout mesurer, tout verbaliser : {detail}. Dédé ne trouve personne à qui offrir un café.',
+      'Desmet fait tout rentrer, tout mesurer, tout verbaliser : {detail}. Le patron ne trouve personne à qui offrir un café.',
     ],
     complaisance: [
       'Desmet constate « une situation en voie de normalisation » et repart. 0 PV. Il a au moins refusé le café.',
@@ -277,7 +277,7 @@ export const BARKS = {
     '« Moi, je dis, l\'ambiance, c\'est l\'ADN de Lille. »',
     '« Tu crois qu\'il y a des gens qui habitent au-dessus ? »',
     '« Chut… non, je rigole. »',
-    '« Mon Uber arrive dans quarante minutes, on a le temps. »',
+    '« Mon VTC arrive dans quarante minutes, on a le temps. »',
     '« Monsieur ! Monsieur ! Une autre bière s\'il vous plaît ! »',
     '« Il fait tellement bon, c\'est criminel de rentrer. »',
     '« Attends, je mets une story. »',
@@ -309,7 +309,7 @@ export const BARKS = {
   ],
   // Murmures quand une patrouille passe
   police_passing: [
-    '« Chut, les flics. » « Mais non, c\'est Lemaire, il est sympa. »',
+    '« Chut, les flics. » « Mais non, c\'est juste une ronde. »',
     '« Rentre ton verre, rentre ton verre ! »',
   ],
 };
@@ -397,12 +397,12 @@ export const WAITER_LINES = {
 export const RECAP_HEADLINES = [
   { id: 'h_custody', priority: 100, when: { reason: 'custody' }, text: 'VIEUX-LILLE · Un riverain passe la nuit au poste après une soirée « animée »' },
   { id: 'h_sleep', priority: 95, when: { reason: 'sleep' }, text: 'TÉMOIGNAGE · « Je ne dors plus » : un habitant de la rue des Bouchers jette l\'éponge' },
-  { id: 'h_scandal', priority: 90, when: { scandal: true }, text: 'POLICE MUNICIPALE · Le commissaire s\'intéresse aux cafés offerts rue des Bouchers' },
+  { id: 'h_scandal', priority: 90, when: { scandal: true }, text: 'POLICE MUNICIPALE · La hiérarchie de la police municipale s\'intéresse aux cafés offerts rue des Bouchers' },
   { id: 'h_tipoff_complaisance', priority: 80, when: { tipoffs: '>=1', complaisance: '>=1' }, text: 'RUE DES BOUCHERS · Les tables rentrent avant la police, ressortent après le café' },
   { id: 'h_tipoff', priority: 75, when: { tipoffs: '>=1' }, text: 'COÏNCIDENCE · Les terrasses se rangent cinq minutes avant chaque patrouille' },
   { id: 'h_complaisance', priority: 70, when: { complaisance: '>=1' }, text: 'CONVIVIALITÉ · Contrôle de terrasse : un café, zéro procès-verbal' },
-  { id: 'h_bucket_seen', priority: 68, when: { bucket: '>=1', witnesses: '>=1' }, text: 'FAITS DIVERS · Une terrasse arrosée depuis un deuxième étage, la vidéo circule' },
-  { id: 'h_bucket_unseen', priority: 66, when: { bucket: '>=1', witnesses: '<1' }, text: 'MYSTÈRE · Une averse localisée sur une seule terrasse, Météo-France perplexe' },
+  { id: 'h_bucket_seen', priority: 68, when: { bucket: '>=1', witnesses: '>=1' }, text: 'FAITS DIVERS · Une terrasse arrosée depuis un deuxième étage, des témoins parlent' },
+  { id: 'h_bucket_unseen', priority: 66, when: { bucket: '>=1', witnesses: '<1' }, text: 'MYSTÈRE · Une averse localisée sur une seule terrasse, les météorologues perplexes' },
   { id: 'h_act', priority: 60, when: { acts: '>=1' }, text: 'ÉVÉNEMENT · Un procès-verbal dressé rue des Bouchers, les anciens n\'en reviennent pas' },
   { id: 'h_ignored', priority: 55, when: { ignored: '>=1' }, text: 'SERVICE PUBLIC · « C\'est encore vous » : la police municipale ne décroche plus pour la rue des Bouchers' },
   { id: 'h_saturday_pee', priority: 50, when: { saturday: true, pees: '>=3' }, text: 'SAMEDI PIÉTON · Les porches du Vieux-Lille transformés en sanitaires publics' },

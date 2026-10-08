@@ -18,7 +18,7 @@ export const INTRO_CARDS = [
     id: 'card_street',
     title: 'Rue des Bouchers, Vieux-Lille',
     text:
-      "Une rue pavée de 150 mètres, ouverte en 1729, qu'on a longtemps surnommée « le Trou ». Aujourd'hui, c'est l'une des rues les plus « conviviales » de Lille. Il y a des terrasses du n°1 jusqu'à la place Maurice-Schumann. Et des gens qui habitent au-dessus.",
+      "Une rue pavée de 150 mètres, ouverte en 1729. Aujourd'hui, c'est l'une des rues les plus « conviviales » de Lille. Il y a des terrasses du n°1 jusqu'à la place Maurice-Schumann. Et des gens qui habitent au-dessus.",
   },
   {
     id: 'card_pilou',
@@ -31,7 +31,7 @@ export const INTRO_CARDS = [
     id: 'card_exhaust',
     title: 'Sous la fenêtre',
     text:
-      "Au rez-de-chaussée : l'Estaminet La Ch'tite Bernadette. Sa gaine d'extraction monte le long de la façade jusque sous la fenêtre de Pilou. Elle ronronne et souffle de la friture jusqu'à 23h30. Une clim est apparue sur la façade, sans autorisation. On lui répond que « c'est en cours de résolution ».",
+      "Au rez-de-chaussée : l'Estaminet La Ch'tite Bernadette. Sa gaine d'extraction monte le long de la façade jusque sous la fenêtre de Pilou. Elle ronronne et souffle de la friture jusqu'à 23h30. Une clim est apparue sur la façade, sans autorisation : une inspectrice de la mairie est passée, le dossier est ouvert. L'estaminet, lui, répond à tout que « c'est en cours de résolution ».",
   },
   {
     id: 'card_rules',
@@ -194,6 +194,6 @@ export const TUTORIAL = [
     trigger: 'night_end',
     when: { day: [1, 1] },
     once: true,
-    text: "Fin de la première nuit. Le bilan récapitule les preuves, la police et les témoins. Demain matin, Koddex. Treize nuits avant la commission.",
+    text: "Fin de la première nuit. Le bilan récapitule les preuves, la police et les témoins. Demain matin, Koddex. Douze nuits avant la commission.",
   },
 ];

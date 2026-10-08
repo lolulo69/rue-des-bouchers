@@ -33,12 +33,12 @@ const ASSO_FATES = [
   {
     when: { flags: ['traitor_recruited'], notFlags: ['traitor_known'] },
     text:
-      "Vous n'avez jamais su qui, à l'association, racontait tout à Ghislain. Régis, lui, vous dit toujours bonjour. Très chaleureusement.",
+      "Vous n'avez jamais su qui, à l'association, racontait tout à Ghislain. Tout le monde, à l'association, vous dit toujours bonjour. Très chaleureusement. Un peu trop, pour l'un d'entre eux.",
   },
   {
     when: { flags: ['tatie_mail_7'] },
     text:
-      "Tatie Bouchon a imprimé les sept promesses de Ghislain et les a fait encadrer, dans l'ordre, dans son couloir. Elle appelle ça « la galerie des en-cours ». Les visites sont gratuites, le jeudi excepté.",
+      "Tatie Bouchon a imprimé toutes les promesses de Ghislain et les a fait encadrer, dans l'ordre, dans son couloir. Elle appelle ça « la galerie des en-cours ». Les visites sont gratuites, le jeudi excepté.",
   },
   {
     when: { flags: ['tatie_leaked_plan'] },
@@ -78,7 +78,7 @@ const INSTITUTIONS = [
   },
   {
     when: { flags: ['conflict_exposed'] },
-    text: "Le dîner chez Stéphane a fini par sortir. Delphine a été dessaisie du dossier de la clim « par souci de déontologie ». Le dossier a été confié à un collègue qui part à la retraite en mars.",
+    text: "Le dîner chez Stéphane a fini par sortir. Delphine a été dessaisie du dossier de la clim « par souci de déontologie ». Le dossier a changé de mains en cours de route, ce qui, à la mairie, revient à le faire traverser la rue à pied.",
   },
   {
     when: { flags: ['delphine_channel'], notFlags: ['conflict_exposed'] },
@@ -97,7 +97,7 @@ const KODDEX = [
   },
   {
     when: { flags: ['todo_app_rust'] },
-    text: "L'appli de to-do de Stéphane en est à sa cinquième réécriture. Elle contient une seule tâche : « vibes ».",
+    text: "L'appli de to-do de Stéphane en est à son énième réécriture. Elle contient une seule tâche : « vibes ».",
   },
 ];
 
@@ -137,7 +137,7 @@ export const ENDINGS = [
       {
         when: {},
         text:
-          "Ce n'est pas la police municipale qui est venue, cette fois. C'est la nationale, à six heures du matin, avec une politesse inquiétante. Vous avez passé vingt-quatre heures dans une pièce sans fenêtre. Pour la première fois depuis des semaines, il n'y avait aucun bruit. Vous avez très bien dormi. C'est la seule victoire de cette fin.",
+          "Ce n'est pas la police municipale qui est venue, cette fois. Ce sont deux agents de la nationale, en pleine nuit, sur les pavés devant le n°10, avec une politesse inquiétante. Vous avez passé le reste de la nuit et la journée suivante dans une pièce sans fenêtre. Pour la première fois depuis des semaines, il n'y avait aucun bruit. Vous avez très bien dormi. C'est la seule victoire de cette fin.",
       },
       {
         when: { flags: ['kitchen_sabotage_caught'] },
@@ -158,7 +158,7 @@ export const ENDINGS = [
         text: "La vidéo de vous à la fenêtre a fait le tour des réseaux. Les commentaires se divisent entre « héros » et « fou furieux ». Votre mère a choisi « fatigué ».",
       },
       {
-        when: { flags: ['backroom_sneak'] },
+        when: { flags: ['backroom_caught'] },
         text: "Être retrouvé caché dans l'arrière-salle d'un restaurant, au milieu des fûts, a pesé lourd. Que vous ayez eu raison sur ce qui s'y passait n'a rien changé : une preuve obtenue comme ça ne vaut rien devant un juge.",
       },
       {
@@ -303,7 +303,11 @@ export const ENDINGS = [
     epilogue: [
       {
         when: { flags: ['won_legal'] },
-        text: "Vous avez gagné. L'autorisation de terrasse de l'estaminet est suspendue. Les tables rentrent à 21h55, la gaine part en toiture.",
+        text: "Vous avez gagné. L'autorisation de terrasse de l'estaminet est suspendue. Les tables de l'estaminet ont disparu de la rue.",
+      },
+      {
+        when: { flags: ['won_legal', 'exhaust_meeting_won'] },
+        text: "La gaine, elle, part en toiture. Vous avez dormi une semaine entière, fenêtre ouverte.",
       },
       {
         when: { flags: ['won_peace'] },
@@ -320,10 +324,10 @@ export const ENDINGS = [
       },
       {
         when: { flags: ['knows_trou'] },
-        text: "Ils ont appelé le bar « Le Trou ». Vous leur aviez fourni le nom vous-même, en le répétant partout pendant deux semaines.",
+        text: "Ils ont appelé le bar « Le Trou ». Vous auriez dû garder ce surnom pour vous.",
       },
       {
-        when: { flags: ['bombance_rumour'] },
+        when: { flags: ['bombance_wait'] },
         text: "Tatie Bouchon vous l'avait dit. Colette le lui avait dit. Vous aviez répondu « un problème à la fois ». Le problème suivant a une licence IV.",
       },
       ...INSTITUTIONS,
@@ -358,10 +362,14 @@ export const ENDINGS = [
       },
       {
         when: { flags: ['seen_complaisance', 'met_klaas'] },
-        text: "Les colonnes du carnet de Klaas, « café offert, 0 PV », recopiées à la main sur trois semaines, ont été publiées en encadré. Klaas a acheté dix exemplaires du journal. Il en a annoté neuf.",
+        text: "Les colonnes du carnet de Klaas, « café offert, 0 PV », recopiées à la main sur deux semaines, ont été publiées en encadré. Klaas a acheté dix exemplaires du journal. Il en a annoté neuf.",
       },
       {
-        when: { flags: ['waiter_informant'] },
+        when: { flags: ['klaas_log_certified'] },
+        text: "Les carnets certifiés de Klaas ont fait le reste : cinq minutes d'avance avant chaque patrouille, toujours les mêmes soirs. L'enquête interne les a appelés « la grille horaire ». Klaas a demandé qu'on écrive « le carnet ».",
+      },
+      {
+        when: { flags: ['waiter_testimony'] },
         text: "Théo, le serveur, a témoigné sous couvert d'anonymat. Tout le monde a deviné. Il travaille maintenant dans une brasserie de la Grand-Place, où on le paie pour ses heures sup. Il vous a dit : « Je fais que mon taf. Mais ailleurs. »",
       },
       ...INSTITUTIONS,
@@ -417,7 +425,7 @@ export const ENDINGS = [
       },
       {
         when: { flags: ['tatie_emails_shared'] },
-        text: "Les « c'est en cours de résolution » de Tatie, versés au dossier, ont fait sourire la commission. Sept promesses. Zéro résolution. Le dossier parlait tout seul.",
+        text: "Les « c'est en cours de résolution » de Tatie, versés au dossier, ont fait sourire la commission. Toutes ces promesses. Zéro résolution. Le dossier parlait tout seul.",
       },
       {
         when: { flags: ['petition_delivered'] },

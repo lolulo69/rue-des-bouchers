@@ -110,7 +110,6 @@ export const FLAGS = {
   read_quotes: "Pilou a trouvé les devis d'extraction jamais signés",
   camera_found: 'La caméra cachée a été découverte',
   cardboard_exhaust: 'Carton scotché sur la sortie d’extraction',
-  kitchen_fire: 'Début de feu dans la cuisine de l’estaminet',
   stink_bomb: "Boule puante lâchée sur la terrasse",
   fake_reviews: 'Faux avis publiés',
   fake_reviews_traced: 'Les faux avis ont été remontés jusqu’à Pilou',
@@ -163,7 +162,7 @@ export const FLAGS = {
   tatie_mail_4: 'Fil Tatie : promesse n°4 reçue',
   tatie_mail_5: 'Fil Tatie : promesse n°5 reçue',
   tatie_mail_6: 'Fil Tatie : promesse n°6 reçue',
-  tatie_mail_7: 'Fil Tatie : promesse n°7 reçue (la dernière)',
+  tatie_mail_7: 'Fil Tatie : promesse n°7 reçue (le consultant olfactif)',
   tatie_leaked_plan: 'Tatie a laissé fuiter un vrai plan à Colette',
 
   // ── Fins de partie ──────────────────────────────────────────────────────
@@ -191,7 +190,7 @@ export const FLAGS = {
   tatie_mail_9: 'Fil Tatie : promesse n°9 reçue (patrimoine immatériel)',
   tatie_mail_10: 'Fil Tatie : promesse n°10 reçue (« c’est réparé »)',
   tatie_mail_11: 'Fil Tatie : promesse n°11 reçue (rédigée par Clode Kode)',
-  tatie_mail_12: 'Fil Tatie : promesse n°12 reçue (réponse automatique)',
+  tatie_mail_12: 'Fil Tatie : promesse n°12 reçue (réponse automatique, la dernière)',
   regis_courted: "Un membre de l'association dîne gratis à l'estaminet (Klaas l'a noté)",
   regis_leak_petition: 'Le bloc a devancé la pétition grâce à une fuite',
   regis_leak_lawyer: "Le bloc a su pour l'avocat avant l'envoi",
@@ -201,4 +200,10 @@ export const FLAGS = {
   cm_air_freshener: 'Diffuseur « parfum frites fraîches » sous le store',
   cm_sugar_blame: 'Dédé a accusé la rue de Gand pour la carbonnade sucrée',
   cm_uritrottoir_terrace: "Dédé a annexé l'uritrottoir à sa terrasse",
+
+  // ── content-fixes (routes du scandal, revue de cohérence) ───────────────
+  waiter_testimony: 'Théo a signé une attestation (repas offerts, coups de fil avant les patrouilles)',
+  klaas_log_certified: 'Les carnets de Klaas sont certifiés : tuyaux horodatés, mêmes soirs',
+  backroom_caught: "Pilou a été surpris caché dans l'arrière-salle",
+  bombance_wait: "Pilou a répondu « un problème à la fois » au projet de bar de La Bombance",
 };

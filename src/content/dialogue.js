@@ -801,7 +801,7 @@ export const DIALOGUE = [
     speaker: 'nico',
     when: { flags: ['cm_fake_post'] },
     lines: [
-      "Le post « Bernadette harcelée » a deux mille partages. Bernadette n'existe pas, mais elle a déjà un comité de soutien.",
+      "Le post « Bernadette harcelée » tourne partout. Des milliers de partages. Bernadette n'existe pas, mais elle a déjà un comité de soutien.",
       "Ne réponds pas à chaud. Réponds bien, ou ne réponds pas.",
     ],
     once: true,
@@ -1699,6 +1699,63 @@ export const DIALOGUE = [
     when: { flags: ['bucket_witnessed'] },
     lines: [
       "*Un seul clignement. Très lent. Elle a vu.*",
+    ],
+    once: true,
+  },
+  {
+    id: 'nico_hate_wave_answered',
+    speaker: 'nico',
+    when: { flags: ['hate_wave_answered'] },
+    lines: [
+      "Ta réponse a été partagée plus que leur post. Trois photos, une date, zéro insulte. J'en ai fait une capture pour l'encadrer.",
+    ],
+    once: true,
+  },
+  {
+    id: 'klaas_certified',
+    speaker: 'klaas',
+    when: { flags: ['klaas_log_certified'] },
+    lines: [
+      "Mes carnets ont un tampon, maintenant. Hilde dit que je marche plus droit depuis.",
+      "Ce n'est pas pour le tampon. C'est que quelqu'un les a enfin lus jusqu'au bout.",
+    ],
+    once: true,
+  },
+  {
+    id: 'serveur_testimony',
+    speaker: 'serveur',
+    when: { flags: ['waiter_testimony'] },
+    lines: [
+      "J'ai signé. Ma mère dit que je suis courageux. Mon banquier dit que je suis au chômage. Les deux ont raison.",
+    ],
+    once: true,
+  },
+  {
+    id: 'hilde_laxative',
+    speaker: 'hilde',
+    when: { flags: ['laxative_done', 'met_hilde'] },
+    lines: [
+      "Des clients malades, à la terrasse d'en bas. Klaas dit qu'on ne sait pas qui. Je ne veux pas le savoir.",
+      "Si c'était quelqu'un de chez nous, Pilou, ce n'est plus une querelle de voisins. C'est autre chose. Quelque chose de grave.",
+    ],
+    effects: { asso: -3 },
+    once: true,
+  },
+  {
+    id: 'avocat_backroom_caught',
+    speaker: 'avocat',
+    when: { flags: ['backroom_caught', 'lawyer_hired'] },
+    lines: [
+      "Dans l'arrière-salle. Entre les fûts. En l'état du dossier, je vais avoir besoin d'un café. Et vous, d'un très bon souvenir de la loi.",
+    ],
+    once: true,
+  },
+  {
+    id: 'serveur_backroom',
+    speaker: 'serveur',
+    when: { flags: ['backroom_sneak'], notFlags: ['backroom_caught'] },
+    lines: [
+      "Quelqu'un a bougé deux fûts dans l'arrière-salle, hier soir. Dédé croit aux fantômes. Moi, je crois pas aux fantômes. Je crois que je vais rien dire.",
     ],
     once: true,
   },

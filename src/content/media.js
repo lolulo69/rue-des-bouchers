@@ -64,7 +64,7 @@ export const MEDIA = {
       when: { day: [4, 8] },
       author: 'nico',
       photo: 'Gaufre endormie sur une pile de tracts',
-      text: "La chatte a dormi sur les tracts de la pétition. On les a quand même distribués. Ils sentent le chat. C'est plus militant.",
+      text: "La chatte a dormi sur les convocations de l'AG. On les a quand même distribués. Ils sentent le chat. C'est plus militant.",
     },
     {
       id: 'wa_cat_3',
@@ -202,7 +202,7 @@ export const MEDIA = {
       id: 'wa_tipoff',
       when: { flags: ['seen_tipoff'] },
       author: 'klaas',
-      text: "21h58 : le téléphone de l'estaminet sonne. 22h01 : tables rentrées. 22h03 : la police arrive. 22h15 : tables ressorties. Je n'interprète pas. Je note.",
+      text: "22h14 : l'estaminet rentre toutes ses tables, sans qu'un seul client soit parti. 22h19 : la police arrive. « Tout est en ordre. » 22h30 : tables ressorties. Je n'interprète pas. Je note.",
     },
     {
       id: 'wa_benali',
@@ -252,7 +252,7 @@ export const MEDIA = {
       id: 'wa_cardboard',
       when: { flags: ['cardboard_exhaust'] },
       author: 'klaas',
-      text: "Un carton sur la sortie d'extraction. 0h52. Je n'ai pas vu qui. J'ai vu un pyjama.",
+      text: "Un carton sur la sortie d'extraction. Je n'ai pas vu qui. Je l'ai constaté ce matin, 7h10.",
     },
     {
       id: 'wa_sugar_rumour',
@@ -439,7 +439,7 @@ export const MEDIA = {
       when: { day: [1, 2] },
       author: 'journaliste',
       headline: 'Rue des Bouchers : 22h, l’heure du couvre-terrasse',
-      text: "Depuis cette année, les terrasses de la rue des Bouchers doivent fermer à 22h, contre minuit rue de Gand. « On n'est pas des citrouilles », proteste un restaurateur. Les riverains, eux, attendent de voir : « 22h, c'est sur le papier. Sous ma fenêtre, la dernière chaise rentre à 0h40. »",
+      text: "Depuis cette année, les terrasses de la rue des Bouchers doivent fermer à 22h, contre 23h ou minuit ailleurs dans le Vieux-Lille. « On n'est pas des citrouilles », proteste un restaurateur. Les riverains, eux, attendent de voir : « 22h, c'est sur le papier. Sous ma fenêtre, la dernière chaise rentre à 0h40. »",
     },
     {
       id: 'press_trou',
@@ -479,7 +479,14 @@ export const MEDIA = {
     },
     {
       id: 'press_petition',
-      when: { flags: ['petition_delivered'] },
+      when: { flags: ['petition_delivered'], notFlags: ['cm_happy_petition'] },
+      author: 'journaliste',
+      headline: 'Rue des Bouchers : les riverains pétitionnent',
+      text: "Les riverains ont déposé leur pétition en mairie, signée presque entièrement par des habitants de la rue. « Ce ne sont que des voisins », relativise un restaurateur. C'est un peu le sujet.",
+    },
+    {
+      id: 'press_petition_duel',
+      when: { flags: ['petition_delivered', 'cm_happy_petition'] },
       author: 'journaliste',
       headline: 'Deux pétitions pour une rue',
       text: "Les riverains ont déposé leur pétition en mairie. Les restaurateurs aussi, avec dix fois plus de signatures, dont une large majorité hors de Lille. « La rue des Bouchers est aimée dans le monde entier », se félicite un restaurateur.",
@@ -510,14 +517,14 @@ export const MEDIA = {
       when: { flags: ['press_scandal'] },
       author: 'journaliste',
       headline: 'Police municipale : cafés offerts et coups de fil, l’enquête',
-      text: "Selon nos informations, des riverains ont documenté plusieurs passages de patrouilles suivis d'aucune verbalisation, et des tables rentrées quelques minutes avant leur arrivée. La police municipale « prend ces allégations très au sérieux ». Le café, lui, reste offert.",
+      text: "Selon nos informations, des riverains ont documenté des arrangements répétés entre un établissement de la rue et certaines patrouilles. La police municipale « prend ces allégations très au sérieux ». Le café, lui, reste offert.",
     },
     {
       id: 'press_igpn',
       when: { flags: ['igpn_open'] },
       author: 'journaliste',
       headline: 'Une enquête interne ouverte',
-      text: "Après nos révélations, une enquête interne vise des agents de la police municipale. Le maire Bertrand Lescaut promet « la transparence totale ». L'ancienne maire Colette Verhaeghe, elle, n'a « aucun commentaire, sauf que c'est scandaleux », sans préciser quoi.",
+      text: "Après la transmission de documents par des riverains, une enquête interne vise des agents de la police municipale. Le maire Bertrand Lescaut promet « la transparence totale ». L'ancienne maire Colette Verhaeghe, elle, n'a « aucun commentaire, sauf que c'est scandaleux », sans préciser quoi.",
     },
     {
       id: 'press_lemaire',
@@ -545,7 +552,7 @@ export const MEDIA = {
       when: { flags: ['bombance_bar_project'] },
       author: 'journaliste',
       headline: 'La Bombance : un bar de nuit dans les cartons',
-      text: "Le local vide de La Bombance pourrait accueillir un bar à cocktails ouvert « jusqu'à tard ». Le porteur de projet promet « une ambiance feutrée ». Les riverains ont acheté des boules Quies feutrées.",
+      text: "Le local vide de La Bombance pourrait accueillir un bar à cocktails ouvert « jusqu'à tard ». Le porteur de projet promet « une ambiance feutrée ». Les riverains ont acheté des bouchons d'oreille feutrés.",
     },
     {
       id: 'press_commission_eve',
@@ -670,7 +677,7 @@ export const MEDIA = {
       author: 'bloemkool',
       kind: 'post',
       photo: 'Assiette minimaliste : trois carottes, une émulsion, une fleur',
-      text: "Nouvelle carte d'automne. Chou-fleur rôti, beurre noisette, silence relatif. Nous fermons notre terrasse à 22h, comme il se doit. (Nous soutenons nos voisins. Globalement.)",
+      text: "Nouvelle carte d'été. Chou-fleur rôti, beurre noisette, silence relatif. Nous fermons notre terrasse à 22h, comme il se doit. (Nous soutenons nos voisins. Globalement.)",
     },
     {
       id: 'so_mug',
@@ -773,7 +780,7 @@ export const MEDIA = {
       handle: 'Thibault.EVG',
       kind: 'review',
       stars: 4,
-      text: "Enterrement de vie de garçon top ! On a chanté jusqu'à 1h devant l'estaminet. -1 étoile parce qu'un vieux monsieur avec une barbe nous a regardés écrire dans un carnet. Flippant.",
+      text: "Enterrement de vie de garçon top ! On a chanté jusqu'à 1h devant l'estaminet. -1 étoile parce qu'un vieux monsieur barbu, tout au bout de la rue, nous regardait en écrivant dans un carnet. Flippant.",
     },
     {
       id: 'rv_carbonnade_good',
@@ -782,7 +789,7 @@ export const MEDIA = {
       handle: 'Gourmet_du_Nord',
       kind: 'review',
       stars: 4,
-      text: "Carbonnade généreuse, frites croustillantes, un peu bruyant en terrasse. Les voisins avaient des banderoles, c'était folklorique.",
+      text: "Carbonnade généreuse, frites croustillantes, un peu bruyant en terrasse. Des voisins nous regardaient depuis leurs fenêtres, c'était folklorique.",
     },
     {
       id: 'rv_smell',

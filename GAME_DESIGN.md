@@ -449,3 +449,9 @@ so it reflects what the player actually did.
   - Daily feed: `mediaFeed(c.state, c.state.day, { seen })` → `{ whatsapp, press, social }` of unseen entries. The engine records the ids it showed and applies each entry's `effects` / `setFlags` when it is read.
   - End screen: `mediaEnding(endingId, c.state)` (the newspaper front page, most specific variant) and `mediaEndingFeed(endingId, c.state)` (every ending-only message).
 - **Talking to someone outside the card queue**: `dialogueFor(speaker, c.state, { seen: c.state.seen.dialogue })`.
+
+**content-fixes (for the balance agent)**
+- Two new routes to `corruption_proof` (the scandal ending): `pm_waiter_testimony` (afternoon, legal; needs `waiter_informant`; also sets `seen_complaisance`) and `pm_klaas_notebook` (afternoon, legal, 2 slots; needs `met_klaas` + `roster_known` + `seen_tipoff`). Their numbers (dossier +4, evidence quality 0.75 / 0.8, `waiter_fired` on a witnessed testimony) are placeholders: retune freely.
+- `pm_waiter_debrief` now also sets `seen_complaisance`, which unlocks the window bribe photo without the engine.
+- New `pm_answer_hate_wave` (sets `hate_wave_answered`, asso +3, placeholder).
+- No ending or countermove `when` / priority was touched. `the_return` may still be under the 2% target (rumour 35% → project 50%), so it's yours to check in the simulator.
