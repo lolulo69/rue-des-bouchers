@@ -12,6 +12,7 @@
     "test:perf": "playwright test -c playwright.perf.config.js",
     "check:bundle": "vite build && node scripts/check-bundle.js",
     "qa:screens": "QA_SCREENS=1 playwright test screens",
+    "qa:qkit": "QA_QKIT=1 playwright test qkit --workers=1",
     "story": "node scripts/story.js",
     "test:fullrun": "QA_FULLRUN=1 playwright test fullrun --workers=1",
     "qa:album": "QA_ALBUM=1 playwright test fullrun -g album --workers=1"
