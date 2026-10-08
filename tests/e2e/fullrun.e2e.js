@@ -294,7 +294,7 @@ Généré par \`tests/e2e/fullrun.e2e.js\` (\`npm run test:fullrun\`). Estimatio
 |---|---|---|---|---|---|---|---|---|
 ${lines.join('\n')}
 
-Résumés par style : `qa/fullrun/*.json` (date du dernier passage dans `at`). Dernière mise à jour : ${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC.
+Résumés par style : \`qa/fullrun/*.json\` (date du dernier passage dans \`at\`). Dernière mise à jour : ${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC.
 `);
 }
 
