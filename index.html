@@ -75,6 +75,22 @@
     <button onclick="location.reload()">Rejouer</button>
   </div>
 
+  <!-- Chargement (src/main.js) -->
+  <div id="loader" class="screen">
+    <h1>Rue des Bouchers</h1>
+    <div class="loader-track"><i id="loader-bar"></i></div>
+    <p id="loader-label">Chargement…</p>
+  </div>
+
+  <!-- Erreur fatale (src/main.js) : jamais d'écran noir -->
+  <div id="fatal" class="screen hidden" role="alert">
+    <h2>Oups. La rue des Bouchers a planté.</h2>
+    <p>Une erreur inattendue a interrompu le jeu. Votre campagne est sauvegardée à chaque étape : en rechargeant, vous la reprendrez là où elle en était (une nuit en cours recommence au début).</p>
+    <p class="note" id="fatal-detail"></p>
+    <button id="fatal-reload">Recharger</button>
+    <button id="fatal-copy">Copier le rapport</button>
+  </div>
+
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>

@@ -49,3 +49,8 @@ kbd { background: #ffffff1a; border: 1px solid #ffffff33; border-radius: 4px; pa
 #log div.tuto { border-color: #4cc9f0; }
 #log div.bark { border-color: #ffffff44; font-style: italic; opacity: .85; }
 .notice { max-width: 560px; background: #e76f5122; border: 1px solid #e76f51; border-radius: 8px; padding: 10px 14px; line-height: 1.45; }
+#loader { background: #0d0d12; z-index: 50; }
+.loader-track { width: min(420px, 80vw); height: 8px; background: #ffffff22; border-radius: 4px; overflow: hidden; }
+#loader-bar { display: block; height: 100%; width: 0; background: #e9c46a; transition: width .25s; }
+#fatal { background: #0d0d12f2; z-index: 100; }
+#fatal p { max-width: 560px; line-height: 1.5; }
