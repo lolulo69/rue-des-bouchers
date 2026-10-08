@@ -210,27 +210,54 @@ async function playNight(page, clock, style, log, day, album) {
     await page.evaluate(() => { window.__rdb.key('KeyN'); window.__rdb.step(2); });
     if (await page.locator('#nightmenu').isVisible()) { await album.snap(page, 'night-menu'); await page.evaluate(() => { window.__rdb.key('KeyN'); window.__rdb.step(1); }); }
   }
-  const acts = await page.evaluate((plan) => {
+  // Avance la nuit jusqu'à `to` ; s'arrête sur chaque événement de nuit dû (le jeu se met en pause sur sa carte),
+  // le fait apparaître (une frame), et le joue au clic dans l'overlay comme un joueur.
+  const advance = async (to) => {
+    for (let k = 0; k < 20; k++) {
+      const due = await page.evaluate((t) => {
+        const r = window.__rdb, { sim } = r, c = r.campaign;
+        for (let i = 0; sim.state.min < t && !sim.state.ended && i < 6000; i++) {
+          const ev = c?.nightEventDue?.(sim);
+          if (ev) { r.step(1); return ev.id; }
+          sim.tick(0.5);
+          if (i % 60 === 0) r.step(1);
+        }
+        r.step(1);
+        return null;
+      }, to);
+      if (!due) return;
+      await page.locator('#nightmenu').waitFor({ state: 'visible', timeout: 30_000 });
+      if (album) await album.snap(page, 'night-event');
+      await clock.read(page);
+      const btns = page.locator('#nightmenu-list button:not([disabled])');
+      const labels = await btns.allInnerTexts();
+      const ok = labels.map((label, k2) => ({ label, k: k2 })).filter((l) => !style.avoid.some((r) => r.test(l.label)));
+      const pick = style.choices.map((r) => ok.find((l) => r.test(l.label))).find(Boolean) ?? ok[0] ?? { k: 0, label: labels[0] };
+      log.cards.push({ day, phase: 'night', id: due, type: 'night-event', choice: pick.label });
+      clock.click();
+      await btns.nth(pick.k).click();
+    }
+  };
+  const plan = NIGHT_PLANS[style.night];
+  const acts = [];
+  const doActs = (p) => page.evaluate((p) => {
     const r = window.__rdb, { sim } = r, c = r.campaign;
-    const run = (min) => { for (let i = 0; sim.state.min < min && !sim.state.ended && i < 4000; i++) { sim.tick(0.5); if (i % 60 === 0) r.step(1); } };
     const done = [];
     const toWindow = () => { const W = sim.cfg.STREET.halfWidth, win = sim.cfg.ANCHORS.pilouWindow; r.player.loc = 'apt'; r.player.pos.set(-W - 0.2, r.world.apt.floor, win.z); r.step(1); };
-    const act = (p) => {
-      for (const t of sim.state.tables.filter((x) => x.out).slice(0, p.photos ?? 0)) { r.aimAt(t.id); r.step(1); r.key('KeyP'); done.push('photo'); }
-      if (p.waiter) { sim.act({ type: 'waiter' }); done.push('waiter'); }
-      if (p.bucket) { toWindow(); r.key('KeyF'); done.push('bucket'); }
-      for (const a of (c?.nightActions(sim) ?? []).filter((x) => x.legality === 'illegal').slice(0, p.illegal ?? 0)) {
-        try { c.doNightAction(sim, a.id); done.push(a.id); } catch { /* indisponible ici */ }
-      }
-      for (let k = 0; k < (p.police ?? 0); k++) { sim.act({ type: 'police' }); done.push('police'); }
-    };
-    if (plan.at) { run(plan.at); act(plan); }
-    if (plan.bucketAgain) { run(plan.bucketAgain); act({ bucket: true }); }
-    if (plan.late) { run(plan.late.at); act(plan.late); }
-    for (let i = 0; !sim.state.ended && i < 6000; i++) { sim.tick(0.5); if (i % 60 === 0) r.step(1); }
-    r.step(2);
+    if (sim.state.ended) return done;
+    for (const t of sim.state.tables.filter((x) => x.out).slice(0, p.photos ?? 0)) { r.aimAt(t.id); r.step(1); r.key('KeyP'); done.push('photo'); }
+    if (p.waiter) { sim.act({ type: 'waiter' }); done.push('waiter'); }
+    if (p.bucket) { toWindow(); r.key('KeyF'); done.push('bucket'); }
+    for (const a of (c?.nightActions(sim) ?? []).filter((x) => x.legality === 'illegal').slice(0, p.illegal ?? 0)) {
+      try { c.doNightAction(sim, a.id); done.push(a.id); } catch { /* indisponible ici */ }
+    }
+    for (let k = 0; k < (p.police ?? 0); k++) { sim.act({ type: 'police' }); done.push('police'); }
     return done;
-  }, NIGHT_PLANS[style.night]);
+  }, p);
+  if (plan.at) { await advance(plan.at); acts.push(...await doActs(plan)); }
+  if (plan.bucketAgain) { await advance(plan.bucketAgain); acts.push(...await doActs({ bucket: true })); }
+  if (plan.late) { await advance(plan.late.at); acts.push(...await doActs(plan.late)); }
+  await advance(hhmm(27, 0)); // jusqu'à la fin de la nuit
   log.nights.push({ day, acts });
   await page.waitForFunction(() => window.__rdb?.ui?.campaign && !window.__rdb.ui.root.classList.contains('ui-hidden'), null, { timeout: 60_000 });
 }
@@ -397,12 +424,12 @@ test('album du parcours (légal, graine 3) → qa/screens/flow/', async ({ page 
       const n = String(taken.size + 1).padStart(2, '0');
       taken.set(name, n);
       await pg.waitForTimeout(300); // fin des transitions CSS
-      await pg.screenshot({ path: `${DIR}/${n}-${name}.png`, timeout: 90_000 });
+      await pg.screenshot({ path: `${DIR}/${n}-${name}.jpg`, type: 'jpeg', quality: 82, timeout: 90_000 });
       if (mobile) {
         const vp = pg.viewportSize();
         await pg.setViewportSize({ width: 390, height: 844 });
         await pg.waitForTimeout(300);
-        await pg.screenshot({ path: `${DIR}/${n}-${name}-mobile.png`, timeout: 90_000 });
+        await pg.screenshot({ path: `${DIR}/${n}-${name}-mobile.jpg`, type: 'jpeg', quality: 82, timeout: 90_000 });
         await pg.setViewportSize(vp);
       }
     },
