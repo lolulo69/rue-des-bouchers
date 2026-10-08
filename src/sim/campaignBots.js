@@ -163,6 +163,8 @@ function recklessNight() {
   };
 }
 
+const STEALTHY = { dossier: 1, risk: -2, hostility: 0.3, illegalEvidence: 3, anyFlag: 2, flags: flagWeights({ stance_direct: 15, disguise_hood: 20, disguise_vest: 20, waiter_bribed: 15, waiter_informant: 15, proj_wifi_cracker: 15, wifi_cracked: 15, kitchen_sabotaged: 25, laxative_done: 15, backroom_sneak: 30, camera_awning: 8, press_scandal: 20 }), caution: 2 };
+const STEALTHY_CAMERA = { ...STEALTHY, flags: { ...STEALTHY.flags, camera_awning: 14 } };
 const DIPLOMAT = { asso: 3, hostility: -1.5, dossier: 1, sleep: 0.5, risk: -5, flags: flagWeights({ stance_dialogue: 30, won_peace: 80, bombance_blocked: -5 }) }; // pas de recours contre un nouveau voisin
 const DIPLOMAT_TURNCOAT = { ...DIPLOMAT, asso: 0, flags: flagWeights({ carbonnade_1: 40, carbonnade_2: 40, carbonnade_3: 40, won_scandal: 0, commission_won: 0 }) };
 const diplomatNight = legalNight({ bedAt: 23 * 60, maxCalls: 1 });
@@ -197,9 +199,10 @@ export const CAMPAIGN_BOTS = {
   }),
   stealthy: () => make({
     name: 'illégal discret', legality: ['illegal', 'grey'], sideProjects: 2, maxRisk: 40,
-    weights: { dossier: 1, risk: -2, hostility: 0.3, illegalEvidence: 3, anyFlag: 2, flags: flagWeights({ stance_direct: 15, disguise_hood: 20, disguise_vest: 20, waiter_bribed: 15, waiter_informant: 15, proj_wifi_cracker: 15, wifi_cracked: 15, kitchen_sabotaged: 25, laxative_done: 15, backroom_sneak: 30 }), caution: 2 },
+    // La caméra sous le store : en fin de campagne (J9+) et casier vierge (Risque < 10), pour qu'elle filme la commission
+    weights: (c) => (c.state.day >= 9 && c.state.stats.risk < 10 ? STEALTHY_CAMERA : STEALTHY),
     nightPolicy: stealthyNight(), nightContent: (sim, a, camp) => unseen(sim, a, camp),
-    alsoLegal: ['pm_press_contact', 'pm_waiter_testimony'], // marchepieds légaux du plan illégal (la presse pour le scandale, le serveur retourné)
+    alsoLegal: ['pm_press_contact', 'pm_press_scandal', 'pm_waiter_testimony'], // marchepieds légaux du plan illégal (la presse pour le scandale, le serveur retourné)
   }),
   mixed: () => make({
     name: 'mixte malin', legality: ['legal', 'grey', 'illegal'], sideProjects: 1, maxRisk: 40,

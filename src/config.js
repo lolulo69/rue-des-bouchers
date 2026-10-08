@@ -278,7 +278,7 @@ export const CAMPAIGN = {
   // Projets perso de Koddex (koddex.js) qui changent la mécanique
   dbLogger: { every: 30, quality: 0.7, valueScale: 0.5 }, // proj_db_logger : relevé auto à la fenêtre, toutes les 30 min après 22h
   whatsappBot: { actions: ['pm_whatsapp_rally', 'pm_petition_start', 'pm_banners', 'pm_recruit'], timeDiscount: 1, assoBonus: 2 }, // proj_whatsapp_bot
-  nightEvidenceScale: 0.073,     // pièce légale de la nuit → points de dossier de campagne (les mêmes infractions reviennent chaque nuit : balance 2026-10-08)
+  nightEvidenceScale: 0.068,     // pièce légale de la nuit → points de dossier de campagne (les mêmes infractions reviennent chaque nuit : balance 2026-10-08)
   contentEvidenceValue: 3,       // effet { evidence } du contenu : valeur × qualité
   contentDossierScale: 0.3,       // gains de Dossier écrits par le contenu (`dossier: +N`) × ce facteur
   contentAssoScale: 0.5,         // gains d'Asso écrits par le contenu (`asso: +N`) × ce facteur

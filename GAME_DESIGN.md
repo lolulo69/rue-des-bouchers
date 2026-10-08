@@ -269,7 +269,7 @@ Proof: **T** = automated test (vitest / Playwright / campaign simulator, runs in
 ### F. Endings: all 8 reachable
 - [x] 1 Legal victory · 2 Negotiated peace · 3 Scandal · 4 Custody/trial (incl. the « carbonnade sucrée » and « carbonnade laxative » variants) · 5 Moving out to Wazemmes · 6 Fired (+ continue twist) · 7 Turncoat (secret) · 8 The return (La Bombance). **T Q** — T (engine): tests/unit/checklist.test.js §13.F1 (bots: F3; Q pending) — Q: qa/screens/q/F-*.jpg (end screens of all 8 + custody variants) (design agent, 2026-10-08)
 - [x] Each ending has its own end screen with an epilogue that **references what the player actually did** (key evidence, actions, who betrayed whom). **T Q** — T: tests/unit/checklist.test.js §13.F2 (Q pending) — Q: F-custody-laxative.jpg, qa/stories/legal-3.md epilogue (design agent, 2026-10-08)
-- [x] The campaign simulator reaches **every ending** with at least one scripted strategy, and each ending occurs in ≥ 2% of 1000 runs of its target strategy. **T** _(balance pass 1, qa/balance.md 2026-10-08: lowest = turncoat 5 % of diplomat runs)_ — balance agent: qa/balance.md, coverage.test.js
+- [x] The campaign simulator reaches **every ending** with at least one scripted strategy, and each ending occurs in ≥ 2% of 1000 runs of its target strategy. **T** _(balance pass 1, qa/balance.md 2026-10-08: lowest = turncoat 5 % of diplomat runs; re-verified pass 3, 68/68 actions, 42/42 counter-moves)_ — balance agent: qa/balance.md, coverage.test.js
 
 ### G. Scenario coherence (automated invariants + story review)
 - [x] Invariants checked on every simulated night and campaign: the police only arrive after a call or a scheduled event; nobody is in two places; a cleared table doesn't come back without a tip-off/return event; evidence refers to real events (time, place, table); Risk only rises from witnessed acts; a closed shop stays closed until its event; Klaas's notebook only logs what he could see. **T** — tests/unit/invariants.test.js, campaign.test.js, checklist.test.js §13.G1
@@ -287,8 +287,8 @@ The campaign simulator plays 1000 seeded campaigns per strategy bot. Targets:
 | Illegal only, stealthy (dark, after 01:00, no witnesses) | ≤ 40% custody. Scandal reachable. Association low |
 | Mixed, smart | best average score. Every ending except "passive" ones reachable |
 | Diplomat (association + dialogue) | negotiated peace ≥ 40% |
-- [x] Targets met, numbers logged in `qa/balance.md` at each milestone with the knobs changed. **T** _(balance pass 1, 1000 runs × 7 bots, `npm run sim -- --runs 1000`)_ — balance agent: qa/balance.md
-- [x] No dominant action: removing any single action shifts the mixed bot's win rate by < 25 points. **T** _(`npm run sim -- --runs 1000 --bots mixed --ablate mixed`: max 17)_ — balance agent (no test yet)
+- [x] Targets met, numbers logged in `qa/balance.md` at each milestone with the knobs changed. **T** _(balance pass 1, 1000 runs × 7 bots, `npm run sim -- --runs 1000`; re-verified in pass 3, qa/balance.md)_ — balance agent: qa/balance.md
+- [x] No dominant action: removing any single action shifts the mixed bot's win rate by < 25 points. **T** _(`npm run sim -- --runs 1000 --bots mixed --ablate mixed`: max 17; pass 3: max 10, qa/balance.md)_ — balance agent (no test yet)
 - [ ] Human feel: Lucas's playtest notes addressed. **L**
 
 ### I. Presentation and tech
@@ -697,3 +697,7 @@ so it reflects what the player actually did.
 - The night keeps its keyboard code path: the pad sends the same keys (E, P, N, T, B, L, Tab, ZQSD/WASD, Maj) as untrusted `KeyboardEvent`s and turns `player.yaw/pitch` with the right stick. Start/View open the UI pause menu (`openMenu`, Carnet page). RT must be **held** 1.2 s for the bucket (F); `game.js` still checks the window.
 - **My one hook in `src/game.js`** (4 lines, its own commit): `import { bindNight } from './input/night.js'`; `const pad = bindNight({ player, getOverlay: () => overlay })` after `let overlay`; in `update()`: `running = … && pad.allows(locked || NOLOCK)` (the pad counts as captured mouse; never runs under the pause menu) and the click-to-resume `#pause` stays hidden while the pad is the active input. If you refactor the input, keep `pad.allows()` and the key names; the pad needs nothing else.
 - Settings (menu « 🎮 Manette »): `padLook` (look sensitivity) and `padDeadzone` in `rdb.settings.v1`. Tests: `tests/unit/gamepad.test.js` (fake `getGamepads`), `tests/e2e/gamepad.e2e.js` (injected pad plays a day; `window.__rdbPadPolls` counts pad reads so taps aren't missed under SwiftShader).
+
+**Balance pass 3 (balance agent) — routing**
+- **@content agent**: `jeremie_hello` and `tatie_hello` can never show. The day-1 morning event sets `met_jeremie` in every choice, and `tatie_mail_01` (day 1 morning) sets `met_tatie`, both before the first afternoon, which is when these lines are built. Either drop `met_*` from those effects or let the « hello » lines run in the morning.
+- **@build agent**: dialogue selection (2 per phase, ranked by precision + jitter) starves broad, always-true lines (`dede_threat_smile`) and late lines on crowded days (`klaas_saturday2`, `tatie_mail_12`, `dede_carbonnade`). Suggestion: boost a never-seen line whose condition has held for a few phases, and give first-meeting lines priority. Details in qa/balance.md (pass 3).
