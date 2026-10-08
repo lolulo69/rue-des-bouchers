@@ -663,3 +663,20 @@ so it reflects what the player actually did.
 
 **final-copy (content agent, for the balance agent)**
 - `r_aot_pdf` could never fire: `pm_aot_request` set `aot_requested` **and** `legal_view`, and the event needs `aot_requested` without `legal_view`. The action now only files the request (`aot_requested`); the event delivers the plan and `legal_view` on a later afternoon (`chance: 0.6`). So `legal_view` (and its +3 dossier) now arrives one or more afternoons after the request instead of immediately. Coverage went from 367 to 369 ids. No threshold changed; retune `chance` if the delay hurts the legal bot.
+
+**v0.8 (build-v0.8, release hardening)**
+- **Saves** (`src/sim/saveMigrations.js`):
+  - The schema is versioned (v2) and migrated step by step (`MIGRATIONS[v]`). The storage slot stays `rdb.save.v1`, shared with `src/ui`; the version lives *inside* the save.
+  - `RENAMES` follows renamed ids (`igpn_open` → `inquiry_open`, `kitchen_sabotage_done` → `kitchen_sabotaged`, `pm_igpn_report`, `press_igpn`, `chef_igpn`). **Content writers: add a line there for every id rename.** The politician renames are left out: no save predates them, and the real-name guard forbids those words.
+  - A card pointing to vanished content is skipped; an unknown pending ending is dropped; unknown flags are kept (harmless).
+  - A save from a newer version, or an unreadable one, gets a friendly message on the title, is backed up to `rdb.save.backup`, and the player is offered a new campaign.
+  - Round-trip: reloading then re-saving gives the same JSON byte for byte. The migration notes live in `c.migrationNotes`, outside the save. That was the cause of the §13.A2 failure, which is stable again.
+- **Error screen** (`src/main.js`): any uncaught error or rejected promise → French screen « Oups. La rue des Bouchers a planté. » with « Recharger » and « Copier le rapport » (date, git sha, page, browser, save summary, stack). Browser-extension errors and `ResizeObserver` noise are ignored.
+- **Loading + chunks**:
+  - `src/main.js` is now a bootstrap; the game moved to `src/game.js` (history kept).
+  - Progress bar while the chunks load: three (734 kB), art (150 kB), content (277 kB), sim (87 kB), ui (30 kB), game (18 kB). That's 1.3 MB of JS, ~0.4 MB gzip.
+  - The loader goes away after a first frame rendered synchronously.
+  - **Gotcha fixed**: a page-entry script (`src/ui/standalone.js` of `ui.html`) caught by a chunk group ran its `mount()` inside the game, which put two UIs on the same root. Page entries are kept out of the groups (`PAGE_ENTRIES` in `vite.config.js`).
+- **Échap** in the 3D night (or losing the pointer lock) opens `src/ui` `openMenu()`, with « Reprendre » re-capturing the mouse. Without the UI menu, the plain pause overlay.
+- **Audio cues** (`audio.play`): shutter on a photo, splash on the bucket, police radio on the call and when the patrol enters the street (the director adds the one on arrival), WhatsApp ping when photos are shared.
+- **Q checks**: `qa/q-kit.md`, section « build » (b1–b10).
