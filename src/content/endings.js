@@ -125,6 +125,33 @@ const SECRETS = [
   },
 ];
 
+// Les suites publiques de la campagne : le scandale dans la presse, la vidéo virale, la vague de haine.
+const AFTERMATH = [
+  {
+    when: { flags: ['press_scandal'], notFlags: ['won_scandal'] },
+    text:
+      "Le « Waterzooi-gate » a tenu La Voix du Nordiste pendant une semaine. Le Commandant Desmet a promis de « faire toute la lumière », sans préciser sur quoi. Au commissariat, on ne prend plus de café en service. On l’emporte.",
+  },
+  {
+    when: { flags: ['press_scandal', 'lemaire_transferred'], notFlags: ['won_scandal'] },
+    text: "Le brigadier Lemaire a écrit à Klaas une carte postale de Lomme : « Ici, personne ne m’offre rien. » Klaas l’a classée à la lettre L.",
+  },
+  {
+    when: { flags: ['video_viral'], notFlags: ['custody'] },
+    text:
+      "La vidéo de la fenêtre circule encore. Elle a été doublée en néerlandais, remixée, puis oubliée. Dans la rue, on vous appelle parfois « le monsieur du deuxième », avec un respect prudent.",
+  },
+  {
+    when: { flags: ['cm_fake_post', 'hate_wave_answered'] },
+    text:
+      "La vague de haine du faux post « Bernadette harcelée » s’est retirée comme elle était venue. Votre réponse, calme et sourcée, a été partagée trois fois moins que le post. Mais elle est restée en ligne, et le post, non.",
+  },
+  {
+    when: { flags: ['cm_fake_post'], notFlags: ['hate_wave_answered'] },
+    text: "Le faux post « Bernadette harcelée » est toujours en ligne. Il a 4 000 partages et zéro source. Vous n’y avez jamais répondu. Lui non plus ne vous a jamais répondu.",
+  },
+];
+
 export const ENDINGS = [
   // ════════════════════════════════════════════════════════════════════════
   // 4 · GARDE À VUE / PROCÈS (échec anticipé, dès la nuit 5)
@@ -288,6 +315,7 @@ export const ENDINGS = [
         text: "Vous laissez peu de chose derrière vous : quelques photos floues, deux relevés de décibels, et une porte qui sent toujours un peu le samedi.",
       },
       ...ASSO_FATES,
+      ...AFTERMATH,
       {
         when: { flags: ['met_klaas'] },
         text: "Klaas a noté votre départ : « 10h40, camion de déménagement, couloir dégagé. » C’était la première fois que le couloir était dégagé pour vous.",
@@ -334,6 +362,7 @@ export const ENDINGS = [
         text: "Tatie Bouchon vous l’avait dit. Colette le lui avait dit. Vous aviez répondu « un problème à la fois ». Le problème suivant a une licence IV.",
       },
       ...INSTITUTIONS,
+      ...AFTERMATH,
       {
         when: {},
         text: "Jérémie a convoqué une assemblée générale extraordinaire. Ordre du jour, point unique : « On recommence. » À suivre…",
@@ -385,6 +414,7 @@ export const ENDINGS = [
         text: "Le bloc ne vous l’a pas pardonné. Dédé ne vous tape plus dans le dos. Il vous regarde passer, en souriant. C’est pire.",
       },
       ...SECRETS,
+      ...AFTERMATH,
     ],
   },
 
@@ -438,6 +468,7 @@ export const ENDINGS = [
       ...ASSO_FATES,
       ...KLAAS_NOTEBOOK,
       ...SECRETS,
+      ...AFTERMATH,
       ...KODDEX,
       {
         when: {},
@@ -479,6 +510,7 @@ export const ENDINGS = [
       ...ASSO_FATES,
       ...INSTITUTIONS,
       ...SECRETS,
+      ...AFTERMATH,
       {
         when: {},
         text: "Le premier trimestre, la réunion s’est tenue à l’estaminet. Hilde a apporté sa tarte au sucre. Dédé a goûté et demandé la recette. Hilde a dit non, très gentiment.",

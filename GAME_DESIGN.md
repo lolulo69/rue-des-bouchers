@@ -598,3 +598,18 @@ so it reflects what the player actually did.
   - C3: at the window after 22:00, the "👁 Témoins possibles" line changes when Klaas picks up his binoculars (police in the street, chairs) and when the cat goes in. Try a bucket with the dachshund nearby (21:30–22:30): it barks.
   - C5: the mayor's office reports from the phone (inspector visits are content-driven).
   - C6: `?day=sat`: standing drinkers, people peeing in doorways (incl. Pilou's door), louder.
+
+**Story transcripts (story-transcripts) — for the build agent and the balance agent**
+- **Tool**: `npm run story -- --bot <passive|legal|reckless|stealthy|mixed|diplomat> --seed N [--out qa/stories/<bot>-<N>.md]` plays one full campaign headless (same night narrator as `main.js`, own RNG) and prints it as a French story, day by day. Twelve transcripts are in `qa/stories/`. Regenerate them after a big change and read one before shipping.
+- **Findings**: `qa/coherence.md`, section « pass 2 (transcripts) ». The content fixes are done. The **engine** rows are for the build agent, in order of visibility:
+  1. End the campaign right after `d14_commission`, for every outcome, with `early: false`. Today the day goes on after the verdict (afternoon, counter-moves, a full night with the suspended terrace out, a recap that says « La commission du jour 14 va devoir l'écouter »), while a lost commission ends at once as an early ending.
+  2. `random_drache` must empty the terraces in the sim.
+  3. Show night-phase event cards at their clock time inside the night, not before 20:30.
+  4. Resolve each generic `'work'` Koddex pick to a different item (the same result prints 2–3 times a morning), and allow one use per afternoon for repeatable actions.
+  5. De-duplicate narrated lines: one witness line per witness kind per act, plus a short « recently said » memory for barks and Théo.
+  6. The nightly verdict should use the campaign's Dossier. The custody verdict should name the real cause (not always « le seau d'eau »). The police call counter should count tonight's calls. The 20:30 photo dB should be measured at the table.
+  7. The UI speaker label should be « le serveur » until `met_waiter`. Each character's `*_hello` should come before their other lines. The IGPN inquiry should depend on an actual transmission.
+- **Balance** rows (for the balance agent):
+  - Asso and Dossier hit 100 by D4–5 for the legal and mixed bots.
+  - Risk sits at 84 for days, then custody comes on a morning with no act; stink bombs raise Sleep.
+  - The diplomat now reaches negotiated peace through `r_charter_talks` (new; the D14 charter pitch requires `charter_drafted`). Re-run `npm run sim` against the ≥ 40 % target.
