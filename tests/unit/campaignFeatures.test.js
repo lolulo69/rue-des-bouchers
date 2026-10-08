@@ -69,12 +69,15 @@ describe('projets perso', () => {
     expect(c.actionCost(recruit)).toBe(recruit.cost.time);
     c.apply({ setFlags: ['proj_whatsapp_bot'] }, 'engine', 'test');
     expect(c.actionCost(recruit)).toBe(Math.max(1, recruit.cost.time - C.whatsappBot.timeDiscount));
-    const rally = c.availableActions().find((a) => a.id === 'pm_whatsapp_rally');
-    if (rally) {
-      const asso = c.state.stats.asso;
-      c.doAction(rally.id);
-      expect(c.state.stats.asso).toBe(Math.min(100, asso + (rally.effects.asso ?? 0) + C.whatsappBot.assoBonus));
-    }
+    // Gain d'Asso du même ralliement, avec et sans le bot (les gains peuvent être dégressifs : on compare, on ne calcule pas)
+    const gain = (withBot) => {
+      const x = advance(fresh(), (y) => y.step === 'actions');
+      if (withBot) x.apply({ setFlags: ['proj_whatsapp_bot'] }, 'engine', 'test');
+      const before = x.state.stats.asso;
+      x.doAction('pm_whatsapp_rally');
+      return x.state.stats.asso - before;
+    };
+    expect(gain(true)).toBeGreaterThan(gain(false));
   });
 
   it('les coûts en Job des projets perso viennent du contenu', () => {
