@@ -97,6 +97,9 @@ export function mount(engine = {}, opts = {}) {
     store.set(ENDINGS_KEY, [...found]);
   }
   const afterEngine = () => { save(); if (c.step === 'ended') recordEnding(); };
+  // Étape affichée : le bilan de la matinée Koddex reste à l'écran jusqu'à « Quitter Koddex » (BUG-002),
+  // même si le moteur est déjà passé à l'après-midi.
+  const shown = () => (view.k?.done && !view.k.left && c.step !== 'ended' ? 'koddex' : c.step);
 
   // ── tutoriel (déclencheurs de jour) ────────────────────────────────
   function tutorial(trigger) {
@@ -109,8 +112,9 @@ export function mount(engine = {}, opts = {}) {
   // ── vignette selon l'écran ─────────────────────────────────────────
   function sceneFor() {
     if (!c) return null;
+    if (shown() === 'koddex') return 'koddex';
     if (c.step === 'ended' || (c.state.day === 14 && c.state.phase !== 'morning')) return 'mairie';
-    if (c.step === 'koddex' || c.state.phase === 'morning') return 'koddex';
+    if (c.state.phase === 'morning') return 'koddex';
     if (c.step === 'actions' || c.state.phase === 'afternoon') return 'atelier';
     return null;
   }
@@ -119,7 +123,7 @@ export function mount(engine = {}, opts = {}) {
   // U4 : une seule boîte de dialogue par transition. Les cartes de dialogue suivantes de la même phase sont
   // « entendues en passant » (rangées dans le téléphone) et résolues AVANT le rendu, pour que l'étape affichée soit juste.
   function settleDialogues() {
-    if (!c || view.result) return;
+    if (!c || view.result || shown() !== c.step) return;
     const at = `${c.state.day}:${c.state.phase}`;
     let moved = false;
     for (let card = c.step === 'cards' ? c.card() : null; card && card.type === 'dialogue' && meta.dialogueAt === at; card = c.step === 'cards' ? c.card() : null) {
@@ -135,7 +139,7 @@ export function mount(engine = {}, opts = {}) {
     if (typing) { typing.skip?.(); typing = null; }
     clear(layer);
     settleDialogues();
-    root.dataset.step = c ? c.step : 'title';
+    root.dataset.step = c ? shown() : 'title';
     if (!c) { vignette.set(null); return layer.append(titleScreen()); }
     if (fresh() && !meta.introSeen && introCards().length) { vignette.set('koddex'); return layer.append(introScreen()); }
     // Nouveaux messages : relevés une fois par phase (le moteur applique leurs effets)
@@ -166,7 +170,7 @@ export function mount(engine = {}, opts = {}) {
   function closePhone() { phone.open = false; render(); }
 
   function screen() {
-    switch (c.step) {
+    switch (shown()) {
       case 'cards': return cardScreen();
       case 'koddex': return koddexScreen();
       case 'actions': return actionsScreen();
@@ -239,7 +243,7 @@ export function mount(engine = {}, opts = {}) {
     const unread = unreadItems(c, meta).length;
     const stats = Object.entries(STAT_LABELS).map(([k, label]) => h(`div.ui-stat${k === 'risk' ? '.danger' : ''}`, { dataset: { stat: k } },
       `${label} ${Math.round(S.stats[k])}`, h('i', h('b', { style: { width: `${S.stats[k]}%` } }))));
-    return h('header.ui-header', { dataset: { testid: 'day-header', day: S.day, step: c.step } },
+    return h('header.ui-header', { dataset: { testid: 'day-header', day: S.day, step: shown() } },
       h('div.ui-header-top',
         h('h1.ui-day', `Jour ${S.day}/14`, h('small', `${WEEKDAYS[c.weekday()]}${c.isSaturday() ? ' · sans voitures' : ''}`)),
         h('div.ui-row',
@@ -341,7 +345,7 @@ export function mount(engine = {}, opts = {}) {
       }
       menu.append(grid);
     } else {
-      menu.append(h('button.ui-btn.center', { dataset: { testid: 'koddex-done' }, onclick: () => { view = {}; render(); } }, 'Quitter Koddex (direction la rue)'));
+      menu.append(h('button.ui-btn.center', { dataset: { testid: 'koddex-done' }, onclick: () => { view = { k: { ...view.k, left: true } }; render(); } }, 'Quitter Koddex (direction la rue)'));
     }
     const freshLines = [];
     for (const line of k.log) {

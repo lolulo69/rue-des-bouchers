@@ -75,9 +75,9 @@ test.describe('campagne (interface de jour)', () => {
     expect(errors).toEqual([]);
   });
 
-  // BUG-002 (qa/bugs.md) : après le 3e prompt, c.koddex() fait passer l'étape à l'après-midi et render() change d'écran
-  // aussitôt : le bilan de la matinée (« ✔ Livré », Job ±, bouton « Quitter Koddex ») n'est jamais affiché.
-  (process.env.QA_RUN_FIXME ? test : test.fixme)('BUG-002 · le bilan de la matinée Koddex reste affiché jusqu’à « Quitter Koddex »', async ({ page }) => {
+  // BUG-002 (qa/bugs.md), corrigé : après le 3e prompt, le bilan de la matinée (« ✔ Livré », Job ±, « Quitter Koddex »)
+  // reste affiché jusqu'au clic, même si le moteur est déjà passé à l'après-midi. Garde-fou de régression.
+  test('BUG-002 · le bilan de la matinée Koddex reste affiché jusqu’à « Quitter Koddex »', async ({ page }) => {
     await newCampaign(page);
     await driveTo(page, 'koddex');
     const proj = await page.evaluate(() => window.__rdb.ui.campaign.koddexOptions().sideProjects.find((p) => p.available && (p.cost?.prompts ?? 1) === 1) ?? null);
