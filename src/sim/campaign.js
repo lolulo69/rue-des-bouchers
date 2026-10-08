@@ -281,20 +281,39 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null } 
   }
 
   // ---------- matin : Koddex ----------
-  c.koddexOptions = () => ({
-    prompts: C.prompts,
-    work: K.KODDEX.work,
-    sideProjects: K.KODDEX.sideProjects.map((p) => ({ ...p, available: !(p.unlocks && c.has(p.unlocks)) && c.check(p.requires, false) })),
-    gag: K.KODDEX.gags.length ? K.KODDEX.gags[rng.int(0, K.KODDEX.gags.length - 1)] : null,
-  });
+  // KODDEX.work : objets { id, label, job, requires, effects, result } (ou chaînes, ancien format) ; 'work' = le premier dispo.
+  // KODDEX.gags : { id, speaker, when, once, lines } ; un gag éligible par matin.
+  const workItems = () => K.KODDEX.work.map((w, i) => (typeof w === 'string' ? { id: `work_${i}`, label: w } : w));
+  const workAvailable = (w) => c.check(w.requires, false) && c.check(w.when, false) && !(w.once && S.seen.actions.includes(w.id));
+  c.koddexOptions = () => {
+    const seenGags = S.seen.gags ?? [];
+    const gags = K.KODDEX.gags.map((g, i) => (typeof g === 'string' ? { id: `gag_${i}`, lines: [g] } : g))
+      .filter((g) => !(g.once !== false && seenGags.includes(g.id)) && c.check(g.when, false));
+    return {
+      prompts: K.PROMPTS_PER_MORNING ?? C.prompts,
+      work: workItems().filter(workAvailable),
+      sideProjects: K.KODDEX.sideProjects.map((p) => ({ ...p, available: !(p.unlocks && c.has(p.unlocks)) && c.check(p.requires, false) && c.check(p.when, false) })),
+      gag: gags.length ? gags[0] : null,
+    };
+  };
   c.koddex = (picks) => {
     if (S.step !== 'koddex') throw new Error(`koddex hors du matin (${S.step})`);
-    const chosen = picks.slice(0, C.prompts);
-    while (chosen.length < C.prompts) chosen.push('work');
+    const o = c.koddexOptions();
+    if (o.gag) (S.seen.gags ??= []).push(o.gag.id);
+    const chosen = picks.slice(0, o.prompts);
+    while (chosen.length < o.prompts) chosen.push('work');
     const lines = [];
-    for (const id of chosen) {
+    for (let id of chosen) {
+      // 'work' générique → le premier vrai travail disponible (s'il y en a)
+      if (id === 'work') id = o.work.find((w) => !chosen.includes(w.id))?.id ?? 'work';
       S.counts.koddex[id] = (S.counts.koddex[id] ?? 0) + 1;
-      if (id === 'work') { setStat('job', S.stats.job + C.workJob); c.note('koddex', { id }); continue; }
+      const w = workItems().find((x) => x.id === id);
+      if (id === 'work' || w) {
+        setStat('job', S.stats.job + (w?.job ?? C.workJob));
+        if (w) { apply(w.effects, 'koddex', w.id); if (w.result) lines.push(w.result); if (w.once) S.seen.actions.push(w.id); }
+        c.note('koddex', { id });
+        continue;
+      }
       const p = K.KODDEX.sideProjects.find((x) => x.id === id);
       if (!p || (p.unlocks && c.has(p.unlocks))) { setStat('job', S.stats.job + C.workJob); continue; }
       setStat('job', S.stats.job + (p.job ?? -10));
@@ -302,6 +321,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null } 
       apply(p.effects, 'koddex', id);
       c.note('koddex', { id });
       lines.push(...(p.lines ?? []));
+      if (p.result) lines.push(p.result);
       // Le risque d'un side project ne compte que si quelqu'un le remarque (Stéphane, un collègue, Clode Kode qui bavarde)
       if (p.risk > 0 && rng.chance(C.sideProjectDiscovery)) {
         c.note('witness', { act: id, by: ['koddex'] });
@@ -475,9 +495,26 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null } 
       setFlag('igpn_open');
       apply({ corruption: C.igpn.openCorruption }, 'engine', 'igpn');
     }
-    // Contenu : actions natives de la sim (sim: 'photo' | 'db' | 'police' | …) → effets en bonus, une fois par nuit
-    const native = new Set(J.filter((e) => e.type === 'action').map((e) => e.action));
-    for (const a of K.ACTIONS) if (a.sim && native.has(a.sim) && usable(a, a.phase ?? 'night')) { apply(a.effects, 'action', a.id); S.counts.actions[a.id] = (S.counts.actions[a.id] ?? 0) + 1; }
+    // Contenu : actions natives de la sim (sim: 'photo' | 'db' | 'police' | …) → effets en bonus, une fois par nuit,
+    // seulement si l'action a vraiment abouti. Police : `simArgs.asso` (ou un id contenant "asso") distingue l'appel « pour l'Association ».
+    const calls = J.filter((e) => e.type === 'call');
+    const done = {
+      photo: N.evidence.some((e) => e.type === 'photo'),
+      db: evk('db'),
+      'police:plain': calls.some((e) => !e.asso),
+      'police:asso': calls.some((e) => e.asso),
+      waiter: N.waiterAsks.length > 0,
+      asso: J.some((e) => e.type === 'action' && e.action === 'asso'),
+      mairie: N.mairieSent,
+      bucket: N.bucketUses > 0,
+      sleep: J.some((e) => e.type === 'action' && e.action === 'sleep'),
+    };
+    const nativeKey = (a) => (a.sim === 'police' ? `police:${(a.simArgs?.asso ?? /asso/.test(a.id)) ? 'asso' : 'plain'}` : a.sim);
+    for (const a of K.ACTIONS) {
+      if (!a.sim || !done[nativeKey(a)] || !usable(a, a.phase ?? 'night')) continue;
+      apply(a.effects, 'action', a.id);
+      S.counts.actions[a.id] = (S.counts.actions[a.id] ?? 0) + 1;
+    }
     const summary = sim.summary();
     S.nights.push({ day: S.day, reason: N.endReason, sleep: Math.round(N.sleep), risk: Math.round(N.risk), evidence: N.evidence.length, gained: Math.round(gained * 10) / 10, police: summary.police.length, witnesses: N.witnessMemories.length });
     S.lastNight = summary;

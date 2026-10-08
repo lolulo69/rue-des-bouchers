@@ -4,7 +4,7 @@ import { createCampaign } from './campaign.js';
 import { checkInvariants } from './invariants.js';
 
 // Joue une nuit déjà créée avec une politique de nuit { decide(sim) → actions[], content?(sim, c) → ids[] }
-export function playNight(sim, policy, c, dt = 0.5) {
+export function playNight(sim, policy, c, dt = 1) {
   while (!sim.state.ended) {
     if (policy) {
       for (const a of policy.decide(sim)) { sim.act(a); if (sim.state.ended) break; }

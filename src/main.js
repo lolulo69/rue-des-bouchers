@@ -3,7 +3,8 @@
 import * as THREE from 'three';
 import { buildWorld, person, mat } from './world.js';
 import { RULES, SKY, STREET, NOISE, EVIDENCE, INTERACT, ZONES, POLICE } from './config.js';
-import { createSim, makeConfig, fmt } from './sim/index.js';
+import { createSim, makeConfig, fmt, createCampaign, contentFromGlob, SAVE_VERSION } from './sim/index.js';
+import { mountFallbackUI } from './dayFallback.js';
 
 const $ = (id) => document.getElementById(id);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -13,7 +14,21 @@ const NOLOCK = params.has('nolock');
 const SEED = Number(params.get('seed')) || (Date.now() % 1e9);
 const cfg = makeConfig();
 const ANCHORS = cfg.ANCHORS; // même objet que celui de la simulation (recalé sur le décor plus bas)
-const sim = createSim({ seed: SEED, day: params.get('day') || 'mon', cfg });
+// ---------- Campagne (§3) ----------
+// Le jour (matin, après-midi, récap) est une interface 2D au-dessus de la scène (src/ui, agent UI ; repli : dayFallback.js).
+// Chaque nuit démarre d'une sauvegarde et d'un rechargement (?mode=night) : nouvelle disposition, nouveau décor.
+const SAVE_KEY = `rdb.save.v${SAVE_VERSION}`;
+const content = contentFromGlob(import.meta.glob('./content/*.js', { eager: true }));
+const UI = Object.values(import.meta.glob('./ui/index.js', { eager: true }))[0];
+const loadSave = () => { try { return JSON.parse(localStorage.getItem(SAVE_KEY)); } catch { return null; } };
+const storeSave = (c) => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(c.save())); } catch { /* stockage indisponible */ } };
+const openCampaign = (save) => { try { return createCampaign({ content, cfg, save }); } catch { return null; } };
+let campaign = null;
+{
+  const saved = loadSave();
+  if (params.get('mode') === 'night' && saved?.step === 'night') campaign = openCampaign(saved);
+}
+const sim = campaign ? campaign.createNight() : createSim({ seed: SEED, day: params.get('day') || 'mon', cfg });
 const S = sim.state;
 const CLOSE = sim.close;
 const W = STREET.halfWidth;
@@ -118,6 +133,11 @@ const officers = [-0.4, 0.4].map(() => {
   cap.position.y = 1.33;
   o.add(cap);
   o.scale.setScalar(1.1);
+  const hit = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 1.8, 6), new THREE.MeshBasicMaterial({ visible: false }));
+  hit.position.y = 0.9;
+  hit.userData.target = { kind: 'police' };
+  o.add(hit);
+  o.userData.hit = hit;
   o.visible = false;
   scene.add(o);
   return o;
@@ -184,9 +204,15 @@ function syncActors() {
   });
   // Patrouille : position interpolée sur l'horloge de la simulation
   const P = S.police;
+  const V = S.visit?.phase === 'onsite' ? S.visit : null; // la police vient pour Pilou : devant sa porte
   officers.forEach((o, i) => {
-    o.visible = !!P && P.phase !== 'pending';
+    o.visible = (!!P && P.phase !== 'pending') || !!V;
     if (!o.visible) return;
+    if (!P || P.phase === 'pending') {
+      o.position.set(ANCHORS.streetDoor.x + 0.9, 0, ANCHORS.streetDoor.z + (i ? 0.5 : -0.5));
+      o.rotation.y = -Math.PI / 2;
+      return;
+    }
     const r = sim.rest(P.restId);
     const dx = i ? 0.4 : -0.4;
     let a = tmpA.set(spawn.x + dx, 0, spawn.z), b = tmpB.set(r.side * 0.4 + dx, 0, (r.z0 + r.z1) / 2), k = 1;
@@ -200,7 +226,7 @@ function syncActors() {
 }
 
 // ---------- Joueur ----------
-const player = { pos: new THREE.Vector3(1.2, 0, 12), yaw: 0, pitch: 0, loc: 'street' };
+const player = { pos: new THREE.Vector3(1.2, 0, ANCHORS.streetDoor.z + 6), yaw: 0, pitch: 0, loc: 'street' };
 const keys = new Set();
 let locked = false;
 let started = false;
@@ -265,6 +291,7 @@ function photo() {
   const hits = [
     ...S.tables.filter((t) => t.out).map((t) => viewTables.get(t.id).hit),
     ...peeViews.filter((v) => v.p.visible).map((v) => v.hit),
+    ...officers.filter((o) => o.visible).map((o) => o.userData.hit),
   ];
   const hit = raycaster.intersectObjects(hits, false)[0];
   sim.act({ type: 'photo', target: hit?.object.userData.target, distance: hit?.distance, fromWindow: player.loc === 'apt', noiseDb });
@@ -301,6 +328,7 @@ function openOverlay(name) {
   overlay = name;
   $(name).classList.remove('hidden');
   if (name === 'dossier') renderDossier();
+  if (name === 'nightmenu') renderNightMenu();
   if (name === 'phone') {
     const P = S.police;
     $('phone-status').textContent = P ? `Patrouille ${P.phase === 'pending' ? 'en route' : 'sur place'} (appel de ${fmt(P.calledAt)})` : `${S.calls} appel(s) à la police ce soir`;
@@ -336,15 +364,61 @@ for (const b of document.querySelectorAll('#phone button')) {
 }
 
 // ---------- Entrées ----------
-$('day').textContent = sim.day.label;
-$('start').addEventListener('click', () => {
+const WEEKDAY = { mon: 'lundi', tue: 'mardi', wed: 'mercredi', thu: 'jeudi', fri: 'vendredi', sat: 'samedi', sun: 'dimanche' };
+const nightLabel = () => (campaign ? `Jour ${campaign.state.day} · ${WEEKDAY[campaign.weekday()]}${campaign.isSaturday() ? ' (sans voitures)' : ''}` : sim.day.label);
+$('day').textContent = nightLabel();
+function startNight() {
   $('title').classList.add('hidden');
   $('hud').classList.remove('hidden');
   started = true;
   timer.update();
-  log(`${sim.day.label.split(' ·')[0]} soir. Les terrasses doivent rentrer à ${RULES.terraceCloseHour}h. En théorie.`);
+  log(`${nightLabel().split(' (')[0]}, le soir. Les terrasses doivent rentrer à ${RULES.terraceCloseHour}h. En théorie.`);
   lock();
-});
+}
+$('start').addEventListener('click', startNight);
+
+// Écran titre : campagne (nouvelle / continuer) ou nuit libre ; en mode nuit de campagne, juste « Commencer la nuit »
+let dayUI = null;
+function showDay() {
+  $('title').classList.add('hidden');
+  $('hud').classList.add('hidden');
+  document.exitPointerLock?.();
+  const opts = {
+    campaign, root: $('dayui'), content,
+    onSave: () => storeSave(campaign),
+    onNight: () => {
+      storeSave(campaign);
+      const q = new URLSearchParams(location.search);
+      q.set('mode', 'night');
+      location.search = q.toString();
+    },
+    onQuit: () => { dayUI?.hide(); $('title').classList.remove('hidden'); },
+    onNew: () => newCampaign(),
+  };
+  window.__rdb.goNight = opts.onNight;
+  dayUI ??= (UI?.mountDayUI ?? mountFallbackUI)(opts);
+  dayUI.show();
+}
+function newCampaign() {
+  campaign = createCampaign({ seed: SEED, content, cfg });
+  storeSave(campaign);
+  dayUI?.destroy?.();
+  dayUI = null;
+  showDay();
+}
+if (campaign) {
+  $('title-sub').textContent = `${nightLabel()}. La nuit tombe sur la rue des Bouchers.`;
+  $('start').textContent = 'Commencer la nuit';
+  $('campaign-buttons').classList.add('hidden');
+} else {
+  const saved = loadSave();
+  const resumable = saved && saved.step !== 'ended' && openCampaign(saved);
+  $('continue').classList.toggle('hidden', !resumable);
+  if (resumable) $('continue').textContent = `Continuer (jour ${saved.day})`;
+  $('continue').addEventListener('click', () => { campaign = openCampaign(loadSave()); if (campaign) showDay(); });
+  $('new-campaign').addEventListener('click', newCampaign);
+  $('start').textContent = 'Nuit libre (une soirée isolée)';
+}
 canvas.addEventListener('click', () => { if (started && !overlay) lock(); });
 $('pause').addEventListener('click', () => lock());
 document.addEventListener('pointerlockchange', () => { locked = document.pointerLockElement === canvas; });
@@ -364,12 +438,14 @@ addEventListener('keydown', (e) => {
   if (e.code === 'Escape') return closeOverlay();
   if (e.code === 'Tab') return overlay === 'dossier' ? closeOverlay() : !overlay && openOverlay('dossier');
   if (e.code === 'KeyT') return overlay === 'phone' ? closeOverlay() : !overlay && openOverlay('phone');
+  if (e.code === 'KeyN' && campaign) return overlay === 'nightmenu' ? closeOverlay() : !overlay && openOverlay('nightmenu');
   if (overlay || e.repeat) return keys.add(e.code);
   keys.add(e.code);
   if (e.code === 'KeyE') interaction()?.act();
   else if (e.code === 'KeyL') ghost.visible = !ghost.visible;
   else if (S.sleeping) return;
   else if (e.code === 'KeyP') photo();
+  else if (e.code === 'KeyB') sim.act({ type: 'db', noiseDb, fromWindow: player.loc === 'apt' });
   else if (e.code === 'KeyF') {
     if (!nearWindow()) log('Le seau, c\'est depuis la fenêtre.');
     else sim.act({ type: 'bucket' });
@@ -447,12 +523,42 @@ function drainSim() {
   for (const e of sim.drainEvents()) {
     if (e.type === 'log') log(e.text, e.cls, e.min);
     else if (e.type === 'splash') splash.fire(v3(ANCHORS.pilouWindow).setX(-W - 0.1));
-    else if (e.type === 'end') showEnd();
+    else if (e.type === 'end') (campaign ? endCampaignNight : showEnd)();
   }
   if (overlay === 'dossier') renderDossier();
 }
 
 // ---------- Fin de nuit ----------
+function endCampaignNight() {
+  document.exitPointerLock?.();
+  for (const id of ['phone', 'dossier', 'pause', 'nightmenu']) $(id).classList.add('hidden');
+  overlay = null;
+  campaign.finishNight(sim);
+  storeSave(campaign);
+  const q = new URLSearchParams(location.search);
+  q.delete('mode');
+  history.replaceState(null, '', `${location.pathname}${q.size ? `?${q}` : ''}`);
+  showDay();
+}
+
+// Actions de nuit du contenu (N) : boule puante, carton sur la hotte… selon l'endroit où se trouve Pilou
+function nightActionsHere() {
+  if (!campaign) return [];
+  return campaign.nightActions(sim).filter((a) => (a.at === 'pilouWindow' ? nearWindow() : a.at === 'street' ? player.loc === 'street' : true));
+}
+function renderNightMenu() {
+  const list = $('nightmenu-list');
+  list.innerHTML = '';
+  const acts = nightActionsHere();
+  if (!acts.length) list.innerHTML = '<p class="note">Rien à faire ici pour l\'instant.</p>';
+  for (const a of acts) {
+    const b = document.createElement('button');
+    b.textContent = `${a.label}${a.legality === 'illegal' ? ' (illégal)' : a.legality === 'grey' ? ' (limite)' : ''}`;
+    b.addEventListener('click', () => { closeOverlay(); campaign.doNightAction(sim, a.id); drainSim(); });
+    list.append(b);
+  }
+}
+
 function showEnd() {
   document.exitPointerLock?.();
   for (const id of ['phone', 'dossier', 'pause']) $(id).classList.add('hidden');
@@ -528,6 +634,9 @@ function tick(dt) {
 // aimAt(tableId) place Pilou dans la rue à 2,5 m de la table, en la regardant ; key(code) simule une touche.
 window.__rdb = {
   sim, player, world, seed: SEED,
+  get campaign() { return campaign; },
+  newCampaign,
+  saveKey: SAVE_KEY,
   step(n = 1, dt = 1 / 30) { for (let i = 0; i < n; i++) tick(dt); return S.min; },
   aimAt(tableId) {
     const t = sim.table(tableId);

@@ -45,3 +45,17 @@ kbd { background: #ffffff1a; border: 1px solid #ffffff33; border-radius: 4px; pa
 .bad { color: #ff8a75; }
 #dossier-list .q { opacity: .6; font-size: 13px; }
 .disclaimer { max-width: 560px; line-height: 1.45; }
+#campaign-buttons { display: flex; flex-direction: column; gap: 10px; }
+#nightmenu-list { display: flex; flex-direction: column; gap: 8px; }
+/* Repli de l'interface de jour (src/dayFallback.js) */
+#dayui { position: fixed; inset: 0; overflow: auto; background: #0d0d12ee; display: flex; justify-content: center; padding: 32px 16px; }
+#dayui .fb { max-width: 680px; width: 100%; display: flex; flex-direction: column; gap: 10px; }
+#dayui h2 { color: #e9c46a; margin: 0; }
+#dayui button { background: #e9c46a; color: #1a1a1a; border: 0; padding: 10px 16px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; text-align: left; }
+#dayui button:disabled { opacity: .35; cursor: not-allowed; }
+#dayui select { margin-left: 8px; max-width: 100%; }
+.fb-stats { opacity: .75; font-size: 14px; }
+.fb-card { background: #ffffff10; border-radius: 10px; padding: 12px 16px; line-height: 1.5; }
+.fb-speaker { font-weight: 700; color: #e9c46a; margin: 0; }
+.fb-term { background: #050805; color: #8ac926; font-family: ui-monospace, monospace; padding: 10px 14px; border-radius: 8px; }
+.fb-notice { color: #8ac926; }

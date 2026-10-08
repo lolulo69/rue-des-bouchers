@@ -51,7 +51,8 @@ function make({ name, weights, legality, sideProjects = 1, nightPolicy, nightCon
       const base = nightPolicy();
       return {
         decide: (s) => base.decide(s),
-        content: (s, camp) => (nightContent ? camp.nightActions(s).filter((a) => allowed(a, camp) && nightContent(s, a, camp)).map((a) => a.id) : []),
+        // Actions de nuit du contenu : seulement celles qui valent quelque chose pour ce bot (pas la carbonnade, etc.)
+        content: (s, camp) => (nightContent ? camp.nightActions(s).filter((a) => allowed(a, camp) && score(a.effects, weights, a.witnessed) > 0 && nightContent(s, a, camp)).map((a) => a.id) : []),
       };
     },
     continueAfterFired: () => continueFired,
@@ -85,7 +86,7 @@ export const CAMPAIGN_BOTS = {
   legal: () => make({
     name: 'légal prudent', legality: ['legal'],
     weights: { dossier: 3, asso: 1.5, sleep: 0.5, risk: -5, hostility: -0.2, job: 0.3, legalEvidence: 6, flags: flagWeights({ stance_legal: 20 }) },
-    nightPolicy: legalNight(),
+    nightPolicy: legalNight(), nightContent: () => true,
   }),
   reckless: () => make({
     name: 'illégal imprudent', legality: ['illegal', 'grey'], sideProjects: 3,
@@ -106,7 +107,7 @@ export const CAMPAIGN_BOTS = {
   diplomat: () => make({
     name: 'diplomate', legality: ['legal'],
     weights: { asso: 3, hostility: -1.5, dossier: 1, sleep: 0.5, risk: -5, flags: flagWeights({ stance_dialogue: 30, won_peace: 80 }) },
-    nightPolicy: legalNight({ bedAt: 23 * 60 }),
+    nightPolicy: legalNight({ bedAt: 23 * 60 }), nightContent: () => true,
   }),
 };
 

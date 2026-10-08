@@ -36,7 +36,10 @@ export function lintContent(K, { cfg = CONFIG, realNames = [], incomplete = fals
 
   // Drapeaux que quelqu'un sait poser
   const settable = new Set(ENGINE_SET_FLAGS);
-  const all = [...K.DIALOGUE, ...K.EVENTS, ...K.ACTIONS, ...K.COUNTERMOVES, ...K.ENDINGS, ...K.KODDEX.sideProjects];
+  const koddexWork = K.KODDEX.work.filter((w) => typeof w === 'object');
+  const koddexGags = K.KODDEX.gags.filter((g) => typeof g === 'object');
+  const media = Object.values(K.MEDIA ?? {}).flat();
+  const all = [...K.DIALOGUE, ...K.EVENTS, ...K.ACTIONS, ...K.COUNTERMOVES, ...K.ENDINGS, ...K.KODDEX.sideProjects, ...koddexWork, ...koddexGags, ...media, ...(K.TUTORIAL ?? [])];
   for (const x of all) {
     for (const e of effectsOf(x)) for (const f of e.setFlags ?? []) settable.add(f);
     if (x.unlocks) settable.add(x.unlocks);
@@ -97,6 +100,16 @@ export function lintContent(K, { cfg = CONFIG, realNames = [], incomplete = fals
   }
   for (const m of K.COUNTERMOVES) { uniq('countermove', m); check(`countermove ${m.id}`, m); }
   for (const p of K.KODDEX.sideProjects) { uniq('koddex', p); check(`koddex ${p.id}`, p); }
+  for (const w of koddexWork) { uniq('koddex', w); check(`koddex travail ${w.id}`, w); }
+  for (const g of koddexGags) { uniq('gag', g); check(`gag ${g.id}`, g); }
+  for (const [feed, items] of Object.entries(K.MEDIA ?? {})) {
+    for (const m of items) {
+      uniq(`media:${feed}`, m);
+      check(`media ${feed} ${m.id}`, { ...m, speaker: undefined });
+      if (m.author && !speakers.has(m.author)) warnings.push(`media ${feed} ${m.id} : auteur "${m.author}" absent de characters.js`);
+    }
+  }
+  for (const t of K.TUTORIAL ?? []) { uniq('tutorial', t); check(`tutoriel ${t.id}`, t); }
   for (const e of K.ENDINGS) {
     uniq('ending', e); check(`ending ${e.id}`, e);
     if (!cfg.CAMPAIGN.endings.includes(e.id)) warnings.push(`ending ${e.id} : id non canonique (${cfg.CAMPAIGN.endings.join(', ')})`);

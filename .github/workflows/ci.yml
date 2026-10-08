@@ -17,6 +17,8 @@ jobs:
       - run: npm ci
       - name: Unit tests (sim, invariants, names, perf)
         run: npm test
+      - name: Campaign simulator smoke (6 bots, invariants)
+        run: npm run sim -- --runs 20
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: E2E smoke (build + vite preview + headless Chromium)

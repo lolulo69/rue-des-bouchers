@@ -31,12 +31,16 @@
 
   <div id="title" class="screen">
     <h1>Rue des Bouchers</h1>
-    <p class="sub">Vieux-Lille. Pierre-Louis « Pilou » Dubeton habite juste au-dessus de l'<b>Estaminet La Ch'tite Bernadette</b>.<br/>
+    <p class="sub" id="title-sub">Vieux-Lille. Pierre-Louis « Pilou » Dubeton habite juste au-dessus de l'<b>Estaminet La Ch'tite Bernadette</b>.<br/>
       La hotte du resto souffle sous sa fenêtre. Les terrasses doivent rentrer à <b>22h</b>, 6 personnes max par table. En théorie.</p>
     <div class="keys">
       <div><kbd>ZQSD</kbd>/<kbd>WASD</kbd> se déplacer · <kbd>Maj</kbd> courir · <kbd>Souris</kbd> regarder</div>
       <div><kbd>E</kbd> portes, serveur, lit · <kbd>P</kbd> photo (preuve) · <kbd>T</kbd> téléphone</div>
-      <div><kbd>F</kbd> seau d'eau (depuis la fenêtre, illégal) · <kbd>Tab</kbd> dossier · <kbd>L</kbd> zones légales</div>
+      <div><kbd>F</kbd> seau d'eau (depuis la fenêtre, illégal) · <kbd>B</kbd> relevé dB · <kbd>N</kbd> actions de nuit · <kbd>Tab</kbd> dossier · <kbd>L</kbd> zones légales</div>
+    </div>
+    <div id="campaign-buttons">
+      <button id="new-campaign">Nouvelle campagne (14 jours)</button>
+      <button id="continue" class="hidden">Continuer</button>
     </div>
     <button id="start">Commencer la soirée</button>
     <p class="note disclaimer"><b>Œuvre de fiction.</b> Le jeu se déroule dans une vraie rue de Lille, mais tous les personnages, commerces, policiers,
@@ -60,6 +64,15 @@
     <ul id="dossier-list"></ul>
     <p class="note">Tab pour fermer</p>
   </div>
+
+  <div id="nightmenu" class="screen hidden">
+    <h2>Actions de nuit</h2>
+    <div id="nightmenu-list"></div>
+    <p class="note">N pour fermer</p>
+  </div>
+
+  <!-- Interface de jour (campagne) : src/ui (agent UI), ou le repli src/dayFallback.js -->
+  <div id="dayui" class="hidden"></div>
 
   <div id="end" class="screen hidden">
     <h2 id="end-title">Fin de la nuit</h2>
