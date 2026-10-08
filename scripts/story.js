@@ -158,9 +158,11 @@ function night() {
   out.push(...log.map((l, i) => [l, i]).sort((a, b) => minOf(a[0]) - minOf(b[0]) || a[1] - b[1]).map(([l]) => l));
   const summary = c.finishNight(sim);
   w();
-  const h = narrative.recapHeadline(c.state.lastNight ?? summary, sim.state);
+  const h = narrative.recapHeadline(c.state.lastNight ?? summary, sim.state, twist ?? undefined);
   w(`**📰 ${h.text}**`);
-  if (twist?.lines.recap?.length) w(`_✨ ${narrRng.pick(twist.lines.recap)}_`);
+  if (h.sub) w(`_✨ ${h.sub}_`);
+  // En attendant le moteur des rebondissements : ses conséquences (`after.setFlags`) posées en fin de nuit
+  if (twist?.after?.setFlags?.length && !c.twistFor) c.apply({ setFlags: twist.after.setFlags }, 'story', `twist:${twist.id}`);
   for (const v of (c.state.lastNight ?? summary)?.verdict ?? []) w(`- ${v}`);
   w();
 }

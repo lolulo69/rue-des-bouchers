@@ -277,3 +277,20 @@ describe('narrative.js : aucune {variable} non remplie', () => {
     }
   });
 });
+
+describe('narrative.js : le rebondissement de la nuit dans le bilan', () => {
+  it('nuit calme : la ligne du rebondissement devient la manchette ; sinon elle vient en sous-titre', async () => {
+    const { TWISTS } = await import('../../src/content/twists.js');
+    const quiet = { reason: 'time', dayLabel: 'Lundi', dossier: { score: 0, target: 10, pieces: 0 }, police: [], verdict: [], restaurants: [] };
+    const t = TWISTS.find((x) => x.pool);
+    const a = recapHeadline(quiet, undefined, t);
+    expect(a.text).toBe(t.lines.recap[0]);
+    expect(a.twist).toBe(t.id);
+    const busy = { ...quiet, police: [{ outcome: 'café offert, 0 PV' }] };
+    const b = recapHeadline(busy, undefined, t.id);
+    expect(b.id).toBe('h_complaisance');
+    expect(b.sub).toBe(t.lines.recap[0]);
+    expect(recapHeadline(quiet).sub).toBeUndefined();
+  });
+});
+

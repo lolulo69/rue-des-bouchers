@@ -1769,4 +1769,252 @@ export const DIALOGUE = [
     ],
     once: true,
   },
+  // ════════════════════════════════════════════════════════════════════════
+  // RÉACTIONS AUX REBONDISSEMENTS DE NUIT (twists.js, drapeaux `after`), le lendemain : content-story
+  // ════════════════════════════════════════════════════════════════════════
+  {
+    id: 'tw_birthday_klaas',
+    speaker: 'klaas',
+    when: { flags: ['twist_birthday', 'met_klaas'] },
+    lines: [
+      "Table 4 : onze personnes, un gâteau, quarante bougies. 23h40 : chant. Quarante voix. J’ai chanté aussi. Je ne l’ai pas noté.",
+    ],
+    once: true,
+  },
+  {
+    id: 'tw_birthday_seb',
+    speaker: 'seb',
+    when: { flags: ['twist_birthday', 'met_seb_nico'] },
+    lines: [
+      "Attends, attends : le Jojo de la table 4, il a quarante ans et il a pleuré quand toute la rue a chanté. J’ai pleuré aussi. Nico dit que c’est la fatigue.",
+    ],
+    once: true,
+  },
+  {
+    id: 'tw_influencer_nico',
+    speaker: 'nico',
+    when: { flags: ['twist_influencer', 'met_seb_nico'] },
+    lines: [
+      "La vidéo de l’influenceuse : 80 000 vues. J’ai fait des captures de chaque plan où on voit les tables dans le couloir. Elle nous a rendu service sans le savoir.",
+      "Dans un plan, on voit ta fenêtre, Pilou. Et toi dedans. Fais attention à ce que tu fais quand il y a une ring light dans la rue.",
+    ],
+    once: true,
+  },
+  {
+    id: 'tw_hen_jeremie',
+    speaker: 'jeremie',
+    when: { flags: ['twist_hen_party', 'met_jeremie'] },
+    lines: [
+      "Un mégaphone en terrasse, ce n’est pas prévu par l’arrêté. J’ai vérifié. Ce n’est pas interdit non plus. J’ai écrit à la mairie pour combler ce vide juridique.",
+      "Biloute a signé le serment de la mariée. Je ne sais pas ce qu’il a juré. Il a l’air serein.",
+    ],
+    once: true,
+  },
+  {
+    id: 'tw_drache_hilde',
+    speaker: 'hilde',
+    when: { flags: ['twist_drache', 'met_hilde'] },
+    lines: [
+      "Avec cette pluie, ils se sont tous serrés sous le store. Quatorze sous trois tables, Klaas a compté. Moi j’ai fait une soupe : quand il pleut, il faut une soupe. Tu en veux ?",
+    ],
+    once: true,
+  },
+  {
+    id: 'tw_heatwave_tatie',
+    speaker: 'tatie',
+    when: { flags: ['twist_heatwave', 'met_tatie'] },
+    lines: [
+      "Vingt-neuf degrés à minuit ! Comme dit le proverbe : quand il fait chaud dehors, il fait chaud dedans. Je l’ai inventé cette nuit, en ne dormant pas.",
+    ],
+    once: true,
+  },
+  {
+    id: 'tw_heatwave_klaas',
+    speaker: 'klaas',
+    when: { flags: ['twist_heatwave', 'met_klaas'] },
+    lines: [
+      "Fenêtres ouvertes partout. J’ai entendu des conversations à trois tables de distance. Je ne les ai pas notées. Certaines choses ne regardent pas le carnet.",
+    ],
+    once: true,
+  },
+  {
+    id: 'tw_guide_hippolyte',
+    speaker: 'hippolyte',
+    when: { flags: ['twist_guide_tour', 'met_hippolyte'] },
+    lines: [
+      "Le guide de la balade nocturne a daté le canal de 1910. C’est 1912. Je lui ai écrit, à l’office de tourisme, sur papier à en-tête. On me répondra sous huit jours. Personne n’a jamais vu ça.",
+    ],
+    once: true,
+  },
+  {
+    id: 'tw_regis_party_seb',
+    speaker: 'seb',
+    when: { flags: ['twist_regis_party', 'met_seb_nico'] },
+    lines: [
+      "Attends, attends : la basse de l’autre nuit, c’était le 27. Chez Régis. Dix-neuf étudiants. Il dit « groupe calme » dans son annonce. Calme comme une sono, quoi.",
+    ],
+    once: true,
+  },
+  {
+    id: 'tw_regis_party_regis',
+    speaker: 'regis',
+    when: { flags: ['twist_regis_party'] },
+    lines: [
+      "Pour l’autre soir, je comprends tout à fait. Les deux côtés. J’avais bien précisé « calme » dans l’annonce. Ce sont eux qui n’ont pas lu.",
+    ],
+    once: true,
+  },
+  {
+    id: 'tw_busker_hilde',
+    speaker: 'hilde',
+    when: { flags: ['twist_busker', 'met_hilde'] },
+    lines: [
+      "L’accordéoniste sous votre fenêtre… Il joue bien, le pauvre. Trois chansons, mais il les joue bien. Je lui ai apporté une tisane, pour la voix. Il m’a joué la quatrième. Il en connaissait une quatrième.",
+    ],
+    once: true,
+  },
+  {
+    id: 'tw_power_cut_klaas',
+    speaker: 'klaas',
+    when: { flags: ['twist_power_cut', 'met_klaas'] },
+    lines: [
+      "La nuit de la panne : quarante-cinq minutes sans courant. Je n’ai rien vu. Je n’ai rien noté. Première page blanche depuis 2019. J’ai bien dormi, après. Ja.",
+    ],
+    once: true,
+  },
+  {
+    id: 'tw_power_cut_nico',
+    speaker: 'nico',
+    when: { flags: ['twist_power_cut', 'met_seb_nico'] },
+    lines: [
+      "Pendant la panne, j’ai mesuré 34 dB sur notre balcon. Trente-quatre. Je l’ai mis en fond d’écran du groupe. C’est notre objectif, maintenant : la panne, sans la panne.",
+    ],
+    once: true,
+  },
+  {
+    id: 'tw_waiter_holidays_seb',
+    speaker: 'seb',
+    when: { flags: ['twist_waiter_holidays', 'met_seb_nico'] },
+    lines: [
+      "Le serveur est parti en vacances, et devine : toutes les tables rentrées à 22h, le soir de son départ. Il avait un train. On devrait lui offrir un abonnement SNCF.",
+    ],
+    once: true,
+  },
+  {
+    id: 'tw_fete_voisins_jeremie',
+    speaker: 'jeremie',
+    when: { flags: ['twist_fete_voisins', 'met_jeremie'] },
+    lines: [
+      "La fête des voisins : rangée à 22h00 pile, quarante-trois personnes, deux tartes. J’ai photographié notre place vide à 22h01, et la terrasse pleine à 22h01. Les deux photos vont au dossier, côte à côte.",
+    ],
+    once: true,
+  },
+  {
+    id: 'tw_fire_jeremie',
+    speaker: 'jeremie',
+    when: { flags: ['twist_fire_inspection', 'met_jeremie'] },
+    lines: [
+      "Les pompiers ont mesuré le couloir : 1,40 m. Il en faut trois. Ce n’est pas moi qui le dis, ce sont eux, avec un mètre plus grand que le mien. C’est la plus belle pièce du dossier.",
+    ],
+    once: true,
+  },
+  {
+    id: 'tw_lescaut_tatie',
+    speaker: 'tatie',
+    when: { flags: ['twist_lescaut_walk', 'met_tatie'] },
+    lines: [
+      "Le maire est passé l’autre soir, à pied ! Je l’ai vu de ma fenêtre. Il a regardé les bonnes tables. Colette, elle, ne venait qu’en berline. Je dis ça, je ne dis rien.",
+    ],
+    once: true,
+  },
+  {
+    id: 'tw_lost_dog_jeremie',
+    speaker: 'jeremie',
+    when: { flags: ['twist_lost_dog', 'met_jeremie'] },
+    lines: [
+      "Biloute a été retrouvé sous la table 3 de l’estaminet, avec une frite. Je ne lui en veux pas. Je lui ai simplement expliqué, longuement, la notion de conflit d’intérêts.",
+    ],
+    once: true,
+  },
+  {
+    id: 'tw_lost_dog_biloute',
+    speaker: 'biloute',
+    when: { flags: ['twist_lost_dog', 'met_jeremie'] },
+    lines: [
+      "*Évite votre regard. Sent la frite. Remue la queue, mais sans conviction.*",
+    ],
+    once: true,
+  },
+  {
+    id: 'tw_tv_nico',
+    speaker: 'nico',
+    when: { flags: ['twist_tv_crew', 'met_seb_nico'] },
+    lines: [
+      "Le reportage est passé à la télé. J’ai envoyé à la rédaction nos photos de la même terrasse, prises à 22h33, trois minutes après le départ de la caméra. Horodatées. Ils peuvent faire une suite.",
+    ],
+    once: true,
+  },
+  {
+    id: 'tw_tv_stephane',
+    speaker: 'stephane',
+    when: { phase: 'morning', flags: ['twist_tv_crew'] },
+    lines: [
+      "Pilou, je t’ai vu à la télé, à ta fenêtre, en arrière-plan. Petit feedback : la posture, c’était pas très « growth ». On en parle en one-to-one ?",
+    ],
+    once: true,
+  },
+  {
+    id: 'tw_sweeper_hippolyte',
+    speaker: 'hippolyte',
+    when: { flags: ['twist_street_sweeper', 'met_hippolyte'] },
+    lines: [
+      "Une balayeuse à 23h30, voilà enfin une institution qui statue. Je propose de l’inviter à la prochaine assemblée générale. Elle ne votera pas, mais elle fera le ménage.",
+    ],
+    once: true,
+  },
+  {
+    id: 'tw_van_klaas',
+    speaker: 'klaas',
+    when: { flags: ['twist_van_corridor', 'met_klaas'] },
+    lines: [
+      "Samedi : camionnette dans le couloir, deux heures, warnings allumés. Un samedi « sans voitures ». J’ai noté la plaque. Je l’ai notée deux fois, pour le principe.",
+    ],
+    once: true,
+  },
+  {
+    id: 'tw_match_tatie',
+    speaker: 'tatie',
+    when: { flags: ['twist_match_night', 'met_tatie'] },
+    lines: [
+      "Cent cinquante supporters sous ma fenêtre ! Comme dit le proverbe : qui crie « but » à minuit ne dort pas à une heure. Moi non plus, du coup.",
+    ],
+    once: true,
+  },
+  {
+    id: 'tw_exhaust_silent_klaas',
+    speaker: 'klaas',
+    when: { flags: ['twist_exhaust_silent', 'met_klaas'] },
+    lines: [
+      "La gaine éteinte la veille de la réunion. Je n’interprète pas. Je mets les deux dates l’une à côté de l’autre. C’est le carnet qui interprète.",
+    ],
+    once: true,
+  },
+  {
+    id: 'tw_model_street_seb',
+    speaker: 'seb',
+    when: { flags: ['twist_model_street', 'met_seb_nico'] },
+    lines: [
+      "Tu as vu la rue, le soir de la visite annoncée ? Six par table, couloir libre, géraniums neufs. Attends, attends : c’est ça qu’ils appellent une visite « annoncée ». On devrait en annoncer tous les soirs.",
+    ],
+    once: true,
+  },
+  {
+    id: 'tw_inspector_seen_nico',
+    speaker: 'nico',
+    when: { flags: ['twist_inspector_seen', 'met_seb_nico'] },
+    lines: [
+      "La dame au carnet, au Goulot, l’autre soir… c’était l’inspectrice. Elle notait plus vite que Klaas. Klaas est vexé. Il dit que c’est une « collègue ».",
+    ],
+    once: true,
+  },
 ];

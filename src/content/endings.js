@@ -164,6 +164,89 @@ const AFTERMATH = [
   },
 ];
 
+// Les nuits de la campagne dont on se souvient (rebondissements §12b, drapeaux `after` de twists.js) : un choix par fin,
+// selon son ton. Une campagne tire environ 7 rebondissements sur 16 : deux parties qui finissent pareil ne se souviennent pas des mêmes nuits.
+const MEM_LEGAL = [
+  { when: { flags: ['twist_fire_inspection'] }, text: "Le rapport des pompiers, « 1,40 m pour 3 exigés », a été lu en séance. On dit que c’est cette ligne-là qui a fait basculer la commission. Jérémie dit que c’est le dossier entier. Les deux ont raison." },
+  { when: { flags: ['twist_tv_crew'] }, text: "Le reportage « Les pépites du Vieux-Lille » repasse parfois en rediffusion. À chaque fois, Seb poste dans le groupe la photo de la même terrasse, prise trente minutes plus tard. La rediffusion fait moins d’audience que la photo." },
+  { when: { flags: ['twist_lescaut_walk'] }, text: "Le maire raconte encore, en conseil, sa ronde de 23h dans la rue des Bouchers. Il ne raconte pas Dédé courant avec trois chaises dans les bras. Il en garde le souvenir pour lui. Il sourit quand même." },
+  { when: { flags: ['twist_street_sweeper'] }, text: "La balayeuse de 23h30 passe toujours. Elle est devenue la mascotte non officielle de l’association. Hippolyte lui a trouvé un nom : « la Commission ». Elle, au moins, statue tous les soirs." },
+  { when: { flags: ['twist_guide_tour'] }, text: "Le guide de l’office de tourisme a ajouté une étape à sa balade : « Ici, des riverains ont fait respecter un arrêté. » Les touristes prennent la rue en photo. La rue est très calme sur les photos." },
+  { when: { flags: ['twist_power_cut'] }, text: "Dans le dossier, entre deux relevés, il y a une page presque vide : la nuit de la panne. 34 dB. Jérémie l’a classée en annexe, sous le titre « Ce qui est possible »." },
+  { when: { flags: ['twist_birthday'] }, text: "Jojo, de la table 4, a fêté ses quarante et un ans au Goulot, à l’intérieur, à 21h. Il a envoyé une carte à l’association : « Merci pour le calme, c’était mon plus bel anniversaire. » Jérémie l’a versée au dossier, par principe." },
+  { when: { flags: ['twist_heatwave'] }, text: "La prochaine canicule, la terrasse de l’estaminet sera vide à 22h00. Les fenêtres de la rue seront ouvertes, et pour une fois, ce ne sera pas une mauvaise nouvelle." },
+];
+const MEM_PEACE = [
+  { when: { flags: ['twist_fete_voisins'] }, text: "La fête des voisins a eu une deuxième édition, cette fois avec une table de l’estaminet, rangée elle aussi à 22h00 pile. Dédé a apporté des gaufres. Hilde a goûté. Elle n’a rien dit, ce qui est un compliment." },
+  { when: { flags: ['twist_lost_dog'] }, text: "Depuis la nuit où Biloute a fugué jusqu’à la table 3, l’estaminet lui garde une frite de côté chaque soir. C’est le seul article de la charte qui n’est écrit nulle part." },
+  { when: { flags: ['twist_birthday'] }, text: "Jojo, de la table 4, est revenu fêter ses quarante et un ans. Onze personnes, mais deux tables, et le chant à 21h45. Il a demandé si c’était à cause de la charte. On lui a dit oui." },
+  { when: { flags: ['twist_waiter_holidays'] }, text: "Le serveur est revenu de vacances bronzé et reposé. Il a signé la charte comme témoin « côté terrasse ». C’est la première fois qu’on lui demandait son avis par écrit." },
+  { when: { flags: ['twist_busker'] }, text: "L’accordéoniste joue encore sous votre fenêtre, mais jusqu’à 21h59 seulement : c’est dans la charte, article 3 bis, rédigé par Jérémie et signé par l’accordéoniste lui-même." },
+  { when: { flags: ['twist_drache'] }, text: "Les jours de drache, désormais, l’estaminet rentre tout, même sous le store. Ce n’est pas dans la charte. C’est arrivé quand même, comme tout ce qui compte." },
+  { when: { flags: ['twist_influencer'] }, text: "L’influenceuse de la ring light est revenue tourner « la rue apaisée du Vieux-Lille ». La vidéo a fait dix fois moins de vues que la première. Le calme, ça ne se partage pas très bien. Ça se vit." },
+  { when: { flags: ['twist_guide_tour'] }, text: "Le guide de la balade nocturne présente désormais la rue comme « un exemple de cohabitation ». Il n’explique pas comment. Personne ne lui a demandé. Dédé fait coucou au groupe." },
+];
+const MEM_SCANDAL = [
+  { when: { flags: ['twist_tv_crew'] }, text: "La chaîne régionale a rediffusé « Les pépites du Vieux-Lille » avec un bandeau : « Reportage tourné avant les révélations ». Dédé, à l’antenne, parle toujours de « respect des voisins ». C’est devenu un classique." },
+  { when: { flags: ['twist_influencer'] }, text: "La vidéo de l’influenceuse a resurgi pendant l’affaire : dans le fond d’un plan, on distingue une enveloppe sur une table. Ce n’était peut-être rien. Internet a décidé que c’était tout." },
+  { when: { flags: ['twist_regis_party'] }, text: "Pendant l’enquête, quelqu’un a rappelé la soirée étudiante du 27. Régis a déclaré qu’il « n’avait rien à voir avec tout ça ». Personne ne lui avait rien demandé." },
+  { when: { flags: ['twist_lescaut_walk'] }, text: "Le maire avait vu la rue de ses propres yeux, à 23h, quelques jours avant la une. Il l’a dit au micro, très calmement. C’est cette phrase-là que Colette n’a pas commentée." },
+  { when: { flags: ['twist_power_cut'] }, text: "La nuit de la panne, la terrasse avait continué à la bougie, police comprise. La photo floue de cette nuit-là a fait le tour des réseaux pendant l’affaire. Personne n’a su qui l’avait prise. Vous, si." },
+  { when: { flags: ['twist_fire_inspection'] }, text: "Le rapport des pompiers, « 1,40 m pour 3 exigés », a été publié en encadré, à côté de la photo de l’enveloppe. Les deux ensemble, ça faisait beaucoup pour une seule terrasse." },
+  { when: { flags: ['twist_waiter_holidays'] }, text: "Le serveur est rentré de vacances le jour de la parution. Il a lu le journal dans le train. Il a dit qu’il aurait dû partir plus longtemps." },
+  { when: { flags: ['twist_street_sweeper'] }, text: "La balayeuse de 23h30 a été la seule à passer tous les soirs pendant l’affaire. Jérémie dit que c’est la seule institution qui n’a rien eu à se reprocher." },
+];
+const MEM_CUSTODY = [
+  { when: { flags: ['twist_influencer'] }, text: "La vidéo de l’influenceuse est ressortie au procès-verbal : dans le fond d’un plan, votre fenêtre, et vous dedans. « La vraie nuit lilloise », disait le titre. Le juge n’a pas souri." },
+  { when: { flags: ['twist_power_cut'] }, text: "L’avocat du bloc a beaucoup insisté sur la nuit de la panne : « Qui sait ce qui s’est passé dans le noir ? » Personne ne le sait. C’était justement l’argument." },
+  { when: { flags: ['twist_hen_party'] }, text: "Une des amies de Marion, l’EVJF au mégaphone, a témoigné : « Il y avait un monsieur à la fenêtre, il avait l’air très fatigué. » C’est le seul témoignage à décharge. Il n’a pas suffi." },
+  { when: { flags: ['twist_busker'] }, text: "L’accordéoniste a été entendu comme témoin. Il a déclaré n’avoir rien vu. Puis il a joué « Le P’tit Quinquin » dans le couloir du commissariat. On l’a laissé finir." },
+  { when: { flags: ['twist_regis_party'] }, text: "L’avocat du bloc a même cité la soirée étudiante du 27 : « Le plaignant habite une rue bruyante, il le sait. » Régis était au premier rang. Il a hoché la tête, dans la nuance." },
+  { when: { flags: ['twist_heatwave'] }, text: "On vous a demandé pourquoi vous étiez à la fenêtre, la nuit de la canicule. Vous avez répondu : « Il faisait vingt-neuf degrés. » Le greffier l’a noté. Il n’a pas noté la suite." },
+  { when: { flags: ['twist_tv_crew'] }, text: "Le reportage « Les pépites du Vieux-Lille » a été cité par la partie civile : « Un établissement exemplaire, harcelé par un voisin. » La caméra était partie à 22h30. Vous, non." },
+  { when: { flags: ['twist_lost_dog'] }, text: "Biloute a été cité, lui aussi : le soir où il a fugué jusqu’à la table 3, « le complice canin de l’association » avait été vu sous la terrasse. Jérémie a protesté. Biloute, non." },
+];
+const MEM_MOVING = [
+  { when: { flags: ['twist_heatwave'] }, text: "De toutes les nuits, c’est la canicule que vous gardez en mémoire : vingt-neuf degrés, toutes les fenêtres ouvertes, la rue entière dans votre chambre. C’est cette nuit-là que vous avez ouvert le site d’annonces pour la première fois." },
+  { when: { flags: ['twist_busker'] }, text: "Le soir de votre départ, l’accordéoniste était sous votre fenêtre. Il a joué « Le P’tit Quinquin ». Pour une fois, vous l’avez écouté jusqu’au bout." },
+  { when: { flags: ['twist_regis_party'] }, text: "Votre appartement a été reloué en trois jours. Par Régis, en meublé touristique. L’annonce dit « vue imprenable sur une rue vivante ». C’est exact." },
+  { when: { flags: ['twist_hen_party'] }, text: "À Wazemmes, au marché, vous avez croisé une jeune femme avec un mégaphone. Vous avez changé de trottoir avant de vérifier si c’était Marion. Il y a des réflexes qui restent." },
+  { when: { flags: ['twist_birthday'] }, text: "Le dernier souvenir de la rue que vous racontez, ce n’est pas la commission. C’est « Joyeux anniversaire » chanté à quarante voix, à 23h40, pour un Jojo que vous n’avez jamais vu." },
+  { when: { flags: ['twist_drache'] }, text: "Il pleut souvent, à Wazemmes. À chaque drache, vous pensez aux terrasses de la rue des Bouchers, serrées sous le store. Vous ne savez pas si c’est de la nostalgie ou de la rancune." },
+  { when: { flags: ['twist_street_sweeper'] }, text: "La balayeuse de 23h30 passe aussi à Wazemmes, mais à 6h. Avant le marché. Vous l’attendez, maintenant, comme on attend un vieil ami qui fait du bruit." },
+  { when: { flags: ['twist_guide_tour'] }, text: "Le guide de l’office de tourisme passe encore sous votre ancienne fenêtre : « Ici vivait un riverain qui photographiait les terrasses. » Il n’a pas précisé qu’il était parti. C’est mieux comme ça." },
+];
+const MEM_FIRED = [
+  { when: { flags: ['twist_power_cut'] }, text: "Stéphane a cité la nuit de la panne dans son post de départ : « Même sans courant, Pilou trouvait le moyen de ne pas coder. » C’était faux : ce soir-là, vous écoutiez le silence." },
+  { when: { flags: ['twist_heatwave'] }, text: "Le lendemain de la canicule, vous aviez livré trois lignes de code et un relevé à 71 dB. Stéphane a gardé la capture d’écran pour l’entretien. Il a dit « ce n’est pas personnel ». C’était une capture d’écran." },
+  { when: { flags: ['twist_tv_crew'] }, text: "Stéphane vous a vu dans le reportage télé, au fond, à votre fenêtre, en pleine journée de télétravail. « C’est quoi, cette énergie ? » C’était la dernière fois qu’il parlait d’énergie avec vous." },
+  { when: { flags: ['twist_influencer'] }, text: "La vidéo de l’influenceuse est arrivée jusqu’à Koddex : « On voit ton bureau, là, derrière la fenêtre. Il est vide. » Il n’était pas vide. Vous étiez à la fenêtre." },
+  { when: { flags: ['twist_regis_party'] }, text: "Le jour de votre licenciement, Régis vous a proposé « un petit boulot » : surveiller ses meublés le week-end. Vous avez décliné. Il a dit qu’il comprenait. Il comprend toujours." },
+  { when: { flags: ['twist_birthday'] }, text: "Le soir de votre départ de Koddex, la table 4 chantait encore un anniversaire. Vous avez chanté avec eux, de la fenêtre. Au chômage, on a le temps de chanter." },
+  { when: { flags: ['twist_lost_dog'] }, text: "Biloute vient désormais vous voir l’après-midi. Il a compris que vous étiez toujours là. Jérémie dit que c’est le seul de l’association qui a gagné quelque chose à votre licenciement." },
+  { when: { flags: ['twist_fete_voisins'] }, text: "À la prochaine fête des voisins, vous avez proposé de tenir la buvette. Toute la soirée. Vous n’aviez plus de réunion à 9h le lendemain. C’est le premier avantage concret du chômage." },
+];
+const MEM_TURNCOAT = [
+  { when: { flags: ['twist_birthday'] }, text: "Jojo, de la table 4, vous a invité à ses quarante et un ans. Vous y êtes allé. Vous avez chanté à 23h40, à quarante voix. Au deuxième étage, la fenêtre de votre ancien vous-même était fermée." },
+  { when: { flags: ['twist_lost_dog'] }, text: "Biloute, lui, était passé à l’ennemi avant vous : sous la table 3, une frite dans la gueule. Jérémie dit qu’il ne lui en veut pas. Il dit la même chose de vous. Il ment moins bien pour vous." },
+  { when: { flags: ['twist_drache'] }, text: "Les soirs de drache, vous êtes sous le store, à quatorze sur trois tables. Vous trouvez ça convivial. Vous avez entendu le mot dans votre propre bouche et vous ne l’avez pas corrigé." },
+  { when: { flags: ['twist_heatwave'] }, text: "La nuit de canicule, vous l’avez passée en terrasse. Rosé, sorbet, chaise. Vous avez levé les yeux vers votre fenêtre ouverte, et vous vous êtes trouvé bruyant." },
+  { when: { flags: ['twist_hen_party'] }, text: "Vous avez signé le serment de l’EVJF de Marion, sur une serviette en papier. Vous ne vous souvenez plus de ce que vous avez juré. Klaas, si. Il l’a noté." },
+  { when: { flags: ['twist_tv_crew'] }, text: "Si « Les pépites du Vieux-Lille » refaisaient un reportage, vous seriez à l’image, à votre table, en train de dire que l’estaminet respecte ses voisins. Vous le penseriez presque." },
+  { when: { flags: ['twist_waiter_holidays'] }, text: "Théo, revenu de vacances, vous sert maintenant votre carbonnade sans demander. « Comme d’habitude ? » C’est le « comme d’habitude » qui fait le plus mal." },
+  { when: { flags: ['twist_street_sweeper'] }, text: "À 23h30, quand la balayeuse passe, vous soulevez les pieds comme tout le monde. Vous faites partie de la terrasse, maintenant. Même la balayeuse ne fait plus de différence." },
+];
+const MEM_RETURN = [
+  { when: { flags: ['twist_guide_tour'] }, text: "Le guide de l’office de tourisme a déjà mis le nouveau bar dans sa balade : « Le Trou, l’adresse la plus authentique du Vieux-Lille. » Il a un micro-cravate. Le bar a un DJ. Ils vont bien s’entendre." },
+  { when: { flags: ['twist_regis_party'] }, text: "Le premier client du nouveau bar, c’est un groupe de dix-neuf étudiants logés au 27. Régis a négocié un tarif. Il comprend les deux côtés, surtout celui de la caisse." },
+  { when: { flags: ['twist_hen_party'] }, text: "La première soirée privée du nouveau bar est un EVJF. Avec mégaphone. Seb a vérifié : ce n’est pas Marion. C’est sa témoin." },
+  { when: { flags: ['twist_street_sweeper'] }, text: "La balayeuse de 23h30 passera-t-elle devant le nouveau bar ? Jérémie a déjà écrit à la mairie pour demander ses horaires. On lui a répondu que c’était « en cours »." },
+  { when: { flags: ['twist_fete_voisins'] }, text: "Jérémie a déjà réservé la place pour la prochaine fête des voisins. Le même soir que l’inauguration du bar. Par hasard. Il a imprimé l’arrêté en A3, par hasard aussi." },
+  { when: { flags: ['twist_birthday'] }, text: "Jojo a déjà réservé le nouveau bar pour ses quarante-deux ans. Onze personnes, un DJ. Le chant est prévu à 1h40. C’est le progrès." },
+  { when: { flags: ['twist_influencer'] }, text: "L’influenceuse de la ring light a été invitée à l’inauguration du bar. Sa vidéo s’appelle « le nouveau spot du Vieux-Lille ». Dans le fond d’un plan, votre fenêtre. Fermée, cette fois." },
+  { when: { flags: ['twist_heatwave'] }, text: "Le nouveau bar a une terrasse « climatisée ». Personne n’a demandé d’autorisation. Hippolyte a déjà sorti son stylo-plume." },
+];
+
 export const ENDINGS = [
   // ════════════════════════════════════════════════════════════════════════
   // 4 · GARDE À VUE / PROCÈS (échec anticipé, dès la nuit 5)
@@ -259,6 +342,7 @@ export const ENDINGS = [
         text: "La ligne que Klaas avait rayée pour vous est restée lisible, en dessous. Le juge ne l’a pas demandée. Klaas ne l’a pas proposée. Vous lui aviez menti ; il ne vous a pas rendu la pareille.",
       },
       ...KLAAS_NOTEBOOK,
+      ...MEM_CUSTODY,
       {
         when: { flags: ['met_klaas'] },
         text: "Klaas est venu vous chercher à la sortie. Il n’a rien dit. Il a juste rangé son carnet dans sa poche, côté cœur.",
@@ -321,6 +405,7 @@ export const ENDINGS = [
         text: "Jérémie a convoqué une réunion extraordinaire, point unique : « soutien à Pilou ». Seb a lancé une cagnotte, Nico l’a appelée « Pilou ship des décibels ». Elle a rapporté 140 euros et un pot de spéculoos.",
       },
       ...KODDEX,
+      ...MEM_FIRED,
       {
         when: {},
         text:
@@ -389,6 +474,7 @@ export const ENDINGS = [
         when: { stats: { job: '>=90' } },
         text: "Chez Koddex, votre productivité n’a jamais été aussi haute. Stéphane vous a demandé votre secret en one-to-one. Vous avez dit « carbonnade ». Il en a fait un framework.",
       },
+      ...MEM_TURNCOAT,
       {
         when: {},
         text: "La nuit, la gaine ronronne toujours sous votre fenêtre. Vous dormez quand même. On s’habitue à tout, surtout à ce qu’on a dans l’assiette.",
@@ -452,6 +538,7 @@ export const ENDINGS = [
       },
       ...ASSO_FATES,
       ...AFTERMATH,
+      ...MEM_MOVING,
       {
         when: { flags: ['met_klaas'] },
         text: "Klaas a noté votre départ : « 10h40, camion de déménagement, couloir dégagé. » C’était la première fois que le couloir était dégagé pour vous.",
@@ -515,6 +602,7 @@ export const ENDINGS = [
         when: { flags: ['corruption_proof'], notFlags: ['press_scandal'] },
         text: "Dans votre tiroir dort une photo que personne n’a vue. « Pour la suite », dit Seb. Nico dit que ce n’est pas une suite, c’est une rue.",
       },
+      ...MEM_RETURN,
       {
         when: {},
         text: "Jérémie a convoqué une assemblée générale extraordinaire. Ordre du jour, point unique : « On recommence. » À suivre…",
@@ -580,6 +668,7 @@ export const ENDINGS = [
       ...SECRETS,
       ...AFTERMATH,
       ...STREET_AFTER,
+      ...MEM_SCANDAL,
       {
         when: {},
         text: "Le soir de la parution, la rue a été très calme. Pas apaisée : attentive. Chaque terrasse vous suivait des yeux. Vous avez dormi quand même, fenêtre fermée, ce qui n’était pas exactement le plan.",
@@ -664,6 +753,7 @@ export const ENDINGS = [
       ...AFTERMATH,
       ...STREET_AFTER,
       ...KODDEX,
+      ...MEM_LEGAL,
       {
         when: {},
         text: "Le premier soir, à 22h00, les cloches ont sonné, et les chaises ont raclé les pavés pour la dernière fois de la journée. Puis le silence. Vous l’avez enregistré : 31 dB. Vous en avez fait votre fond d’écran.",
@@ -730,6 +820,7 @@ export const ENDINGS = [
       ...SECRETS,
       ...AFTERMATH,
       ...STREET_AFTER,
+      ...MEM_PEACE,
       {
         when: {},
         text: "Le premier trimestre, la réunion s’est tenue à l’estaminet. Hilde a apporté sa tarte au sucre. Dédé a goûté et demandé la recette. Hilde a dit non, très gentiment.",

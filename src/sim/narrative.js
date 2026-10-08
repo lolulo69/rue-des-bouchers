@@ -9,6 +9,7 @@ import { INTRO_CARDS, TUTORIAL } from '../content/intro.js';
 import { MEDIA } from '../content/media.js';
 import { DIALOGUE } from '../content/dialogue.js';
 import { EVENTS } from '../content/events.js';
+import { TWISTS } from '../content/twists.js';
 import { CHARACTERS } from '../content/characters.js';
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -240,7 +241,18 @@ export function pickHeadline(metrics) {
   const best = [...RECAP_HEADLINES].sort((a, b) => b.priority - a.priority).find((h) => headlineMatches(h.when, metrics));
   return { id: best.id, text: best.text };
 }
-export const recapHeadline = (summary, simState) => pickHeadline(recapMetrics(summary, simState));
+// Le rebondissement de la nuit (twists.js, §12b) : objet, id, ou lu dans sim.state.twist / summary.twist quand le moteur le pose.
+// Nuit calme (manchette par défaut ou « nuit ordinaire ») : la ligne du rebondissement devient la manchette.
+// Sinon elle revient en `sub`, à afficher sous la manchette. → { id, text, sub?, twist? }
+const QUIET_HEADLINES = new Set(['h_default', 'h_quiet_pieces']);
+export function recapHeadline(summary, simState, twist) {
+  const h = pickHeadline(recapMetrics(summary, simState));
+  const ref = twist ?? simState?.twist ?? summary?.twist;
+  const t = typeof ref === 'string' ? TWISTS.find((x) => x.id === ref) : ref;
+  const line = t?.lines?.recap?.[0];
+  if (!line) return h;
+  return QUIET_HEADLINES.has(h.id) ? { id: `twist:${t.id}`, text: line, twist: t.id } : { ...h, sub: line, twist: t.id };
+}
 
 // ════════════════════════════════════════════════════════════════════════════
 // Ouverture et tutoriel
