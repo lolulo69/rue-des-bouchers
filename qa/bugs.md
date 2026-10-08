@@ -5,6 +5,19 @@ When a bug is fixed, remove the `fixme` (the test then guards against regression
 
 ## Open
 
+### BUG-008 · v1.1: the night card never shows the twist (UI calls `c.tonightTwist()`, the engine has `c.twistTonight()`)
+- **Files**: `src/ui/index.js:587` feature-detects `typeof c.tonightTwist === 'function'`; the engine (`src/sim/campaign.js:444`, f9d341c) exposes `c.twistTonight()` (the build note b78a1c6 said `tonightTwist`).
+- **Expected**: the « Descendre dans la rue » night card shows tonight's twist (title + intro).
+- **Actual**: the detection fails silently, the night card has no twist. (The engine also queues the intro as an `info` card `twist:<id>` at the start of the night phase, so the text does appear once, as a separate card; once the UI reads the twist, decide whether to keep both.)
+- **Owner guess**: UI agent with the build agent (one name to align). Test: `tests/e2e/v11.e2e.js` (updated locally to the engine's name; pushed once main is green).
+
+### BUG-009 · v1.1: « Nouveau » unlock cards render as a generic « Nouvel outil » (no text, no key hint)
+- **Files**: the engine queues unlock cards as `{ type: 'info', id: 'unlock:<id>', unlock: '<id>', title, text, hint }` (`src/sim/campaign.js` › `beginPhase`); `src/ui/index.js:338` calls `unlockCard(card, card.unlock ?? card.data ?? card)`, so `u` is the **string** id and `u.title` / `u.text` / `u.hint` are undefined.
+- **Expected**: « ✨ Nouveau » + the card's title, its two lines and « Touche : B » (or the pad glyph).
+- **Actual**: « Nouvel outil », no text, no hint, for all 21 unlocks.
+- **Owner guess**: UI agent: `unlockCard(card, typeof card.unlock === 'object' ? card.unlock : card.data?.title ? card.data : card)`. One line.
+
+
 ### BUG-007 · The D14 commission's verdict text is skipped: the screen jumps straight to the ending
 - **Test**: `tests/e2e/fullrun.e2e.js` › « BUG-004 (corrigé) · le résultat de la dernière carte d’une phase est affiché » (fails after a full run whose commission choice has a `result`: `lostResults: [{ day: 14, id: 'd14_commission', step: 'ended' }]`).
 - **Files**: `src/ui/index.js` › `shown()`: `c.step === 'ended'` takes priority over `view.cardResult` (my BUG-004 fix, b0677ae), so `choose()`'s result card is never drawn when that choice ends the campaign.
