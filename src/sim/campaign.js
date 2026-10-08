@@ -20,7 +20,7 @@ export const SAVE_VERSION = 1;
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
 // Correspondance entre les témoins nommés par le contenu (witnessed.by) et ceux de la nuit simulée
-const NIGHT_WITNESS = { klaas: 'klaas', seb_nico: 'gaystapo', waiter: 'waiter', customers: 'customers', biloute: 'jeremie', jeremie: 'jeremie' };
+const NIGHT_WITNESS = { klaas: 'klaas', seb_nico: 'seb_nico', waiter: 'waiter', customers: 'customers', biloute: 'jeremie', jeremie: 'jeremie' };
 const ALLIES = new Set(['klaas', 'seb_nico', 'biloute', 'jeremie', 'hilde', 'tatie']);
 // Présence en journée (actions de l'après-midi) des témoins nommés par le contenu
 const DAY_PRESENCE = { klaas: 0.8, seb_nico: 0.6, waiter: 0.7, customers: 0.8, biloute: 0.3, jeremie: 0.3, dede: 0.6, ghislain: 0.5, police: 0.1 };
@@ -63,7 +63,9 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null } 
   if (S.version !== SAVE_VERSION) throw new Error(`sauvegarde v${S.version} incompatible (attendu v${SAVE_VERSION})`);
   const rng = createRng(1);
   rng.setState(S.rng);
-  const flags = () => new Set(S.flags);
+  // Ensemble des drapeaux, mis en cache (les conditions sont évaluées très souvent) ; invalidé à chaque modification
+  let flagSet = null;
+  const flags = () => (flagSet ??= new Set(S.flags));
   const byId = (list) => Object.fromEntries(list.map((x) => [x.id, x]));
   const EVENTS = byId(K.EVENTS), ACTIONS = byId(K.ACTIONS), DIALOGUE = byId(K.DIALOGUE), CMS = byId(K.COUNTERMOVES), ENDINGS = byId(K.ENDINGS);
 
@@ -99,7 +101,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null } 
       deltas[k] = S.hidden[k] - before;
     }
     for (const f of effects.setFlags ?? []) setFlag(f);
-    for (const f of effects.clearFlags ?? []) S.flags = S.flags.filter((x) => x !== f);
+    for (const f of effects.clearFlags ?? []) { S.flags = S.flags.filter((x) => x !== f); flagSet = null; }
     if (effects.evidence) addEvidence({ ...effects.evidence, source });
     if (effects.ending) {
       // Une fin anticipée demandée avant la nuit 5 est ignorée (on frôle, on ne tombe pas)
@@ -124,7 +126,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null } 
     if (k === 'risk' && c.gateOpen() && S.stats.risk >= cfg.RISK.custody) setFlag('custody');
     return S.stats[k] - before;
   }
-  function setFlag(f) { if (!S.flags.includes(f)) S.flags.push(f); }
+  function setFlag(f) { if (!S.flags.includes(f)) { S.flags.push(f); flagSet = null; } }
   function addEvidence(e) {
     const legal = e.legal !== false;
     const quality = e.quality ?? 1;
@@ -187,17 +189,14 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null } 
         n++;
       }
     }
-    // Dialogues (par défaut l'après-midi, ou la phase de leur `when`)
-    let d = 0;
-    for (const x of K.DIALOGUE) {
-      if (d >= C.maxDialoguesPerPhase) break;
-      const phase = x.when?.phase ?? 'afternoon';
-      if (![phase].flat().includes(ph)) continue;
-      if (x.once !== false && S.seen.dialogue.includes(x.id)) continue;
-      if (!c.check(x.when)) continue;
-      cards.push({ type: 'dialogue', id: x.id });
-      d++;
-    }
+    // Dialogues (par défaut l'après-midi, ou la phase de leur `when`) : on tire au sort parmi les éligibles, en
+    // privilégiant les plus précis (plus de conditions) et les jamais vus, sinon les premiers du fichier monopolisent.
+    const precision = (x) => Object.keys(x.when ?? {}).length + (x.when?.flags?.length ?? 0);
+    const eligible = K.DIALOGUE.filter((x) => [x.when?.phase ?? 'afternoon'].flat().includes(ph)
+      && !(x.once !== false && S.seen.dialogue.includes(x.id)) && c.check(x.when))
+      .map((x) => ({ x, k: precision(x) + rng.next() * 2 + (S.counts.dialogue[x.id] ? -3 : 0) }))
+      .sort((a, b) => b.k - a.k);
+    for (const { x } of eligible.slice(0, C.maxDialoguesPerPhase)) cards.push({ type: 'dialogue', id: x.id });
     return cards;
   }
 
@@ -365,6 +364,13 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null } 
   };
   c.endAfternoon = () => {
     if (S.step !== 'actions') throw new Error(`fin d'après-midi hors de l'après-midi (${S.step})`);
+    // Tatie hésite (flattée par le bloc) : elle peut laisser fuiter le vrai plan à Colette
+    const L = C.tatieLeak;
+    if (L && c.has(L.flag) && !c.has('tatie_leaked_plan') && S.hidden.hostility >= L.minHostility && rng.chance(L.chance)) {
+      setFlag('tatie_leaked_plan');
+      c.note('engine-flag', { flag: 'tatie_leaked_plan' });
+      S.cards.push({ type: 'info', id: 'tatie_leak', title: 'Fuite', text: 'Tatie Bouchon a pris le thé avec Colette Verhaeghe. Le bloc connaît vos plans.' });
+    }
     beginPhase('night');
   };
 
@@ -412,7 +418,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null } 
         // Risque et Asso passent par la nuit (Risque × poids des témoins), le reste par la campagne
         sim.punish(seen, a.id, (we.risk ?? 0) + Math.max(0, a.effects?.risk ?? 0), -(we.asso ?? 0));
         for (const w of seen) {
-          S.witnessMemories.push({ day: S.day, who: w.kind === 'gaystapo' ? 'seb_nico' : w.kind, ally: !!w.ally, act: a.id, night: true });
+          S.witnessMemories.push({ day: S.day, who: w.kind, ally: !!w.ally, act: a.id, night: true });
           if (w.kind === 'klaas') setFlag('klaas_noted_pilou');
         }
         c.note('witness', { act: a.id, by: seen.map((w) => w.id), night: true });

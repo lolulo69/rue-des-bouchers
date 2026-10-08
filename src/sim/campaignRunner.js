@@ -4,11 +4,16 @@ import { createCampaign } from './campaign.js';
 import { checkInvariants } from './invariants.js';
 
 // Joue une nuit déjà créée avec une politique de nuit { decide(sim) → actions[], content?(sim, c) → ids[] }
-export function playNight(sim, policy, c, dt = 1) {
+// Les actions de nuit du contenu sont proposées au bot toutes les `contentEvery` minutes de jeu (coût).
+export function playNight(sim, policy, c, dt = 1, contentEvery = 10) {
+  let nextContent = -Infinity;
   while (!sim.state.ended) {
     if (policy) {
       for (const a of policy.decide(sim)) { sim.act(a); if (sim.state.ended) break; }
-      if (c && policy.content && !sim.state.ended) for (const id of policy.content(sim, c)) c.doNightAction(sim, id);
+      if (c && policy.content && !sim.state.ended && sim.state.min >= nextContent) {
+        nextContent = sim.state.min + contentEvery;
+        for (const id of policy.content(sim, c)) c.doNightAction(sim, id);
+      }
     }
     sim.tick(dt);
     sim.events.length = 0;

@@ -39,7 +39,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
     scandal: false, blocKnows: false, serialComplainer: !!carry.serialComplainer, tipoffs: [],
     bucketUses: 0, bucketReadyAt: 0, waiterReadyAt: 0, waiterAsks: [], mairieSent: false,
     witnessMemories: [], sleeping: false, ended: false, endReason: null,
-    catLeaveAt: rng.range(...WITNESS.gaystapo.catLeave),
+    catLeaveAt: rng.range(...WITNESS.seb_nico.catLeave),
     lastClatterLog: {},
     journal: [],
     noiseBed: NOISE.ambientDb,

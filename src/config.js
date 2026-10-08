@@ -198,7 +198,7 @@ export const WITNESS = {
     name: 'Klaas (place Maurice-Schumann)', p: 0.9, weight: 0.5, ally: true, sleepAt: 25 * 60, near: [35, 15], far: [130, 75],
     binoculars: { p: 0.95, near: 80, far: 170, every: [12, 25], duration: [4, 8], react: 8 },
   },
-  gaystapo: { name: 'Seb & Nico (balcon)', p: 0.7, weight: 0.3, ally: true, catLeave: [23 * 60, 24 * 60 + 30] },
+  seb_nico: { name: 'Seb & Nico (balcon)', p: 0.7, weight: 0.3, ally: true, catLeave: [23 * 60, 24 * 60 + 30] },
   waiter: { name: 'le serveur', p: 0.6, weight: 1, ally: false },
   customers: { name: 'des clients', p: 0.25, weight: 0.8, ally: false, filmChance: 0.35, filmWeight: 0.5, wetBonus: 0.3 },
   darkFactor: 0.5,              // la nuit, dans la rue, on distingue mal une fenêtre éteinte (serveur, clients)
@@ -276,6 +276,7 @@ export const CAMPAIGN = {
   dayWitness: { grey: 0.25, illegal: 0.45 }, // actions de jour : chance d'être vu (avant déguisement)
   reversal: { minHostility: 60, chance: 0.35, window: [22 * 60, 24 * 60] }, // la police vient pour Pilou
   igpn: { openCorruption: -15, transferAfterDays: 3, transferCorruption: -25 },
+  tatieLeak: { flag: 'tatie_wavering', minHostility: 40, chance: 0.25 }, // Tatie, flattée par le bloc, peut laisser fuiter le vrai plan à Colette
 };
 
 export const CONFIG = { RULES, DAYS, SKY, STREET, ZONES, RESTAURANTS, ANCHORS, INTERACT, NOISE, SLEEP, EVIDENCE, POLICE, WAITER, WITNESS, BUCKET, RISK, ASSO, DOG, DISGUISE, ENGINE_FLAGS, CAMPAIGN };

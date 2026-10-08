@@ -40,7 +40,7 @@ export function potentialWitnesses(sim, pos) {
     const name = sim.klaasWatching() ? `${WITNESS.klaas.name.split(' (')[0]} (jumelles)` : WITNESS.klaas.name;
     if (p > 0) out.push({ id: 'klaas', kind: 'klaas', name, pos: ANCHORS.klaasWindow, p, baseP: WITNESS.klaas.p, weight: WITNESS.klaas.weight, ally: true });
   }
-  if (sim.catPresent()) add('gaystapo', 'gaystapo', WITNESS.gaystapo, ANCHORS.balcony);
+  if (sim.catPresent()) add('seb_nico', 'seb_nico', WITNESS.seb_nico, ANCHORS.balcony);
   if (sim.dogActive()) add('jeremie', 'jeremie', WITNESS.jeremie, { ...sim.dogPos(), y: 1.6 });
   if (sim.waiterOnDuty()) add('waiter', 'waiter', WITNESS.waiter, { ...sim.waiterPos(), y: 1.6 });
   const cover = sim.day.key === 'sat' ? WITNESS.saturdayCover : 1;

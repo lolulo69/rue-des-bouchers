@@ -7,7 +7,7 @@ const cfgWith = (p = {}) => ({
   RESTAURANTS: restaurants({ compliance: 0 }),
   WITNESS: {
     darkFactor: 1,
-    klaas: { p: p.klaas ?? 0, near: [200, 200], far: [300, 300] }, gaystapo: { p: p.gaystapo ?? 0, catLeave: [H(24), H(24)] },
+    klaas: { p: p.klaas ?? 0, near: [200, 200], far: [300, 300] }, seb_nico: { p: p.seb_nico ?? 0, catLeave: [H(24), H(24)] },
     waiter: { p: p.waiter ?? 0 }, customers: { p: p.customers ?? 0, wetBonus: 0, filmChance: 0 },
   },
 });
@@ -55,10 +55,10 @@ describe('témoins du seau d\'eau', () => {
   });
 
   it('le chat sur le balcon = Seb & Nico sont là ; chat rentré = personne', () => {
-    const sim = simAt(H(23), { cfg: cfgWith({ gaystapo: 1 }) });
+    const sim = simAt(H(23), { cfg: cfgWith({ seb_nico: 1 }) });
     expect(sim.catPresent()).toBe(true);
-    expect(sim.act({ type: 'bucket' }).seen.map((w) => w.kind)).toEqual(['gaystapo']);
-    const later = simAt(H(24, 30), { cfg: cfgWith({ gaystapo: 1 }) });
+    expect(sim.act({ type: 'bucket' }).seen.map((w) => w.kind)).toEqual(['seb_nico']);
+    const later = simAt(H(24, 30), { cfg: cfgWith({ seb_nico: 1 }) });
     expect(later.catPresent()).toBe(false);
   });
 
