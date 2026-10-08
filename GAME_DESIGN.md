@@ -299,7 +299,40 @@ The campaign simulator plays 1000 seeded campaigns per strategy bot. Targets:
 ### Deviations
 _(none yet)_
 
-## 14. Still open
+## 14. Content format (contract between the engine and the writing)
+All narrative content lives in **`src/content/*.js`** as plain data (no logic, no DOM), owned by the content agent.
+The engine (`src/sim/campaign*.js`, owned by the build agent) loads and evaluates it. A **content linter test** checks the whole tree.
+
+```js
+// src/content/flags.js: registry. Every flag used anywhere must be declared here.
+export const FLAGS = { met_klaas: 'Pilou a parlé à Klaas', camera_awning: 'Caméra cachée sous le store', /* … */ };
+
+// Conditions (all optional, AND-ed): evaluated against campaign state
+// { day: [min, max], phase: 'morning'|'afternoon'|'night', flags: ['a'], notFlags: ['b'],
+//   stats: { asso: '>=40', risk: '<30' }, hidden: { corruption: '>50' }, chance: 0.3 }
+
+// Effects (all optional): applied by the engine, clamped 0–100
+// { sleep: -10, asso: +5, risk: +20, job: -5, dossier: +1, hostility: +10, corruption: -15,
+//   setFlags: ['x'], clearFlags: ['y'], evidence: { kind, quality, legal: true|false, label }, ending: 'scandal' }
+
+// dialogue.js
+export const DIALOGUE = [{ id, speaker: 'klaas', when: {...}, lines: ['…'], effects: {...}, once: true }];
+// events.js: fixed calendar events and random ones
+export const EVENTS = [{ id, day: 7, phase: 'afternoon', title, text, choices: [{ label, requires: {...}, effects: {...}, result: '…' }] }];
+// actions.js: day and night actions available from menus
+export const ACTIONS = [{ id, label, phase, legality: 'legal'|'grey'|'illegal', cost: { time: 1 }, requires: {...}, effects: {...}, witnessed: {...} }];
+// countermoves.js: what the restaurants do, by trigger
+export const COUNTERMOVES = [{ id, when: {...}, text, effects: {...} }];
+// koddex.js: the three morning prompts
+export const KODDEX = { work: [...], sideProjects: [{ id, label, unlocks: 'flag', job: -10, risk: 0, lines: [...] }], gags: [...] };
+// endings.js: the 8 endings, decided at day 14 or early (failures, from night 5)
+export const ENDINGS = [{ id, title, when: {...}, priority, epilogue: [{ when: {...}, text }] }];
+```
+Rules: all text is in French; **no real restaurant names**; every `speaker` exists in `characters.js`; every flag is declared;
+every action, event and ending is reachable (the linter + the campaign simulator check this). An epilogue is built from the parts whose `when` matches,
+so it reflects what the player actually did.
+
+## 15. Still open
 - Nothing blocking. New lore welcome anytime.
 
 ## Build notes
