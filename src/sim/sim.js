@@ -63,7 +63,11 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
   if (carry.reversal) S.visit = { at: rng.range(...CAMPAIGN.reversal.window), phase: 'pending', enemyMemories: carry.enemyMemories ?? 0 };
   const earlyEndings = carry.earlyEndings ?? true;
 
+  // Théo renvoyé (waiter_fired, campagne) : un nouveau serveur le remplace sur la terrasse
+  const waiterId = flags.has('waiter_fired') ? 'nouveau' : 'theo';
+
   const sim = {
+    waiterId,
     cfg, rng, day: dayCfg, weekday: weekday ?? dayCfg.key, state: S, restaurants, close, late, flags,
     events: [],
     seed,

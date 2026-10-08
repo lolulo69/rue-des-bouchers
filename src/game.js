@@ -33,7 +33,8 @@ const narrRng = createRng((SEED ^ 0x5bd1e995) >>> 0);
 function narrator(kind, s, a) {
   switch (kind) {
     case 'police': return narrative.policeLine(a.outcome, a.patrolId, { ...narrative.nightCtx.police(s, a.entry ?? {}), asso: !!a.asso }, narrRng);
-    case 'waiter': return narrative.pickNightLine('waiter', s, narrRng, { result: a.result, metWaiter: !!campaign?.has('met_waiter') });
+    // Les répliques « Théo » s'arrêtent quand il est renvoyé : le nouveau serveur est un inconnu
+    case 'waiter': return narrative.pickNightLine('waiter', s, narrRng, { result: a.result, metWaiter: !!campaign?.has('met_waiter') && s.waiterId === 'theo' });
     case 'witness': return narrative.pickNightLine('witness', s, narrRng, a.witness ? { witness: a.witness } : {});
     case 'end': return narrative.pickNightLine('end', s, narrRng, { reason: a.reason });
     case 'klaas': { const e = narrative.klaasEntry(a.event, a.detection, narrRng); return e ? `📓 Carnet de Klaas : ${e.text}` : null; }

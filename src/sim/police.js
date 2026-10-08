@@ -113,6 +113,12 @@ function resolve(sim, P) {
       S.benaliTransferred = true;
       sim.log('Rumeur : l’agent Benali serait muté. « Trop zélé. »', 'bad');
     }
+  } else if (!POLICE.patrols[P.patrolId].complaisant) {
+    // Benali, le chef : jamais de café. Sans PV, c'est un avertissement : les tables rentrent dans la demi-heure.
+    entry.outcome = 'warning';
+    for (const t of inf) if (t.clearAt > S.min + POLICE.warningClearMinutes) t.clearAt = S.min + POLICE.warningClearMinutes;
+    entry.detail = `avertissement, ${inf.length} table(s) à rentrer`;
+    sim.log(sim.say('police', { outcome: 'warning', patrolId: P.patrolId, entry }, `${P.patrolName} sermonne ${rest.name} : « Je repasse dans une demi-heure. » Avertissement, sans PV.`));
   } else {
     entry.outcome = 'complaisance';
     // Consigné seulement si quelqu'un l'a vu : Klaas depuis sa fenêtre, ou Pilou s'il ne dort pas.

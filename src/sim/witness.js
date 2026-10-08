@@ -42,7 +42,7 @@ export function potentialWitnesses(sim, pos) {
   }
   if (sim.catPresent()) add('seb_nico', 'seb_nico', WITNESS.seb_nico, ANCHORS.balcony);
   if (sim.dogActive()) add('jeremie', 'jeremie', WITNESS.jeremie, { ...sim.dogPos(), y: 1.6 });
-  if (sim.waiterOnDuty()) add('waiter', 'waiter', WITNESS.waiter, { ...sim.waiterPos(), y: 1.6 });
+  if (sim.waiterOnDuty()) add('waiter', 'waiter', sim.waiterId === 'theo' ? WITNESS.waiter : (WITNESS.newWaiter ?? WITNESS.waiter), { ...sim.waiterPos(), y: 1.6 }, { waiterId: sim.waiterId });
   const cover = sim.day.key === 'sat' ? WITNESS.saturdayCover : 1;
   const c = WITNESS.customers;
   for (const t of S.tables) {

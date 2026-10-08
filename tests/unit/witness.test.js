@@ -116,3 +116,21 @@ describe('seuils de Risque', () => {
     expect(sim.state.risk).toBe(0);
   });
 });
+
+describe('le serveur renvoyé (qa/coherence.md pass 3)', () => {
+  it('Théo renvoyé : un nouveau serveur le remplace (témoin et nom différents), Théo n\'est plus là', async () => {
+    const { createSim, makeConfig } = await import('../../src/sim/index.js');
+    const cfg = makeConfig({ RESTAURANTS: restaurants({ compliance: 0 }) });
+    const theo = createSim({ seed: 1, cfg });
+    const fired = createSim({ seed: 1, cfg, carry: { flags: ['waiter_fired'] } });
+    expect(theo.waiterId).toBe('theo');
+    expect(fired.waiterId).toBe('nouveau');
+    for (const s of [theo, fired]) while (s.state.min < H(22, 30)) s.tick(0.5);
+    const waiterOf = (s) => s.potentialWitnesses(s.cfg.ANCHORS.pilouWindow).find((w) => w.kind === 'waiter');
+    expect(waiterOf(theo).name).toBe(cfg.WITNESS.waiter.name);
+    expect(waiterOf(fired).name).toBe(cfg.WITNESS.newWaiter.name);
+    expect(waiterOf(fired).waiterId).toBe('nouveau');
+    // le nouveau serveur répond toujours (on peut lui demander de rentrer les tables)
+    expect(fired.act({ type: 'waiter' }).reason).not.toBe('offduty');
+  });
+});

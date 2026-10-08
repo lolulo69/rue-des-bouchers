@@ -161,6 +161,7 @@ export const POLICE = {
   bribePhotoRange: 15,           // une photo nette depuis un endroit légal (rue ou fenêtre)
   visitMinutes: 6,               // la police vient pour Pilou (plainte du bloc) : durée de la visite
   visitRisk: 10,                 // …et s'il y a des témoins ennemis d'actes passés : rappel à la loi
+  warningClearMinutes: 30,       // un agent non complaisant qui ne verbalise pas avertit : tables rentrées dans les 30 min
   scandalThreshold: 2,           // pièces "police" (complaisance, tuyau) diffusées → scandale → le commissaire
   shiftChange: 23 * 60,
   roster: {
@@ -169,7 +170,8 @@ export const POLICE = {
   },
   patrols: {
     lemaire: {
-      name: 'Brigadier Lemaire', actBase: 0.12, delayMult: 1.3, firstCallExtra: 8,
+      // complaisant : le café offert (complaisance) est le trait de Lemaire, et de lui seul (qa/coherence.md pass 3)
+      name: 'Brigadier Lemaire', complaisant: true, actBase: 0.12, delayMult: 1.3, firstCallExtra: 8,
       tipoff: { bernadette: 0.85, default: 0.4 }, tipoffLead: 5, tipoffReturn: [5, 12],
     },
     benali: { name: 'Agent Benali', actBase: 0.8, delayMult: 1, firstCallExtra: 0, tipoff: { default: 0 }, transferAfterActs: 3 },
@@ -201,6 +203,7 @@ export const WITNESS = {
   },
   seb_nico: { name: 'Seb & Nico (balcon)', p: 0.7, weight: 0.3, ally: true, catLeave: [23 * 60, 24 * 60 + 30] },
   waiter: { name: 'le serveur', p: 0.6, weight: 1, ally: false },
+  newWaiter: { name: 'le nouveau serveur', p: 0.7, weight: 1, ally: false }, // remplace Théo une fois renvoyé (waiter_fired)
   customers: { name: 'des clients', p: 0.25, weight: 0.8, ally: false, filmChance: 0.35, filmWeight: 0.5, wetBonus: 0.3 },
   darkFactor: 0.5,              // la nuit, dans la rue, on distingue mal une fenêtre éteinte (serveur, clients)
   saturdayCover: 0.7,

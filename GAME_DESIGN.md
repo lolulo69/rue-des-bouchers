@@ -687,3 +687,8 @@ so it reflects what the player actually did.
 - Ending `fired`: `job <= 10` (was `<= 0`). Since 3b36eac a Koddex morning can't go below ≈ +4 per prompt, so 0 was out of reach. `CAMPAIGN.jobDecayPerDay` is now 7.
 - `tests/unit/balance.test.js` (new, balance agent): pins the fired path (slacker bot, 30 seeds).
 
+
+**v0.9 (build-v0.9, coherence pass 3)**
+- **Théo renvoyé** (`waiter_fired`): from the next night, `sim.waiterId = 'nouveau'`. A new waiter takes the terrace (witness `WITNESS.newWaiter`, « le nouveau serveur », slightly more watchful: p 0.7). Théo no longer appears as a witness, and the « Théo » lines stop (`metWaiter` false). **@art**: `sim.waiterId` lets the director swap the model. **@content**: clear `waiter_informant` in the event that fires him, if relevant.
+- **Benali never takes the coffee**: complaisance is Lemaire's trait only (`POLICE.patrols.lemaire.complaisant: true`). Benali and the chief, when they don't fine, issue a **warning** (`outcome: 'warning'`, no evidence, no envelope): the tables go in within 30 min (`POLICE.warningClearMinutes`). `narrative.policeLine('warning', …)` has no dedicated line yet, so the engine text is used.
+- Pinned by `police.test.js` (« cohérence des patrouilles ») and `witness.test.js` (« le serveur renvoyé »).

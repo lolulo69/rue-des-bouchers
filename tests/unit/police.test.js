@@ -24,7 +24,7 @@ describe('police municipale', () => {
   });
 
   it('complaisance : café offert, consigné comme preuve liée au passage', () => {
-    const sim = simAt(H(22, 20), { cfg: { ...late, POLICE: { maxAct: 0, minAct: 0 } } });
+    const sim = simAt(H(22, 20), { cfg: { ...late, POLICE: { maxAct: 0, minAct: 0, roster: { mon: ['lemaire', 'lemaire'] }, patrols: { lemaire: { tipoff: { bernadette: 0, default: 0 } } } } } });
     sim.act({ type: 'police' });
     untilGone(sim);
     const ev = sim.state.evidence.find((e) => e.type === 'complaisance');
@@ -34,7 +34,7 @@ describe('police municipale', () => {
   });
 
   it('complaisance non consignée si Pilou dort et que Klaas ne peut pas voir', () => {
-    const sim = simAt(H(22, 20), { cfg: { ...late, POLICE: { maxAct: 0, minAct: 0 }, WITNESS: { klaas: { sleepAt: 0 } } } });
+    const sim = simAt(H(22, 20), { cfg: { ...late, POLICE: { maxAct: 0, minAct: 0, roster: { mon: ['lemaire', 'lemaire'] }, patrols: { lemaire: { tipoff: { bernadette: 0, default: 0 } } } }, WITNESS: { klaas: { sleepAt: 0 } } } });
     sim.act({ type: 'police' });
     sim.act({ type: 'sleep', on: true });
     untilGone(sim);
@@ -100,5 +100,38 @@ describe('police municipale', () => {
   it('la police n\'arrive jamais sans appel', () => {
     const sim = simAt(H(25, 30));
     expect(sim.state.journal.some((e) => e.type === 'police-arrive')).toBe(false);
+  });
+});
+
+
+describe('cohérence des patrouilles (qa/coherence.md pass 3)', () => {
+  it('Benali ne prend jamais de café : sans PV, c\'est un avertissement, jamais une complaisance', () => {
+    const outcomes = new Set();
+    for (let seed = 1; seed <= 40; seed++) {
+      const sim = simAt(H(22, 20), { seed, cfg: { ...late, POLICE: { maxAct: 0, minAct: 0, roster: { mon: ['benali', 'benali'] } } } });
+      sim.act({ type: 'police' });
+      untilGone(sim);
+      const p = sim.state.policeLog[0];
+      expect(p.patrolId).toBe('benali');
+      outcomes.add(p.outcome);
+      expect(sim.state.evidence.some((e) => e.type === 'complaisance')).toBe(false);
+      expect(sim.state.bribes).toHaveLength(0);
+    }
+    expect(outcomes.has('complaisance')).toBe(false);
+    expect(outcomes.has('warning')).toBe(true);
+  });
+
+  it('l\'avertissement de Benali fait rentrer les tables dans la demi-heure', () => {
+    const sim = simAt(H(22, 20), { seed: 3, cfg: { ...late, POLICE: { maxAct: 0, minAct: 0, roster: { mon: ['benali', 'benali'] } } } });
+    sim.act({ type: 'police' });
+    while (!sim.state.policeLog.length) advance(sim, sim.state.min + 1);
+    const at = sim.state.policeLog[0].arrivedAt;
+    advance(sim, at + sim.cfg.POLICE.warningClearMinutes + 1);
+    expect(sim.state.tables.filter((t) => t.restId === sim.state.policeLog[0].restId && t.out)).toHaveLength(0);
+  });
+
+  it('seul Lemaire est complaisant (config)', () => {
+    const { patrols } = simAt(H(21)).cfg.POLICE;
+    expect(Object.entries(patrols).filter(([, p]) => p.complaisant).map(([id]) => id)).toEqual(['lemaire']);
   });
 });

@@ -2,7 +2,7 @@
 import { fmt } from './time.js';
 
 const OUTCOME = {
-  act: 'PV', complaisance: 'café offert, 0 PV', nothing: 'rien à signaler', tipoff: 'tout rangé juste avant (tuyau ?)',
+  act: 'PV', complaisance: 'café offert, 0 PV', warning: 'avertissement, sans PV', nothing: 'rien à signaler', tipoff: 'tout rangé juste avant (tuyau ?)',
   ignored: '« c’est encore vous », personne',
 };
 const BY = { police: 'la police', waiter: 'le serveur', bucket: 'le seau', tipoff: 'un tuyau', rain: 'la pluie' };
