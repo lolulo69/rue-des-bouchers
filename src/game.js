@@ -9,6 +9,7 @@ import * as narrative from './sim/narrative.js';
 import { audio } from './audio/index.js';
 import { createRng } from './sim/rng.js';
 import { WHATSAPP_GROUP } from './content/characters.js';
+import { bindNight } from './input/night.js'; // manette (agent UI, src/input)
 
 const $ = (id) => document.getElementById(id);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -129,6 +130,7 @@ const keys = new Set();
 let locked = false;
 let started = false;
 let overlay = null;
+const pad = bindNight({ player, getOverlay: () => overlay });
 const timer = new THREE.Timer();
 let now = 0;
 
@@ -549,8 +551,8 @@ let hudTimer = 0;
 let lastPolicePhase = null;
 const camPos = new THREE.Vector3();
 function update(dt) {
-  const running = started && !S.ended && !overlay && (locked || NOLOCK);
-  $('pause').classList.toggle('hidden', !started || S.ended || !!overlay || locked || NOLOCK);
+  const running = started && !S.ended && !overlay && pad.allows(locked || NOLOCK);
+  $('pause').classList.toggle('hidden', !started || S.ended || !!overlay || locked || NOLOCK || pad.active);
   if (!running) return;
   move(dt);
   ambientLines(dt);
