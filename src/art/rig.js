@@ -24,6 +24,7 @@ export const GEO = {
   sphere: new THREE.SphereGeometry(1, 9, 6),
   ball: new THREE.SphereGeometry(1, 6, 4),
   dot: new THREE.SphereGeometry(1, 5, 3), // détails du visage (reflet, joues, nez)
+  arc: new THREE.TorusGeometry(1, 0.22, 3, 8, Math.PI), // sourire / moue
   hemi: new THREE.SphereGeometry(1, 12, 5, 0, Math.PI * 2, 0, Math.PI / 2),
   limb: limbGeo(2, 5),
   torso: torsoGeo(10),
@@ -182,7 +183,7 @@ export function attachRigs(scene, { main = false, lod = true } = {}) {
       for (const b in rig.bones) rig.boneW[b].multiplyMatrices(proxy.matrixWorld, rig.bones[b]);
       for (const p of rig.parts) {
         // morceau conditionnel : visible seulement si l'état (anim / objet tenu / drapeau) correspond
-        if (p.when !== undefined && p.when !== rig.anim && p.when !== rig.held && !rig.flags?.[p.when]) continue;
+        if (p.when !== undefined && p.when !== rig.anim && p.when !== rig.held && p.when !== rig.expr && !rig.flags?.[p.when]) continue;
         if (isFar) { if (p.farKey) pool(p.farKey, p.farGeo, p.glow).push(_m.multiplyMatrices(rig.boneW[p.bone], p.m), p.c); }
         else pool(p.key, p.geo, p.glow).push(_m.multiplyMatrices(rig.boneW[p.bone], p.m), p.c);
       }

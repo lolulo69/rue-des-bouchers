@@ -9,8 +9,11 @@ import { createProps } from './propkit.js';
 import { createDirector } from './anim.js';
 import { perfHud } from './perf.js';
 import { audio } from '../audio/index.js';
+import { portrait, portraitIds, portraitExpressions } from './portraits.js';
+import { scenes } from './scenes.js';
 
-export const art = {};
+// portrait et scenes marchent sans la rue (phases de jour) : disponibles dès l'import
+export const art = { portrait, portraitIds, portraitExpressions, scenes, audio };
 
 export function attachArt(scene, world) {
   let director = null;

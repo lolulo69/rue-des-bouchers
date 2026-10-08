@@ -63,12 +63,12 @@ function hair(add, style, r, c) {
 // bLift : sourcil gauche en plus (suspicion) · ms : bouche [largeur, hauteur] · mx : décalage de la bouche (× r)
 export const EXPRESSIONS = {
   neutral: { eye: 1, by: 0, bt: 0, ms: [1, 0.35], mx: 0 },
-  happy: { eye: 0.45, by: 0.06, bt: -0.1, ms: [1.5, 1.1], mx: 0 },
-  angry: { eye: 0.75, by: -0.06, bt: 0.45, ms: [1.4, 0.3], mx: 0 },
-  suspicious: { eye: 0.4, by: 0, bt: 0.15, bLift: 0.1, ms: [0.8, 0.3], mx: 0.18 },
-  surprised: { eye: 1.35, by: 0.12, bt: -0.15, ms: [0.8, 1.9], mx: 0 },
-  sick: { eye: 0.65, by: 0.04, bt: -0.4, ms: [1.2, 0.45], mx: 0.05 },
-  sad: { eye: 0.8, by: 0.03, bt: -0.45, ms: [1.0, 0.25], mx: 0 },
+  happy: { eye: 0.4, by: 0.08, bt: -0.15, ms: [0.4, 0.3], mx: 0 },
+  angry: { eye: 0.7, by: -0.08, bt: 0.6, ms: [0.4, 0.3], mx: 0 },
+  suspicious: { eye: 0.38, by: -0.02, bt: 0.2, bLift: 0.12, ms: [0.8, 0.3], mx: 0.18, look: 0.09 },
+  surprised: { eye: 1.4, by: 0.14, bt: -0.15, ms: [0.8, 2.1], mx: 0 },
+  sick: { eye: 0.6, by: 0.04, bt: -0.5, ms: [1.3, 0.4], mx: 0.05 },
+  sad: { eye: 0.8, by: 0.03, bt: -0.55, ms: [0.4, 0.3], mx: 0 },
 };
 
 // ---------- Objets tenus : un morceau n'apparaît que si rig.held (ou rig.anim) vaut son nom ----------
@@ -144,16 +144,25 @@ export function humanoid(o = {}) {
   for (const [sx, eb, bb] of [[1, 'eyeL', 'browL'], [-1, 'eyeR', 'browR']]) {
     add('ball', eb, [0, 0, 0], [0.1 * r, 0.15 * r, 0.07 * r], DARK);
     add('dot', eb, [-sx * 0.03 * r, 0.06 * r, 0.06 * r], [0.035 * r, 0.035 * r, 0.02 * r], 0xffffff, null, true);
-    add('box', bb, [0, 0, 0], [0.26 * r, 0.055 * r, 0.05 * r], o.brows ?? new THREE.Color(look.hairColor).multiplyScalar(0.7).getHex());
+    add('box', bb, [0, 0, 0], [0.28 * r, 0.07 * r, 0.08 * r], o.brows ?? new THREE.Color(look.hairColor).multiplyScalar(0.7).getHex());
     if (o.blush !== false) add('dot', 'head', [sx * 0.56 * r, cy - 0.2 * r, 0.77 * r], [0.15 * r, 0.08 * r, 0.05 * r], new THREE.Color(skin).lerp(new THREE.Color(0xff7f86), 0.45).getHex());
     add('dot', 'head', [sx * 0.97 * r, cy, 0], [0.12 * r, 0.2 * r, 0.12 * r], skin); // oreilles
   }
   add('dot', 'head', [0, cy - 0.1 * r, 0.98 * r], 0.1 * r, new THREE.Color(skin).multiplyScalar(0.88).getHex());
   add('dot', 'mouth', [0, 0, 0], [0.11 * r, 0.06 * r, 0.04 * r], 0x6a2a2a);
+  // marques d'expression (visibles selon rig.expr)
+  addW('happy', 'arc', 'head', [0, cy - 0.38 * r, 0.93 * r], [0.17 * r, 0.13 * r, 0.12 * r], 0x6a2a2a, [0, 0, Math.PI]);
+  for (const ex of ['angry', 'sad']) addW(ex, 'arc', 'head', [0, cy - 0.5 * r, 0.92 * r], [0.14 * r, 0.09 * r, 0.12 * r], 0x6a2a2a);
+  addW('angry', 'box', 'head', [0.45 * r, cy + 0.62 * r, 0.75 * r], [0.04, 0.14 * r, 0.02], 0xe0353a, [0.5, 0, 0.6], true, true);
+  addW('angry', 'box', 'head', [0.45 * r, cy + 0.62 * r, 0.75 * r], [0.04, 0.14 * r, 0.02], 0xe0353a, [0.5, 0, -0.6], true, true);
+  addW('sad', 'dot', 'head', [0.36 * r, cy - 0.18 * r, 0.93 * r], [0.05 * r, 0.09 * r, 0.04 * r], 0x8fd0ff, null, true);
+  addW('sick', 'dot', 'head', [0.75 * r, cy + 0.55 * r, 0.55 * r], [0.07, 0.1, 0.05], 0x9fd8ff, null, true);
+  for (const sx of [-1, 1]) addW('sick', 'dot', 'head', [sx * 0.56 * r, cy - 0.2 * r, 0.8 * r], [0.16 * r, 0.09 * r, 0.05 * r], 0x9ccf6a);
   hair(add, o.hair ?? 'short', r, look.hairColor);
   if (o.beard) { // grosse barbe (blanche pour Klaas)
-    add('sphere', 'head', [0, cy - 0.55 * r, 0.42 * r], [0.95 * r, 0.9 * r, 0.62 * r], o.beard);
-    add('sphere', 'head', [0, cy - 1.1 * r, 0.5 * r], [0.55 * r, 0.5 * r, 0.4 * r], o.beard);
+    const bs = o.beardSize ?? 1; // 1 = barbe de Père Noël, < 1 = barbe courte
+    add('sphere', 'head', [0, cy - (0.45 + 0.1 * bs) * r, 0.42 * r], [0.95 * r, 0.9 * r * bs, 0.62 * r], o.beard);
+    if (bs >= 0.9) add('sphere', 'head', [0, cy - 1.1 * r, 0.5 * r], [0.55 * r, 0.5 * r, 0.4 * r], o.beard);
   }
   if (o.mustache) for (const sx of [-1, 1]) add('sphere', 'head', [sx * 0.2 * r, cy - 0.27 * r, 0.93 * r], [0.24 * r, 0.1 * r, 0.1 * r], o.mustache, [0, 0, sx * 0.25]);
   if (o.glasses) for (const sx of [-1, 1]) add('torus', 'head', [sx * 0.34 * r, cy + 0.06 * r, 1.0 * r], 0.2 * r, o.glasses);
@@ -332,9 +341,9 @@ function animHuman(rig, t, dt, proxy) {
   const ms = X.ms;
   B.mouth.copy(B.head).multiply(trs(_t, X.mx * r, cy - 0.42 * r, 0.9 * r, 0, 0, 0, 'XYZ', ms[0], Math.min(2.4, ms[1] + mouth), 1));
   for (const [sx, eb, bb] of [[1, 'eyeL', 'browL'], [-1, 'eyeR', 'browR']]) {
-    B[eb].copy(B.head).multiply(trs(_t, sx * 0.34 * r, cy + 0.06 * r, 0.9 * r, 0, 0, 0, 'XYZ', 1, X.eye * blink, 1));
+    B[eb].copy(B.head).multiply(trs(_t, sx * 0.34 * r + (X.look ?? 0) * r, cy + 0.06 * r, 0.9 * r, 0, 0, 0, 'XYZ', 1, X.eye * blink, 1));
     const lift = (X.by + (sx > 0 ? X.bLift ?? 0 : 0)) * r;
-    B[bb].copy(B.head).multiply(trs(_t, sx * 0.34 * r, cy + 0.33 * r + lift, 0.9 * r, 0, 0, sx * X.bt));
+    B[bb].copy(B.head).multiply(trs(_t, sx * 0.33 * r, cy + 0.3 * r + lift, 0.94 * r, -0.3, 0, sx * X.bt));
   }
   B.armL.copy(B.hips).multiply(trs(_t, k.shX, k.shY, 0, raiseL, yawL, spreadL, 'YZX'));
   B.armR.copy(B.hips).multiply(trs(_t, -k.shX, k.shY, 0, raiseR, yawR, -spreadR, 'YZX'));
@@ -456,9 +465,9 @@ export function clodeBot() {
   const parts = [];
   const add = (geo, bone, pos, scale, c, rot, glow) => parts.push(part(geo, bone, pos, scale, c, rot, glow, true));
   add('box', 'head', [0, 0.3, 0], [0.62, 0.46, 0.12], 0x2a2d36);
-  add('box', 'head', [0, 0.3, 0.062], [0.54, 0.38, 0.01], 0x1d3a4a, null, true);
-  for (const sx of [-1, 1]) add('box', 'eyeL', [sx * 0.11, 0, 0], [0.06, 0.1, 0.01], 0x7fe0ff, null, true);
-  add('box', 'mouth', [0, 0, 0], [0.14, 0.025, 0.01], 0x7fe0ff, null, true);
+  add('box', 'head', [0, 0.3, 0.062], [0.54, 0.38, 0.01], 0x24597a, null, true);
+  for (const sx of [-1, 1]) add('box', 'eyeL', [sx * 0.12, 0, 0], [0.08, 0.13, 0.01], 0x9fefff, null, true);
+  add('box', 'mouth', [0, 0, 0], [0.16, 0.035, 0.01], 0x9fefff, null, true);
   add('cyl', 'root', [0, 0.04, 0], [0.12, 0.08, 0.12], 0x3a3d48);
   add('cyl', 'root', [0, -0.05, 0], [0.3, 0.03, 0.2], 0x3a3d48);
   const proxy = makeRig(parts, { bones: ['root', 'head', 'eyeL', 'mouth'], animate: (rig, t) => {
@@ -504,7 +513,7 @@ const police = (o = {}) => humanoid({ hair: 'short', hairColor: pick(HAIR), shir
 export const CAST = {
   pilou: (o = {}) => humanoid({ hair: 'spiky', hairColor: 0x5a3b26, shirt: 0x7d8790, pants: 0x2f3542, glasses: 0x222222, skin: 0xf6d2b4, ...o,
     extras: (add, k) => add('hemi', 'body', [0, k.th * 0.86, -0.12], [0.2, 0.12, 0.16], 0x6c757d, [-1.9, 0, 0]) }), // capuche
-  jeremie: (o = {}) => humanoid({ hair: 'short', hairColor: 0x3b2a20, shirt: 0xc9a46a, pants: 0x3d4a63, glasses: 0x3a2a1a, height: 1.05, anim: 'leash', ...o,
+  jeremie: (o = {}) => humanoid({ skin: 0xeebf98, hair: 'short', hairColor: 0x3b2a20, shirt: 0xc9a46a, pants: 0x3d4a63, glasses: 0x3a2a1a, height: 1.05, anim: 'leash', ...o,
     extras: (add, k, addW) => addW('leash', 'box', 'handL', [0, -0.02, 0.35], [0.01, 0.01, 0.7], 0xd23c3c, [0.6, 0, 0]) }),
   biloute: () => dachshund(),
   klaas: (pose = 'lean') => humanoid({ pose, height: 1.12, girth: 1.18, headR: 0.29, skin: 0xf3cdb0, hair: 'bald', hairColor: 0xf7f5f0,
@@ -515,26 +524,26 @@ export const CAST = {
       addW('write', 'box', 'handL', [0, 0.03, 0.05], [0.14, 0.02, 0.18], 0x2b4d7a);
     } }),
   hilde: (pose = 'lean') => humanoid({ pose, hair: 'bob', hairColor: 0xe6e6e6, shirt: 0xb39ddb, pants: 0x55617a, skin: 0xf6d2b4, held: 'mug', mugColor: 0xf3b3c8, talk: 0.5, height: 0.95, glasses: 0x8a6a9a }),
-  tatie: (pose = 'lean') => humanoid({ pose, hair: 'curly', hairColor: 0xa26cc4, shirt: 0xe85d9b, pants: 0x3d4a63, glasses: 0xd4af37, held: 'phone', talk: 0.9, height: 0.92, girth: 1.12 }),
-  seb: (pose = 'stand') => humanoid({ pose, hair: 'short', hairColor: 0x1f1a17, beard: 0x1f1a17, shirt: 0x2a9d8f, pants: 0xe8e2d0, held: 'wine', height: 1.1, talk: 1 }),
-  nico: (pose = 'stand') => humanoid({ pose, hair: 'quiff', hairColor: 0xe0c070, shirt: 0xf2a7b8, pants: 0x3d4a63, held: 'wine', wine: 0xf0d080, talk: 1 }),
+  tatie: (pose = 'lean') => humanoid({ skin: 0xfbe0c8, pose, hair: 'curly', hairColor: 0xa26cc4, shirt: 0xe85d9b, pants: 0x3d4a63, glasses: 0xd4af37, held: 'phone', talk: 0.9, height: 0.92, girth: 1.12 }),
+  seb: (pose = 'stand') => humanoid({ skin: 0xd9a072, pose, hair: 'short', hairColor: 0x2d2018, beard: 0x3b2a20, beardSize: 0.55, shirt: 0x2a9d8f, pants: 0xe8e2d0, held: 'wine', height: 1.1, talk: 1 }),
+  nico: (pose = 'stand') => humanoid({ skin: 0xfbe0c8, pose, hair: 'quiff', hairColor: 0xe0c070, shirt: 0xf2a7b8, pants: 0x3d4a63, held: 'wine', wine: 0xf0d080, talk: 1 }),
   gaufre: () => cat(),
-  hippolyte: (o = {}) => humanoid({ hair: 'side', hairColor: 0xd8d8d8, mustache: 0xd8d8d8, shirt: 0x6b5e3a, pants: 0x4a4436, height: 1.08, anim: 'cane', talk: 0.3, ...o,
+  hippolyte: (o = {}) => humanoid({ skin: 0xf3cdb0, hair: 'side', hairColor: 0xd8d8d8, mustache: 0xd8d8d8, shirt: 0x6b5e3a, pants: 0x4a4436, height: 1.08, anim: 'cane', talk: 0.3, ...o,
     extras: (add, k, addW) => {
       add('sphere', 'body', [0, k.th * 0.86, 0.1], [0.08, 0.06, 0.06], 0x8e1b3a); // lavallière
       add('torso', 'body', [0, k.th * 0.25, 0.02], [0.47, k.th * 0.55, 0.37], 0x8c7a4a); // gilet
       addW('cane', 'cyl', 'handL', [0, -0.32, 0.02], [0.03, 0.7, 0.03], 0x2a1a10);
       addW('cane', 'ball', 'handL', [0, 0.02, 0.02], 0.035, 0xd4af37);
     } }),
-  regis: (o = {}) => humanoid({ hair: 'quiff', hairColor: 0x8a5a2b, shirt: 0xf0e6d0, pants: 0x55617a, height: 1.02, girth: 1.08, held: 'phone', talk: 0.7, ...o,
+  regis: (o = {}) => humanoid({ skin: 0xeebf98, hair: 'quiff', hairColor: 0x8a5a2b, shirt: 0xf0e6d0, pants: 0x55617a, height: 1.02, girth: 1.08, held: 'phone', talk: 0.7, ...o,
     extras: (add, k) => {
       for (const sx of [-1, 1]) add('ball', 'head', [sx * 0.1, 0.92 * k.r + 0.2, 0.1], [0.07, 0.035, 0.05], 0x1a1a1a); // lunettes de soleil sur la tête
       add('torus', 'body', [0, k.th * 0.85, 0.02], [0.13, 0.13, 0.2], 0x7fb3d5, [Math.PI / 2, 0, 0]); // pull sur les épaules
     } }),
-  dede: (o = {}) => humanoid({ hair: 'bald', hairColor: 0x3b2a20, mustache: 0x3b2a20, shirt: 0x24305e, pants: 0x2f3542, height: 0.84, girth: 1.55, headR: 0.29, talk: 0.9, ...o,
+  dede: (o = {}) => humanoid({ skin: 0xd9a072, hair: 'bald', hairColor: 0x3b2a20, mustache: 0x3b2a20, shirt: 0x24305e, pants: 0x2f3542, height: 0.84, girth: 1.55, headR: 0.29, talk: 0.9, ...o,
     extras: (add, k) => add('box', 'body', [0, k.th * 0.28, k.g * 0.19], [0.36, k.th * 0.5, 0.02], 0xf3efe6, [-0.12, 0, 0]) }), // tablier court
-  ghislain: (o = {}) => humanoid({ hair: 'manbun', hairColor: 0x2b1d14, shirt: 0x1d1d22, pants: 0x1d1d22, height: 1.22, girth: 0.72, headR: 0.24, held: 'cig', talk: 0.15, ...o }),
-  serveur: (o = {}) => humanoid({ hair: 'quiff', hairColor: 0x3b2a20, shirt: 0x1f1f24, pants: 0x1f1f24, height: 1.02, anim: 'tray', talk: 0.4, ...o,
+  ghislain: (o = {}) => humanoid({ skin: 0xf6d2b4, hair: 'manbun', hairColor: 0x2b1d14, shirt: 0x1d1d22, pants: 0x1d1d22, height: 1.22, girth: 0.72, headR: 0.24, held: 'cig', talk: 0.15, ...o }),
+  serveur: (o = {}) => humanoid({ skin: 0xeebf98, hair: 'quiff', hairColor: 0x3b2a20, shirt: 0x1f1f24, pants: 0x1f1f24, height: 1.02, anim: 'tray', talk: 0.4, ...o,
     extras: (add, k, addW) => {
       add('box', 'body', [0, -0.08, 0.17], [0.34, 0.52, 0.02], 0xf6f2ea); // grand tablier blanc
       addW('tray', 'cyl', 'handL', [0, 0.02, 0], [0.4, 0.02, 0.4], 0xc0c4ca); // plateau
@@ -542,21 +551,21 @@ export const CAST = {
       addW('tray', 'cyl', 'handL', [-0.07, 0.09, -0.03], [0.07, 0.12, 0.07], 0xf0a830);
     } }),
   // Police municipale : Lemaire (rond, moustache, bonhomme), Benali (jeune, carnet), le chef (galons dorés)
-  lemaire: (o = {}) => police({ hair: 'short', hairColor: 0x6b5b4b, mustache: 0x5a4a3a, height: 0.98, girth: 1.35, headR: 0.28, talk: 0.6, ...o }),
+  lemaire: (o = {}) => police({ skin: 0xf3cdb0, hair: 'short', hairColor: 0x6b5b4b, mustache: 0x5a4a3a, height: 0.98, girth: 1.35, headR: 0.28, talk: 0.6, ...o }),
   benali: (o = {}) => police({ hair: 'short', hairColor: 0x1f1a17, skin: 0xc98e5f, height: 1.12, girth: 0.9, headR: 0.25, held: 'notebook', ...o }),
-  chef: (o = {}) => police({ hair: 'side', hairColor: 0xb0b0b0, height: 1.1, girth: 1.1, capBand: 0xe8c45a, glasses: 0x333333, ...o }),
+  chef: (o = {}) => police({ skin: 0xfbe0c8, hair: 'side', hairColor: 0xb0b0b0, height: 1.1, girth: 1.1, capBand: 0xe8c45a, glasses: 0x333333, ...o }),
   police: (o = {}) => police(o),
-  delphine: (o = {}) => humanoid({ hair: 'bob', hairColor: 0x2d2420, shirt: 0x2f3e5c, skirt: 0x2f3542, height: 1.05, girth: 0.92, glasses: 0x111111, anim: 'clipboard', held: 'clipboard', talk: 0.4, ...o,
+  delphine: (o = {}) => humanoid({ skin: 0xf6d2b4, hair: 'bob', hairColor: 0x2d2420, shirt: 0x2f3e5c, skirt: 0x2f3542, height: 1.05, girth: 0.92, glasses: 0x111111, anim: 'clipboard', held: 'clipboard', talk: 0.4, ...o,
     extras: (add, k) => add('box', 'body', [0, k.th * 0.6, 0.18], [0.05, 0.08, 0.01], 0xffffff) }), // badge
-  colette: (o = {}) => humanoid({ hair: 'bob', hairColor: 0xe8d39a, shirt: 0xb0283a, skirt: 0x2a2a35, height: 0.98, girth: 1.08, talk: 0.8, ...o,
+  colette: (o = {}) => humanoid({ skin: 0xf3cdb0, hair: 'bob', hairColor: 0xe8d39a, shirt: 0xb0283a, skirt: 0x2a2a35, height: 0.98, girth: 1.08, talk: 0.8, ...o,
     extras: (add, k) => { for (let i = 0; i < 9; i++) { const a = -0.9 + i * 0.225; add('ball', 'body', [Math.sin(a) * 0.15, k.th * 0.92 - Math.cos(a) * 0.06, 0.13 + Math.cos(a) * 0.03], 0.022, 0xf8f4ea); } } }), // collier de perles
-  lescaut: (o = {}) => humanoid({ hair: 'side', hairColor: 0x4a3f35, shirt: 0x2b3550, pants: 0x2b3550, glasses: 0x333333, height: 1.1, talk: 0.5, ...o,
+  lescaut: (o = {}) => humanoid({ skin: 0xeebf98, hair: 'side', hairColor: 0x4a3f35, shirt: 0x2b3550, pants: 0x2b3550, glasses: 0x333333, height: 1.1, talk: 0.5, ...o,
     extras: (add, k) => { add('box', 'body', [0, k.th * 0.6, 0.17], [0.06, k.th * 0.55, 0.02], 0x9a2a3a); add('box', 'body', [0, k.th * 0.7, 0.165], [0.14, k.th * 0.4, 0.015], 0xf2f2f2); } }), // cravate
-  journaliste: (o = {}) => humanoid({ hair: 'ponytail', hairColor: 0xa0522d, shirt: 0xc9b48a, pants: 0x3d4a63, height: 1.0, held: 'notebook', talk: 0.8, ...o,
+  journaliste: (o = {}) => humanoid({ skin: 0xfbe0c8, hair: 'ponytail', hairColor: 0xa0522d, shirt: 0xc9b48a, pants: 0x3d4a63, height: 1.0, held: 'notebook', talk: 0.8, ...o,
     extras: (add, k) => add('torus', 'body', [0, k.th * 0.9, 0.02], [0.14, 0.14, 0.25], 0x2a9d8f, [Math.PI / 2, 0, 0]) }), // écharpe
-  avocat: (o = {}) => humanoid({ hair: 'side', hairColor: 0x2d2420, shirt: 0x15151a, pants: 0x15151a, glasses: 0x222222, height: 1.08, talk: 0.5, ...o,
+  avocat: (o = {}) => humanoid({ skin: 0xd9a072, hair: 'side', hairColor: 0x2d2420, shirt: 0x15151a, pants: 0x15151a, glasses: 0x222222, height: 1.08, talk: 0.5, ...o,
     extras: (add, k) => { add('box', 'body', [0, k.th * 0.78, 0.17], [0.12, 0.12, 0.015], 0xffffff); add('skirt', 'body', [0, -0.2, 0], [0.62, 0.5, 0.5], 0x15151a); } }), // robe et rabat
-  stephane: (o = {}) => humanoid({ hair: 'quiff', hairColor: 0xd9b26a, shirt: 0x3a3f4a, pants: 0x3d4a63, shoes: 0xf2f2f2, height: 1.06, held: 'phone', talk: 1, ...o,
+  stephane: (o = {}) => humanoid({ skin: 0xf6d2b4, hair: 'quiff', hairColor: 0xd9b26a, shirt: 0x3a3f4a, pants: 0x3d4a63, shoes: 0xf2f2f2, height: 1.06, held: 'phone', talk: 1, ...o,
     extras: (add, k) => { add('torso', 'body', [0, k.th * 0.2, 0.01], [0.48, k.th * 0.62, 0.38], 0x5a7a9a); for (const sx of [-1, 1]) add('ball', 'head', [sx * 0.98 * k.r, 0.85 * k.r, 0.1 * k.r], 0.05, 0xffffff); } }), // doudoune sans manches, écouteurs
   clode: () => clodeBot(),
 };
