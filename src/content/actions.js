@@ -35,6 +35,16 @@ export const ACTIONS = [
     result: "« Une équipe va passer, monsieur. » Le standardiste a dit « va passer » comme on dit « un jour, peut-être ».",
   },
   {
+    id: 'night_ronde_jeremie',
+    label: 'Faire la ronde de 22h avec Jérémie et Biloute',
+    phase: 'night',
+    legality: 'legal',
+    cost: { minutes: 20 },
+    requires: { stats: { asso: '>=30' } },
+    effects: { setFlags: ['joined_rounds'], asso: +3, dossier: +1, sleep: -3 },
+    result: "Jérémie compte les tables à voix haute, Biloute renifle chaque pied de chaise, vous notez. À 22h04, trois terrasses sont encore dehors. Biloute aboie sur la troisième. Personne ne sait pourquoi, mais il a raison.",
+  },
+  {
     id: 'night_police_asso',
     label: "Appeler la police « pour l'Association de la rue des Bouchers »",
     phase: 'night',
