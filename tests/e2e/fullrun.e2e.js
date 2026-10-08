@@ -15,7 +15,8 @@ const WPM = 200;
 const CLICK_S = 2;
 const NIGHT_S = (RULES.nightEnd - RULES.nightStart) / RULES.gameMinutesPerSecond; // durée réelle d'une nuit, en s
 const FIXED = { 1: 'd1_monday', 4: 'd4_colette_dinner', 6: 'd6_saturday', 7: 'd7_general_meeting', 9: 'd9_inspector', 11: 'd11_exhaust_meeting', 13: 'd13_saturday', 14: 'd14_commission' };
-const OUT = 'test-results/fullrun';
+const OUT = 'test-results/fullrun'; // journaux complets (effacés par Playwright à chaque lancement)
+const SUMMARY = 'qa/fullrun'; // résumés versionnés : qa/duration.md est reconstruit à partir de tous les styles déjà joués
 
 // ── Styles de jeu ────────────────────────────────────────────────────────────
 const STYLES = {
@@ -277,7 +278,7 @@ async function reloadAndCompare(page, style, log) {
 }
 
 function writeDuration() {
-  const rows = readdirSync(OUT).filter((f) => f.endsWith('.json')).map((f) => JSON.parse(readFileSync(`${OUT}/${f}`, 'utf8')));
+  const rows = readdirSync(SUMMARY).filter((f) => f.endsWith('.json')).map((f) => JSON.parse(readFileSync(`${SUMMARY}/${f}`, 'utf8')));
   const m = (s) => `${Math.floor(s / 3600)}h${String(Math.round((s % 3600) / 60)).padStart(2, '0')}`;
   const lines = rows.map((r) => `| ${r.title} | ${r.ending} (jour ${r.lastDay}) | ${r.nights} | ${r.words} | ${r.clicks} | ${m(r.daySeconds)} | ${m(r.nightSeconds)} | **${m(r.totalSeconds)}** | ${r.early ? `⏹ fin anticipée (jour ${r.lastDay})` : r.totalSeconds < 9000 ? '⚠️ trop court' : r.totalSeconds > 14400 ? '⚠️ trop long' : '✅'} |`);
   writeFileSync('qa/duration.md', `# Durée d'une campagne (GAME_DESIGN §13.A : 2h30 à 4h)
@@ -293,7 +294,7 @@ Généré par \`tests/e2e/fullrun.e2e.js\` (\`npm run test:fullrun\`). Estimatio
 |---|---|---|---|---|---|---|---|---|
 ${lines.join('\n')}
 
-Dernière mise à jour : ${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC.
+Résumés par style : `qa/fullrun/*.json` (date du dernier passage dans `at`). Dernière mise à jour : ${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC.
 `);
 }
 
@@ -369,7 +370,8 @@ async function runCampaign(page, key, style, album = null) {
 
   // ── Calendrier : chaque événement fixe à son jour (jours atteints) ──
   for (const [day, id] of Object.entries(FIXED)) {
-    if (Number(day) > s.day) continue;
+    // Fin anticipée : le dernier jour peut s'arrêter avant l'événement (ex. déménagement le matin du J11)
+    if (Number(day) > s.day || (end.early && Number(day) === s.day)) continue;
     const seen = log.cards.filter((c) => c.id === id);
     expect(seen.length, `${id} vu`).toBeGreaterThan(0);
     for (const c of seen) expect(c.day, `${id} au jour ${day}`).toBe(Number(day));
@@ -399,6 +401,8 @@ for (const [key, style] of Object.entries(STYLES)) {
     test.setTimeout(60 * 60_000);
     const { r, log, end } = await runCampaign(page, key, style);
     writeFileSync(`${OUT}/${key}.json`, JSON.stringify({ ...r, log }, null, 2));
+    mkdirSync(SUMMARY, { recursive: true });
+    writeFileSync(`${SUMMARY}/${key}.json`, `${JSON.stringify({ ...r, at: new Date().toISOString().slice(0, 10) }, null, 2)}\n`);
     writeDuration();
     test.info().annotations.push({ type: 'duration', description: `${style.title} : ${Math.round(r.totalSeconds / 60)} min (${end.id})` });
     if (key === 'reckless') expect(end.id).toBe('custody');
