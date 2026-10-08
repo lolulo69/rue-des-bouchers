@@ -105,7 +105,8 @@ describe('fins', () => {
   });
 
   it('épilogue : seulement les parties qui collent, variables remplies', () => {
-    const c = createCampaign({ seed: 6, content });
+    // Échelle des gains du contenu à 1 : on teste le remplissage de l'épilogue, pas l'équilibrage
+    const c = createCampaign({ seed: 6, content, cfg: makeConfig({ CAMPAIGN: { contentDossierScale: 1 } }) });
     c.apply({ setFlags: ['won_legal', 'met_klaas'], dossier: 70 }, 'story', 'test');
     while (c.state.day < 14) { c.state.day++; }
     c.state.step = 'recap';

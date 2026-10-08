@@ -97,7 +97,9 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     const deltas = {};
     for (const k of STAT_KEYS) {
       if (typeof effects[k] !== 'number') continue;
-      deltas[k] = setStat(k, S.stats[k] + effects[k]);
+      // Les gains écrits par le contenu sont relatifs : la config fixe l'échelle (équilibrage, qa/balance.md)
+      const scale = effects[k] > 0 && cause !== 'engine' ? (k === 'dossier' ? C.contentDossierScale : k === 'asso' ? C.contentAssoScale : 1) ?? 1 : 1;
+      deltas[k] = setStat(k, S.stats[k] + effects[k] * scale);
     }
     for (const k of HIDDEN_KEYS) {
       if (typeof effects[k] !== 'number') continue;
@@ -300,6 +302,8 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
   function beginDay() {
     c.note('day', {});
     setStat('risk', S.stats.risk - C.riskDecayPerDay);
+    // Le soutien s'effrite si on ne le nourrit pas (vers le niveau de départ, pas en dessous)
+    if (S.stats.asso > C.start.asso) setStat('asso', Math.max(C.start.asso, S.stats.asso - (C.assoDecayPerDay ?? 0)));
     if (!c.has('unemployed')) setStat('job', S.stats.job - C.jobDecayPerDay);
     S.police.fatigue = Math.max(0, S.police.fatigue - C.policeFatigueDecay);
     updateIgpn();

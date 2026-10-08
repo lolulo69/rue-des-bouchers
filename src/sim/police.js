@@ -98,6 +98,7 @@ function resolve(sim, P) {
   entry.pAct = p;
   if (sim.rng.chance(p)) {
     entry.outcome = 'act';
+    S.hostility = clamp(S.hostility + (POLICE.fineHostility ?? 0), 0, 100); // un PV après un appel : le bloc enrage
     let cleared = 0, trimmed = 0, moved = 0;
     for (const t of inf) {
       if (sim.isLate()) { t.clearAt = S.min + 0.5 + cleared * 0.8; t.pendingBy = 'police'; cleared++; continue; }

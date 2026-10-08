@@ -8,6 +8,6 @@ export { createCampaign, initialState, SAVE_VERSION } from './campaign.js';
 export { normalizeContent, contentFromGlob, isEmptyContent } from './content.js';
 export { evalCondition, unsatisfiable } from './conditions.js';
 export { runCampaign, playNight } from './campaignRunner.js';
-export { CAMPAIGN_BOTS, TARGETS, ENDING_SCORE } from './campaignBots.js';
+export { CAMPAIGN_BOTS, TARGETS, ENDING_SCORE, baseEnding } from './campaignBots.js';
 export { checkCampaignInvariants } from './campaignInvariants.js';
 export { availableNightActions, performNightAction } from './nightActions.js';
