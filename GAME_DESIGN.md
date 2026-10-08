@@ -382,6 +382,28 @@ export const KODDEX = { work: [...], sideProjects: [{ id, label, unlocks: 'flag'
 // endings.js: the 8 endings, decided at day 14 or early (failures, from night 5)
 export const ENDINGS = [{ id, title, when: {...}, priority, epilogue: [{ when: {...}, text }] }];
 ```
+```js
+// twists.js (v1.1): the night twists. Engine: src/sim/twists.js (build agent). Content: src/content/twists.js.
+export const TWISTS = [{
+  id: 'birthday_t4', title: 'Anniversaire à la table 4', pool: true,      // or day: 4 for a fixed calendar night
+  when: {...},                                   // §14 conditions (day range, flags, weekday 'sat', not after X…)
+  intro: '…',                                    // the card shown before the night (≤ 300 chars)
+  sim: {                                         // all optional; the engine applies them to that night only
+    crowd: 1.2, noise: 1.15, closeDelay: 20,     // multipliers / minutes added to the restaurants' clearing
+    tables: [{ rest: 'bernadette', count: 11, label: 'table 4' }],   // extra or altered tables
+    witnesses: [{ id: 'influencer', at: 'street', filming: true }],  // extra witnesses (witness.js)
+    darkness: 0.5, rain: true, exhaustOff: true, corridorBlocked: true,
+    events: [{ at: 23 * 60 + 40, text: '…', simEffect: { noise: +8 } }], // timed moments (minutes since midnight)
+    opportunities: ['night_photo'],              // actions highlighted / unlocked for this night only
+  },
+  lines: { barks: ['…'], klaas: ['…'], recap: ['…'] },   // flavour, picked by narrative.js
+  props: ['ring_light'],                         // art ids the scene director spawns for the night
+  after: { setFlags: ['…'], media: ['…'] },       // consequences on the following days
+}];
+// unlocks.js (v1.1): progressive tools. Engine: src/sim/unlocks.js. Content: src/content/unlocks.js.
+export const UNLOCKS = [{ id: 'db_reading', unlocks: { keys: ['B'], actions: ['night_db'] }, when: { day: [1, 14] },
+  card: { title: 'Nouveau : le relevé de décibels', text: '…', hint: 'B / RB' } }];
+```
 Rules: all text is in French; **no real restaurant names**; every `speaker` exists in `characters.js`; every flag is declared;
 every action, event and ending is reachable (the linter + the campaign simulator check this). An epilogue is built from the parts whose `when` matches,
 so it reflects what the player actually did.
