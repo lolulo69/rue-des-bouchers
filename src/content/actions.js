@@ -774,7 +774,7 @@ export const ACTIONS = [
   },
   {
     id: 'pm_waiter_debrief',
-    label: 'Retrouver Théo en douce pour un débrief',
+    label: 'Retrouver le serveur en douce pour un débrief',
     phase: 'afternoon',
     legality: 'illegal',
     cost: { time: 1 },
