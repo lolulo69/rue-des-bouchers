@@ -20,7 +20,7 @@ altered names.
 | Cup (n°3) | **Mug** | Takeaway, customers drink standing in the street |
 | La Ripaille (n°4, closed) | **La Bombance** (closed) | Empty premises. Late-game threat: a new bar wants to open there |
 | Martine Aubry (ex-mayor) | **Martine Aubrac** | Tatie Bouchon's contact. Sides with the restaurants |
-| Current mayor (A. Deslandes) | **Arnaud Delandre** | Martine's successor and protégé |
+| Current mayor (A. Deslandes) | **Arnaud Delandre** | Martine's successor, but **leans toward the residents** |
 | Claude Code | **Clode Kode** | Pilou's work tool (wink) |
 | Real neighbours Jérémy, Klaus | **Jérémie**, **Klaas** | First names slightly altered (Klaas = Flemish, fits Lille) |
 | La Voix du Nord | **La Voix du Nordiste** | Local newspaper |
@@ -29,10 +29,13 @@ Sources: listings (PagesJaunes, Yelp, TheFork), the city's summer pedestrianisat
 
 ## 1. Setting and rules (reality)
 - After Covid, Lille extended terraces onto the street to help restaurants recover.
-- **Terraces close at 22:00, every day** (per Lucas). [CHECK] The city's 2025 summer
-  pedestrianisation page lists terraces until 23:00 Sun–Wed and midnight Thu–Sat for pedestrianised streets.
-  Is 22:00 a street-specific rule for rue des Bouchers (like the 6-per-table rule)?
+- **Terraces close at 22:00, every day**: a rule **specific to rue des Bouchers, new in 2026** (elsewhere in the
+  Vieux-Lille: 23:00 Sun–Wed, midnight Thu–Sat). Satire material: the restaurants say "but rue de Gand closes at midnight!".
 - **Max 6 people per table**. This applies **only on rue des Bouchers**.
+- **Terrace zone**: each restaurant has an authorised zone, **not marked on the ground**, and a **free passage corridor** must
+  stay open in the middle of the street (pedestrians, prams, wheelchairs, fire brigade). The restaurants overflow regularly.
+  Gameplay: tables/chairs encroaching on the corridor = evidence (needs a measurement: Pilou's tape measure, or Klaas's paces).
+  The zone is invisible by default. A "legal view" (unlocked via the association / the AOT permit document) shows it as a ghost overlay.
 - **Cobblestone street (pavés)**. Gameplay: metal chairs dragged on cobbles = signature noise of terrace set-up and pack-up (the 22:00 clatter), heels and wheeled suitcases (Airbnb) at night, glass bottles that shatter. Low-poly cobble texture is enough.
 - **No vehicles on Saturdays** → biggest crowds, people drinking standing up, and **people peeing in the street**
   (in doorways, including Pilou's).
@@ -75,6 +78,9 @@ The restaurants form a **bloc**: Bernadette's leads it, and the others back her.
   Pilou's boss.** Real but compromising lever: a dinner at the boss's place = an informal channel to her
   (a conflict of interest that can come out).
 - **Martine Aubrac**: ex-mayor, still influential, protects the restaurants. Reached through Tatie Bouchon.
+- **Arnaud Delandre**: current mayor, **more on the residents' side** (he brought in the 22:00 rule). City hall is split:
+  the new mayor and the inspector lean toward the residents, while the old Martine network and parts of the municipal police protect the bloc.
+  Getting a meeting with Delandre is a mid-campaign goal. Martine works to undermine him.
 - **Koddex boss**: **Stéphane**, startup founder who is never there and talks about "vibes".
 
 ## 3. Structure: a 14-night campaign
@@ -182,21 +188,31 @@ recruiting a resident (the traitor) · a fake post "Ch'tite Bernadette is being 
 7. **Turncoat (secret)**: Pilou becomes a regular at Bernadette's, eats the carbonnade, and Klaas writes it down.
 8. **The return**: you win, then **La Bombance reopens as a bar** next door. Wink at a sequel.
 
-## 10. Prototype v0.1 (current build target)
+## 10. Art direction and language
+- **Stylised, cute low-poly**, in the family of cozy "simulator" games: chunky proportions, big heads, soft flat colours,
+  warm lantern light at night, bouncy idle animations. Readable silhouettes: Klaas = Santa (white beard, red cardigan),
+  Ghislain = huge bun, Dédé = short and round, the dachshund, the cat on the balcony. Flemish brick façades with stepped gables.
+- Models are **procedural three.js geometry** (no external assets needed) unless a CC0 low-poly pack fits.
+  Performance budget: 60 fps on a laptop iGPU.
+- **French only** for all in-game text. Ch'ti touches in dialogue ("hein", "biloute", "drache", "estaminet"), sparingly.
+
+## 11. Prototype v0.1 (shipped)
 A single night (night 1, Monday) on one street. First person, ZQSD/WASD + mouse. Pilou's apartment reachable
 via the building door. Tables with headcounts (some over the limit), a waiter, the exhaust with steam under the window,
 a clock, the stats HUD, a phone (police / association / mayor's office), the dossier (Tab), a bucket of water (illegal), an end-of-night summary.
 Tunable rules live in `src/config.js`.
 
-### Next (v0.2, after v0.1 ships)
-- Witnesses + line-of-sight stealth (Klaas's window, the Gaystapo balcony with the cat).
-- Police patrols with personalities, tip-off mechanic.
-- Saturday variant (crowd, standing drinkers, peeing).
-- Day/Koddex menu phase + 14-night calendar with save (localStorage).
+## 12. Roadmap
+| Milestone | Content |
+|---|---|
+| **v0.2: core tension** | Sim logic split out of rendering + tests. Witnesses and line-of-sight stealth (Klaas, the Gaystapo + cat, waiter, customers filming). Police patrols with personalities, tip-off, "c'est encore vous", complaisance logging. Terrace zone + passage corridor evidence. Saturday variant (crowd, standing drinkers, peeing). |
+| **v0.3: art pass** | Cute low-poly restyle: characters (Pilou, the association, Dédé & Ghislain, the waiter, police, customers), stepped gables, the cat, the dachshund, animations, ambient audio (WebAudio: crowd murmur, chairs on cobbles, the exhaust hum). |
+| **v0.4: campaign** | The 14-day calendar, day phase (Koddex / Clode Kode prompts, afternoon association actions), save in localStorage, scripted events (Martine's dinner, general meeting, inspector, exhaust meeting, commission), bloc counter-moves, dialogue system with the association members. |
+| **v0.5: dirty tricks** | Hidden cameras + electricity/wifi hijack, cardboard on the exhaust, stink bomb, laxatives, fake reviews, sabotage, bribing the waiter, photographing the bribe. Risk thresholds → complaint, custody, trial. |
+| **v1.0: endings + polish** | The 8 endings, balancing via simulated runs, French copy pass, performance, a full QA run in Chrome. |
 
-## 11. Still open
-- [CHECK] 22:00 vs the city's summer hours (23:00 / midnight).
-- Is Bernadette's terrace marked on the ground (the area is checkable)?
+## 13. Still open
+- Nothing blocking. New lore welcome anytime.
 
 ## Build notes
 > Appended by the build agent. Simplest-option choices made for v0.1, to confirm or override.
