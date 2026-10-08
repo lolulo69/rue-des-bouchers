@@ -124,3 +124,19 @@ On main 3b36eac the pass-1 values gave: legal victory **33 %** ❌, turncoat 1 %
 | diplomat bot: gives up at hostility | ≥ 80 | ≥ 70 (day ≥ 8) | Hostility is lower on the new main (median 27): the turncoat was at 1 %. Now 6 %. |
 
 No dominant action (`--ablate mixed`, 1000 runs, base 96 %): `pm_klaas_roster` −14, `pm_klaas_notebook` −12, `pm_heritage` / `pm_press_contact` / `night_bribe_photo_window` −3, the rest smaller. Max 14 < 25 ✅.
+
+## 2026-10-08 21:55 · design agent verification · main 72009e6 · 1000 runs × 7 bots on CT 106 (110 s)
+Independent re-run after the balance agent's pass 1b. Invariants ✅.
+
+| bot | outcome | verdict |
+|---|---|---|
+| passive | 100% moving out | ✅ |
+| legal careful | 47% legal victory, 47% scandal, 6% moving out, never custody | ✅ (but asso 96: saturation persists) |
+| reckless | 100% custody (median night 5) | ✅ |
+| stealthy | 1% custody, 13% scandal, 80% moving out, 6% the return | ✅ |
+| mixed smart | 82% legal victory, best score 92 | ✅ |
+| diplomat | 29% peace + 56% the return (peace twist) + 6% turncoat | ✅ (counting the return as a peace variant) |
+| **slacker** | **0% fired** (57% scandal, 23% moving out, 21% legal) | ❌ **regression**: the agent measured 99% fired before main moved |
+
+Never reached on this commit: the ending **fired**; actions night_saboter_cuisine, night_laxatif_carbonnade, night_backroom_photo, pm_bloc_fooled; event r_aot_pdf; 4 counter-moves; 23 dialogue lines.
+→ Back to the balance agent (fired regression, bots exercising the kitchen sabotages / backroom photo, asso saturation) and the content side (r_aot_pdf).
