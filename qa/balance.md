@@ -103,3 +103,24 @@ New **slacker** bot (side projects + naps) → fired.
 - **Stealthy moves out 97 %**: illegal-only has no tool against noise apart from the one-off cardboard. Its targets are met (custody 1 %, scandal reachable), but it's a weak strategy.
 - **The legal win is a cliff** (dossier p10–p90 spans ~10 points around the bar): new content that adds or removes ~3 dossier points moves the legal rate by ~10 points. Re-run `npm run sim -- --runs 1000` after content changes.
 - Never used: `night_saboter_cuisine`, `night_laxatif_carbonnade`, `night_backroom_photo`, `pm_bloc_fooled` (+3 counter-moves that follow them); `r_aot_pdf` can't fire (content condition, see Build notes).
+
+## 2026-10-08 · balance pass 1b · retune after main moved (scheduled presences, Koddex once-per-morning, new events)
+On main 3b36eac the pass-1 values gave: legal victory **33 %** ❌, turncoat 1 % ❌, the return **0 %** ❌ (the diplomat now gets the heritage angle and blocks the bar project).
+`npm run sim -- --runs 1000 --detail` after the changes below, 1000 campaigns × 7 bots, invariants ✅:
+
+| bot | custody | fired | legal_victory | moving_out | negotiated_peace | scandal | the_return | turncoat | score | sommeil | asso | risque | job | dossier | garde à vue (nuit méd.) | cibles §13.H |
+| passif | · | · | · | 100% | · | · | · | · | 0 | 11 | 38 | 0 | 100 | 12 | – | ✅ ≥ 90 % déménagement / défaite |
+| légal prudent | · | · | 48% | 6% | · | 45% | · | · | 80 | 51 | 96 | 0 | 100 | 50 | – | ✅ victoire légale 35–60 %<br>✅ jamais de garde à vue |
+| illégal imprudent | 100% | · | · | · | · | · | · | · | -20 | 76 | 3 | 95 | 37 | 14 | 5 | ✅ ≥ 70 % garde à vue / procès |
+| illégal discret | 2% | · | · | 91% | · | 5% | 2% | · | 4 | 1 | 12 | 28 | 77 | 22 | 10 | ✅ ≤ 40 % garde à vue<br>✅ scandale atteignable |
+| mixte malin | · | · | 82% | 5% | · | 13% | · | · | 92 | 35 | 96 | 0 | 74 | 54 | – | ✅ meilleur score moyen |
+| diplomate | · | · | · | 6% | 30% | 6% | 52% | 6% | 78 | 72 | 93 | 0 | 100 | 33 | – | ✅ paix négociée ≥ 40 % |
+| tire-au-flanc | · | 99% | 0% | 0% | · | 0% | · | · | 10 | 82 | 90 | 2 | 0 | 30 | – | ✅ licenciement atteignable (≥ 2 %, §13.F) |
+
+| change | was | now | why |
+|---|---|---|---|
+| `CAMPAIGN.nightEvidenceScale` | 0.065 | 0.073 | Legal median dossier fell to 49 (bar 50). 0.068 → 39 %, 0.07 → 43 %, 0.073 → 48 %, 0.076 → 52 %. |
+| diplomat bot: `bombance_blocked` weight | +30 | −5 | A dialogue player doesn't file a heritage / legal objection against a new neighbour, so the bar opens on top of the peace (the return, 52 %). |
+| diplomat bot: gives up at hostility | ≥ 80 | ≥ 70 (day ≥ 8) | Hostility is lower on the new main (median 27): the turncoat was at 1 %. Now 6 %. |
+
+No dominant action (`--ablate mixed`, 1000 runs, base 96 %): `pm_klaas_roster` −14, `pm_klaas_notebook` −12, `pm_heritage` / `pm_press_contact` / `night_bribe_photo_window` −3, the rest smaller. Max 14 < 25 ✅.

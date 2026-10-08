@@ -155,10 +155,10 @@ function recklessNight() {
   };
 }
 
-const DIPLOMAT = { asso: 3, hostility: -1.5, dossier: 1, sleep: 0.5, risk: -5, flags: flagWeights({ stance_dialogue: 30, won_peace: 80 }) };
+const DIPLOMAT = { asso: 3, hostility: -1.5, dossier: 1, sleep: 0.5, risk: -5, flags: flagWeights({ stance_dialogue: 30, won_peace: 80, bombance_blocked: -5 }) }; // pas de recours contre un nouveau voisin
 const DIPLOMAT_TURNCOAT = { ...DIPLOMAT, asso: 0, flags: flagWeights({ carbonnade_1: 40, carbonnade_2: 40, carbonnade_3: 40, won_scandal: 0, commission_won: 0 }) };
 const diplomatNight = legalNight({ bedAt: 23 * 60, maxCalls: 1 });
-const diplomatGaveUp = (c) => c.has('carbonnade_1') || (c.state.day >= 8 && c.state.hidden.hostility >= 80);
+const diplomatGaveUp = (c) => c.has('carbonnade_1') || (c.state.day >= 8 && c.state.hidden.hostility >= 70);
 
 // Aucun des témoins que l'acte redoute (`witnessed.by`) ne peut voir l'endroit, sauf des clients
 // (le serveur ne « témoigne » pas du pot-de-vin qu'il reçoit ; Dédé / Ghislain restent un aléa qu'on ne voit pas venir)
