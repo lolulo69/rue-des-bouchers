@@ -310,17 +310,17 @@ for (const [key, style] of Object.entries(STYLES)) {
   });
 }
 
-// BUG-003 (qa/bugs.md) : la scène de la commission (répliques de Jérémie, Ghislain, Delphine, Colette, du maire)
+// BUG-003 (corrigé, qa/bugs.md) : la scène de la commission (répliques de Jérémie, Ghislain, Delphine, Colette, du maire)
 // est calculée par le moteur (card.scene) mais l'interface ne l'affiche pas.
-(process.env.QA_RUN_FIXME ? test : test.fixme)('BUG-003 · la scène de la commission (J14) est affichée avant les plaidoiries', async () => {
+test('BUG-003 (corrigé) · la scène de la commission (J14) est affichée avant les plaidoiries', async () => {
   const f = `${OUT}/legal.json`;
   test.skip(!existsSync(f), 'lancer d’abord la campagne « légal prudent »');
   const { log } = JSON.parse(readFileSync(f, 'utf8'));
   expect(log.commission.shownSpeeches).toBe(log.commission.sceneFromEngine);
 });
 
-// BUG-004 (qa/bugs.md) : le résultat de la dernière carte d'une phase n'est jamais affiché (l'écran passe à la phase suivante).
-(process.env.QA_RUN_FIXME ? test : test.fixme)('BUG-004 · le résultat de la dernière carte d’une phase est affiché', async () => {
+// BUG-004 (corrigé, qa/bugs.md) : le résultat de la dernière carte d'une phase n'est jamais affiché (l'écran passe à la phase suivante).
+test('BUG-004 (corrigé) · le résultat de la dernière carte d’une phase est affiché', async () => {
   const files = existsSync(OUT) ? readdirSync(OUT).filter((f) => f.endsWith('.json')) : [];
   test.skip(!files.length, 'lancer d’abord les campagnes complètes');
   const lost = files.flatMap((f) => JSON.parse(readFileSync(`${OUT}/${f}`, 'utf8')).log.lostResults);
