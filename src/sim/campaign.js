@@ -389,7 +389,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     // Un Risque écrit dans `effects` est une exposition : il ne compte que si l'acte est remarqué (§4, §13.G)
     const { risk: exposedRisk = 0, ...effects } = a.effects ?? {};
     apply(effects, 'action', a.id);
-    if (botHelps(a)) apply({ asso: C.whatsappBot.assoBonus }, 'action', 'proj_whatsapp_bot');
+    if (botHelps(a)) apply({ asso: C.whatsappBot.assoBonus }, 'engine', 'proj_whatsapp_bot'); // bonus de config : pas remis à l'échelle du contenu
     let seen = [];
     if (a.witnessed || exposedRisk > 0) {
       seen = dayWitnesses(a.witnessed ?? {}, a.legality);
