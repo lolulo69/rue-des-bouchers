@@ -451,9 +451,13 @@ async function showDay({ resume = false } = {}) {
   dayUI.show();
 }
 if (campaign) {
-  $('title-sub').textContent = `${nightLabel()}. La nuit tombe sur la rue des Bouchers.`;
-  $('start').textContent = 'Commencer la nuit';
-  $('campaign').classList.add('hidden');
+  // Pas d'écran titre en campagne (QA U6) : la nuit démarre tout de suite. Le navigateur exige un clic pour capturer
+  // la souris et lancer le son : c'est l'overlay de pause, qui montre les commandes la première nuit seulement.
+  $('title').classList.add('hidden');
+  $('pause-text').textContent = `${nightLabel()} · cliquez pour descendre dans la rue`;
+  if (campaign.state.nightCount === 0) $('pause-keys').append($('title').querySelector('.keys').cloneNode(true));
+  $('pause').addEventListener('click', () => { $('pause-text').textContent = 'Pause. Cliquez pour reprendre.'; $('pause-keys').replaceChildren(); }, { once: true });
+  startNight();
 } else {
   $('campaign').addEventListener('click', () => showDay());
   $('start').textContent = 'Nuit libre (une soirée isolée)';

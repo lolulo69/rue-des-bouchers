@@ -36,8 +36,9 @@ test('campagne : titre → interface de jour → nuit 3D → bilan → jour 2, s
 
   expect(await driveTo(page, 'night')).toBe('night');
   await Promise.all([page.waitForURL(/mode=night/), page.click('[data-testid=night-go]')]);
-  await expect(page.locator('#start')).toContainText('Commencer la nuit');
-  await page.click('#start');
+  // Pas d'écran titre en campagne : la nuit démarre directement (QA U6)
+  await expect(page.locator('#title')).toBeHidden();
+  await expect(page.locator('#hud')).toBeVisible();
   await page.evaluate(() => {
     const { sim, step } = window.__rdb;
     for (let i = 0; !sim.state.ended && i < 2000; i++) { sim.tick(0.5); if (i % 60 === 0) step(1); }
