@@ -29,7 +29,7 @@ export function mat(color, opts = {}) {
 
 // Habillage des terrasses par resto (les autres prennent la couleur de config.js)
 const REST_STYLE = {
-  bernadette: { chair: 0xc49152, top: 0x8a5a35, cloth: 0xc4473d, parasol: 0xa83232, awning: ['#a83232', '#f3e6cc'], proj: 0.45, tilt: 0.95 },
+  bernadette: { chair: 0xc49152, top: 0x8a5a35, cloth: 0xc4473d, parasol: 0xa83232, awning: ['#a83232', '#f3e6cc'], proj: 0.32, tilt: 1.15 },
   goulot: { chair: 0x3a5a8c, top: 0xe8e4dc, awning: ['#2b4a8a', '#f3eee0'], proj: 0.75, tilt: 0.75 },
   malunes: { chair: 0x4c8a55, top: 0x5b3a1e, awning: ['#2b6a3a', '#efe6cc'], proj: 0.6, tilt: 0.85 },
 };
@@ -233,17 +233,25 @@ export function buildWorld(scene, opts = {}) {
   const brickP = mats.walls.red();
   const fx = -(W + 0.15);
   const hz0 = bz - 1, hz1 = bz + 1, hy0 = F, hy1 = F + 1.8; // ouverture de la fenêtre de Pilou
+  // Sous la fenêtre de Pilou, l'allège est en retrait (presque au nu intérieur) : depuis la fenêtre on voit les
+  // tables juste en dessous, ce qui est la vue principale du jeu (pas de garde-corps : il barrait la vue).
+  const ry0 = winY(0) + 1.45; // juste au-dessus de la clé de la fenêtre du 1er étage
   for (const [h, d, y, z] of [
-    [hy0, P1 - P0, hy0 / 2, (P0 + P1) / 2],
+    [ry0, P1 - P0, ry0 / 2, (P0 + P1) / 2],
+    [hy0 - ry0, hz0 - P0, (ry0 + hy0) / 2, (P0 + hz0) / 2],
+    [hy0 - ry0, P1 - hz1, (ry0 + hy0) / 2, (hz1 + P1) / 2],
     [PH - hy1, P1 - P0, (hy1 + PH) / 2, (P0 + P1) / 2],
     [hy1 - hy0, hz0 - P0, (hy0 + hy1) / 2, (P0 + hz0) / 2],
     [hy1 - hy0, P1 - hz1, (hy0 + hy1) / 2, (hz1 + P1) / 2],
   ]) kit.add(new THREE.BoxGeometry(0.3, h, d), brickP, fx, y, z);
+  kit.add(new THREE.BoxGeometry(0.08, hy0 - ry0, hz1 - hz0), brickP, -(W + 0.26), (ry0 + hy0) / 2, bz); // allège en retrait
+  kit.fbox(-1, -0.2, hy0 - 0.02, bz, 0.08, 0.04, hz1 - hz0, mats.iron); // seuil en fer, au nu intérieur
   const pBays = [bz - 4.6, bz - 2.4, bz, bz + 2.4, bz + 4.6, bz + 6.8];
   for (let k = 0; k < 3; k++) {
-    kit.stringCourse(-1, P0, P1, winY(k) - 1.02);
+    if (k === 1) { kit.stringCourse(-1, P0, hz0 - 0.2, winY(k) - 1.02); kit.stringCourse(-1, hz1 + 0.2, P1, winY(k) - 1.02); } // pas de bandeau sous la fenêtre de Pilou
+    else kit.stringCourse(-1, P0, P1, winY(k) - 1.02);
     for (const z of pBays) {
-      if (k === 1 && z === bz) kit.windowAt(-1, z, winY(k), { noPane: true, open: true, w: 2.0, h: 1.8 });
+      if (k === 1 && z === bz) kit.windowAt(-1, z, winY(k), { noPane: true, open: true, noSill: true, w: 2.0, h: 1.8 });
       else kit.windowAt(-1, z, winY(k), k === 2 && z === bz ? { lit: true } : {});
     }
   }

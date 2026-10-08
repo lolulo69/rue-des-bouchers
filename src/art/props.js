@@ -52,7 +52,7 @@ export function bistroTable({ top = 0x8a5a35, metal = 0x2b2b2e, cloth = null, pa
   if (parasol) {
     const pp = [
       part('cyl', 'root', [0, 1.4, 0], [0.04, 2.6, 0.04], 0xe8e2d0),
-      part('cone', 'root', [0, 2.15, 0], [0.32, 1.2, 0.32], parasol, [Math.PI, 0, 0]),
+      part('cone', 'root', [0, 2.2, 0], [0.18, 1.1, 0.18], parasol, [Math.PI, 0, 0]),
       part('ball', 'root', [0, 2.75, 0], 0.05, 0xe8e2d0),
     ];
     for (const q of pp) { q.when = 'parasol'; p.push(q); }

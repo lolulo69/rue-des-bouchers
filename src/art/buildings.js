@@ -64,12 +64,12 @@ export function makeKit(city, W, rng) {
   };
   const faceRot = (side) => -side * Math.PI / 2; // plan (normale +Z) tourné vers la rue
 
-  function windowAt(side, z, y, { lit = rng() < 0.4, open = false, noPane = false, w = WW, h = WH, curtains = rng() < 0.5 } = {}) {
+  function windowAt(side, z, y, { lit = rng() < 0.4, open = false, noPane = false, noSill = false, w = WW, h = WH, curtains = rng() < 0.5 } = {}) {
     const pane = lit ? mats.lit[rng() < 0.15 ? 2 : rng() < 0.5 ? 1 : 0] : mats.dark;
     if (!noPane) fbox(side, 0.0, y, z, 0.04, h, w, pane);
     fbox(side, 0.04, y, z - w / 2 - 0.06, 0.1, h + 0.08, 0.12, mats.stone);
     fbox(side, 0.04, y, z + w / 2 + 0.06, 0.1, h + 0.08, 0.12, mats.stone);
-    fbox(side, 0.08, y - h / 2 - 0.045, z, 0.2, 0.09, w + 0.36, mats.stone);
+    if (!noSill) fbox(side, 0.08, y - h / 2 - 0.045, z, 0.2, 0.09, w + 0.36, mats.stone);
     fbox(side, 0.05, y + h / 2 + 0.12, z, 0.12, 0.24, w + 0.32, mats.stone);
     fbox(side, 0.07, y + h / 2 + 0.14, z, 0.16, 0.3, 0.18, mats.stone);
     if (open) return;
