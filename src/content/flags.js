@@ -178,6 +178,8 @@ export const FLAGS = {
   // ── content-actions (actions.js) ────────────────────────────────────────
   asso_meeting: "Pilou a réuni l'association un après-midi",
   kitchen_sabotaged: "Cuisine de l'estaminet sabotée (sel et sucre inversés)",
+  laxative_done: 'Laxatif dans la carbonnade de l’estaminet',
+  laxative_caught: 'Pilou identifié pour le laxatif',
   kitchen_sabotage_caught: 'Pilou identifié pour le sabotage de la cuisine',
 
   // ── content-koddex (koddex.js) ──────────────────────────────────────────

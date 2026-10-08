@@ -209,6 +209,18 @@ export const ACTIONS = [
     result: "Le service du soir est une catastrophe sucrée : frites au sucre glace, crème brûlée salée, carbonnade au goût de pain d'épices (ça, personne ne voit la différence). Les avis tombent comme une drache.",
   },
   {
+    id: 'night_laxatif_carbonnade',
+    label: 'Mettre un laxatif dans la carbonnade',
+    phase: 'night',
+    legality: 'illegal',
+    once: true,
+    cost: { minutes: 15 },
+    requires: { flags: ['waiter_informant'], notFlags: ['laxative_done'] },
+    effects: { setFlags: ['laxative_done'], hostility: +30, asso: -10 },
+    witnessed: { exposure: 0.6, by: ['waiter', 'dede', 'ghislain'], effects: { risk: +60, asso: -15, setFlags: ['laxative_caught'] } },
+    result: "Vers 21h40, la terrasse découvre la notion de file d'attente. Une seule toilette, quatorze clients, un Dédé qui hurle « c'est pas la carbonnade, c'est le Covid ! ». La terrasse est vide à 22h pile. Pour la première fois. Vous n'en êtes pas fier. Enfin, pas complètement.",
+  },
+  {
     id: 'night_sabotage_chairs',
     label: 'Dévisser les chaises de la terrasse',
     phase: 'night',

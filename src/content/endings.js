@@ -109,6 +109,11 @@ const SECRETS = [
       "Personne n'a jamais su pourquoi, un soir, la carbonnade de l'estaminet était salée comme la mer du Nord et les frites sucrées comme une gaufre. Ghislain a accusé le fournisseur. Le fournisseur a accusé Ghislain. Vous avez gardé une expression neutre pendant six mois.",
   },
   {
+    when: { flags: ['laxative_done'], notFlags: ['laxative_caught'] },
+    text:
+      "L'estaminet a changé de fournisseur de bœuf, puis de bière, puis de chef. Le soir de la « grande file d'attente » est devenu une légende de la rue. Personne n'a jamais su. Biloute, lui, vous regarde parfois d'un drôle d'air.",
+  },
+  {
     when: { flags: ['camera_found'] },
     text: "La petite caméra retrouvée sous le store est exposée derrière le comptoir de l'estaminet, avec une étiquette : « Souvenir des riverains ». Dédé la montre à chaque client. Il en rit encore. Pas vous.",
   },
@@ -138,6 +143,11 @@ export const ENDINGS = [
         when: { flags: ['kitchen_sabotage_caught'] },
         text:
           "Variante « carbonnade sucrée ». La Voix du Nordiste titre : « Vieux-Lille : un riverain inverse le sel et le sucre d'un estaminet ». L'audience devant le tribunal de police dure quarante minutes, dont vingt sur la question de savoir si une carbonnade est censée être sucrée. L'avocat de l'estaminet plaide « l'atteinte à un patrimoine culinaire régional ». Dédé témoigne en tablier. Vous êtes condamné à une amende, à des dommages et intérêts, et à une célébrité locale dont vous vous seriez passé.",
+      },
+      {
+        when: { flags: ['laxative_caught'] },
+        text:
+          "Variante « carbonnade laxative ». Ce n'est plus le tribunal de police : c'est le correctionnel. La Voix du Nordiste titre : « Vieux-Lille : un riverain empoisonne la terrasse d'un estaminet ». Le mot « empoisonne » vous poursuivra longtemps. L'association publie un communiqué pour se désolidariser. Klaas, sobre, apporte au tribunal son carnet : il y est noté, à 21h12, « Pilou entre par la cuisine. Mauvaise idée. »",
       },
       {
         when: { flags: ['bucket_witnessed'] },
