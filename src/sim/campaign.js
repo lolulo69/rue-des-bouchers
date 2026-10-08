@@ -556,7 +556,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
       S.police.lemaireTransferred = true;
       setFlag('lemaire_transferred');
       apply({ corruption: C.igpn.transferCorruption }, 'engine', 'igpn');
-      S.cards.push({ type: 'info', id: 'igpn', title: 'Enquête interne', text: 'L\'IGPN a bouclé son enquête : le brigadier Lemaire est muté. Au commissariat, on regarde ses chaussures.' });
+      S.cards.push({ type: 'info', id: 'igpn', title: 'Enquête interne', text: 'L’enquête interne est bouclée : le brigadier Lemaire est muté. Au commissariat, on regarde ses chaussures.' });
     }
   }
 

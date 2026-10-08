@@ -44,8 +44,8 @@ export function buildSummary(sim) {
     if (S.risk >= RISK.complaint) verdict.push('Dédé a porté plainte. Ça va revenir.');
     else if (S.risk >= RISK.warning) verdict.push('Une vidéo de la fenêtre circule sur les réseaux.');
   }
-  if (S.scandal) verdict.push('Le commissaire s\'intéresse aux cafés offerts. Lemaire transpire.');
-  if (S.blocKnows) verdict.push('Le bloc sait que c\'est toi qui appelles au nom de l\'Association.');
+  if (S.scandal) verdict.push('La hiérarchie de la police municipale s’intéresse aux cafés offerts. Lemaire transpire.');
+  if (S.blocKnows) verdict.push('Le bloc sait que c’est vous qui appelez au nom de l\'Association.');
   if (S.asso < 30) verdict.push('L\'Association prend ses distances.');
 
   return {

@@ -267,7 +267,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
       const p = { id: `pipi-${++S.peeCount}`, doorway, start: S.min, end: S.min + pee.duration };
       S.pees.push(p);
       sim.note('pee', { peeId: p.id, pos: { x: doorway.x, z: doorway.z } });
-      if (doorway.pilou) sim.log('Quelqu\'un urine contre ta porte d\'entrée. Classique du samedi.', 'bad');
+      if (doorway.pilou) sim.log('Quelqu\'un urine contre votre porte d’entrée. Classique du samedi.', 'bad');
       S.nextPeeAt = S.min + rng.range(...pee.interval);
     }
   }
@@ -301,7 +301,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
         if (!fromWindow && distance <= EVIDENCE.measureRange) {
           add('corridor', `${t.label} empiète de ${Math.round(enc * 100)} cm sur le passage libre (mesuré)`, EVIDENCE.corridorValue, { encroach: enc });
         } else if (!found.length) {
-          sim.log(`${t.label} déborde sur le passage ? Il faut mesurer : approche-toi à moins de ${EVIDENCE.measureRange} m, dans la rue.`);
+          sim.log(`${t.label} déborde sur le passage ? Il faut mesurer : approchez-vous à moins de ${EVIDENCE.measureRange} m, dans la rue.`);
           return { ok: false, found };
         }
       }
@@ -393,7 +393,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
   // Un acte illégal en `pos` : tire les témoins (aboiement du teckel compris), les mémorise, sans encore punir.
   sim.witnessAct = (pos, label, opts = {}) => {
     const dog = sim.dogActive() && Math.hypot(sim.dogPos().x - pos.x, sim.dogPos().z - pos.z) <= DOG.barkRange;
-    if (dog) { sim.log('Le teckel de Jérémie aboie comme un fou ! Toute la rue lève la tête.', 'bad'); sim.klaasAlert(); }
+    if (dog) { sim.log('Biloute, le teckel de Jérémie, aboie comme un fou ! Toute la rue lève la tête.', 'bad'); sim.klaasAlert(); }
     const seen = rollWitnesses(sim, pos, { ...opts, bark: dog ? DOG.barkBonus : 0 });
     for (const w of seen) {
       S.witnessMemories.push({ time: S.min, who: w.id, kind: w.kind, ally: !!w.ally, name: w.name, act: label, filmed: w.filmed });
@@ -432,7 +432,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
     const b = sim.activeBribe();
     if (!b) { sim.log('Les agents… rien d\'illégal à photographier. Pour l\'instant.'); return { ok: false, found: [] }; }
     if (b.photographed) { sim.log('L\'enveloppe est déjà dans le dossier.'); return { ok: false, found: [] }; }
-    if (distance > POLICE.bribePhotoRange) { sim.log('Trop loin : on voit une main, pas une enveloppe. Rapproche-toi.'); return { ok: false, found: [] }; }
+    if (distance > POLICE.bribePhotoRange) { sim.log('Trop loin : on voit une main, pas une enveloppe. Rapprochez-vous.'); return { ok: false, found: [] }; }
     b.photographed = true;
     const ev = sim.addEvidence({
       type: 'photo', kind: 'bribe', restId: b.restId, callId: b.callId, bribeId: b.id, quality, value: EVIDENCE.bribeValue * quality,
@@ -452,10 +452,10 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
       sim.note('police-scheduled', { reason: 'pilou' });
       sim.note('police-arrive', { visit: true, reason: 'pilou' });
       if (v.enemyMemories > 0) {
-        sim.log('On sonne : la police, pour toi. Plainte du bloc pour « harcèlement ». Rappel à la loi.', 'bad');
+        sim.log('On sonne : la police, pour vous. Plainte du bloc pour « harcèlement ». Rappel à la loi.', 'bad');
         sim.addRisk(POLICE.visitRisk ?? 10, 'plainte', [{ id: 'memoire-ennemie' }]);
       } else {
-        sim.log('On sonne : la police, pour toi. Contrôle d\'identité… rien à te reprocher. Le bloc a essayé.', 'bad');
+        sim.log('On sonne : la police, pour vous. Contrôle d’identité… rien à vous reprocher. Le bloc a essayé.', 'bad');
       }
     } else if (v.phase === 'onsite' && S.min >= v.until) v.phase = 'done';
   }

@@ -121,7 +121,7 @@ function resolve(sim, P) {
       if (byKlaas) { sim.note('klaas-note', { about: 'complaisance', pos }); sim.klaasNote({ about: 'complaisance', time: fmtMin(S.min), rest: rest.name, patrol: P.patrolName }, pos); }
       sim.addEvidence({
         type: 'complaisance', restId: rest.id, callId: P.callId, quality: 1, value: EVIDENCE.complaisanceValue, byKlaas, pos,
-        text: `${P.patrolName} chez ${rest.name} : café offert, 0 PV (${inf.length} infraction(s) visibles)${byKlaas ? ' · noté par Klaas' : ''}`,
+        text: `${P.patrolName} chez ${rest.name} : café offert, 0 PV (${inf.length} infraction(s) visible(s))${byKlaas ? ' · noté par Klaas' : ''}`,
       });
       sim.log(sim.say('police', { outcome: 'complaisance', patrolId: P.patrolId, entry }, `${P.patrolName} prend un café chez ${rest.name}… 0 PV. Noté dans le dossier (complaisance).`), 'bad');
     } else {
