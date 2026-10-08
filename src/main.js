@@ -1,7 +1,8 @@
 // Rendu + entrées + HUD. Toute la logique de jeu vit dans src/sim (testée sans navigateur) :
 // main.js lit sim.state pour dessiner, et envoie les actions du joueur via sim.act().
 import * as THREE from 'three';
-import { buildWorld, person, mat } from './world.js';
+import { buildWorld } from './world.js';
+import { createDirector } from './scene/director.js';
 import { RULES, SKY, STREET, NOISE, EVIDENCE, INTERACT, ZONES, POLICE } from './config.js';
 import { createSim, makeConfig, fmt, createCampaign, contentFromGlob, SAVE_VERSION } from './sim/index.js';
 import * as narrative from './sim/narrative.js';
@@ -107,136 +108,8 @@ Object.assign(ANCHORS, {
 });
 for (const v of world.tables) v.hit.userData.target = { kind: 'table', id: v.id };
 
-// ---------- Acteurs de gameplay (placeholders : person() de world.js, restylés par la passe art) ----------
-const v3 = (p, y = p.y ?? 0) => new THREE.Vector3(p.x, y, p.z);
-const COLORS = [0x264653, 0x2a9d8f, 0xe9c46a, 0xf4a261, 0xe76f51, 0x6d597a, 0x355070, 0xb5838d, 0x3d405b];
-
-// [art v0.3] Klaas & Hilde (fenêtre sur la place), Seb & Nico et le chat (balcon) sont dessinés par world.js : world.cast
-const klaas = { userData: { figure: world.cast.klaas } };
-const cat = world.cast.cat;
-// Buveurs debout (samedi)
-const standingViews = S.standing.map((g) => {
-  const grp = new THREE.Group();
-  for (let i = 0; i < g.size; i++) {
-    const p = person(COLORS[(i * 3 + g.size) % COLORS.length]);
-    const a = (i / g.size) * Math.PI * 2;
-    p.position.set(Math.cos(a) * 0.6, 0, Math.sin(a) * 0.6); // [art v0.3] persos posés au sol
-    p.rotation.y = -a + Math.PI / 2;
-    grp.add(p);
-  }
-  grp.position.set(g.x, 0, g.z);
-  grp.visible = false;
-  scene.add(grp);
-  return { g, grp };
-});
-// Pipis dans les portes : une petite réserve de silhouettes
-const peeViews = Array.from({ length: 4 }, (_, i) => {
-  const p = person(COLORS[(i * 2 + 1) % COLORS.length]);
-  const hit = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 1.8, 6), new THREE.MeshBasicMaterial({ visible: false }));
-  hit.position.y = 0.9;
-  p.add(hit);
-  p.visible = false;
-  scene.add(p);
-  return { p, hit };
-});
-// Patrouille
-const officers = [-0.4, 0.4].map(() => {
-  const o = person(0x1b2847);
-  const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.08, 10), mat(0x0d1426));
-  cap.position.y = 1.33;
-  o.add(cap);
-  o.scale.setScalar(1.1);
-  const hit = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 1.8, 6), new THREE.MeshBasicMaterial({ visible: false }));
-  hit.position.y = 0.9;
-  hit.userData.target = { kind: 'police' };
-  o.add(hit);
-  o.userData.hit = hit;
-  o.visible = false;
-  scene.add(o);
-  return o;
-});
-// Vue "légale" (L) : zones de terrasse (vert) et couloir de passage (rouge), invisibles par défaut
-const ghost = new THREE.Group();
-{
-  const ghostMat = (color) => new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.22, depthWrite: false });
-  const corridor = new THREE.Mesh(new THREE.PlaneGeometry(ZONES.corridorHalfWidth * 2, STREET.length), ghostMat(0xff4040));
-  corridor.rotation.x = -Math.PI / 2;
-  corridor.position.y = 0.03;
-  ghost.add(corridor);
-  for (const r of sim.restaurants) {
-    const depth = W - ZONES.corridorHalfWidth;
-    const zone = new THREE.Mesh(new THREE.PlaneGeometry(depth, r.z1 - r.z0), ghostMat(0x40ff70));
-    zone.rotation.x = -Math.PI / 2;
-    zone.position.set(r.side * (ZONES.corridorHalfWidth + depth / 2), 0.035, (r.z0 + r.z1) / 2);
-    ghost.add(zone);
-  }
-  const ringGeo = new THREE.RingGeometry(ZONES.tableFootprint - 0.06, ZONES.tableFootprint, 24);
-  const ringMat = new THREE.MeshBasicMaterial({ color: 0xff2020, transparent: true, opacity: 0.8, depthWrite: false });
-  for (const t of S.tables) {
-    if (sim.encroachment(t) <= 0) continue;
-    const ring = new THREE.Mesh(ringGeo, ringMat);
-    ring.rotation.x = -Math.PI / 2;
-    ring.userData.tableId = t.id;
-    ghost.add(ring);
-  }
-  ghost.visible = false;
-  scene.add(ghost);
-}
-
-const spawn = v3(ANCHORS.policeSpawn);
-const tmpA = new THREE.Vector3(), tmpB = new THREE.Vector3();
-function syncActors() {
-  for (const t of S.tables) {
-    const v = viewTables.get(t.id);
-    v.group.visible = t.out;
-    v.group.position.x = t.x; // la police peut recaler une table hors du couloir
-    v.people.forEach((p, i) => { p.visible = i < t.count; });
-  }
-  for (const r of ghost.children) {
-    if (!r.userData.tableId) continue;
-    const t = sim.table(r.userData.tableId);
-    r.visible = t.out && sim.encroachment(t) > 0;
-    r.position.set(t.x, 0.04, t.z);
-  }
-  const wp = sim.waiterPos();
-  world.waiter.visible = sim.waiterOnDuty();
-  world.waiter.position.set(wp.x, 0, wp.z);
-  world.waiter.rotation.y = Math.cos(S.min * ANCHORS.waiter.speed) > 0 ? 0 : Math.PI;
-  klaas.userData.figure.visible = sim.klaasAwake();
-  cat.visible = sim.catPresent();
-  for (const { g, grp } of standingViews) grp.visible = S.min >= g.arriveAt && S.min < g.leaveAt;
-  const pees = sim.activePees();
-  peeViews.forEach((v, i) => {
-    const p = pees[i];
-    v.p.visible = !!p;
-    v.hit.userData.target = p ? { kind: 'pee', id: p.id } : null;
-    if (!p) return;
-    const side = Math.sign(p.doorway.x);
-    v.p.position.set(p.doorway.x - side * 0.45, 0, p.doorway.z);
-    v.p.rotation.y = side > 0 ? Math.PI / 2 : -Math.PI / 2;
-  });
-  // Patrouille : position interpolée sur l'horloge de la simulation
-  const P = S.police;
-  const V = S.visit?.phase === 'onsite' ? S.visit : null; // la police vient pour Pilou : devant sa porte
-  officers.forEach((o, i) => {
-    o.visible = (!!P && P.phase !== 'pending') || !!V;
-    if (!o.visible) return;
-    if (!P || P.phase === 'pending') {
-      o.position.set(ANCHORS.streetDoor.x + 0.9, 0, ANCHORS.streetDoor.z + (i ? 0.5 : -0.5));
-      o.rotation.y = -Math.PI / 2;
-      return;
-    }
-    const r = sim.rest(P.restId);
-    const dx = i ? 0.4 : -0.4;
-    let a = tmpA.set(spawn.x + dx, 0, spawn.z), b = tmpB.set(r.side * 0.4 + dx, 0, (r.z0 + r.z1) / 2), k = 1;
-    if (P.phase === 'walking') k = (S.min - P.enterAt) / Math.max(0.01, P.arriveAt - P.enterAt);
-    if (P.phase === 'leaving') { [a, b] = [b, a]; k = (S.min - P.leaveAt) / Math.max(0.01, P.exitAt - P.leaveAt); }
-    k = clamp(k, 0, 1);
-    o.position.lerpVectors(a, b, k);
-    o.position.y = k < 1 ? Math.abs(Math.sin(now * 8)) * 0.04 : 0;
-    o.rotation.y = Math.atan2(b.x - a.x, b.z - a.z);
-  });
-}
+// ---------- Acteurs, accessoires, effets : le metteur en scène (src/scene/director.js) ----------
+const director = createDirector({ scene, world, art: world.art, audio: world.audio });
 
 // ---------- Joueur ----------
 const player = { pos: new THREE.Vector3(1.2, 0, ANCHORS.streetDoor.z + 6), yaw: 0, pitch: 0, loc: 'street' };
@@ -333,8 +206,7 @@ function photo() {
   raycaster.far = EVIDENCE.photoRange;
   const hits = [
     ...S.tables.filter((t) => t.out).map((t) => viewTables.get(t.id).hit),
-    ...peeViews.filter((v) => v.p.visible).map((v) => v.hit),
-    ...officers.filter((o) => o.visible).map((o) => o.userData.hit),
+    ...director.hitTargets(), // pipis, policiers
   ];
   const hit = raycaster.intersectObjects(hits, false)[0];
   const target = hit?.object.userData.target;
@@ -490,7 +362,7 @@ addEventListener('keydown', (e) => {
   if (overlay || e.repeat) return keys.add(e.code);
   keys.add(e.code);
   if (e.code === 'KeyE') interaction()?.act();
-  else if (e.code === 'KeyL') { ghost.visible = !ghost.visible; tuto('legal_view_toggle'); }
+  else if (e.code === 'KeyL') { director.toggleLegalView(); tuto('legal_view_toggle'); }
   else if (S.sleeping) return;
   else if (e.code === 'KeyP') photo();
   else if (e.code === 'KeyB') sim.act({ type: 'db', noiseDb, fromWindow: player.loc === 'apt' });
@@ -534,43 +406,10 @@ function move(dt) {
 }
 
 // ---------- Événements de la simulation ----------
-const splash = (() => {
-  const N = 140;
-  const geo = new THREE.BufferGeometry();
-  const pos = new Float32Array(N * 3), vel = new Float32Array(N * 3);
-  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  const points = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0x9fd3ff, size: 0.12, transparent: true, opacity: 0.8, depthWrite: false }));
-  points.visible = false;
-  points.frustumCulled = false;
-  scene.add(points);
-  let life = 0;
-  const rnd = (a, b) => a + Math.random() * (b - a); // purement visuel, hors simulation
-  return {
-    fire(o) {
-      for (let i = 0; i < N; i++) {
-        pos.set([o.x + rnd(-0.2, 0.2), o.y, o.z + rnd(-0.3, 0.3)], i * 3);
-        vel.set([rnd(0.8, 2.2), rnd(-0.5, 1), rnd(-1.2, 1.2)], i * 3);
-      }
-      life = 1.6;
-      points.visible = true;
-    },
-    update(dt) {
-      if (life <= 0) return;
-      life -= dt;
-      for (let i = 0; i < N; i++) {
-        vel[i * 3 + 1] -= 9.8 * dt;
-        for (let k = 0; k < 3; k++) pos[i * 3 + k] += vel[i * 3 + k] * dt;
-        if (pos[i * 3 + 1] < 0.02) { pos[i * 3 + 1] = 0.02; vel[i * 3] *= 0.5; vel[i * 3 + 1] = 0; vel[i * 3 + 2] *= 0.5; }
-      }
-      geo.attributes.position.needsUpdate = true;
-      if (life <= 0) points.visible = false;
-    },
-  };
-})();
 function drainSim() {
   for (const e of sim.drainEvents()) {
+    director.onEvent(e); // éclaboussure, crochets art des actions de nuit…
     if (e.type === 'log') log(e.text, e.cls, e.min);
-    else if (e.type === 'splash') splash.fire(v3(ANCHORS.pilouWindow).setX(-W - 0.1));
     else if (e.type === 'end') (campaign ? endCampaignNight : showEnd)();
   }
   if (overlay === 'dossier') renderDossier();
@@ -645,16 +484,6 @@ function update(dt) {
   noiseDb = sim.noiseAt(camPos, player.loc === 'apt');
 }
 
-function animate(dt) {
-  for (const t of S.tables) {
-    if (!t.out) continue;
-    for (const p of viewTables.get(t.id).people) p.rotation.y = Math.sin(now * 0.7 + p.userData.phase) * 0.4;
-  }
-  world.steam.intensity = S.min < NOISE.exhaustOffMinute ? 1 : Math.max(0, world.steam.intensity - dt * 0.3);
-  world.steam.update(dt);
-  splash.update(dt);
-}
-
 function syncCamera() {
   camera.position.set(player.pos.x, player.pos.y + 1.65, player.pos.z);
   camera.rotation.set(player.pitch, player.yaw, 0);
@@ -670,8 +499,7 @@ function tick(dt) {
   now += dt;
   update(dt);
   drainSim(); // à chaque frame, même en pause : aucun événement de la simulation n'est perdu
-  syncActors();
-  animate(dt);
+  director.update(sim, campaign?.state, dt);
   syncCamera();
   updateSky();
   hudTimer -= dt;
