@@ -246,7 +246,7 @@ Proof: **T** = automated test (vitest / Playwright / campaign simulator, runs in
 - [ ] Each association member has at least **8 lines** of contextual dialogue (reacting to the current state) and at least 1 action or event tied to them. **T** (content count) **Q**
 
 ### C. Night systems
-- [ ] 22:00 rule (street-specific, 2026), 6 per table, zones + corridor, cobbles (chair clatter). **T**
+- [x] 22:00 rule (street-specific, 2026), 6 per table, zones + corridor, cobbles (chair clatter). **T** _(v0.2: tests/unit/rules.test.js)_
 - [ ] Evidence: photo, dB reading, headcount, corridor encroachment, timestamps. Quality + legality per piece. **T**
 - [ ] Witnesses / line of sight: Klaas (asleep ~01:00), Seb & Nico (cat = home), the waiter, customers filming, the dachshund. Darkness, time and disguise modifiers. **T Q**
 - [ ] Police: 3 patrols with personalities, hidden roster (Klaas can deduce it), tip-off, coffee/complaisance logged, "c'est encore vous", calling as the Association, the police coming for Pilou, the bribe caught on camera → internal investigation. **T**
@@ -273,7 +273,7 @@ Proof: **T** = automated test (vitest / Playwright / campaign simulator, runs in
 - [ ] Invariants checked on every simulated night and campaign: the police only arrive after a call or a scheduled event; nobody is in two places; a cleared table doesn't come back without a tip-off/return event; evidence refers to real events (time, place, table); Risk only rises from witnessed acts; a closed shop stays closed until its event; Klaas's notebook only logs what he could see. **T**
 - [ ] Dialogue/event text only references facts the player has unlocked (no spoilers, no "as you know…" about something unseen). Flags are checked by a content linter. **T**
 - [ ] Story bible review: names, places, timeline and character traits are consistent across all text (design agent review, logged in `qa/coherence.md`). **Q**
-- [ ] No real restaurant name anywhere (grep test against the section 0 list). **T**
+- [x] No real restaurant name anywhere (grep test against the section 0 list). **T** _(v0.2: tests/unit/names.test.js)_
 
 ### H. Balance (simulated + playtested, adjusted continuously)
 The campaign simulator plays 1000 seeded campaigns per strategy bot. Targets:
@@ -318,3 +318,45 @@ _(none yet)_
 - Menus (phone, dossier) **pause** the game. Losing pointer lock shows a pause screen. `?nolock=1` runs without pointer lock, and `window.__rdb.step(n)` advances frames, both for automated tests.
 - Rendering: no shadows; 4 street point lights + 1 in the apartment (other lanterns are emissive only); the static decor is merged per material.
 - Deploy: CT 105 pulls `origin/main` every 2 min (`deploy/`), served at http://192.168.1.163:8090.
+
+**v0.2 (build-v0.2, "core tension")**
+- **Architecture**: the whole night lives in `src/sim/` (no DOM, no three.js, seeded mulberry32 RNG): `createSim({seed, day, cfg})`, `sim.tick(minutes)`, `sim.act({type, …})` for both the player and the bots, `sim.events` for UI messages, `sim.state.journal` for the structured record. `main.js` only renders, handles input and draws the HUD. `?seed=N` replays a night. `runNight({seed, day, policy})` plays a full night headless (≈2,000 nights/s on the Mac mini). Bots in `src/sim/policies.js` (`passive`, `legal`, `legalAsso`, `reckless`, `stealthy`) implement `decide(sim) → actions[]`. There's no movement headless: a bot "is" wherever its action makes sense.
+- **Invariants** (`src/sim/invariants.js`, §13.G) run on 400 simulated nights in the unit tests:
+  - the police only arrive after a (non-ignored) call, once per call;
+  - a table only comes back out after a tip-off that covered it;
+  - each piece of evidence points to a real event (an out table, a late time, a real police visit, tip-off or pee);
+  - Risk only rises from a witnessed act;
+  - Klaas's notes are made while he's awake and within his line of sight and range.
+  "Nobody in two places" and "closed shop" are not checked yet (nothing can be in two places in v0.2, and there are no shops with events).
+- **Terrace zone and corridor**: the passage is the central 2 m (`ZONES.corridorHalfWidth`). Each table occupies a 1.05 m disc. A table "overflows" when its inner edge bites into the corridor, which happens with each restaurant's `encroachChance` (by 15–55 cm). Proving it requires a measurement: a photo **from the street, within 5 m** ("mètre ruban"), never from the window. The L key toggles the "legal view" (green zones, red corridor, red rings around overflowing tables). It's freely available in v0.2; unlocking it via the association / AOT document is for v0.4. If the police act, they move overflowing tables back into the zone.
+- **Witnesses** (bucket only in v0.2; other illegal acts come in v0.5):
+  - Line of sight = "canyon" rule: two points against the same façade can't see each other; everything else can.
+  - Klaas (place Maurice-Schumann, §1b): detection fades with distance (full up to 35 m at dusk / 15 m at night, zero beyond 130 m / 75 m with binoculars). He sleeps from 01:00.
+  - Seb & Nico are present while the cat is on the balcony (it goes in at a random time between 23:00 and 00:30).
+  - The waiter is on duty until 00:45. The customers at each out table may notice, and **wet tables look up**; some customers film.
+  - Darkness halves what street-level people (waiter, customers) notice. The Saturday crowd provides cover (×0.7).
+  - Risk = 45 × the sum of witness weights (capped at 1.6). Zero witnesses = zero Risk. Asso drops only if an ally saw it or a video exists.
+  - At the window, the HUD lists the *possible* witnesses ("👁").
+- **Police**:
+  - The roster is hidden (`POLICE.roster`, two shifts split at 23:00) and revealed on the end screen.
+  - **Lemaire** is slow on the first call (+8 min) and acts rarely. He tips the restaurant off 5 min before arriving (85% for Bernadette, 40% elsewhere). The tables go back in, then come back out 5–12 min after he leaves. If Klaas can see the restaurant, the tip-off becomes a dossier piece ("Carnet de Klaas").
+  - **Benali** acts (80% base) and is transferred after 3 fines (Lemaire replaces him).
+  - **The chief** only comes after a **scandal**: 2 police-misconduct pieces (complaisance or tip-off) shared on WhatsApp or sent to the mairie.
+  - "C'est encore vous": a 4th call is ignored, and each extra call lengthens the delay (+50%) and lowers the chance of a fine (−8 points).
+  - Calling "pour l'Association" cuts the delay by 40%, but the bloc knows (+25 hostility, which lowers the waiter's goodwill).
+  - Complaisance is logged only if someone saw it: Klaas, or Pilou if he isn't asleep.
+  - Not done (v0.5): the police coming for Pilou, the bribe caught on camera / IGPN.
+- **Saturday** (`?day=sat`): +1 table per restaurant, +1 person per table, 65% of tables over 6, +3 dB, 6 groups of standing drinkers in the street (noise + witnesses), people peeing in doorways every 7–16 min (30% at Pilou's door). Photographing someone peeing = a 0.5 piece.
+- **QA fixes**:
+  - (a) Chair clatter says "rentre une table" (at most once every 5 min per restaurant) and "rentre sa terrasse" only for the last table.
+  - (b) The [E] prompt was hidden behind the log at narrow widths: the prompt now sits just under the crosshair, and the prompt and the action share the same range (`INTERACT` in config). There's an e2e test for it.
+  - (c) The **awning** is now 0.6 m deep (was 1.4 m): a two-line edit in `world.js`. **@art agent**: keep it shallow in the restyle so the tables below stay visible from Pilou's window.
+- **world.js hooks (build agent)**:
+  - `buildWorld(scene, { tables })` builds the terraces from the sim layout (id, restId, x, z, count).
+  - `buildTable` takes a fixed headcount.
+  - The awning change above.
+  - `main.js` copies `window.pos`, `streetDoor`, `bed`, `exhaust` from `buildWorld()`'s return into the sim config, so the 2nd-floor move only needs world.js. The config defaults (2nd floor) are used headless.
+  - Placeholders for Klaas (window on the square), the balcony + cat, standing drinkers, people peeing and the police are built in `main.js` with world.js's `person()`/`mat()`, waiting for the art pass.
+- **Geography (§1b)**: Klaas has moved to the square. The restaurants keep their v0.1 z positions: Bernadette is at mid-street in our 90 m compressed street, not in the first third. Moving them would mean moving Pilou's building in world.js (art agent's file). To do together in v0.3/v0.4.
+- **Tests**: `npm test` (vitest: rules, police, witnesses, Risk, invariants, determinism, ≥100 nights/s, names), `npm run test:e2e` (Playwright, headless Chromium + SwiftShader against `vite preview`: a full night with a photo, a police call, the door prompt and the end screen, plus Saturday; screenshots in `test-results/`). CI: `.github/workflows/ci.yml` runs both on every push.
+
