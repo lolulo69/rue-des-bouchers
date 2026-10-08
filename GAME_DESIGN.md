@@ -22,6 +22,7 @@ altered names.
 | Martine Aubry (ex-mayor) | **Martine Aubrac** | Tatie Bouchon's contact. Sides with the restaurants |
 | Current mayor (A. Deslandes) | **Arnaud Delandre** | Martine's successor and protégé |
 | Claude Code | **Clode Kode** | Pilou's work tool (wink) |
+| Real neighbours Jérémy, Klaus | **Jérémie**, **Klaas** | First names slightly altered (Klaas = Flemish, fits Lille) |
 | La Voix du Nord | **La Voix du Nordiste** | Local newspaper |
 
 Sources: listings (PagesJaunes, Yelp, TheFork), the city's summer pedestrianisation page (zoomsurlille.fr, 2025).
@@ -50,19 +51,18 @@ where his job amounts to prompting **Clode Kode** all day and building silly sid
 ### The Association de la rue des Bouchers
 | Character | Who | Gameplay role |
 |---|---|---|
-| **Jérémy** | President, Pilou's neighbour, has a **dachshund** | Leads the evening **rounds** (dog walk = patrol). Unlocks official channels. The dachshund barks: it helps (spots things) and hurts (draws attention when you sneak). |
-| **Klaus** | Elderly, Santa Claus look (big, not fat, white beard). **Sees everything, writes everything down.** | Passive **evidence engine**: his notebook logs infractions automatically. **Double-edged**: he also writes down what *Pilou* does. Only a lie or a bribe keeps an illegal act out of his notebook. |
-| **Klaus's wife** [name OPEN, proposal: **Hilde**] | Very kind | Brings food and tisane → restores Sleep and morale. Calms Klaus. |
+| **Jérémie** | President, Pilou's neighbour, has a **dachshund** | Leads the evening **rounds** (dog walk = patrol). Unlocks official channels. The dachshund barks: it helps (spots things) and hurts (draws attention when you sneak). |
+| **Klaas** | Elderly, Santa Claus look (big, not fat, white beard). **Sees everything, writes everything down.** | Passive **evidence engine**: his notebook logs infractions automatically. **Double-edged**: he also writes down what *Pilou* does. Only a lie or a bribe keeps an illegal act out of his notebook. |
+| **Hilde**, Klaas's wife | Very kind | Brings food and tisane → restores Sleep and morale. Calms Klaas. |
 | **Tatie Bouchon** | Emails Bernadette about the smell. They always answer "it's being fixed"; she doesn't believe it. Also chats with **Martine Aubrac**. | Email thread = running gag and evidence ("promise #14 that it's fixed"). Her Martine connection makes her an unreliable channel: she can open a door at the mayor's office or leak your plan. |
-| **The Gaystapo** (WhatsApp group of the gay members, across the street, facing Pilou) [names OPEN, proposal: **Seb & Nico**] | Talk a lot. Their **cat** sits on the balcony | The **WhatsApp group** is the association's nervous system: rally the troops, share photos, gossip. **Cat on the balcony = they are home and watching**: allies witness legal actions (+evidence) but also see illegal ones. |
-| **Hippolyte** [name proposal] | Owns an old building where **carriages (calèches)** were made since the 1800s | Old money, knows the old families and the city's heritage department. Late game: heritage-protection angle (exhaust and AC on a historic façade), a meeting room in the former carriage workshop. |
+| **The Gaystapo** (WhatsApp group of the gay members, across the street, facing Pilou) **Seb & Nico** | Talk a lot. Their **cat** sits on the balcony | The **WhatsApp group** is the association's nervous system: rally the troops, share photos, gossip. **Cat on the balcony = they are home and watching**: allies witness legal actions (+evidence) but also see illegal ones. |
+| **Hippolyte** | Owns an old building where **carriages (calèches)** were made since the 1800s | Old money, knows the old families and the city's heritage department. Late game: heritage-protection angle (exhaust and AC on a historic façade), a meeting room in the former carriage workshop. |
 
 ### The restaurants ("restaurants vs residents")
 The restaurants form a **bloc**: Bernadette's leads it, and the others back her.
-- **Bernadette's owners** (Bernadette is a fake name, there's no real Bernadette):
-  - **Dédé** [name proposal]: short and stout, jovial in public, a fixer. Handles the police ("a coffee, a waterzooi, on the house").
-  - **Ghislaine** [name proposal]: skinny, **huge chignon**, cold, does the paperwork and the emails ("it's being fixed").
-  - [OPEN] Couple or business partners?
+- **Bernadette's owners**: two men, **business partners (not a couple)**. Bernadette is a fake name, there's no real Bernadette.
+  - **Dédé**: short and stout, jovial in public, a fixer. Handles the police ("a coffee, a waterzooi, on the house").
+  - **Ghislain**: skinny man with a **huge chignon (man bun)**, cold, does the paperwork and the emails ("it's being fixed").
 - **The waiter**: young, overworked, sympathetic. Can become an informant.
 
 ### Institutions
@@ -70,12 +70,12 @@ The restaurants form a **bloc**: Bernadette's leads it, and the others back her.
   - **Brigadier Lemaire** [proposal]: eats for free at Bernadette's. Slow on the night's first call, and tips the restaurant off five minutes before arriving.
   - **Agent Benali** [proposal]: young, by the book, really comes. Is transferred if he is "too zealous".
   - **The chief**: only shows up after a scandal or a call from the mayor's office.
-  - The **duty roster** is a hidden variable. Klaus can deduce it from his notebook ("Tuesdays and Fridays, it's Lemaire").
-- **The mayor's office inspector** [name proposal: **Delphine Vermeersch**]: handles the AC case. **Married to
+  - The **duty roster** is a hidden variable. Klaas can deduce it from his notebook ("Tuesdays and Fridays, it's Lemaire").
+- **The mayor's office inspector** **Delphine Vermeersch**: handles the AC case. **Married to
   Pilou's boss.** Real but compromising lever: a dinner at the boss's place = an informal channel to her
   (a conflict of interest that can come out).
 - **Martine Aubrac**: ex-mayor, still influential, protects the restaurants. Reached through Tatie Bouchon.
-- **Koddex boss** [name proposal: **Bastien**]: startup founder who is never there and talks about "vibes".
+- **Koddex boss**: **Stéphane**, startup founder who is never there and talks about "vibes".
 
 ## 3. Structure: a 14-night campaign
 Each **day** = 3 phases:
@@ -112,9 +112,9 @@ Each **day** = 3 phases:
 
 ## 5. Stealth: illegal = OK if no one sees you
 Every illegal act checks for **witnesses** in line of sight + hearing:
-- **Klaus** (window, almost always there; asleep ~01:00–05:00), the **Gaystapo** (cat on the balcony = present),
-  the **waiter/owners**, **customers** (may film → viral video), Jérémy's **dachshund** (barks if you're nearby and nervous),
-  **street CCTV** at the ends of the street [CHECK whether there are cameras].
+- **Klaas** (window, almost always there; asleep ~01:00–05:00), the **Gaystapo** (cat on the balcony = present),
+  the **waiter/owners**, **customers** (may film → viral video), Jérémie's **dachshund** (barks if you're nearby and nervous),
+  **no CCTV on the street** (confirmed): the only cameras are the ones Pilou installs himself.
 - Modifiers: darkness, time (after 01:00 the street is empty), disguise (hood, hi-vis vest = "looks like a delivery guy"),
   noise covering (Saturday crowds).
 - Being seen = a **witness memory**. Allies can be asked to "forget" (costs Association); enemies use it.
@@ -145,12 +145,19 @@ Every illegal act checks for **witnesses** in line of sight + hearing:
 - **Fake reviews** / fake TripAdvisor accounts.
 - **Sabotage**: unscrew chairs, steal the parasols, glue the terrace locks.
 - **Bribe the waiter** to rat out the owners.
+- **Hidden cameras**: there's no CCTV, so Pilou installs his own. Filming the public street from private property is
+  already not allowed in France (CNIL), so a camera at his window = grey; one hidden on the street/awning = illegal.
+  Footage = continuous evidence, **unusable in court** but gold for the press, the internal police investigation (IGPN) and blackmail. If discovered → complaint.
+  - **Power**: plug it into **Bernadette's electricity** (outdoor socket under the awning, the AC unit's line) = electricity theft.
+  - **Network**: crack **Bernadette's wifi** (the Rust dev wink: a Koddex side project) = unauthorized system access, art. 323-1 of the penal code.
+    Bonus: on their network you can read the reservations book (over-capacity proof), the "it's being fixed" emails, and the real exhaust quotes they never signed.
+  - The camera can be found by: the waiter (smoke break), Ghislain cleaning the awning, the bloc's paranoia after a leak.
 - **Photograph the police bribery** at close range (legal in itself, but hiding in their back room is not).
 
 ## 7. Police: what can happen when you call (inventive, realistic)
 Outcome depends on: patrol on duty, time, how often you've called, whether you mentioned the Association, the dossier, Corruption.
 - **They come and act**: tables brought in, a fine (PV). Rarely the whole terrace.
-- **They come, have a coffee, leave**. Klaus notes "20:47, coffee offered, 0 fines" → evidence of **complaisance**.
+- **They come, have a coffee, leave**. Klaas notes "20:47, coffee offered, 0 fines" → evidence of **complaisance**.
 - **The tip-off**: the tables vanish at 22:14, the police arrive at 22:19 ("everything's fine here sir"), and the tables come back out at 22:30.
 - **"Ah, it's you again"**: after too many calls, Pilou is flagged as a **serial complainer** → lower priority.
 - **The reversal**: the police come... for Pilou (a bloc complaint about "harassment", or Pilou doing something stupid).
@@ -172,7 +179,7 @@ recruiting a resident (the traitor) · a fake post "Ch'tite Bernadette is being 
 4. **Custody / trial**: caught red-handed. Variant: the "laxatives" trial in the newspaper.
 5. **Moving out**: Sleep at 0 → Pilou moves to Wazemmes. ("At least at the Wazemmes market, it's noise in the morning.")
 6. **Fired**: Job at 0. Twist: it unlocks the full-time fight for the remaining days (hard mode).
-7. **Turncoat (secret)**: Pilou becomes a regular at Bernadette's, eats the carbonnade, and Klaus writes it down.
+7. **Turncoat (secret)**: Pilou becomes a regular at Bernadette's, eats the carbonnade, and Klaas writes it down.
 8. **The return**: you win, then **La Bombance reopens as a bar** next door. Wink at a sequel.
 
 ## 10. Prototype v0.1 (current build target)
@@ -182,14 +189,11 @@ a clock, the stats HUD, a phone (police / association / mayor's office), the dos
 Tunable rules live in `src/config.js`.
 
 ### Next (v0.2, after v0.1 ships)
-- Witnesses + line-of-sight stealth (Klaus's window, the Gaystapo balcony with the cat).
+- Witnesses + line-of-sight stealth (Klaas's window, the Gaystapo balcony with the cat).
 - Police patrols with personalities, tip-off mechanic.
 - Saturday variant (crowd, standing drinkers, peeing).
 - Day/Koddex menu phase + 14-night calendar with save (localStorage).
 
 ## 11. Still open
 - [CHECK] 22:00 vs the city's summer hours (23:00 / midnight).
-- [CHECK] Are there city cameras on the street?
-- Names: Klaus's wife, the Gaystapo members, the last member (Hippolyte?), the owners (Dédé & Ghislaine?), the inspector, the boss.
-- Are the real neighbours OK with appearing (first names in a public repo)? Change first names slightly?
 - Is Bernadette's terrace marked on the ground (the area is checkable)?
