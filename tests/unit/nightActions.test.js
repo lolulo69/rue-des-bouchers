@@ -121,6 +121,7 @@ describe('nightActions : règles', () => {
       tickTo(sim, 21 * 60 + 45); // terrasse pleine, serveur là, teckel en ronde
       const risk = sim.state.risk;
       const r = performNightAction(sim, c, 'night_stink_bomb');
+      if (!r.ok) { expect(sim.state.weather?.kind).toBe('drache'); continue; } // soir de drache : la terrasse est déjà rentrée
       if (r.seen.length) {
         seenRuns++;
         expect(sim.state.risk).toBeGreaterThan(risk);
