@@ -4,14 +4,14 @@ Cross-file review of every narrative file against the story bible (`src/content/
 Owned by the content-review agent. Each pass: date, commit, method, then one table. **Status**: `fixed` (done in this commit) ·
 `open` (fix listed for the file's owner) · `engine` (waits for the campaign engine) · `doc` (doc-only fix).
 
-## 2026-10-08 · pass 1 · base 95c06db
+## 2026-10-08 · pass 1 · base 95c06db, re-audited on dac41da
 
 **Method.** (1) A script loads every content module and walks every `when` / `requires` / `effects` / `unlocks` / `speaker` / `by`. It lists
 undeclared flags, unknown speakers, duplicate ids, day ranges outside 1–14, flags read but never set, flags set but never read.
 (2) Each file was read line by line for names, geography, timeline, voices, facts and the spoiler rule.
 
 **Files reviewed:** characters.js, flags.js, actions.js, events.js, countermoves.js, endings.js, koddex.js, dialogue.js.
-Not landed yet at this pass: night.js, intro.js, media.js.
+media.js, night.js and intro.js landed during the pass: mechanical audit only for now (see pass 1b).
 
 **Clean, no finding:** no undeclared flag, no unknown dialogue/event/countermove speaker, no duplicate id, no day range outside 1–14.
 Every fixed event (D1, D4, D6, D7, D9, D11, D13, D14) sits on its day and has a `requires`-free fallback choice. Names, house numbers and
@@ -23,10 +23,10 @@ Delphine always married to Stéphane. No real person or business, and no real-wo
 | File | Id | Problem | Fix | Status |
 |---|---|---|---|---|
 | **Cross-file: flags** | | | | |
-| flags.js / dialogue.js | `joined_rounds` | Read by `r_biloute_chairs`, 3 endings and dialogue, but no content set it. | `jeremie_rounds_invite` now sets it (once, nights D1–5). Owners may still add an explicit « faire la ronde » action. | fixed |
+| flags.js / dialogue.js | `joined_rounds` | Read by `r_biloute_chairs`, 3 endings and dialogue, but no content set it. | `jeremie_rounds_invite` now sets it (dac41da, plus `once` here). Owners may still add an explicit « faire la ronde » action. | fixed |
 | flags.js / endings.js | `tatie_leaked_plan` | Read by 3 endings, never set. The §2 « Tatie leaks your real plan » risk is not implemented. | countermoves owner: add a countermove (e.g. `tatie_wavering` + a plan flag such as `petition_started` → leak), or endings owner drops the parts. | open |
-| flags.js / endings.js / koddex.js | `custody` | Read by the `custody` ending, `night_ask_waiter`, `stephane_custody`, never set. The night sim ends with reason `custody` (`src/sim/sim.js:117`) but sets no flag, and its risk scale isn't the campaign's. | Engine: set `custody` when a night ends that way (or merge the risk scales). Until then only `risk >= 90` reaches the ending. | engine |
-| flags.js | engine block (`night_photo`, `night_db`, `bucket_used`, `talked_waiter`, `video_viral`, `seen_complaisance`, `corridor_measured`, …) | No campaign engine yet, so no engine flag is ever set. `r_waiter_smoke`, `cm_fake_post_viral`, the scandal route and several epilogue parts are unreachable until then. `night_photo`, `night_db`, `bucket_used` are never read. | Engine to-do. Optionally read the 3 unused flags (e.g. dossier epilogue). | engine |
+| flags.js / endings.js / koddex.js / media.js | `custody` | Read by the `custody` ending, `night_ask_waiter`, `stephane_custody`, `wa_custody`, `press_end_custody(_sugar)`, never set. The night sim ends with reason `custody` (`src/sim/sim.js:117`) but sets no flag, and its risk scale isn't the campaign's. | Engine: set `custody` when a night ends that way (or merge the risk scales). Until then only `risk >= 90` reaches the ending. | engine |
+| flags.js | engine block (`night_photo`, `night_db`, `bucket_used`, `talked_waiter`, `video_viral`, `seen_complaisance`, `corridor_measured`, …) | No campaign engine yet, so no engine flag is ever set. `r_waiter_smoke`, `cm_fake_post_viral`, the scandal route and several epilogue parts are unreachable until then. `night_db`, `bucket_used` are never read. | Engine to-do. Optionally read the 2 unused flags (e.g. dossier epilogue). | engine |
 | flags.js | `kitchen_fire`, `hate_wave_answered` | Declared, never set or read. | actions/countermoves owners: set them (cardboard consequence → `kitchen_fire`; an answer choice on `cm_fake_post` → `hate_wave_answered`), or remove. | open |
 | all files | 22 flags set but never read (`reported_mairie`, `filmed_faces`, `police_flooded`, `cardboard_exhaust`, `complaint_filed`, `hygiene_visit`, `asso_meeting`, `met_delphine`, `bloc_fooled`, `fake_reviews`, `read_reservations`, `read_emails`, `colette_dinner_ignored`, `ag_held`, `stance_legal`, `inspector_surprise`, `inspector_announced`, `ac_case_stalled`, `exhaust_meeting_lost`, `saturday2_done`, `proj_db_report`, `proj_klaas_ocr`) | Set, then nothing reacted to them. | Each now has at least one reaction line in dialogue.js. Re-run of the audit: 0 flags set-but-never-read. | fixed |
 | actions.js / src/config.js | `witnessed.by` | actions use witness ids `seb_nico`, `waiter`, `customers`, `police`; the sim's `WITNESS` keys are `klaas`, `gaystapo`, `waiter`, `customers`. `seb_nico` and `police` match nothing. | Build agent: pick one id set (suggest `seb_nico`, since the group label must stay a constant; the `gaystapo` key bakes the release name into code) and map `police` or drop it. | open |
