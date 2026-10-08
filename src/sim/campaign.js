@@ -64,12 +64,14 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
   const K = normalizeContent(content ?? {});
   const C = cfg.CAMPAIGN;
   // Sauvegarde : migrée vers le schéma courant (SaveError si illisible ou d'une version plus récente), puis nettoyée
-  // contre le contenu chargé (ids renommés suivis, contenus disparus ignorés). Notes dans S.migrationNotes.
+  // contre le contenu chargé (ids renommés suivis, contenus disparus ignorés). Notes dans c.migrationNotes.
+  // Les notes restent hors de l'état : une sauvegarde rechargée puis resauvegardée est identique octet pour octet.
   let S;
+  const migrationNotes = [];
   if (save) {
     const m = migrateSave(save);
     S = m.save;
-    S.migrationNotes = [...m.notes];
+    migrationNotes.push(...m.notes);
   } else S = initialState(seed, cfg);
   const rng = createRng(1);
   rng.setState(S.rng);
@@ -87,10 +89,10 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
   const flags = () => (flagSet ??= new Set(S.flags));
   const byId = (list) => Object.fromEntries(list.map((x) => [x.id, x]));
   const EVENTS = byId(K.EVENTS), ACTIONS = byId(K.ACTIONS), DIALOGUE = byId(K.DIALOGUE), CMS = byId(K.COUNTERMOVES), ENDINGS = byId(K.ENDINGS);
-  if (save) S.migrationNotes.push(...sanitizeSave(S, K));
+  if (save) migrationNotes.push(...sanitizeSave(S, K));
 
   const c = {
-    state: S, content: K, cfg, rng,
+    state: S, content: K, cfg, rng, migrationNotes,
     get step() { return S.step; },
     get ended() { return S.step === 'ended'; },
     ctx: () => ({ day: S.day, phase: S.phase, flags: flags(), stats: S.stats, hidden: S.hidden }),

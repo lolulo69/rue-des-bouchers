@@ -3,19 +3,12 @@
 // ou un id a été renommé ou supprimé. Ce qui est renommé suit la table ; ce qui est inconnu est ignoré sans bruit.
 export const SAVE_VERSION = 2;
 
-// Renommages connus (ancien → nouveau). Ajouter ici chaque renommage d'id du contenu.
+// Renommages connus (ancien → nouveau). Ajouter ici chaque renommage d'id du contenu. (Les renommages des élus,
+// antérieurs à toute sauvegarde publiée, n'y figurent pas : la garde des noms réels les refuserait.)
 export const RENAMES = {
   flags: {
     igpn_open: 'inquiry_open',
     kitchen_sabotage_done: 'kitchen_sabotaged',
-    met_delandre: 'met_lescaut',
-    delandre_requested: 'lescaut_requested',
-    delandre_meeting: 'lescaut_meeting',
-    delandre_ally: 'lescaut_ally',
-    martine_dinner_seen: 'colette_dinner_seen',
-    martine_dinner_photo: 'colette_dinner_photo',
-    martine_dinner_ignored: 'colette_dinner_ignored',
-    cm_martine_call: 'cm_colette_call',
   },
   // Ids d'actions, d'événements, de dialogues, de contre-offensives, de médias (un seul espace de noms suffit)
   ids: {
@@ -70,7 +63,7 @@ export function migrateSave(raw) {
   // Renommages d'ids
   const before = JSON.stringify([s.flags, s.seen, s.cards]);
   s.flags = uniq((s.flags ?? []).map(renameFlag));
-  for (const k of Object.keys(s.seen)) s.seen[k] = uniq((s.seen[k] ?? []).map(renameId));
+  for (const k of Object.keys(s.seen)) s.seen[k] = (s.seen[k] ?? []).map(renameId); // pas de dédoublonnage : des listes répètent légitimement
   for (const k of Object.keys(s.counts)) s.counts[k] = renameKeys(s.counts[k]);
   s.cards = (s.cards ?? []).map((c) => ({ ...c, id: renameId(c.id) }));
   if (s.pendingEnding) s.pendingEnding = renameId(s.pendingEnding);

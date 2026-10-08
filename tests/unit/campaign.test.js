@@ -199,17 +199,20 @@ describe('sauvegarde', () => {
     const v1 = JSON.parse(JSON.stringify(a.save()));
     v1.version = 1;
     delete v1.seen.tutorial; delete v1.seen.media;
-    v1.flags.push('igpn_open', 'martine_dinner_seen', 'flag_supprime_depuis');
+    v1.flags.push('igpn_open', 'kitchen_sabotage_done', 'flag_supprime_depuis');
     v1.cards.unshift({ type: 'event', id: 'evenement_supprime' }, { type: 'dialogue', id: 'dialogue_supprime' });
     v1.pendingEnding = 'fin_supprimee';
     const b = createCampaign({ content, save: v1 });
     expect(b.state.version).toBe(SAVE_VERSION);
     expect(b.has('inquiry_open')).toBe(true);
-    expect(b.has('colette_dinner_seen')).toBe(true);
+    expect(b.has('kitchen_sabotaged')).toBe(true);
     expect(b.has('igpn_open')).toBe(false);
     expect(b.state.seen.tutorial).toEqual([]);
     expect(b.state.pendingEnding).toBeNull();
-    expect(b.state.migrationNotes.join(' ')).toMatch(/v1 → v2/);
+    expect(b.migrationNotes.join(' ')).toMatch(/v1 → v2/);
+    // aller-retour : recharger une sauvegarde v2 la redonne à l'identique
+    const again = JSON.stringify(b.save());
+    expect(JSON.stringify(createCampaign({ content, save: JSON.parse(again) }).save())).toBe(again);
     expect(b.card()?.id).not.toBe('evenement_supprime');
     drive(b, CAMPAIGN_BOTS.legal(), () => false);
     expect(b.ended).toBe(true);
