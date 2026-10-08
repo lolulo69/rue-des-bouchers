@@ -10,12 +10,13 @@ import * as koddex from '../../src/content/koddex.js';
 import * as media from '../../src/content/media.js';
 import * as night from '../../src/content/night.js';
 import * as intro from '../../src/content/intro.js';
+import * as codex from '../../src/content/codex.js';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 // Typographie française du texte affiché (README « Typography ») : apostrophe ’, guillemets « » avec espace insécable,
 // espace fine insécable avant ; ! ?, insécable avant :, points de suspension …
-const MODULES = { characters, flags, actions, events, countermoves, dialogue, endings, koddex, media, night, intro };
+const MODULES = { characters, flags, actions, events, countermoves, dialogue, endings, koddex, media, night, intro, codex };
 const RULES = [
   [/[A-Za-zÀ-ÿ]'[A-Za-zÀ-ÿ]/, "apostrophe droite (utiliser ’)"],
   [/« |«(?![ ])/, '« sans espace insécable après'],
