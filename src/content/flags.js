@@ -181,4 +181,8 @@ export const FLAGS = {
   asso_meeting: "Pilou a réuni l'association un après-midi",
   kitchen_sabotaged: "Cuisine de l'estaminet sabotée (sel et sucre inversés)",
   kitchen_sabotage_caught: 'Pilou identifié pour le sabotage de la cuisine',
+
+  // ── content-koddex (koddex.js) ──────────────────────────────────────────
+  proj_db_report: 'Relevés dB mis en forme pour la mairie (graphes + PDF)',
+  proj_klaas_ocr: 'Carnet de Klaas numérisé (tableur horodaté)',
 };
