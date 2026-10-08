@@ -3,7 +3,7 @@ import { mkdirSync } from 'node:fs';
 import { startNight, tickTo, goToWindow, hhmm } from './helpers.js';
 
 // Q-kit : captures pour les sessions de QA de Lucas dans Chrome (§13, items « Q » non cochés). Voir qa/q-kit.md.
-// Ce n'est PAS une suite d'assertions : une capture par item dans qa/screens/q/<item>.png.
+// Ce n'est PAS une suite d'assertions : une capture par item dans qa/screens/q/<item>.jpg.
 // Lancement : npm run qa:qkit (hors CI : sauté sans QA_QKIT=1).
 test.skip(!process.env.QA_QKIT, 'captures Q-kit : lancer `npm run qa:qkit`');
 test.describe.configure({ mode: 'serial' });
@@ -12,7 +12,7 @@ test.setTimeout(600_000);
 const DIR = 'qa/screens/q';
 const SEED = 11;
 test.beforeAll(() => mkdirSync(DIR, { recursive: true }));
-const shot = (page, name, opts = {}) => page.screenshot({ path: `${DIR}/${name}.png`, timeout: 120_000, ...opts });
+const shot = (page, name, opts = {}) => page.screenshot({ path: `${DIR}/${name}.jpg`, type: 'jpeg', quality: 82, timeout: 120_000, ...opts });
 
 // ── qk : avance rapide de la campagne par l'API du moteur (mêmes appels que l'interface), copiée dans qa/q-kit.md ──
 // Garde Sommeil / Job / Risque dans une zone sûre pendant l'avance rapide (sinon la partie finit avant le jour voulu).
