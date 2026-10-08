@@ -186,23 +186,23 @@ Decision (design): the turncoat at 14% of diplomat runs is **kept**. A diplomat 
 Left (minor): counter-moves cm_regis_leak_petition, cm_camera_found_paranoia never reached; 13 dialogue lines never surfaced (incl. the « hello » lines).
 
 ## 2026-10-08 · balance pass 3 (balance agent) · last 2 counter-moves, unsurfaced dialogue
-`npm run sim -- --runs 1000 --detail` on CT 106, 1000 campaigns × 7 bots. Invariants ✅. **68/68 actions, 28/28 events, 8/8 endings, 42/42 counter-moves** reached; 12/184 dialogue lines never shown (see below).
+`npm run sim -- --runs 1000 --detail` on CT 106, 1000 campaigns × 7 bots, rebased on main with v0.9 (new waiter after a firing, Benali never complaisant). Invariants ✅. **68/68 actions, 28/28 events, 8/8 endings, 42/42 counter-moves** reached; 12/184 dialogue lines never shown (see below).
 
 | bot | custody | fired | legal_victory | moving_out | negotiated_peace | scandal | the_return | turncoat | score | sommeil | asso | risque | job | dossier | garde à vue (nuit méd.) | cibles §13.H |
 | passif | · | · | · | 100% | · | · | · | · | 0 | 42 | 40 | 0 | 97 | 12 | – | ✅ ≥ 90 % déménagement / défaite |
-| légal prudent | · | · | 52% | 5% | · | 43% | · | · | 82 | 60 | 77 | 0 | 99 | 50 | – | ✅ victoire légale 35–60 %<br>✅ jamais de garde à vue |
+| légal prudent | · | · | 47% | 6% | · | 47% | · | · | 80 | 61 | 77 | 0 | 99 | 49 | – | ✅ victoire légale 35–60 %<br>✅ jamais de garde à vue |
 | illégal imprudent | 100% | · | · | · | · | · | · | · | -20 | 78 | 1 | 95 | 37 | 14 | 5 | ✅ ≥ 70 % garde à vue / procès |
-| illégal discret | 30% | · | · | 45% | · | 19% | 6% | · | 12 | 18 | 15 | 55 | 78 | 25 | 6 | ✅ ≤ 40 % garde à vue<br>✅ scandale atteignable |
-| mixte malin | · | · | 83% | 5% | · | 12% | · | · | 92 | 30 | 77 | 0 | 84 | 55 | – | ✅ meilleur score moyen |
-| diplomate | · | · | · | 20% | 24% | 3% | 38% | 15% | 60 | 67 | 74 | 0 | 100 | 34 | – | ✅ paix négociée ≥ 40 % |
-| tire-au-flanc | · | 40% | 18% | 14% | · | 28% | · | · | 42 | 76 | 73 | 1 | 50 | 40 | – | ✅ licenciement atteignable (≥ 2 %, §13.F) |
+| illégal discret | 19% | · | · | 42% | · | 29% | 10% | · | 23 | 26 | 15 | 44 | 87 | 26 | 6 | ✅ ≤ 40 % garde à vue<br>✅ scandale atteignable |
+| mixte malin | · | · | 83% | 5% | · | 12% | · | · | 91 | 31 | 77 | 0 | 85 | 54 | – | ✅ meilleur score moyen |
+| diplomate | · | · | · | 21% | 26% | 2% | 36% | 15% | 59 | 68 | 74 | 0 | 100 | 33 | – | ✅ paix négociée ≥ 40 % |
+| tire-au-flanc | · | 39% | 15% | 16% | · | 31% | · | · | 40 | 76 | 73 | 1 | 50 | 40 | – | ✅ licenciement atteignable (≥ 2 %, §13.F) |
 
 ### Counter-moves
 - `cm_regis_leak_petition` (`when`): it needed Régis recruited (day ≥ 4) while a petition was started but not yet delivered. Every bot starts and delivers its petition the same afternoon (day 1–2), so that window never existed. Its text says the plan leaked from the closed-door meeting (« On n’en avait parlé qu’à la réunion »), so it now needs `traitor_recruited` + `asso_meeting`, before any petition is delivered (`notFlags: petition_delivered`). Mostly reached by the diplomat, who holds meetings and petitions late.
-- `cm_camera_found_paranoia` (needs the awning camera **and** the press scandal): no bot had both. The stealthy bot can now publish the scandal (`pm_press_scandal`, a legal stepping stone like the press contact). It plants the awning camera from day 9, while its Risk is < 10. Planting it early pushed custody to 39 % (the camera's consequences pile up over the campaign); late → 30 %.
+- `cm_camera_found_paranoia` (needs the awning camera **and** the press scandal): no bot had both. The stealthy bot can now publish the scandal (`pm_press_scandal`, a legal stepping stone like the press contact). It plants the awning camera from day 9, while its Risk is < 10. Planting it early pushed custody to 39 % (the camera's consequences pile up over the campaign); late → 30 % (19 % after the v0.9 rebase).
 
 ### Night evidence
-`CAMPAIGN.nightEvidenceScale` 0.073 → 0.068: on the current main the legal bot was at 59 % (edge of 35–60). Now 52 %.
+`CAMPAIGN.nightEvidenceScale` 0.073 → 0.068: on the current main the legal bot was at 59 % (edge of 35–60). Now 52 % (47 % after the v0.9 rebase).
 
 ### Dialogue never surfaced (12) → routed (Build notes)
 - **Content conflicts (content agent)**: `jeremie_hello` needs `notFlags: met_jeremie` on days 1–2, but the day-1 morning event sets `met_jeremie` in every choice, before the first afternoon. `tatie_hello` needs `notFlags: met_tatie`, but `tatie_mail_01` (day 1 morning, live since the morning counter-move fix) sets `met_tatie`.
