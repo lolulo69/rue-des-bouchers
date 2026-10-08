@@ -211,7 +211,77 @@ Tunable rules live in `src/config.js`.
 | **v0.5: dirty tricks** | Hidden cameras + electricity/wifi hijack, cardboard on the exhaust, stink bomb, laxatives, fake reviews, sabotage, bribing the waiter, photographing the bribe. Risk thresholds → complaint, custody, trial. |
 | **v1.0: endings + polish** | The 8 endings, balancing via simulated runs, French copy pass, performance, a full QA run in Chrome. |
 
-## 13. Still open
+## 13. v1.0 acceptance checklist
+v1.0 ships only when **every** box is ticked. Nothing is dropped silently: anything cut or simplified is listed under "Deviations" with Lucas's OK.
+Proof: **T** = automated test (vitest / Playwright / campaign simulator, runs in CI) · **Q** = design agent's QA session in Chrome (screenshots in `qa/`) · **L** = Lucas playtest.
+
+### A. Campaign and length
+- [ ] 14-day calendar Monday → Sunday of week 2, each day = Koddex morning → afternoon → night (3D). **T Q**
+- [ ] Save/continue (localStorage), a new campaign, and one save slot minimum. Reload mid-campaign resumes the same day and state. **T Q**
+- [ ] **Duration**: a full campaign takes **2h30 to 4h** for a human (14 nights × ~10 min + day phases). Nights can't be skipped without consequence ("go to bed" = you lose what happens). **Q L**
+- [ ] Early endings (custody, fired, moving out) can't trigger before **night 5**. The "real" endings are decided at the **Day 14 commission**. **T**
+- [ ] Fixed events happen on their day: Saturdays 6 & 13, Martine's dinner (D4), the general meeting (D7), the inspector (D9), the exhaust meeting (D11), the commission (D14). **T Q**
+
+### B. Characters (all present, recognisable, with a role and dialogue)
+- [ ] Pilou · Jérémie + dachshund · Klaas (Santa look, notebook) · Hilde · Tatie Bouchon (+ the "it's being fixed" email thread) · Seb & Nico + the cat · Hippolyte (carriage building). **Q**
+- [ ] Dédé · Ghislain (bun) · the waiter · Brigadier Lemaire · Agent Benali · the police chief · inspector Delphine Vermeersch · Stéphane (Koddex boss) · Martine Aubrac · mayor Arnaud Delandre. **Q**
+- [ ] Each association member has at least **8 lines** of contextual dialogue (reacting to the current state) and at least 1 action or event tied to them. **T** (content count) **Q**
+
+### C. Night systems
+- [ ] 22:00 rule (street-specific, 2026), 6 per table, zones + corridor, cobbles (chair clatter). **T**
+- [ ] Evidence: photo, dB reading, headcount, corridor encroachment, timestamps. Quality + legality per piece. **T**
+- [ ] Witnesses / line of sight: Klaas (asleep ~01:00), Seb & Nico (cat = home), the waiter, customers filming, the dachshund. Darkness, time and disguise modifiers. **T Q**
+- [ ] Police: 3 patrols with personalities, hidden roster (Klaas can deduce it), tip-off, coffee/complaisance logged, "c'est encore vous", calling as the Association, the police coming for Pilou, the bribe caught on camera → internal investigation. **T**
+- [ ] Mayor's office: reports, inspector visits (announced = tip-off via Martine, surprise = via Delphine/Hippolyte). **T**
+- [ ] Saturday: no vehicles, crowd, standing drinkers, peeing in doorways. **Q**
+
+### D. Day systems
+- [ ] Koddex: 3 Clode Kode prompts a day, work vs side projects (dB logger, WhatsApp bot, review scraper, wifi cracker, fake reviews), Job meter, boss gags. **T Q**
+- [ ] Afternoon actions: meeting, mayor's office, emails, press (La Voix du Nordiste), lawyer (formal notice), petition, health agency (ARS) / environmental health about the exhaust, recruiting residents, asking for a uritrottoir, dinner at Stéphane's with Delphine. **T**
+- [ ] The restaurants' counter-moves (all of section 8) can trigger, depending on state. **T**
+
+### E. Actions (every one implemented, with a cost, an effect and a consequence)
+- [ ] Legal: every item of section 6 "Legal". **T**
+- [ ] Grey: every item of section 6 "Grey". **T**
+- [ ] Illegal: bucket, cardboard on the exhaust, stink bomb, laxatives, fake reviews, sabotage (chairs, parasols, locks), bribing the waiter, hidden cameras (window = grey, awning = illegal), power from Bernadette's electricity, cracking their wifi (+ reading reservations, emails, quotes), sneaking in to photograph the bribe. **T**
+- [ ] Illegally obtained evidence is unusable in court but usable for the press / internal police investigation. **T**
+
+### F. Endings: all 8 reachable
+- [ ] 1 Legal victory · 2 Negotiated peace · 3 Scandal · 4 Custody/trial (incl. the laxatives variant) · 5 Moving out to Wazemmes · 6 Fired (+ continue twist) · 7 Turncoat (secret) · 8 The return (La Bombance). **T Q**
+- [ ] Each ending has its own end screen with an epilogue that **references what the player actually did** (key evidence, actions, who betrayed whom). **T Q**
+- [ ] The campaign simulator reaches **every ending** with at least one scripted strategy, and each ending occurs in ≥ 2% of 1000 runs of its target strategy. **T**
+
+### G. Scenario coherence (automated invariants + story review)
+- [ ] Invariants checked on every simulated night and campaign: the police only arrive after a call or a scheduled event; nobody is in two places; a cleared table doesn't come back without a tip-off/return event; evidence refers to real events (time, place, table); Risk only rises from witnessed acts; a closed shop stays closed until its event; Klaas's notebook only logs what he could see. **T**
+- [ ] Dialogue/event text only references facts the player has unlocked (no spoilers, no "as you know…" about something unseen). Flags are checked by a content linter. **T**
+- [ ] Story bible review: names, places, timeline and character traits are consistent across all text (design agent review, logged in `qa/coherence.md`). **Q**
+- [ ] No real restaurant name anywhere (grep test against the section 0 list). **T**
+
+### H. Balance (simulated + playtested, adjusted continuously)
+The campaign simulator plays 1000 seeded campaigns per strategy bot. Targets:
+| Strategy bot | Target outcome |
+|---|---|
+| Passive (does nothing) | ≥ 90% moving out / defeat |
+| Legal only, careful | legal victory 35–60%, otherwise peace or defeat. Never custody |
+| Illegal only, reckless | ≥ 70% custody/trial |
+| Illegal only, stealthy (dark, after 01:00, no witnesses) | ≤ 40% custody. Scandal reachable. Association low |
+| Mixed, smart | best average score. Every ending except "passive" ones reachable |
+| Diplomat (association + dialogue) | negotiated peace ≥ 40% |
+- [ ] Targets met, numbers logged in `qa/balance.md` at each milestone with the knobs changed. **T**
+- [ ] No dominant action: removing any single action shifts the mixed bot's win rate by < 25 points. **T**
+- [ ] Human feel: Lucas's playtest notes addressed. **L**
+
+### I. Presentation and tech
+- [ ] Cute low-poly cast and street (stepped gables, carriage door, La Bombance, the cat, the dachshund). **Q**
+- [ ] Audio: crowd, chairs on cobbles, exhaust hum, 22:00 bell, mute (M). **Q**
+- [ ] French only, satirical tone, Ch'ti touches. Copy proofread. **Q L**
+- [ ] 60 fps on a laptop iGPU (perf test logs the frame time). Loads in < 5 s. Bundle < 3 MB. **T Q**
+- [ ] CI green (unit + e2e + campaign simulator smoke). Deploy auto from main. **T**
+
+### Deviations
+_(none yet)_
+
+## 14. Still open
 - Nothing blocking. New lore welcome anytime.
 
 ## Build notes
