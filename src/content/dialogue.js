@@ -47,9 +47,10 @@ export const DIALOGUE = [
     when: { day: [1, 5], phase: 'night', flags: ['met_jeremie'], notFlags: ['joined_rounds'] },
     lines: [
       "Tous les soirs à 22h, je sors Biloute. Officiellement, c'est une promenade hygiénique.",
-      "Officieusement, c'est une ronde. Tu viens ? Le chien a le flair, moi j'ai le règlement.",
+      "Officieusement, c'est une ronde. Allez, viens. Le chien a le flair, moi j'ai le règlement, toi tu as le téléphone.",
     ],
     effects: { setFlags: ['joined_rounds'] },
+    once: true,
   },
   {
     id: 'jeremie_rounds_regular',
@@ -143,6 +144,56 @@ export const DIALOGUE = [
       "Demain, la commission. J'ai repassé ma chemise et classé les pièces par ordre chronologique, puis par ordre de gravité, puis de nouveau chronologique.",
       "Quoi qu'il arrive, on aura essayé. Proprement. Enfin, le plus proprement possible.",
     ],
+  },
+
+  {
+    id: 'jeremie_asso_meeting',
+    speaker: 'jeremie',
+    when: { flags: ['asso_meeting'] },
+    lines: [
+      "Belle réunion. Quatorze présents, onze chaises, un teckel. On a voté trois motions et mangé deux tartes.",
+      "Le compte rendu part ce soir. Je l'ai déjà rédigé, en fait. Avant la réunion. Par efficacité.",
+    ],
+    once: true,
+  },
+  {
+    id: 'jeremie_reported_mairie',
+    speaker: 'jeremie',
+    when: { flags: ['reported_mairie'] },
+    lines: [
+      "Ton signalement est parti à la mairie. Accusé de réception automatique : « Votre demande sera traitée dans les meilleurs délais. »",
+      "Les meilleurs délais, en mairie, c'est une unité de mesure à part entière. Mais c'est daté, et c'est ce qui compte.",
+    ],
+    once: true,
+  },
+  {
+    id: 'jeremie_stance_legal',
+    speaker: 'jeremie',
+    when: { flags: ['stance_legal'] },
+    lines: [
+      "L'AG a voté la voie légale. Je ne vais pas mentir : j'ai failli pleurer. Des procédures, des pièces, des dates. Mon terrain.",
+    ],
+    once: true,
+  },
+  {
+    id: 'jeremie_police_flooded',
+    speaker: 'jeremie',
+    when: { flags: ['police_flooded', 'met_jeremie'] },
+    lines: [
+      "Le standard de la police municipale m'a appelé. Moi. Pour me demander si l'association pouvait « calmer un de ses membres ».",
+      "Un appel, c'est un signalement. Trente, c'est un fan-club. On revient au dossier, d'accord ?",
+    ],
+    effects: { asso: -2 },
+    once: true,
+  },
+  {
+    id: 'jeremie_exhaust_lost',
+    speaker: 'jeremie',
+    when: { flags: ['exhaust_meeting_lost'] },
+    lines: [
+      "Statu quo sur la gaine. La ville « prend acte des positions de chacun ». J'ai pris acte aussi. Dans le classeur rouge.",
+    ],
+    once: true,
   },
 
   // ════════════════════════════════════════════════════════════════════════
@@ -258,6 +309,37 @@ export const DIALOGUE = [
     ],
   },
 
+  {
+    id: 'klaas_ocr',
+    speaker: 'klaas',
+    when: { flags: ['proj_klaas_ocr'] },
+    lines: [
+      "Vous avez mis mes carnets dans l'ordinateur ? Tout ? Même le chapitre sur le pigeon de 2021 ?",
+      "Ja. Le tableur ne fait pas de fautes. Moi non plus. Nous allons bien nous entendre.",
+    ],
+    once: true,
+  },
+  {
+    id: 'klaas_saturday2',
+    speaker: 'klaas',
+    when: { flags: ['saturday2_done', 'met_klaas'] },
+    lines: [
+      "Deux samedis. J'ai fait la moyenne : quarante et une personnes debout, deux portes arrosées, zéro procès-verbal.",
+      "La moyenne, c'est la seule chose dans cette rue qui ne déborde pas.",
+    ],
+    once: true,
+  },
+  {
+    id: 'klaas_cardboard',
+    speaker: 'klaas',
+    when: { flags: ['cardboard_exhaust', 'met_klaas'] },
+    lines: [
+      "7h10, sortie de l'extraction : un carton. Je l'ai noté. Qui l'a posé, je ne l'ai pas vu.",
+      "Je l'ai écrit comme ça : « pas vu ». C'est la vérité. Ce n'est pas toute la vérité, mais c'est la mienne.",
+    ],
+    once: true,
+  },
+
   // ════════════════════════════════════════════════════════════════════════
   // HILDE — tisane, soupe, tarte au sucre, déteste la violence
   // ════════════════════════════════════════════════════════════════════════
@@ -355,6 +437,26 @@ export const DIALOGUE = [
     lines: [
       "J'ai fait deux gâteaux pour l'assemblée générale. Un pour ceux qui gagnent le vote, un pour consoler les autres.",
     ],
+  },
+
+  {
+    id: 'hilde_complaint',
+    speaker: 'hilde',
+    when: { flags: ['complaint_filed', 'met_hilde'] },
+    lines: [
+      "Une plainte contre vous ? Mon Dieu. Je vous ai fait un gratin.",
+      "Au commissariat on mange mal, tout le monde le sait. Gardez-en un peu, au cas où.",
+    ],
+    once: true,
+  },
+  {
+    id: 'hilde_ag_held',
+    speaker: 'hilde',
+    when: { flags: ['ag_held', 'met_hilde'] },
+    lines: [
+      "Les deux gâteaux sont partis. Celui des gagnants et celui des perdants. Je crois que certains ont voté deux fois pour avoir les deux.",
+    ],
+    once: true,
   },
 
   // ════════════════════════════════════════════════════════════════════════
@@ -464,6 +566,37 @@ export const DIALOGUE = [
     once: true,
   },
 
+  {
+    id: 'tatie_mail_12',
+    speaker: 'tatie',
+    when: { flags: ['tatie_mail_12'] },
+    lines: [
+      "Douze. La dernière, c'est une réponse automatique. Même leur ordinateur me dit que c'est en cours.",
+      "« Quand la machine répond à la place de l'homme, c'est que l'homme n'a plus rien à dire. » Je l'imprime aussi, celle-là.",
+    ],
+    once: true,
+  },
+  {
+    id: 'tatie_bloc_fooled',
+    speaker: 'tatie',
+    when: { flags: ['bloc_fooled', 'met_tatie'] },
+    lines: [
+      "J'ai raconté à Colette le plan que vous m'aviez confié. Il paraît qu'en bas, ils ont tout rangé pour rien toute la soirée.",
+      "« Qui sème le vent récolte des chaises vides. » Je ne me sens pas du tout coupable. Un peu fière, même.",
+    ],
+    once: true,
+  },
+  {
+    id: 'tatie_hygiene',
+    speaker: 'tatie',
+    when: { flags: ['hygiene_visit', 'met_tatie'] },
+    lines: [
+      "Le service d'hygiène est venu à l'estaminet ! Ghislain m'a écrit que c'était « une visite de courtoisie ».",
+      "De la courtoisie avec des gants en latex et une lampe torche. Je veux bien la même chez moi.",
+    ],
+    once: true,
+  },
+
   // ════════════════════════════════════════════════════════════════════════
   // SEB — le feuilletonniste du balcon, admin du groupe
   // ════════════════════════════════════════════════════════════════════════
@@ -565,6 +698,37 @@ export const DIALOGUE = [
     once: true,
   },
 
+  {
+    id: 'seb_colette_ignored',
+    speaker: 'seb',
+    when: { flags: ['colette_dinner_ignored', 'met_seb_nico'] },
+    lines: [
+      "Colette Verhaeghe a dîné EN BAS DE CHEZ TOI et tu n'as même pas ouvert la fenêtre ?!",
+      "J'ai dû tout raconter dans le groupe tout seul. Avec des photos de travers. Tu me dois un feuilleton.",
+    ],
+    once: true,
+  },
+  {
+    id: 'seb_inspector_surprise',
+    speaker: 'seb',
+    when: { flags: ['inspector_surprise', 'met_seb_nico'] },
+    lines: [
+      "Attends, attends. L'inspectrice est arrivée à pied, sans prévenir, avec un mètre laser. Ghislain a lâché son classeur.",
+      "Le chignon a bougé. Je te jure. Il a BOUGÉ.",
+    ],
+    once: true,
+  },
+  {
+    id: 'seb_read_reservations',
+    speaker: 'seb',
+    when: { flags: ['read_reservations', 'met_seb_nico'] },
+    lines: [
+      "Attends. Tu SAIS combien de couverts ils ont pris samedi ? Non. Je veux pas savoir comment. Si, je veux savoir. Non.",
+      "Bon. Je n'ai rien entendu. Mais je n'ai rien entendu très attentivement.",
+    ],
+    once: true,
+  },
+
   // ════════════════════════════════════════════════════════════════════════
   // NICO — pince-sans-rire, archive tout, pose la question qui fâche
   // ════════════════════════════════════════════════════════════════════════
@@ -649,6 +813,37 @@ export const DIALOGUE = [
     lines: [
       "Tu as envoyé un message à 4h12 dans le groupe. Il disait juste « chaise ». On s'inquiète.",
     ],
+  },
+
+  {
+    id: 'nico_filmed_faces',
+    speaker: 'nico',
+    when: { flags: ['filmed_faces', 'met_seb_nico'] },
+    lines: [
+      "Tu as filmé des clients à visage découvert. Règle numéro un du groupe. Je ne poste pas ça.",
+      "Floute, ou garde-le pour toi. Une vidéo de visages, c'est une plainte qui attend son tour.",
+    ],
+    once: true,
+  },
+  {
+    id: 'nico_read_emails',
+    speaker: 'nico',
+    when: { flags: ['read_emails', 'met_seb_nico'] },
+    lines: [
+      "Tu as des e-mails de l'estaminet. Je ne te demande pas d'où ils sortent.",
+      "Je constate juste qu'on ne pourra jamais les montrer à la commission. Ce sont les preuves les plus inutiles et les plus savoureuses de l'année.",
+    ],
+    once: true,
+  },
+  {
+    id: 'nico_fake_reviews_seen',
+    speaker: 'nico',
+    when: { flags: ['fake_reviews', 'met_seb_nico'], notFlags: ['fake_reviews_traced'] },
+    lines: [
+      "Quarante avis une étoile sur l'estaminet depuis hier. Tous avec la même virgule mal placée.",
+      "Moi, j'ai rien vu. J'archive, c'est tout. Et j'archive ça très loin.",
+    ],
+    once: true,
   },
 
   // ════════════════════════════════════════════════════════════════════════
@@ -737,6 +932,27 @@ export const DIALOGUE = [
     lines: [
       "La Bombance, au numéro 4. Un bar voudrait s'y installer. Ce local était une sellerie en 1880. J'ai les plans.",
       "Les plans sont une arme élégante, monsieur Dubeton. Ils ne font aucun bruit.",
+    ],
+    once: true,
+  },
+
+  {
+    id: 'hippolyte_ac_stalled',
+    speaker: 'hippolyte',
+    when: { flags: ['ac_case_stalled', 'met_hippolyte'] },
+    lines: [
+      "Le dossier de la climatisation s'enlise. Comme le canal avant qu'on le couvre, en 1912.",
+      "Je vais écrire au patrimoine une seconde fois. Sur un papier plus épais.",
+    ],
+    once: true,
+  },
+  {
+    id: 'hippolyte_inspector_announced',
+    speaker: 'hippolyte',
+    when: { flags: ['inspector_announced', 'met_hippolyte'] },
+    lines: [
+      "Une visite annoncée trois jours à l'avance. Et, par un heureux hasard, la climatisation s'était déguisée en jardinière la veille.",
+      "Mon arrière-grand-père appelait cela « recevoir ». Moi, j'appelle cela « prévenir ».",
     ],
     once: true,
   },
@@ -878,6 +1094,26 @@ export const DIALOGUE = [
     once: true,
   },
 
+  {
+    id: 'ghislain_hygiene',
+    speaker: 'ghislain',
+    when: { flags: ['hygiene_visit'] },
+    lines: [
+      "Le service d'hygiène nous a rendu une visite de courtoisie. Nous avons apprécié leur courtoisie. Nous avons noté le nom de chacun.",
+    ],
+    effects: { hostility: +3 },
+    once: true,
+  },
+  {
+    id: 'ghislain_lawyer',
+    speaker: 'ghislain',
+    when: { flags: ['cm_lawyer_reply'] },
+    lines: [
+      "Notre conseil vous a répondu. Sur papier à en-tête. Il est très cher, ce papier. Nous comptons sur vous pour le lire en entier.",
+    ],
+    once: true,
+  },
+
   // ════════════════════════════════════════════════════════════════════════
   // POLICE — Lemaire, Benali, le chef
   // ════════════════════════════════════════════════════════════════════════
@@ -994,6 +1230,26 @@ export const DIALOGUE = [
     ],
   },
 
+  {
+    id: 'chef_complaint',
+    speaker: 'chef',
+    when: { flags: ['complaint_filed'] },
+    lines: [
+      "Monsieur Dubeton. Commandant Desmet. Une plainte a été déposée à votre encontre. Je vous en informe avec le plus grand sérieux.",
+      "Je ne me déplace pas, d'habitude. Considérez cela comme un honneur. Un honneur administratif.",
+    ],
+    once: true,
+  },
+  {
+    id: 'chef_flooded',
+    speaker: 'chef',
+    when: { flags: ['police_flooded'] },
+    lines: [
+      "Le standard m'informe d'un volume d'appels inhabituel en provenance d'un même numéro. Nous prenons cela très au sérieux. Le standardiste aussi : il a demandé un congé.",
+    ],
+    once: true,
+  },
+
   // ════════════════════════════════════════════════════════════════════════
   // INSTITUTIONS — Delphine, Colette, Lescaut, Stéphane
   // ════════════════════════════════════════════════════════════════════════
@@ -1020,11 +1276,12 @@ export const DIALOGUE = [
   {
     id: 'delphine_visit',
     speaker: 'delphine',
-    when: { day: [9, 9] },
+    when: { flags: ['ac_violation_confirmed'] },
     lines: [
       "Unité extérieure, quatre-vingts centimètres sur soixante, fixée à une façade ancienne. Autorisation : aucune. Excuse : « c'est en cours ».",
       "J'ai entendu « c'est en cours » onze fois cette année. Je commence à le prendre personnellement.",
     ],
+    once: true,
   },
   {
     id: 'delphine_conflict',
@@ -1148,5 +1405,301 @@ export const DIALOGUE = [
     lines: [
       "Delphine bosse sur un dossier de clim dans le Vieux-Lille. Elle rentre crevée. Je lui ai proposé un framework de priorisation. Elle a dit non.",
     ],
+  },
+  {
+    id: 'delphine_met',
+    speaker: 'delphine',
+    when: { flags: ['met_delphine'], phase: 'afternoon', chance: 0.3 },
+    lines: [
+      "On s'est vus chez moi, monsieur Dubeton. Ici, on est à la mairie. Je vous vouvoie, et je relis tout deux fois.",
+    ],
+  },
+  {
+    id: 'stephane_db_report',
+    speaker: 'stephane',
+    when: { flags: ['proj_db_report'] },
+    lines: [
+      "C'est quoi ces graphes de décibels dans le drive partagé ? Des courbes, des PDF, un logo ? C'est un side project ?",
+      "J'adore. On pivote ? « Koddex, the noise company. » Non ? Je laisse mûrir.",
+    ],
+    once: true,
+  },
+
+  // ════════════════════════════════════════════════════════════════════════
+  // RÉGIS DEWAELE — n°27, deux meublés, « dans la nuance ». Traître seulement après traitor_known
+  // ════════════════════════════════════════════════════════════════════════
+  {
+    id: 'regis_hello',
+    speaker: 'regis',
+    when: { day: [1, 8], notFlags: ['traitor_known'] },
+    lines: [
+      "Régis, numéro 27. Membre de l'association depuis le début. Moi, je comprends les deux côtés, hein.",
+      "Le sommeil, c'est important. L'ambiance aussi. Il faut trouver un équilibre. Dans la nuance.",
+    ],
+    once: true,
+  },
+  {
+    id: 'regis_tenants',
+    speaker: 'regis',
+    when: { notFlags: ['traitor_known'], chance: 0.4 },
+    lines: [
+      "Mes locataires adorent l'ambiance. Cinq étoiles, à chaque fois. Bon, ils dorment avec des bouchons d'oreilles, mais avec le sourire.",
+    ],
+  },
+  {
+    id: 'regis_22h',
+    speaker: 'regis',
+    when: { phase: 'night', notFlags: ['traitor_known'], chance: 0.3 },
+    lines: [
+      "Vingt-deux heures, c'est bien. Vingt-deux heures trente, ce serait bien aussi. Je dis ça, je ne dis rien.",
+    ],
+  },
+  {
+    id: 'regis_saturday',
+    speaker: 'regis',
+    when: { day: [6, 6], notFlags: ['traitor_known'] },
+    lines: [
+      "Ce soir, mes deux appartements sont complets. Un enterrement de vie de jeune fille dans chacun. Ce sera… vivant.",
+    ],
+    once: true,
+  },
+  {
+    id: 'regis_courted',
+    speaker: 'regis',
+    when: { flags: ['regis_courted'], notFlags: ['traitor_known'] },
+    lines: [
+      "Moi, à l'estaminet ? Une fois. Bon, deux. Pour observer. De l'intérieur. Pour l'association.",
+      "Klaas a noté ? Il note tout, Klaas. Même les gens qui n'ont rien fait. Enfin, rien de grave.",
+    ],
+    once: true,
+  },
+  {
+    id: 'regis_unmasked',
+    speaker: 'regis',
+    when: { flags: ['traitor_known'] },
+    lines: [
+      "Traître, traître… Tout de suite les grands mots. Je faisais de la médiation. En amont.",
+      "Je comprends les deux côtés. C'est juste que l'un des deux côtés offre le dessert.",
+    ],
+    once: true,
+  },
+  {
+    id: 'regis_after',
+    speaker: 'regis',
+    when: { flags: ['traitor_known'], chance: 0.3 },
+    lines: [
+      "Vous ne me dites plus bonjour dans l'escalier. Je le comprends. Je comprends tout, moi. C'est mon drame.",
+    ],
+  },
+
+  // ════════════════════════════════════════════════════════════════════════
+  // LA PRESSE ET L'AVOCAT — Anne-Sophie Lepoutre (La Voix du Nordiste), Maître Vandamme
+  // ════════════════════════════════════════════════════════════════════════
+  {
+    id: 'journaliste_first',
+    speaker: 'journaliste',
+    when: { flags: ['press_contacted'], notFlags: ['press_article'] },
+    lines: [
+      "Vous avez des éléments ? Des photos, des PV, des dates ?",
+      "Parce que « mon voisin fait du bruit », j'en reçois quarante par semaine. Je les classe par arrondissement.",
+    ],
+    once: true,
+  },
+  {
+    id: 'journaliste_thin',
+    speaker: 'journaliste',
+    when: { flags: ['press_contacted'], notFlags: ['press_article'], stats: { dossier: '<25' } },
+    lines: [
+      "Votre histoire est sympathique, mais il me manque un angle. Une chaise sur des pavés, ça ne fait pas une une.",
+    ],
+  },
+  {
+    id: 'journaliste_solid',
+    speaker: 'journaliste',
+    when: { flags: ['press_contacted'], stats: { dossier: '>=40' } },
+    lines: [
+      "Ça, c'est un dossier. Horodaté, chiffré, recoupé. Je le montre au rédac' chef avant le bouclage. Ne parlez à personne d'autre.",
+    ],
+    once: true,
+  },
+  {
+    id: 'journaliste_article',
+    speaker: 'journaliste',
+    when: { flags: ['press_article'] },
+    lines: [
+      "L'article est sorti, page 7. Pas la une : il y avait la braderie. Mais page 7, dans le Vieux-Lille, tout le monde la lit en attendant son café.",
+    ],
+    once: true,
+  },
+  {
+    id: 'journaliste_illicit',
+    speaker: 'journaliste',
+    when: { flags: ['press_contacted', 'bribe_photo_illegal'] },
+    lines: [
+      "Je ne vous demande pas comment vous avez eu cette photo. Je ne la publierai pas sans une deuxième source.",
+      "Et à titre personnel, je vous conseille un bon avocat. Celui de votre association, par exemple.",
+    ],
+    once: true,
+  },
+  {
+    id: 'journaliste_scandal',
+    speaker: 'journaliste',
+    when: { flags: ['press_scandal'] },
+    lines: [
+      "La police municipale, un estaminet, des cafés offerts. Mon rédac' chef a dit « enfin ». Il ne dit jamais « enfin ».",
+    ],
+    once: true,
+  },
+  {
+    id: 'avocat_hired',
+    speaker: 'avocat',
+    when: { flags: ['lawyer_hired'] },
+    lines: [
+      "En l'état du dossier, j'ai trois remarques et une facture. Commençons par la facture, c'est la plus courte.",
+    ],
+    once: true,
+  },
+  {
+    id: 'avocat_notice',
+    speaker: 'avocat',
+    when: { flags: ['formal_notice'] },
+    lines: [
+      "La mise en demeure est partie en recommandé. Je l'ai rédigée avec une politesse qui devrait les empêcher de dormir.",
+      "Une forme de réciprocité, en somme.",
+    ],
+    once: true,
+  },
+  {
+    id: 'avocat_reply',
+    speaker: 'avocat',
+    when: { flags: ['cm_lawyer_reply', 'lawyer_hired'] },
+    lines: [
+      "Leur conseil répond que la terrasse « participe à l'animation du quartier ». C'est joli. En droit, cela ne veut strictement rien dire.",
+    ],
+    once: true,
+  },
+  {
+    id: 'avocat_illicit',
+    speaker: 'avocat',
+    when: { flags: ['lawyer_hired', 'camera_awning'] },
+    lines: [
+      "Une caméra sous le store d'un tiers ? En l'état du dossier, cette vidéo n'existe pas.",
+      "Je vous conseille vivement de faire comme elle.",
+    ],
+    once: true,
+  },
+  {
+    id: 'avocat_complaint',
+    speaker: 'avocat',
+    when: { flags: ['lawyer_hired', 'complaint_filed'] },
+    lines: [
+      "Une plainte contre vous. Je vous facture l'heure entamée pour vous dire ceci : ne dites plus rien. À personne. Surtout pas sur WhatsApp.",
+    ],
+    once: true,
+  },
+  {
+    id: 'avocat_solid',
+    speaker: 'avocat',
+    when: { flags: ['lawyer_hired'], stats: { dossier: '>=50' } },
+    lines: [
+      "Des preuves licites, horodatées, recoupées. Je n'ai rien à redire. C'est extrêmement désagréable pour un avocat.",
+    ],
+    once: true,
+  },
+
+  // ════════════════════════════════════════════════════════════════════════
+  // LES ANIMAUX — Biloute (teckel de Jérémie) et Gaufre (chatte de Seb et Nico) : onomatopées et didascalies
+  // ════════════════════════════════════════════════════════════════════════
+  {
+    id: 'biloute_stairs',
+    speaker: 'biloute',
+    when: { flags: ['met_jeremie'], chance: 0.3 },
+    lines: [
+      "*Renifle tes chaussures dans l'escalier. Conclut « carbonnade ». Te regarde avec reproche.*",
+    ],
+  },
+  {
+    id: 'biloute_corridor',
+    speaker: 'biloute',
+    when: { phase: 'night', flags: ['joined_rounds'], chance: 0.4 },
+    lines: [
+      "Ouaf ! *S'arrête net devant une chaise qui mord sur le couloir de passage. Ne bouge plus.* Ouaf.",
+    ],
+  },
+  {
+    id: 'biloute_frite',
+    speaker: 'biloute',
+    when: { phase: 'night', flags: ['met_jeremie'], chance: 0.3 },
+    lines: [
+      "*A trouvé une frite entre deux pavés. La soirée est un succès.*",
+    ],
+  },
+  {
+    id: 'biloute_22h',
+    speaker: 'biloute',
+    when: { phase: 'night', flags: ['joined_rounds'], chance: 0.3 },
+    lines: [
+      "*22h00. Les chaises raclent les pavés. Grogne en direction de l'estaminet. Jérémie murmure « bon chien ».*",
+    ],
+  },
+  {
+    id: 'biloute_carbonnade',
+    speaker: 'biloute',
+    when: { flags: ['carbonnade_1', 'met_jeremie'] },
+    lines: [
+      "*Te renifle longuement. Très longuement.* Grrr. *Il sait.*",
+    ],
+    once: true,
+  },
+  {
+    id: 'biloute_nervous',
+    speaker: 'biloute',
+    when: { phase: 'night', flags: ['joined_rounds'], stats: { risk: '>=40' } },
+    lines: [
+      "OUAF ! OUAF ! *Au pire moment, évidemment. Jérémie fait semblant de chercher ses clés.*",
+    ],
+  },
+  {
+    id: 'gaufre_balcony',
+    speaker: 'gaufre',
+    when: { phase: 'night', flags: ['met_seb_nico'], chance: 0.3 },
+    lines: [
+      "*Au balcon du 13. Clignement lent. Seb et Nico sont là, et ils regardent.*",
+    ],
+  },
+  {
+    id: 'gaufre_leaves',
+    speaker: 'gaufre',
+    when: { phase: 'night', chance: 0.25 },
+    lines: [
+      "*Se lève, s'étire, tourne le dos à la rue et rentre. Même elle en a assez.*",
+    ],
+  },
+  {
+    id: 'gaufre_saturday',
+    speaker: 'gaufre',
+    when: { day: [13, 13], phase: 'night' },
+    lines: [
+      "*N'est pas sortie du tout. Samedi : trop de monde, trop de bruit. Elle a raison.*",
+    ],
+    once: true,
+  },
+  {
+    id: 'gaufre_pee',
+    speaker: 'gaufre',
+    when: { flags: ['pee_at_door'] },
+    lines: [
+      "*Fixe ta porte d'entrée. Puis toi. Ne dit rien. N'en pense pas moins.*",
+    ],
+    once: true,
+  },
+  {
+    id: 'gaufre_bucket',
+    speaker: 'gaufre',
+    when: { flags: ['bucket_witnessed'] },
+    lines: [
+      "*Un seul clignement. Très lent. Elle a vu.*",
+    ],
+    once: true,
   },
 ];
