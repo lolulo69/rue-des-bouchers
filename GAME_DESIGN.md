@@ -492,3 +492,10 @@ so it reflects what the player actually did.
   - `campaign.js` (optional, keeps bots and the simulator on one code path): `c.doNightAction = (sim, id) => performNightAction(sim, c, id)`, and `c.nightActions` can stay as the base filter (`availableNightActions` uses it).
   - `sim.js` `tick()` (one line, so the cardboard really stops the exhaust): `if (S.min < NOISE.exhaustOffMinute && !S.exhaustBlocked) d -= SLEEP.exhaustDrainPerMinute;`. Add the same `!S.exhaustBlocked` check where the exhaust hum / steam is drawn.
   - `index.js`: `export { availableNightActions, performNightAction } from './nightActions.js';`
+
+**Night hooks (night-hooks) — for the balance agent**
+- `c.doNightAction(sim, id, player?)` now delegates to `performNightAction` (`src/sim/nightActions.js`). Bots, `campaignRunner.playNight` and the simulator play content night actions on the same code path as the player. That path includes the location, the time window and the scene condition: no stink bomb on an empty terrace, cooking sabotage only before 23:00, the back-room photo only while a patrol is on site, chair, parasol and lock sabotage only after 23:30 or midnight.
+- Without `player` the location is not checked. A rejected action returns `{ ok: false, reason }` and has no effect. So a bot that asks for an action outside its window simply gets nothing: pick ids from `availableNightActions(sim, c).filter((x) => x.available)` to time them (for example, a stealthy bot can wait until after 01:00, when Klaas sleeps).
+- `c.doNightAction` now also spends the action's `cost.minutes`, ticking minute by minute inside the call, so the night clock moves forward during content actions.
+- Dédé, Ghislain and the police are now real witnesses for night content actions, so the reckless and stealthy custody rates may shift. Re-run `npm run sim` and update `qa/balance.md`.
+- `sim.state.exhaustBlocked` (cardboard on the exhaust) stops the exhaust's Sleep drain in `tick()`.

@@ -198,7 +198,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
         let d = 0;
         if (S.min >= SLEEP.drainAfter) {
           d -= Math.max(0, S.noiseBed - SLEEP.thresholdDb) * SLEEP.drainPerDbMinute;
-          if (S.min < NOISE.exhaustOffMinute) d -= SLEEP.exhaustDrainPerMinute;
+          if (S.min < NOISE.exhaustOffMinute && !S.exhaustBlocked) d -= SLEEP.exhaustDrainPerMinute; // carton sur la gaine (nightActions.js)
         }
         if (S.sleeping && S.noiseBed < SLEEP.thresholdDb) d += SLEEP.recoverPerMinute;
         S.sleep = clamp(S.sleep + d * dMin, earlyEndings ? 0 : CAMPAIGN.preGate.sleepFloor, 100);

@@ -15,12 +15,11 @@ import { createRng } from './rng.js';
 import { createSim } from './sim.js';
 import { evalCondition, STAT_KEYS, HIDDEN_KEYS } from './conditions.js';
 import { normalizeContent } from './content.js';
+import { performNightAction } from './nightActions.js';
 
 export const SAVE_VERSION = 1;
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
-// Correspondance entre les témoins nommés par le contenu (witnessed.by) et ceux de la nuit simulée
-const NIGHT_WITNESS = { klaas: 'klaas', seb_nico: 'seb_nico', waiter: 'waiter', customers: 'customers', biloute: 'jeremie', jeremie: 'jeremie' };
 const ALLIES = new Set(['klaas', 'seb_nico', 'biloute', 'jeremie', 'hilde', 'tatie']);
 // Présence en journée (actions de l'après-midi) des témoins nommés par le contenu
 const DAY_PRESENCE = { klaas: 0.8, seb_nico: 0.6, waiter: 0.7, customers: 0.8, biloute: 0.3, jeremie: 0.3, dede: 0.6, ghislain: 0.5, police: 0.1 };
@@ -422,47 +421,9 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     return sim;
   };
   c.nightActions = (sim) => K.ACTIONS.filter((a) => (a.phase ?? 'afternoon') === 'night' && !a.sim && usable(a, 'night') && !sim.contentActions.includes(a.id));
-  // Action de nuit du contenu (hors actions natives de la sim) : témoins tirés par la sim de nuit, à la position `at`
-  c.doNightAction = (sim, id) => {
-    const a = ACTIONS[id];
-    if (!a || !c.nightActions(sim).includes(a)) return { ok: false, reason: 'indisponible' };
-    sim.contentActions.push(a.id);
-    S.seen.actions.push(a.id);
-    S.counts.actions[a.id] = (S.counts.actions[a.id] ?? 0) + 1;
-    c.note('action', { id: a.id, legality: a.legality, night: true });
-    sim.note('content-action', { id: a.id });
-    applyNight(sim, a.effects, 'action', a.id);
-    let seen = [];
-    if (a.witnessed || (a.effects?.risk ?? 0) > 0) {
-      const anchors = sim.cfg.ANCHORS;
-      const pos = anchors[a.at] ?? (a.at === 'street' || !a.at ? sim.restCenter(sim.rest('bernadette')) : anchors.pilouWindow);
-      const kinds = (a.witnessed?.by ?? Object.keys(NIGHT_WITNESS)).map((w) => NIGHT_WITNESS[w]).filter(Boolean);
-      seen = sim.witnessAct(pos, a.label, { exposure: a.witnessed?.exposure ?? C.dayWitness[a.legality], kinds });
-      if (seen.length) {
-        const we = a.witnessed?.effects ?? {};
-        // Risque et Asso passent par la nuit (Risque × poids des témoins), le reste par la campagne
-        sim.punish(seen, a.id, (we.risk ?? 0) + Math.max(0, a.effects?.risk ?? 0), -(we.asso ?? 0));
-        for (const w of seen) {
-          S.witnessMemories.push({ day: S.day, who: w.kind, ally: !!w.ally, act: a.id, night: true });
-          if (w.kind === 'klaas') setFlag('klaas_noted_pilou');
-        }
-        c.note('witness', { act: a.id, by: seen.map((w) => w.id), night: true });
-        applyNight(sim, { ...we, risk: undefined, asso: undefined }, 'witnessed', a.id);
-      } else sim.log('Personne n\'a rien vu… a priori.', 'good');
-    }
-    if (a.result) sim.log(a.result, a.legality === 'legal' ? 'good' : 'bad');
-    return { ok: true, seen };
-  };
-
-  // Pendant la nuit, Asso / Sommeil vivent dans la sim (rapatriés à la fin) : on les y applique.
-  function applyNight(sim, effects, cause, source) {
-    if (!effects) return;
-    const N = sim.state;
-    if (typeof effects.asso === 'number') N.asso = clamp(N.asso + effects.asso, 0, 100);
-    if (typeof effects.sleep === 'number') N.sleep = clamp(N.sleep + effects.sleep, 0, 100);
-    if (typeof effects.risk === 'number' && effects.risk > 0) c.note('effects', { cause, source, ignoredRisk: effects.risk });
-    apply({ ...effects, asso: undefined, sleep: undefined, risk: undefined }, cause, source);
-  }
+  // Action de nuit du contenu (hors actions natives de la sim) : lieu, créneau, témoins, effets → nightActions.js
+  // (même chemin pour le joueur, les bots et le simulateur ; `player` facultatif : sans lui, le lieu n'est pas vérifié)
+  c.doNightAction = (sim, id, player) => performNightAction(sim, c, id, player);
 
   // Fin de nuit : on rapatrie stats, preuves, police, témoins ; drapeaux moteur ; fins anticipées.
   c.finishNight = (sim) => {
