@@ -29,6 +29,19 @@ const ALLIES = new Set(['klaas', 'seb_nico', 'biloute', 'jeremie', 'hilde', 'tat
 // Présence en journée (actions de l'après-midi) des témoins nommés par le contenu
 const DAY_PRESENCE = { klaas: 0.8, seb_nico: 0.6, waiter: 0.7, customers: 0.8, biloute: 0.3, jeremie: 0.3, dede: 0.6, ghislain: 0.5, police: 0.1 };
 
+// Bureau ou maison chaque jour (§12b.D) : homePerWeek jours de semaine à la maison, jamais le dernier jour, tirés à la graine
+export function workplacePlan(seed, cfg = CONFIG) {
+  const C = cfg.CAMPAIGN;
+  const rng = createRng((seed ^ 0xb1cc1e) >>> 0);
+  const plan = Array.from({ length: C.days }, () => 'office');
+  for (let w = 0; w * 7 < C.days; w++) {
+    const days = [];
+    for (let d = w * 7 + 1; d <= Math.min(C.days - 1, w * 7 + 7); d++) if (!['sat', 'sun'].includes(C.weekdays[(d - 1) % 7])) days.push(d);
+    for (let k = 0; k < (C.workdays?.homePerWeek ?? 2) && days.length; k++) plan[days.splice(rng.int(0, days.length - 1), 1)[0] - 1] = 'home';
+  }
+  return plan;
+}
+
 export function initialState(seed, cfg = CONFIG) {
   const C = cfg.CAMPAIGN;
   return {
@@ -54,6 +67,8 @@ export function initialState(seed, cfg = CONFIG) {
     nightCount: 0,
     nights: [],
     pendingEnding: null,
+    workplaces: workplacePlan(seed, cfg), // §12b.D : 'office' | 'home' pour chaque jour
+    workplace: 'office',
     twistHistory: [],    // v1.1 : [{ day, id }], jamais deux fois le même twist
     tonightTwist: null,  // { day, id } : choisi à l'entrée de la nuit, rejoué tel quel après un rechargement
     unlocked: [],        // v1.1 : ids de UNLOCKS acquis
@@ -98,13 +113,16 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
   if (save) migrationNotes.push(...sanitizeSave(S, K));
   const U = createUnlocks(K.UNLOCKS);
   if (S.unlocked === null) S.unlocked = K.UNLOCKS.map((u) => u.id); // sauvegarde d'avant la v1.1 : rien ne disparaît
+  if (S.workplaces === null) { S.workplaces = workplacePlan(S.seed, cfg); S.workplace = S.workplaces[S.day - 1] ?? 'office'; }
   const TWISTS = byId(K.TWISTS);
+  // Distractions des jours de télétravail (§12b.D) : des événements à choix, comme les cartes d'événement
+  const WORK_EVENTS = byId(K.WORKDAYS.home?.distractions ?? []);
 
   const c = {
     state: S, content: K, cfg, rng, migrationNotes,
     get step() { return S.step; },
     get ended() { return S.step === 'ended'; },
-    ctx: () => ({ day: S.day, phase: S.phase, weekday: c.weekday(), flags: flags(), stats: S.stats, hidden: S.hidden }),
+    ctx: () => ({ day: S.day, phase: S.phase, weekday: c.weekday(), workplace: S.workplace, flags: flags(), stats: S.stats, hidden: S.hidden }),
     check: (cond, useChance = true) => evalCondition(cond, c.ctx(), useChance ? rng : null),
     has: (f) => S.flags.includes(f),
     weekday: (day = S.day) => C.weekdays[(day - 1) % 7],
@@ -201,8 +219,33 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
   }
 
   // ---------- cartes (événements, dialogues, contre-offensives) ----------
+  // Matin (§12b.D) : jour de bureau → le trajet (et parfois une scène au bureau) ; télétravail → une distraction à choix
+  // et parfois la visio de Stéphane. Les entrées viennent de src/content/workdays.js.
+  function workdayCards() {
+    const W = K.WORKDAYS;
+    const fresh = (x) => !(x.once && (S.seen.dialogue.includes(x.id) || S.seen.events.includes(x.id)));
+    const pick = (list) => (list ?? []).find((x) => fresh(x) && c.check(x.when));
+    const lineCard = (x, kind, title) => {
+      if (x.once) S.seen.dialogue.push(x.id);
+      return { type: 'info', id: `${kind}:${x.id}`, workday: kind, speaker: x.speaker ?? null, title, text: (x.lines ?? []).map((l) => (typeof l === 'string' ? l : l.text)).join(' '), lines: x.lines ?? [], effects: x.effects };
+    };
+    const out = [];
+    if (S.workplace === 'office') {
+      const ride = pick(W.commute);
+      if (ride) out.push(lineCard(ride, 'commute', 'Le trajet'));
+      const scene = rng.chance(C.workdays?.officeSceneChance ?? 0.5) ? pick(W.office) : null;
+      if (scene) out.push(lineCard(scene, 'office', 'Chez Koddex'));
+    } else {
+      const d = (W.home?.distractions ?? []).find((x) => !S.seen.events.includes(x.id) && c.check(x.when));
+      if (d) out.push({ type: 'event', id: d.id, workday: 'home' });
+      const call = pick(W.home?.calls);
+      if (call) out.push(lineCard(call, 'call', 'Visio avec Stéphane'));
+    }
+    return out;
+  }
+
   function buildCards() {
-    const cards = [];
+    const cards = S.phase === 'morning' ? workdayCards() : [];
     const ph = S.phase;
     // Événements fixes du jour, puis aléatoires (sans `day`, avec `when`)
     for (const e of K.EVENTS) {
@@ -246,7 +289,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
   c.card = () => {
     const card = S.cards[0];
     if (!card) return null;
-    const src = { event: EVENTS, dialogue: DIALOGUE, countermove: CMS }[card.type]?.[card.id];
+    const src = card.type === 'event' ? EVENTS[card.id] ?? WORK_EVENTS[card.id] : { dialogue: DIALOGUE, countermove: CMS }[card.type]?.[card.id];
     // Contenu disparu entre-temps (sauvegarde ancienne) : on saute la carte plutôt que de planter
     if (!src && card.type !== 'info') {
       S.cards.shift();
@@ -318,6 +361,8 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
       S.seen.dialogue.push(card.id);
       S.counts.dialogue[card.id] = (S.counts.dialogue[card.id] ?? 0) + 1;
       apply(card.data.effects, 'story', card.id);
+    } else if (card.type === 'info' && card.effects) {
+      apply(card.effects, 'story', card.id); // trajet en vélo (§12b.D) : batterie à plat, etc.
     } else if (card.type === 'countermove') {
       shown(card.id);
       S.seen.countermoves.push(card.id);
@@ -369,6 +414,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
   // Début de journée : décroissances lentes, puis cartes du matin
   function beginDay() {
     c.note('day', {});
+    S.workplace = S.workplaces?.[S.day - 1] ?? 'office';
     setStat('risk', S.stats.risk - C.riskDecayPerDay);
     // Le soutien s'effrite si on ne le nourrit pas (vers le niveau de départ, pas en dessous)
     if (S.stats.asso > C.start.asso) setStat('asso', Math.max(C.start.asso, S.stats.asso - (C.assoDecayPerDay ?? 0)));
@@ -387,7 +433,8 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
   const workAvailable = (w) => c.check(w.requires, false) && c.check(w.when, false) && !(w.once && S.seen.actions.includes(w.id)) && cooled(w);
   c.koddexOptions = () => {
     const seenGags = S.seen.gags ?? [];
-    const gags = K.KODDEX.gags.map((g, i) => (typeof g === 'string' ? { id: `gag_${i}`, lines: [g] } : g))
+    // Gags de Clode Kode : ceux du lieu de travail du jour d'abord (§12b.D, WORKDAYS.koddex)
+    const gags = [...(K.WORKDAYS.koddex?.[S.workplace] ?? []), ...K.KODDEX.gags].map((g, i) => (typeof g === 'string' ? { id: `gag_${i}`, lines: [g] } : g))
       .filter((g) => !(g.once !== false && seenGags.includes(g.id)) && cooled(g) && c.check(g.when, false));
     return {
       prompts: K.PROMPTS_PER_MORNING ?? C.prompts,
@@ -413,7 +460,8 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
       S.counts.koddex[id] = (S.counts.koddex[id] ?? 0) + 1;
       const w = workItems().find((x) => x.id === id);
       if (id === 'work' || w) {
-        setStat('job', S.stats.job + (w?.job ?? C.workJob));
+        // Télétravail : la rue à un mètre du clavier, un peu moins de travail fait (§12b.D)
+        setStat('job', S.stats.job + (w?.job ?? C.workJob) - (S.workplace === 'home' ? C.workdays?.homeJobPenalty ?? 0 : 0));
         if (w) { shown(w.id); apply(w.effects, 'koddex', w.id); if (w.result) lines.push(w.result); if (w.once) S.seen.actions.push(w.id); }
         c.note('koddex', { id });
         continue;

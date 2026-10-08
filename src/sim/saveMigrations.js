@@ -1,7 +1,7 @@
 // Sauvegardes : schéma versionné, migrations, renommages d'ids du contenu, et nettoyage contre le contenu courant.
 // Le contenu change pendant que les auteurs écrivent : une sauvegarde ne doit jamais planter parce qu'un drapeau
 // ou un id a été renommé ou supprimé. Ce qui est renommé suit la table ; ce qui est inconnu est ignoré sans bruit.
-export const SAVE_VERSION = 3;
+export const SAVE_VERSION = 4;
 
 // Renommages connus (ancien → nouveau). Ajouter ici chaque renommage d'id du contenu. (Les renommages des élus,
 // antérieurs à toute sauvegarde publiée, n'y figurent pas : la garde des noms réels les refuserait.)
@@ -48,6 +48,13 @@ const MIGRATIONS = {
     s.unlocked ??= null; // null = « tout ce qui est verrouillable », résolu au chargement contre le contenu
     s.pushedMedia ??= [];
     s.version = 3;
+    return s;
+  },
+  // v3 → v4 (§12b.D) : bureau / maison chaque jour ; le plan est recalculé au chargement (campaign.js), à la graine
+  3: (s) => {
+    s.workplaces ??= null;
+    s.workplace ??= 'office';
+    s.version = 4;
     return s;
   },
 };

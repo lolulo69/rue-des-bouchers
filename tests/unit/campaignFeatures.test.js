@@ -86,7 +86,8 @@ describe('projets perso', () => {
     const job = c.state.stats.job;
     c.koddex([p.id, p.id, p.id]); // un projet ne se débloque qu'une fois : les deux autres prompts deviennent du travail
     expect(c.has('proj_db_logger')).toBe(true);
-    expect(c.state.stats.job).toBe(Math.max(0, Math.min(100, job + p.job + 2 * C.workJob)));
+    const pen = c.state.workplace === 'home' ? C.workdays.homeJobPenalty : 0; // télétravail (§12b.D) : un peu moins de travail fait
+    expect(c.state.stats.job).toBe(Math.max(0, Math.min(100, job + p.job + 2 * (C.workJob - pen))));
   });
 });
 

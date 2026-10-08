@@ -32,6 +32,7 @@ export function evalCondition(cond, ctx, rng) {
   }
   // weekday : 'sat' | ['fri', 'sat'] (v1.1, twists) ; ignoré si le contexte ne connaît pas le jour de la semaine
   if (cond.weekday && ctx.weekday && ![cond.weekday].flat().includes(ctx.weekday)) return false;
+  if (cond.workplace && ctx.workplace && ![cond.workplace].flat().includes(ctx.workplace)) return false; // 'office' | 'home' (§12b.D)
   for (const f of cond.flags ?? []) if (!ctx.flags.has(f)) return false;
   for (const f of cond.notFlags ?? []) if (ctx.flags.has(f)) return false;
   for (const [k, e] of Object.entries(cond.stats ?? {})) if (!compare(ctx.stats[k] ?? 0, e)) return false;

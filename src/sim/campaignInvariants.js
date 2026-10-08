@@ -36,7 +36,7 @@ export function checkCampaignInvariants(c) {
     if (e.type === 'ending' && e.early && e.day < C.earlyFromDay) fail('fin anticipée avant la nuit 5', e);
     // Une preuve renvoie à un fait réel : une pièce de la nuit, ou un contenu existant
     if (e.type === 'evidence' && !e.night && e.source && !String(e.source).split('#')[0].split(':')[0]
-      .split(',').every((id) => K.ACTIONS.some((a) => a.id === id) || events[id] || K.COUNTERMOVES.some((m) => m.id === id) || K.DIALOGUE.some((d) => d.id === id) || K.KODDEX.sideProjects.some((p) => p.id === id))) {
+      .split(',').every((id) => K.ACTIONS.some((a) => a.id === id) || events[id] || K.COUNTERMOVES.some((m) => m.id === id) || K.DIALOGUE.some((d) => d.id === id) || K.KODDEX.sideProjects.some((p) => p.id === id) || (K.WORKDAYS?.home?.distractions ?? []).some((d) => d.id === id) || String(id).includes('commute') || (K.TWISTS ?? []).some((t) => `twist:${t.id}` === id || t.id === id))) {
       fail('preuve sans source', e);
     }
   }

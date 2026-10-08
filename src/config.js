@@ -69,7 +69,8 @@ export const RESTAURANTS = [
 export const ANCHORS = {
   pilouWindow: { x: -3.4, y: 8.4, z: -24 },  // 2e étage au-dessus de Bernadette (aplomb du milieu de sa terrasse)
   streetDoor: { x: -2.6, y: 0, z: -18.2 },   // devant la porte de l'immeuble de Pilou
-  bed: { x: -8.2, y: 7.8, z: -25.6 },        // oreille de Pilou au lit
+  bed: { x: -8.2, y: 7.8, z: -25.6 },        // oreille de Pilou au lit (chambre côté cour)
+  sofa: { x: -5.5, y: 7.8, z: -24 },         // canapé du salon, côté rue (§12b.D)
   exhaust: { x: -2.9, y: 7.0, z: -23 },      // la gaine monte jusque sous sa fenêtre
   klaasWindow: { x: 0, y: 5.7, z: 67.6 },    // au fond de la place Maurice-Schumann, en enfilade sur toute la rue
   balcony: { x: 3.0, y: 7.8, z: -22.5 },     // Seb & Nico, juste en face de Pilou
@@ -114,6 +115,7 @@ export const SLEEP = {
   drainPerDbMinute: 0.02,
   exhaustDrainPerMinute: 0.04,
   recoverPerMinute: 0.25,
+  sofaRecover: 0.6,              // s'assoupir sur le canapé (salon, côté rue) récupère moins que la chambre côté cour
 };
 
 export const EVIDENCE = {
@@ -293,7 +295,9 @@ export const CAMPAIGN = {
   dayWitness: { grey: 0.25, illegal: 0.45 }, // actions de jour : chance d'être vu (avant déguisement)
   reversal: { minHostility: 60, chance: 0.35, window: [22 * 60, 24 * 60] }, // la police vient pour Pilou
   igpn: { openCorruption: -15, transferAfterDays: 3, transferCorruption: -25 },
-  tatieLeak: { flag: 'tatie_wavering', minHostility: 40, chance: 0.25 }, // Tatie, flattée par le bloc, peut laisser fuiter le vrai plan à Colette
+  tatieLeak: { flag: 'tatie_wavering', minHostility: 40, chance: 0.25 },
+  // Bureau ou télétravail (§12b.D) : ~2 jours à la maison par semaine (jamais le J14), tirés à la graine de campagne
+  workdays: { homePerWeek: 2, homeJobPenalty: 1, officeSceneChance: 0.5 }, // Tatie, flattée par le bloc, peut laisser fuiter le vrai plan à Colette
 };
 
 export const CONFIG = { RULES, DAYS, SKY, STREET, ZONES, RESTAURANTS, ANCHORS, INTERACT, NOISE, SLEEP, EVIDENCE, POLICE, WAITER, WITNESS, BUCKET, RISK, ASSO, DOG, DISGUISE, ENGINE_FLAGS, CAMPAIGN };

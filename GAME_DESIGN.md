@@ -859,7 +859,7 @@ so it reflects what the player actually did.
 **v1.1 engine: contract answers for the UI agent (red-main fix)**
 - **« Nouveau » card**: an `info` card in `c.card()`:
   `{ type: 'info', id: 'unlock:<unlockId>', unlock: { id, title, text, hint }, title, text, hint, choices: [{ i: 0, label: 'OK' }] }`.
-  `unlock` is now the **object** `src/ui` `unlockCard()` reads (it was the id until 5b… : fixed in this commit). Resolve it with `c.resolveCard(0)`.
+  `unlock` is now the **object** `src/ui` `unlockCard()` reads (it was the id before 13e6ec1). Resolve it with `c.resolveCard(0)`.
   Unlock cards come **first** in the phase whose start makes them due. `db_reading` (`when: { phase: 'night' }`) therefore opens night 1.
 - **Twist of the night**: `c.tonightTwist()` (alias of `c.twistTonight()`) returns the content entry `{ id, title, intro, lines, props, sim, … }` or `null`. It's chosen when the night phase begins and kept in the save, so a reload replays the same twist. The engine no longer queues a separate twist intro card: the UI's night screen shows it.
 - **Night gating**:

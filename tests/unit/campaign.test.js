@@ -333,6 +333,7 @@ describe('Koddex : un travail ou un projet perso au plus une fois par matin', ()
     const job = c.state.stats.job;
     c.koddex(['db_logger', 'db_logger', 'db_logger']);
     expect(c.state.counts.koddex.db_logger).toBe(1);
-    expect(c.state.stats.job).toBe(Math.min(100, job - 10 + 2 * c.cfg.CAMPAIGN.workJob));
+    const pen = c.state.workplace === 'home' ? c.cfg.CAMPAIGN.workdays.homeJobPenalty : 0; // télétravail (§12b.D)
+    expect(c.state.stats.job).toBe(Math.min(100, job - 10 + 2 * (c.cfg.CAMPAIGN.workJob - pen)));
   });
 });

@@ -213,13 +213,15 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
       updateDog();
       updatePees();
       if (S.min >= SLEEP.drainAfter || S.sleeping) {
-        S.noiseBed = sim.noiseAt(ANCHORS.bed, true);
+        // Au lit (chambre côté cour) ou assoupi sur le canapé (salon, côté rue : plus de bruit, moins de repos)
+        const sofa = S.sleepSpot === 'sofa' && ANCHORS.sofa;
+        S.noiseBed = sim.noiseAt(sofa ? ANCHORS.sofa : ANCHORS.bed, true);
         let d = 0;
         if (S.min >= SLEEP.drainAfter) {
           d -= Math.max(0, S.noiseBed - SLEEP.thresholdDb) * SLEEP.drainPerDbMinute;
           if (S.min < NOISE.exhaustOffMinute && !S.exhaustBlocked && !S.exhaustOff) d -= SLEEP.exhaustDrainPerMinute; // carton sur la gaine (nightActions.js), coupure (twist)
         }
-        if (S.sleeping && S.noiseBed < SLEEP.thresholdDb) d += SLEEP.recoverPerMinute;
+        if (S.sleeping && S.noiseBed < SLEEP.thresholdDb) d += SLEEP.recoverPerMinute * (sofa ? SLEEP.sofaRecover ?? 1 : 1);
         S.sleep = clamp(S.sleep + d * dMin, earlyEndings ? 0 : CAMPAIGN.preGate.sleepFloor, 100);
         // Nuit isolée : à 0, Pilou craque et la nuit s'arrête. En campagne (sleepEndsNight: false), une nuit blanche ne
         // clôt rien à elle seule : elle coûte tout le Sommeil de campagne, et le déménagement se décide sur la stat de campagne.
@@ -240,7 +242,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
         case 'waiter': return askWaiter();
         case 'bucket': return bucket();
         case 'db': return dbReading(a);
-        case 'sleep': S.sleeping = !!a.on; return { ok: true };
+        case 'sleep': S.sleeping = !!a.on; S.sleepSpot = a.where === 'sofa' ? 'sofa' : 'bed'; return { ok: true }; // canapé : §12b.D
         default: throw new Error(`action inconnue : ${a.type}`);
       }
     },
