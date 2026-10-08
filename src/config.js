@@ -266,6 +266,9 @@ export const CAMPAIGN = {
   prompts: 3,
   afternoonTime: 3,              // créneaux d'actions l'après-midi
   unemployedBonusTime: 2,
+  // Projets perso de Koddex (koddex.js) qui changent la mécanique
+  dbLogger: { every: 30, quality: 0.7, valueScale: 0.5 }, // proj_db_logger : relevé auto à la fenêtre, toutes les 30 min après 22h
+  whatsappBot: { actions: ['pm_whatsapp_rally', 'pm_petition_start', 'pm_banners', 'pm_recruit'], timeDiscount: 1, assoBonus: 2 }, // proj_whatsapp_bot
   nightEvidenceScale: 1.2,       // pièce légale de la nuit → points de dossier de campagne
   contentEvidenceValue: 3,       // effet { evidence } du contenu : valeur × qualité
   dossierTarget: 100,            // ~8–10 bonnes nuits (QA balance #2)

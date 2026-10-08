@@ -16,6 +16,7 @@ import { createSim } from './sim.js';
 import { evalCondition, STAT_KEYS, HIDDEN_KEYS } from './conditions.js';
 import { normalizeContent } from './content.js';
 import { performNightAction } from './nightActions.js';
+import { fmt } from './time.js';
 
 export const SAVE_VERSION = 1;
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -230,6 +231,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     const m = (K.MEDIA?.[feed] ?? []).find((x) => x.id === id);
     if (!m || S.seen.media.includes(id)) return false;
     S.seen.media.push(id);
+    (S.counts.media ??= {})[id] = 1;
     c.note('media', { feed, id });
     apply({ ...m.effects, setFlags: [...(m.effects?.setFlags ?? []), ...(m.setFlags ?? [])] }, 'story', id);
     return true;
@@ -363,12 +365,15 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
   const usable = (a, phase) => (a.phase ?? 'afternoon') === phase
     && !(a.once && S.seen.actions.includes(a.id))
     && c.check(a.requires, false);
-  c.availableActions = (phase = 'afternoon') => K.ACTIONS.filter((a) => usable(a, phase) && (phase !== 'afternoon' || (a.cost?.time ?? 1) <= S.timeLeft));
+  // Bot WhatsApp (proj_whatsapp_bot) : la mobilisation coûte un créneau de moins (minimum 1) et rapporte plus d'Asso
+  const botHelps = (a) => c.has('proj_whatsapp_bot') && C.whatsappBot.actions.includes(a.id);
+  c.actionCost = (a) => { const t = a.cost?.time ?? 1; return botHelps(a) ? Math.max(1, t - C.whatsappBot.timeDiscount) : t; };
+  c.availableActions = (phase = 'afternoon') => K.ACTIONS.filter((a) => usable(a, phase) && (phase !== 'afternoon' || c.actionCost(a) <= S.timeLeft));
   c.doAction = (id) => {
     if (S.step !== 'actions') throw new Error(`action hors de l'après-midi (${S.step})`);
     const a = ACTIONS[id];
     if (!a || !usable(a, 'afternoon')) throw new Error(`action indisponible : ${id}`);
-    const cost = a.cost?.time ?? 1;
+    const cost = c.actionCost(a);
     if (cost > S.timeLeft) throw new Error(`plus assez de temps pour ${id}`);
     S.timeLeft -= cost;
     S.seen.actions.push(a.id);
@@ -377,6 +382,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     // Un Risque écrit dans `effects` est une exposition : il ne compte que si l'acte est remarqué (§4, §13.G)
     const { risk: exposedRisk = 0, ...effects } = a.effects ?? {};
     apply(effects, 'action', a.id);
+    if (botHelps(a)) apply({ asso: C.whatsappBot.assoBonus }, 'action', 'proj_whatsapp_bot');
     let seen = [];
     if (a.witnessed || exposedRisk > 0) {
       seen = dayWitnesses(a.witnessed ?? {}, a.legality);
@@ -418,9 +424,30 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     });
     sim.campaignDay = S.day;
     sim.contentActions = [];
+    if (c.has('proj_db_logger')) autoDbLogger(sim);
     c.note('night-start', { reversal });
     return sim;
   };
+  // Démon Rust de relevé (proj_db_logger) : à chaque pas de la nuit, un relevé horodaté à la fenêtre de Pilou
+  // toutes les C.dbLogger.every minutes après 22h, s'il y a tapage (même seuil que le relevé manuel). Preuve passive.
+  function autoDbLogger(sim) {
+    const { EVIDENCE, SLEEP, ANCHORS } = sim.cfg;
+    const tick = sim.tick;
+    let next = SLEEP.drainAfter;
+    sim.tick = (dMin) => {
+      tick(dMin);
+      const N = sim.state;
+      if (N.ended || N.min < next) return;
+      next = N.min + C.dbLogger.every;
+      const db = Math.round(sim.noiseAt(ANCHORS.pilouWindow, false));
+      if (db < EVIDENCE.dbThreshold) return;
+      sim.addEvidence({
+        type: 'db', kind: 'db', auto: true, restId: null, quality: C.dbLogger.quality, db,
+        value: sim.pieceValue(null, 'db', EVIDENCE.dbValue) * C.dbLogger.valueScale,
+        text: `Démon Rust : ${db} dB à ${fmt(N.min)}, fenêtre de Pilou (relevé automatique)`,
+      });
+    };
+  }
   c.nightActions = (sim) => K.ACTIONS.filter((a) => (a.phase ?? 'afternoon') === 'night' && !a.sim && usable(a, 'night') && !sim.contentActions.includes(a.id));
   // Action de nuit du contenu (hors actions natives de la sim) : lieu, créneau, témoins, effets → nightActions.js
   // (même chemin pour le joueur, les bots et le simulateur ; `player` facultatif : sans lui, le lieu n'est pas vérifié)

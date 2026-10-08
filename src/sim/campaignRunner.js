@@ -21,8 +21,9 @@ export function playNight(sim, policy, c, dt = 1, contentEvery = 10) {
   return sim;
 }
 
-export function runCampaign({ seed = 1, content, cfg, bot, maxSteps = 5000 } = {}) {
-  const c = createCampaign({ seed, content, cfg });
+// narrative (facultatif) : src/sim/narrative.js, pour le fil du téléphone que le bot lit chaque soir
+export function runCampaign({ seed = 1, content, cfg, bot, maxSteps = 5000, narrative = null } = {}) {
+  const c = createCampaign({ seed, content, cfg, narrative });
   const nightErrors = [];
   for (let i = 0; i < maxSteps && !c.ended; i++) {
     switch (c.step) {
@@ -45,7 +46,11 @@ export function runCampaign({ seed = 1, content, cfg, bot, maxSteps = 5000 } = {
         c.finishNight(sim);
         break;
       }
-      case 'recap': c.nextDay(); break;
+      case 'recap':
+        // Le bot lit son téléphone en fin de journée (effets des messages, couverture du contenu)
+        for (const [feed, items] of Object.entries(c.mediaFeed())) for (const m of items) c.readMedia(feed, m.id);
+        c.nextDay();
+        break;
       default: throw new Error(`étape inconnue ${c.step}`);
     }
     // Le rebond du licenciement : certains bots continuent au chômage

@@ -12,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
 import { normalizeContent, runCampaign, CAMPAIGN_BOTS, TARGETS, ENDING_SCORE, checkCampaignInvariants } from '../src/sim/index.js';
 import * as fixture from '../tests/fixtures/content.js';
+import * as narrative from '../src/sim/narrative.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const argv = process.argv.slice(2);
@@ -48,7 +49,7 @@ for (const name of BOTS) {
   const ends = {};
   const acc = { sleep: 0, asso: 0, risk: 0, job: 0, dossier: 0, score: 0, earlyDay: [], custodyDay: [] };
   for (let seed = 1; seed <= RUNS; seed++) {
-    const { c, nightErrors } = runCampaign({ seed, content: K, bot: make() });
+    const { c, nightErrors } = runCampaign({ seed, content: K, bot: make(), narrative: FIXTURE ? null : narrative });
     const S = c.state;
     const id = S.ending?.id ?? 'none';
     ends[id] = (ends[id] ?? 0) + 1;
