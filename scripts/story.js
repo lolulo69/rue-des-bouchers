@@ -18,7 +18,8 @@ const arg = (k, d) => { const i = argv.indexOf(`--${k}`); return i < 0 ? d : arg
 const BOT = arg('bot', 'legal');
 const SEED = Number(arg('seed', 1));
 const OUT = arg('out', null);
-if (!CAMPAIGN_BOTS[BOT]) throw new Error(`bot inconnu : ${BOT} (${Object.keys(CAMPAIGN_BOTS).join(', ')})`);
+const ENDING = arg('ending', null); // --ending <id|all> : voir scripts/story-endings.js
+if (!ENDING && !CAMPAIGN_BOTS[BOT]) throw new Error(`bot inconnu : ${BOT} (${Object.keys(CAMPAIGN_BOTS).join(', ')})`);
 
 const dir = join(ROOT, 'src', 'content');
 const K = normalizeContent(await Promise.all(readdirSync(dir).filter((f) => f.endsWith('.js')).map((f) => import(join(dir, f)))));
@@ -27,16 +28,17 @@ let c = null; // la campagne (déclarée plus bas) : le serveur reste « le serv
 const who = (id) => (id === 'serveur' && !c?.has('met_waiter') ? 'Le serveur' : CHARACTERS[id]?.name ?? PLACES[id]?.name ?? WITNESS[id] ?? id);
 const DAYS = { mon: 'lundi', tue: 'mardi', wed: 'mercredi', thu: 'jeudi', fri: 'vendredi', sat: 'samedi', sun: 'dimanche' };
 
-const out = [];
+let out = [];
 const w = (s = '') => out.push(s);
 const quote = (t) => String(t).split('\n').map((l) => `> ${l}`).join('\n');
 const stats = (S) => `Sommeil ${Math.round(S.stats.sleep)} · Asso ${Math.round(S.stats.asso)} · Risque ${Math.round(S.stats.risk)} · Job ${Math.round(S.stats.job)} · Dossier ${Math.round(S.stats.dossier)}`
   + ` · (caché) hostilité ${Math.round(S.hidden.hostility)}, corruption ${Math.round(S.hidden.corruption)}`;
 
 // ── Le narrateur de la nuit, comme dans main.js (RNG à part : le texte ne change pas l'issue) ────────────
-const bot = CAMPAIGN_BOTS[BOT]();
-c = createCampaign({ seed: SEED, content: K, narrative });
-const narrRng = createRng((SEED ^ 0x5bd1e995) >>> 0);
+let bot = null;
+let narrRng = null;
+// steer (mode --ending) : { onStep(c, note), choose(c, card, ok) } : pilotage visible dans la transcription
+let steer = null;
 function narrator(kind, s, a) {
   switch (kind) {
     case 'police': return narrative.policeLine(a.outcome, a.patrolId, { ...narrative.nightCtx.police(s, a.entry ?? {}), asso: !!a.asso }, narrRng);
@@ -47,12 +49,6 @@ function narrator(kind, s, a) {
     default: return null;
   }
 }
-
-w(`# Rue des Bouchers · transcription · bot « ${bot.name} » · graine ${SEED}`);
-w();
-w(`_Générée par \`npm run story -- --bot ${BOT} --seed ${SEED}\`. Contenu réel, narrative.js, mêmes règles que le jeu._`);
-w();
-for (const card of c.introCards()) { w(`**${card.title}**`); w(quote(card.text)); w(); }
 
 let day = 0;
 function header() {
@@ -69,7 +65,7 @@ function cards() {
     const d = card.data ?? {};
     const ok = card.choices.filter((x) => x.available);
     let i = 0;
-    if (card.type === 'event' && ok.length) i = bot.choose(c, card, ok);
+    if (card.type === 'event' && ok.length) i = steer?.choose?.(c, card, ok) ?? bot.choose(c, card, ok);
     if (card.type === 'event') {
       w(`### 🃏 ${d.title ?? card.id} \`${card.id}\``);
       if (d.text) w(quote(d.text));
@@ -117,7 +113,7 @@ function night() {
     // Événements de nuit à leur heure (campaign.nightEventDue), choix du bot
     for (let ev = c.nightEventDue(sim); ev; ev = c.nightEventDue(sim)) {
       const ok = ev.choices.filter((x) => x.available);
-      const i = ok.length ? bot.choose(c, ev, ok) : 0;
+      const i = ok.length ? (steer?.choose?.(c, ev, ok) ?? bot.choose(c, ev, ok)) : 0;
       const r = c.resolveNightEvent(sim, i);
       say(sim.state.min, `🃏 **${ev.data.title}** \`${ev.id}\` : ${ev.data.text}`);
       say(sim.state.min, `→ **${ev.choices[i]?.label ?? 'OK'}**${r ? ` : ${r}` : ''}`);
@@ -159,8 +155,21 @@ function phone() {
   w();
 }
 
+function tell({ botName, seed, steerWith = null, title = null }) {
+  out = []; day = 0; steer = steerWith;
+  bot = CAMPAIGN_BOTS[botName]();
+  c = createCampaign({ seed, content: K, narrative });
+  narrRng = createRng((seed ^ 0x5bd1e995) >>> 0);
+w(`# Rue des Bouchers · transcription · bot « ${bot.name} » · graine ${seed}${title ? ` · ${title}` : ''}`);
+w();
+w(`_Générée par \`npm run story -- ${title ? `--ending ${title.split(' ')[0]}` : `--bot ${botName} --seed ${seed}`}\`. Contenu réel, narrative.js, mêmes règles que le jeu._`);
+w();
+for (const card of c.introCards()) { w(`**${card.title}**`); w(quote(card.text)); w(); }
+
 for (let guard = 0; guard < 5000 && !c.ended; guard++) {
   header();
+  steer?.onStep?.(c, (msg) => { w(`> ⚙️ _Pilotage (test, hors jeu) : ${msg}_`); w(); });
+  if (c.ended) break;
   switch (c.step) {
     case 'cards': cards(); break;
     case 'koddex': {
@@ -187,7 +196,7 @@ for (let guard = 0; guard < 5000 && !c.ended; guard++) {
     case 'recap': phone(); c.nextDay(); break;
     default: throw new Error(`étape ${c.step}`);
   }
-  if (c.ended && c.state.ending?.canContinue && bot.continueAfterFired?.(c)) {
+  if (c.ended && c.state.ending?.canContinue && !steer?.noContinue && bot.continueAfterFired?.(c)) {
     w(`**↩️ ${c.state.ending.continueLabel}** (fin « ${c.state.ending.title} » refusée, on continue au chômage)`);
     w();
     c.continueAfterEnding();
@@ -204,6 +213,13 @@ for (const p of c.state.epilogue ?? []) { w(quote(p)); w('>'); }
 w();
 w(`Drapeaux en fin de partie : ${[...c.state.flags].sort().join(', ')}`);
 
-const text = out.join('\n') + '\n';
-if (OUT) { mkdirSync(dirname(join(ROOT, OUT)), { recursive: true }); writeFileSync(join(ROOT, OUT), text); console.log(`${OUT} : ${E?.id}, ${out.length} lignes`); }
-else process.stdout.write(text);
+  return { text: out.join('\n') + '\n', ending: c.state.ending?.id, flags: new Set(c.state.flags), lines: out.length };
+}
+
+if (!ENDING) {
+  const r = tell({ botName: BOT, seed: SEED });
+  if (OUT) { mkdirSync(dirname(join(ROOT, OUT)), { recursive: true }); writeFileSync(join(ROOT, OUT), r.text); console.log(`${OUT} : ${r.ending}, ${r.lines} lignes`); }
+  else process.stdout.write(r.text);
+} else {
+  await import('./story-endings.js').then((m) => m.run({ tell, ENDING, ROOT, K }));
+}
