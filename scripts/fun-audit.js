@@ -92,11 +92,11 @@ function auditCampaign(seed, botName) {
       case 'koddex': c.koddex(bot.morning(c, c.koddexOptions())); break;
       case 'actions': { const id = bot.afternoon(c, c.availableActions()); if (id) c.doAction(id); else c.endAfternoon(); break; }
       case 'night': {
+        const twist = c.tonightTwist?.()?.id ?? null; // v1.1 (build note ui-v1.1), lu avant la nuit
         const sim = c.createNight();
         const start = sim.state.min;
         const moments = playNightAudited(sim, bot.night(c, sim), c, (card, ok) => bot.choose(c, card, ok));
         const end = sim.state.min;
-        const twist = c.state.twist?.id ?? c.state.nightTwist?.id ?? sim.twist?.id ?? null;
         nights.push({ day: c.state.day, twist, ...nightStats(moments, start, end), minutes: end - start });
         for (const m of moments) if (m.text) lines.set(m.text, (lines.get(m.text) ?? 0) + 1);
         c.finishNight(sim);
