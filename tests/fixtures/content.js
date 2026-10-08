@@ -9,7 +9,7 @@ export const FLAGS = {
   saturday1_done: '', saturday2_done: '', boss_noticed: '',
   // test
   met_klaas: '', stance_legal: '', stance_direct: '', stance_dialogue: '', petition_started: '', press_contacted: '',
-  won_legal: '', won_peace: '', commission_won: '', commission_lost: '', carbonnade_1: '', carbonnade_2: '', carbonnade_3: '',
+  won_legal: '', won_peace: '', commission_won: '', commission_lost: '', commission_done: '', carbonnade_1: '', carbonnade_2: '', carbonnade_3: '',
   bombance_bar_project: '', cm_bins: '', cm_harassment_complaint: '', proj_db_logger: '', proj_fake_reviews: '', stink_bomb: '',
   disguise_hood: '', martine_seen: '', random_drache: '',
 };
@@ -31,9 +31,9 @@ export const EVENTS = [
     { label: 'Dialogue', effects: { setFlags: ['stance_dialogue'], hostility: -10 } },
   ] },
   { id: 'commission', day: 14, phase: 'afternoon', title: 'La commission', text: 'Plaidez.', choices: [
-    { label: 'Le dossier', requires: { stats: { dossier: '>=60', risk: '<60' } }, effects: { setFlags: ['won_legal', 'commission_won'] } },
-    { label: 'La paix', requires: { flags: ['stance_dialogue'], stats: { asso: '>=60' } }, effects: { setFlags: ['won_peace', 'commission_won'] } },
-    { label: 'Improviser', effects: { setFlags: ['commission_lost'] } },
+    { label: 'Le dossier', requires: { stats: { dossier: '>=60', risk: '<60' } }, effects: { setFlags: ['won_legal', 'commission_won', 'commission_done'] } },
+    { label: 'La paix', requires: { flags: ['stance_dialogue'], stats: { asso: '>=60' } }, effects: { setFlags: ['won_peace', 'commission_won', 'commission_done'] } },
+    { label: 'Improviser', effects: { setFlags: ['commission_lost', 'commission_done'] } },
   ] },
   { id: 'drache', phase: 'afternoon', when: { chance: 0.1 }, once: true, title: 'Drache', text: 'Il pleut.', effects: { setFlags: ['random_drache'], sleep: 3 } },
 ];

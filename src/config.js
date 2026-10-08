@@ -256,6 +256,7 @@ export const CAMPAIGN = {
   endings: ['legal_victory', 'negotiated_peace', 'scandal', 'custody', 'moving_out', 'fired', 'turncoat', 'the_return'], // ids de src/content/endings.js
   earlyEndings: ['custody', 'fired', 'moving_out'], // ou `early: true` sur la fin
   earlyFromDay: 5,               // aucune fin anticipée avant la nuit 5
+  finalFlag: 'commission_done',  // posé par la commission du J14 : la campagne se termine là (pas de 14e nuit)
   preGate: { riskCap: 89, sleepFloor: 5, jobFloor: 5 }, // avant la nuit 5 : on frôle, on ne tombe pas
   riskDecayPerDay: 5,            // le Risque persiste et ne baisse que lentement (QA balance #3)
   sleepNeutral: 60,              // une nuit qui finit au-dessus repose Pilou, en dessous elle l'use

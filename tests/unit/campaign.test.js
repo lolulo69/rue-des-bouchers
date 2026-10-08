@@ -60,10 +60,28 @@ describe('calendrier de 14 jours', () => {
     expect(sim.weekday).toBe('sat');
   });
 
-  it('14 nuits jouées si personne ne craque, puis la fin', () => {
-    const { c } = runCampaign({ seed: 4, content, bot: CAMPAIGN_BOTS.diplomat() });
-    expect(c.state.nightCount).toBe(14);
-    expect(c.state.ending).toBeTruthy();
+  it('A1 : la campagne se termine juste après la commission du J14 (13 nuits, fin non anticipée)', () => {
+    for (let seed = 1; seed <= 10; seed++) {
+      const { c } = runCampaign({ seed, content, bot: CAMPAIGN_BOTS.diplomat() });
+      if (c.state.ending.early) continue; // garde à vue, licenciement… avant le J14
+      expect(c.state.ending.day).toBe(14);
+      expect(c.state.nightCount).toBe(13);
+      expect(c.state.phase).toBe('afternoon');
+      expect(c.has('commission_done')).toBe(true);
+      expect(c.state.journal.filter((e) => e.type === 'night-start' && e.day === 14)).toHaveLength(0);
+    }
+  });
+
+  it('A1 : commission perdue → fin à la commission (early: false), pas la fin anticipée « déménagement »', () => {
+    let c;
+    for (let seed = 1; seed <= 20 && !c; seed++) {
+      const x = drive(createCampaign({ seed, content }), CAMPAIGN_BOTS.diplomat(), (y) => y.state.day === 14 && y.step === 'cards' && y.card()?.id === 'commission');
+      if (!x.ended) c = x;
+    }
+    const lose = c.card().choices.find((ch) => ch.label === 'Improviser').i;
+    c.resolveCard(lose);
+    expect(c.ended).toBe(true);
+    expect(c.state.ending).toMatchObject({ id: 'moving_out', early: false, day: 14 });
   });
 });
 

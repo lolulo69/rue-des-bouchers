@@ -266,6 +266,9 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
       apply(card.data.effects, 'story', card.id);
     }
     S.lastCard = { ...card, data: undefined, result };
+    // A1 (décision du design) : la campagne se termine juste après la commission du J14, gagnée ou perdue :
+    // pas de 14e nuit, fin « normale » (early: false), épilogue et éventuel « retour » de La Bombance.
+    if (S.day >= C.days && c.has(C.finalFlag)) { S.cards = []; finalResolution(); return result; }
     checkEarlyEnding();
     if (!S.cards.length && S.step === 'cards') afterCards();
     return result;
