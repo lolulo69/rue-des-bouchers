@@ -7,7 +7,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -17,12 +17,18 @@ jobs:
       - run: npm ci
       - name: Unit tests (sim, invariants, names, perf)
         run: npm test
+      - name: Bundle size (< 3 MB, §13.I)
+        run: npm run check:bundle
       - name: Campaign simulator smoke (6 bots, invariants)
         run: npm run sim -- --runs 20
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: E2E smoke (build + vite preview + headless Chromium)
         run: npm run test:e2e
+        env:
+          CI: true
+      - name: Perf (frame time Saturday street, load < 5 s; 60 fps is a warning on SwiftShader)
+        run: npm run test:perf
         env:
           CI: true
       - uses: actions/upload-artifact@v4

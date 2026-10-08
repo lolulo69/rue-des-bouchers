@@ -8,7 +8,10 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "sim": "node scripts/sim.js"
+    "sim": "node scripts/sim.js",
+    "test:perf": "playwright test -c playwright.perf.config.js",
+    "check:bundle": "vite build && node scripts/check-bundle.js",
+    "qa:screens": "QA_SCREENS=1 playwright test screens"
   },
   "keywords": [],
   "author": "Lucas Lefort",
