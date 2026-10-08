@@ -324,7 +324,8 @@ export const DIALOGUE = [{ id, speaker: 'klaas', when: {...}, lines: ['…'], ef
 // events.js: fixed calendar events and random ones
 export const EVENTS = [{ id, day: 7, phase: 'afternoon', title, text, choices: [{ label, requires: {...}, effects: {...}, result: '…' }] }];
 // actions.js: day and night actions available from menus
-export const ACTIONS = [{ id, label, phase, legality: 'legal'|'grey'|'illegal', cost: { time: 1 }, requires: {...}, effects: {...}, witnessed: {...} }];
+export const ACTIONS = [{ id, label, phase, legality: 'legal'|'grey'|'illegal', cost: { time: 1 }, requires: {...}, effects: {...}, witnessed: {...},
+  sim: 'police', simArgs: { asso: true } }]; // sim/simArgs: night actions handled by the engine → sim.act({ type: sim, ...simArgs })
 // countermoves.js: what the restaurants do, by trigger
 export const COUNTERMOVES = [{ id, when: {...}, text, effects: {...} }];
 // koddex.js: the three morning prompts

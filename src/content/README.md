@@ -19,7 +19,7 @@ This file records the writing decisions so that every text stays consistent. Rea
 - Satire aimed at **institutions, the bloc's tactics, bureaucracy and Pilou himself**. Never at the residents' identities.
 - Ch'ti touches sparingly: *hein*, *biloute*, *drache*, *estaminet*, *allez va*, *min p'tit*. One per scene at most.
 - Seb & Nico are defined by their **role**: the couple across the street, the gossip, the admins of the WhatsApp group. No humour about who they are.
-- No lethal poison, no real people, no real businesses (§0). The darkest act is the laxative, and it's treated as serious.
+- Work of fiction (§0): no real people, no real businesses. Nothing that harms anyone's health: the kitchen sabotage is a salt/sugar swap (« la carbonnade sucrée »).
 
 ## Cast quick reference
 | id | Who | Where (§1b) |
