@@ -15,7 +15,7 @@ export const DIALOGUE = [
   {
     id: 'jeremie_hello',
     speaker: 'jeremie',
-    when: { day: [1, 2], notFlags: ['met_jeremie'] },
+    when: { day: [1, 2] }, // met_jeremie est posé dès le matin du J1 : on ne le teste plus (balance pass 3)
     lines: [
       "Pilou ! Le voisin du deuxième. Jérémie, troisième étage, président de l’Association de la rue des Bouchers.",
       "On se croise dans l’escalier depuis deux ans, il était temps qu’on se parle autrement qu’en s’excusant pour le teckel.",
@@ -465,7 +465,7 @@ export const DIALOGUE = [
   {
     id: 'tatie_hello',
     speaker: 'tatie',
-    when: { notFlags: ['met_tatie'] },
+    when: { day: [1, 3] }, // tatie_mail_01 pose met_tatie dès le matin du J1 (balance pass 3)
     lines: [
       "Ah, le petit du numéro 10 ! Asseyez-vous. Je vais vous dire une chose que la vie m’a apprise.",
       "« Si vous voulez quelque chose dans la vie, faut résister et se battre pour. » Voilà. Un biscuit ?",

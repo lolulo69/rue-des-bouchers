@@ -446,6 +446,97 @@ export const MEDIA = {
       author: 'jeremie',
       text: "Merci à tous pour la fête des voisins. Rangée à 22h00 pile, comme prévu. Photo jointe de la place à 22h01, et de la terrasse de l’estaminet à 22h01. Je ne commente pas. Je joins.",
     },
+    // ── content-unlocks : réactions aux twists de la nuit (twists.js, after.setFlags) ──
+    {
+      id: "wa_twist_colette",
+      when: { flags: ['twist_colette_dinner'] },
+      author: "seb",
+      text: "Attends, attends : COLETTE VERHAEGHE à l’estaminet ce soir. Huit couverts sur une table de six. J’ai la photo, de loin, de travers, mais c’est elle.",
+    },
+    {
+      id: "wa_twist_inspector",
+      when: { flags: ['twist_inspector_seen'] },
+      author: "nico",
+      text: "La dame au carnet au Goulot hier soir, c’était l’inspectrice. Elle a pris des notes « en simple cliente ». Je l’aime bien.",
+    },
+    {
+      id: "wa_twist_model_street",
+      when: { flags: ['twist_model_street'] },
+      author: "klaas",
+      text: "Hier soir : six par table partout, tables rentrées à 21h58, géraniums neufs. J’ai noté « exceptionnel ». Puis j’ai noté « jusqu’à quand ? ».",
+    },
+    {
+      id: "wa_twist_exhaust",
+      when: { flags: ['twist_exhaust_silent'] },
+      author: "tatie",
+      text: "La gaine s’est éteinte la veille de la réunion. « Le loup se brosse les dents avant d’aller chez le dentiste. » Celle-là est de moi.",
+    },
+    {
+      id: "wa_twist_birthday",
+      when: { flags: ['twist_birthday'] },
+      author: "seb",
+      text: "Joyeux anniversaire Jojo 🎂 de la part de tout le deuxième étage. 23h40, onze voix, une seule note juste. Nico a enregistré : c’est pour le dossier.",
+    },
+    {
+      id: "wa_twist_hen_party",
+      when: { flags: ['twist_hen_party'] },
+      author: "nico",
+      text: "Le mégaphone de l’EVJF à 0h20 : 94 dB depuis notre balcon. Félicitations à Marion. Condoléances à nos oreilles.",
+    },
+    {
+      id: "wa_twist_drache",
+      when: { flags: ['twist_drache'] },
+      author: "jeremie",
+      text: "Point météo et légalité : hier, pendant la drache, quatorze personnes sur trois tables sous le store. Sec, oui. Six par table, non. C’est noté.",
+    },
+    {
+      id: "wa_twist_heatwave",
+      when: { flags: ['twist_heatwave'] },
+      author: "hilde",
+      text: "Avec cette chaleur, je fais de la citronnade pour tout le monde demain. Et des bouchons d’oreille : Klaas en achète par boîtes de cent.",
+    },
+    {
+      id: "wa_twist_guide",
+      when: { flags: ['twist_guide_tour'] },
+      author: "hippolyte",
+      text: "La balade nocturne a présenté notre rue comme « autrefois surnommée le Trou ». Autrefois. J’ai écrit à l’office de tourisme pour suggérer un adverbe plus exact.",
+    },
+    {
+      id: "wa_twist_busker",
+      when: { flags: ['twist_busker'] },
+      author: "tatie",
+      text: "L’accordéoniste a joué « Le P’tit Quinquin » trente-deux fois. J’ai compté. À la vingtième, j’ai chanté avec. Je ne m’en vante pas.",
+    },
+    {
+      id: "wa_twist_power_cut",
+      when: { flags: ['twist_power_cut'] },
+      author: "klaas",
+      text: "22h40 : panne. 23h25 : retour du courant. Entre les deux : bougies, étoiles, et 41 dB sous ma fenêtre. J’ai encadré la page.",
+    },
+    {
+      id: "wa_twist_waiter",
+      when: { flags: ['twist_waiter_holidays'] },
+      author: "seb",
+      text: "Le remplaçant du serveur rentre les tables à 23h passées. Je ne pensais pas écrire ça un jour : rendez-nous le serveur.",
+    },
+    {
+      id: "wa_twist_lescaut",
+      when: { flags: ['twist_lescaut_walk'] },
+      author: "jeremie",
+      text: "Le maire est passé hier à 23h : dix minutes exemplaires. Je lui ai envoyé ce matin les photos des dix minutes d’avant. Avec les heures.",
+    },
+    {
+      id: "wa_twist_lost_dog",
+      when: { flags: ['twist_lost_dog'] },
+      author: "jeremie",
+      text: "Merci à tous pour les recherches d’hier. Biloute va bien. Il était sous la table 3. Il a mangé des frites. Il ne regrette rien.",
+    },
+    {
+      id: "wa_twist_sweeper",
+      when: { flags: ['twist_street_sweeper'] },
+      author: "nico",
+      text: "La balayeuse de 23h30 a vidé les terrasses en quatre minutes. Je propose qu’on l’invite à l’AG. Seb propose qu’on l’adopte.",
+    },
   ],
 
   // ════════════════════════════════════════════════════════════════════════
@@ -689,6 +780,28 @@ export const MEDIA = {
       author: 'journaliste',
       headline: "« Les pépites du Vieux-Lille » : un estaminet à l’honneur",
       text: "Le reportage diffusé hier montre une terrasse impeccable. Plusieurs riverains ont fait parvenir à la rédaction des photos prises le même soir, une demi-heure plus tard. La rédaction remercie les riverains.",
+    },
+    // ── content-unlocks : réactions aux twists de la nuit (twists.js, after.setFlags) ──
+    {
+      id: "press_twist_colette",
+      when: { flags: ['twist_colette_dinner'] },
+      author: "journaliste",
+      headline: "L’ancienne maire dîne en terrasse rue des Bouchers",
+      text: "Colette Verhaeghe a été aperçue jeudi soir à la terrasse d’un estaminet de la rue des Bouchers, à une table de huit couverts. Le maximum y est de six. « Je dînais entre amis », a-t-elle précisé. Huit amis.",
+    },
+    {
+      id: "press_twist_power",
+      when: { flags: ['twist_power_cut'] },
+      author: "journaliste",
+      headline: "Panne de courant dans le Vieux-Lille : 45 minutes d’obscurité",
+      text: "Lampadaires éteints, terrasses aux bougies : rue des Bouchers, des riverains parlent de « la nuit la plus calme de l’année ». Le gestionnaire du réseau évoque un incident technique.",
+    },
+    {
+      id: "press_twist_sweeper",
+      when: { flags: ['twist_street_sweeper'] },
+      author: "journaliste",
+      headline: "Nettoyage de nuit : la balayeuse fait rentrer les terrasses",
+      text: "Nouveaux horaires de nettoyage dans le Vieux-Lille : la balayeuse-laveuse passe à 23h30 rue des Bouchers. Les restaurateurs n’avaient pas lu l’affichette. « On a été prévenus par un lampadaire », regrette l’un d’eux.",
     },
   ],
 
@@ -949,6 +1062,30 @@ export const MEDIA = {
       handle: 'Lou.lillestyle',
       kind: 'post',
       text: "La vraie nuit lilloise ✨ Ambiance, guirlandes, gens trop chaleureux 🥰 (et un monsieur qui m’a fait coucou du deuxième étage, trop mignon) #VieuxLille #Authentique",
+    },
+    // ── content-unlocks : réactions aux twists de la nuit (twists.js, after.setFlags) ──
+    {
+      id: "so_twist_birthday",
+      when: { flags: ['twist_birthday'] },
+      author: "reviewer",
+      handle: "Jojo_40ans",
+      kind: "post",
+      text: "Meilleur anniversaire de ma vie à l’estaminet 🎉 Merci à toute la rue d’avoir chanté avec nous (les voisins aussi je crois ??) #40ans #VieuxLille",
+    },
+    {
+      id: "so_twist_hen_party",
+      when: { flags: ['twist_hen_party'] },
+      author: "reviewer",
+      handle: "temoin.de.marion",
+      kind: "post",
+      text: "EVJF de rêve aux Bouchers Mal Lunés 👰💕 Le mégaphone a été un SUCCÈS. On a même eu des applaudissements d’une fenêtre. Ou c’était des volets.",
+    },
+    {
+      id: "so_twist_heatwave",
+      when: { flags: ['twist_heatwave'] },
+      author: "bernadette",
+      kind: "post",
+      text: "Canicule 🥵 Notre terrasse reste ouverte pour vous rafraîchir ! Jusqu’à 22h, bien sûr 😇 #Convivialité #Lille",
     },
   ],
 };
