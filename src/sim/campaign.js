@@ -457,7 +457,10 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     return U.key(key, S.unlocked, viaOpp);
   };
   // Verbe natif de la nuit (photo, db, police…) : verrouillé si toutes les actions du contenu qui le portent le sont
+  // Verbes natifs portés par une touche (db ↔ B) : la touche verrouillée verrouille aussi le verbe (joueur et bots)
+  const NATIVE_KEYS = { db: 'B' };
   c.nativeAllowed = (type, { asso = false } = {}, sim) => {
+    if (NATIVE_KEYS[type] && !c.keyAllowed(NATIVE_KEYS[type], sim)) return false;
     const carriers = K.ACTIONS.filter((a) => a.sim === type && (type !== 'police' || !!(a.simArgs?.asso ?? /asso/.test(a.id)) === !!asso));
     return !carriers.length || carriers.some((a) => c.actionAllowed(a.id, sim));
   };

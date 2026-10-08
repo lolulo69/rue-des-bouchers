@@ -164,7 +164,9 @@ function ambientLines(dt) {
   if (nextBark <= 0) {
     nextBark = 20 + narrRng.next() * 20;
     const near = S.tables.some((t) => t.out && Math.hypot(t.x - player.pos.x, t.z - player.pos.z) < (player.loc === 'apt' ? 10 : 6));
-    if (near) log(narrative.pickNightLine('bark', sim, narrRng), 'bark');
+    // Le twist de la nuit a ses propres bribes : une sur deux
+    const twistBarks = sim.twist?.lines?.barks;
+    if (near) log(twistBarks?.length && narrRng.chance(0.5) ? twistBarks[narrRng.int(0, twistBarks.length - 1)] : narrative.pickNightLine('bark', sim, narrRng), 'bark');
   }
   if (S.tipoffs.length) tuto('first_tipoff');
   if (S.policeLog.some((p) => p.outcome === 'complaisance')) tuto('first_complaisance');
@@ -265,7 +267,12 @@ function openOverlay(name) {
   $(name).classList.remove('hidden');
   if (name === 'dossier') renderDossier();
   if (name === 'nightmenu') renderNightMenu();
-  if (name === 'phone') tuto('first_phone');
+  if (name === 'phone') {
+    tuto('first_phone');
+    // Boutons du téléphone selon les outils débloqués (v1.1, unlocks.js)
+    const allowed = { police: true, 'police-asso': !campaign || campaign.nativeAllowed('police', { asso: true }, sim), asso: !campaign || campaign.nativeAllowed('asso', {}, sim), mairie: !campaign || campaign.nativeAllowed('mairie', {}, sim) };
+    for (const b of document.querySelectorAll('#phone button[data-call]')) if (b.dataset.call in allowed) b.classList.toggle('hidden', !allowed[b.dataset.call]);
+  }
   if (name === 'dossier') tuto('first_dossier');
   if (name === 'phone') {
     const P = S.police;
@@ -354,6 +361,13 @@ if (campaign) {
   // la souris et lancer le son : c'est l'overlay de pause, qui montre les commandes la première nuit seulement.
   $('title').classList.add('hidden');
   $('pause-text').textContent = `${nightLabel()} · cliquez pour descendre dans la rue`;
+  // Le twist de la nuit (v1.1) : son titre et son intro sur l'écran d'entrée
+  if (sim.twist) {
+    const p = document.createElement('p');
+    p.className = 'twist-intro';
+    p.innerHTML = `<b>${sim.twist.title}</b><br>${sim.twist.intro ?? ''}`;
+    $('pause-keys').prepend(p);
+  }
   if (campaign.state.nightCount === 0) $('pause-keys').append($('title').querySelector('.keys').cloneNode(true));
   $('pause').addEventListener('click', () => { $('pause-text').textContent = 'Pause. Cliquez pour reprendre.'; $('pause-keys').replaceChildren(); }, { once: true });
   startNight();
@@ -415,10 +429,16 @@ addEventListener('keydown', (e) => {
   if (overlay || e.repeat) return keys.add(e.code);
   keys.add(e.code);
   if (e.code === 'KeyE') interaction()?.act();
-  else if (e.code === 'KeyL') { director.toggleLegalView(); tuto('legal_view_toggle'); }
+  else if (e.code === 'KeyL') {
+    if (campaign && !campaign.keyAllowed('L', sim)) log('La vue des zones légales viendra avec le plan de l’AOT (pas encore).');
+    else { director.toggleLegalView(); tuto('legal_view_toggle'); }
+  }
   else if (S.sleeping) return;
   else if (e.code === 'KeyP') photo();
-  else if (e.code === 'KeyB') sim.act({ type: 'db', noiseDb, fromWindow: player.loc === 'apt' });
+  else if (e.code === 'KeyB') {
+    if (campaign && !campaign.nativeAllowed('db', {}, sim)) log('Pas encore de sonomètre (il arrive bientôt).');
+    else sim.act({ type: 'db', noiseDb, fromWindow: player.loc === 'apt' });
+  }
   else if (e.code === 'KeyF') {
     if (!nearWindow()) log('Le seau, c’est depuis la fenêtre.');
     else sim.act({ type: 'bucket' });
