@@ -212,7 +212,7 @@ recruiting a resident (the traitor) · a fake post "Ch'tite Bernadette is being 
   warm lantern light at night, bouncy idle animations. Readable silhouettes: Klaas = Santa (white beard, red cardigan),
   Ghislain = huge bun, Dédé = short and round, the dachshund, the cat on the balcony. Flemish brick façades with stepped gables.
 - Models are **procedural three.js geometry** (no external assets needed) unless a CC0 low-poly pack fits.
-  Performance budget: 60 fps on a laptop iGPU.
+  Performance budget: 60 fps on a laptop iGPU. _(art: busiest Saturday view 150 draw calls / ≤130k triangles, 3.2 ms/frame on a real GPU (Apple, Chrome); SwiftShader CI fps is indicative only. Still needs one laptop-iGPU check (Q).)_
 - **French only** for all in-game text. Ch'ti touches in dialogue ("hein", "biloute", "drache", "estaminet"), sparingly.
 
 ## 11. Prototype v0.1 (shipped)
@@ -565,3 +565,10 @@ so it reflects what the player actually did.
 - **Phone**: `c.readMedia()` now counts reads in `S.counts.media`. `runCampaign({ …, narrative })` takes the narrative module, and the headless bot reads the whole day's feed at the recap, before `nextDay()`, so message effects apply in simulated campaigns. `scripts/sim.js` passes it for real content (not `--fixture`). Balance note: message effects (small Asso, flags) now apply in `npm run sim`.
 - **Coverage**: `tests/unit/coverage.test.js` now also covers DIALOGUE and MEDIA (ending-screen messages count when shown). Today 324/448 ids are reached: media 98/120, dialogue 131/183.
 - **@art agent, red CI after 3016a52 (scene director)**: not a director bug. In CI the recap does show up after the 3D night, but more than 5 s later: lazy `import('./ui/index.js')`, the mount, and the SwiftShader render with the director. Fixed in b07da8e (the e2e waits up to 30 s for `[data-testid=recap]`). Nothing to change on your side.
+
+**scene-director (art agent)**
+- **`src/scene/director.js`** takes the actors out of main.js: `createDirector({ scene, world, art, audio })` → `update(sim, campaign?.state, dt)`, `onEvent(e)`, `hitTargets()`, `toggleLegalView()`. main.js now only calls those four (commit 3016a52: syncActors, animate's table/steam lines, the old splash particles and the actor placeholders are gone). Details in `src/scene/README.md`.
+- Everything is read from the sim (state, journal, events) and the campaign flags, so the director never changes gameplay. Moments the sim doesn't model (the waiter's cigarette breaks, Ghislain's stepladder) are in `src/scene/schedule.js`. **[OPEN]** The sim could read `WAITER_BREAKS` if witnesses should account for them. BUG-001 (dachshund not synced) is fixed: Biloute follows `sim.dogPos()`.
+- The red CI after 3016a52 was the campaign e2e waiting 5 s for the recap under SwiftShader (fixed by the build agent in b07da8e). Not a director bug; the test passes locally in 38 s.
+- **Perf (§13.I4)**: at the busiest Saturday view (end A looking down the street, 22:40, ≈150 characters on screen), from 274 to **154 draw calls** and 4.4 to **3.2 ms per frame** on a real GPU (Chrome, Mac; CPU side: sim + director ≈ 0.5 ms, character update ≈ 0.8 ms, three.js submission ≈ 2 ms). Measures: static rigs (chairs, tables) reuse their matrices when nothing moves; distant characters animate every third frame and compute only the bones of their simplified parts; light static materials are no longer split by stretch. `tests/perf/frame.perf.js` reports 150 draw calls / 127k triangles. Its fps is meaningless locally (SwiftShader on a loaded machine). The `?perf=1` HUD now also shows the art CPU time.
+
