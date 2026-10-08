@@ -1,18 +1,23 @@
+// Rendu + entrées + HUD. Toute la logique de jeu vit dans src/sim (testée sans navigateur) :
+// main.js lit sim.state pour dessiner, et envoie les actions du joueur via sim.act().
 import * as THREE from 'three';
 import { buildWorld, person, mat } from './world.js';
-import { RULES, SKY, RESTAURANTS, STREET, NOISE, SLEEP, EVIDENCE, POLICE, WAITER, BUCKET, RISK, ASSO } from './config.js';
+import { RULES, SKY, STREET, NOISE, EVIDENCE, INTERACT, ZONES, POLICE } from './config.js';
+import { createSim, makeConfig, fmt } from './sim/index.js';
 
 const $ = (id) => document.getElementById(id);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-const rand = (a, b) => a + Math.random() * (b - a);
-const fmt = (m) => {
-  const h = Math.floor(m / 60) % 24, mm = Math.floor(m % 60);
-  return `${String(h).padStart(2, '0')}:${String(mm).padStart(2, '0')}`;
-};
-const CLOSE = RULES.terraceCloseHour * 60;
-const LATE = CLOSE + RULES.lateGraceMinutes;
-// ?nolock=1 : pas de pointer lock (tests automatisés, captures d'écran)
-const NOLOCK = new URLSearchParams(location.search).has('nolock');
+const params = new URLSearchParams(location.search);
+// ?nolock=1 : pas de pointer lock (tests automatisés) · ?day=sat : samedi · ?seed=42 : soirée rejouable
+const NOLOCK = params.has('nolock');
+const SEED = Number(params.get('seed')) || (Date.now() % 1e9);
+const cfg = makeConfig();
+const ANCHORS = cfg.ANCHORS; // même objet que celui de la simulation (recalé sur le décor plus bas)
+const sim = createSim({ seed: SEED, day: params.get('day') || 'mon', cfg });
+const S = sim.state;
+const CLOSE = sim.close;
+const W = STREET.halfWidth;
+const HALF = STREET.length / 2;
 
 // ---------- Rendu ----------
 const canvas = $('game');
@@ -59,40 +64,192 @@ function updateSky() {
   sky.position.copy(camera.position);
 }
 
-const world = buildWorld(scene);
-const { tables, apt } = world;
-const W = STREET.halfWidth;
-const HALF = STREET.length / 2;
-const REST = Object.fromEntries(RESTAURANTS.map((r) => [r.id, { ...r }]));
-for (const t of tables) t.rest = REST[t.rest.id];
+// Le décor (world.js, art) dessine les terrasses tirées par la simulation
+const world = buildWorld(scene, { tables: S.tables });
+const { apt } = world;
+const viewTables = new Map(world.tables.map((v) => [v.id, v]));
+// Les positions du décor font foi : la simulation lit les mêmes points que ce qu'on voit (étages, fenêtre, porte, lit).
+const xyz = (p) => ({ x: p.x, y: p.y, z: p.z });
+Object.assign(ANCHORS, {
+  pilouWindow: xyz(world.window.pos),
+  streetDoor: xyz(world.streetDoor),
+  bed: { ...xyz(world.bed), y: world.bed.y + 0.6 },
+  ...(world.exhaust && { exhaust: xyz(world.exhaust) }),
+});
+for (const v of world.tables) v.hit.userData.target = { kind: 'table', id: v.id };
 
-// ---------- État ----------
-const S = {
-  started: false, ended: false, overlay: null, sleeping: false,
-  min: RULES.nightStart,
-  sleep: SLEEP.start, asso: ASSO.start, risk: RISK.start,
-  evidence: [], calls: 0, police: null, policeLog: [],
-  bucketUses: 0, bucketReadyAt: 0, waiterReadyAt: 0, waiterAsks: [], mairieSent: false,
-  loc: 'street', noiseDb: NOISE.ambientDb,
-};
+// ---------- Acteurs de gameplay (placeholders : person() de world.js, restylés par la passe art) ----------
+const v3 = (p, y = p.y ?? 0) => new THREE.Vector3(p.x, y, p.z);
+const COLORS = [0x264653, 0x2a9d8f, 0xe9c46a, 0xf4a261, 0xe76f51, 0x6d597a, 0x355070, 0xb5838d, 0x3d405b];
 
-const player = { pos: new THREE.Vector3(1.2, 0, 12), yaw: 0, pitch: 0 };
-window.__rdb = { S, tables, player, world }; // debug console
-const keys = new Set();
-let locked = false;
-const timer = new THREE.Timer();
-let now = 0; // secondes réelles depuis le chargement
-
-// Planning de rangement : chaque table, selon la conformité de son resto, rentre à l'heure ou bien plus tard.
-for (const t of tables) {
-  t.clearAt = Math.random() < t.rest.compliance ? CLOSE - 5 + rand(0, 5 + RULES.lateGraceMinutes) : rand(...t.rest.lateClear);
+// Klaas à sa fenêtre sur la place Maurice-Schumann, face à la rue (barbe blanche, gilet rouge) : allumée tant qu'il veille
+const klaas = new THREE.Group();
+{
+  const facade = new THREE.Mesh(new THREE.BoxGeometry(5, ANCHORS.klaasWindow.y + 3, 0.4), mat(0xb9a58c));
+  facade.position.set(0, -ANCHORS.klaasWindow.y + (ANCHORS.klaasWindow.y + 3) / 2, 0.25);
+  const pane = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 1.5), new THREE.MeshStandardMaterial({ color: 0x332211, emissive: 0xffc070, emissiveIntensity: 0.9 }));
+  pane.rotation.y = Math.PI;
+  const k = person(0xb3261e);
+  k.position.set(0, -1.25, 0.1);
+  k.rotation.y = Math.PI;
+  const beard = new THREE.Mesh(new THREE.SphereGeometry(0.13, 8, 6), mat(0xf4f4f4));
+  beard.position.set(0, 1.1, 0.08);
+  k.add(beard);
+  klaas.add(facade, pane, k);
+  klaas.userData = { pane, figure: k };
+  klaas.position.copy(v3(ANCHORS.klaasWindow));
+  scene.add(klaas);
+}
+// Balcon de Seb & Nico : le chat = ils sont là
+const balcony = new THREE.Group();
+const cat = new THREE.Group();
+{
+  const slab = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.1, 2.2), mat(0xcfc6b8));
+  const rail = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.9, 2.2), mat(0x1c1c1c, { metalness: 0.6 }));
+  rail.position.set(-0.43, 0.45, 0);
+  const fur = mat(0x2b2b2b);
+  const body = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.2, 0.18), fur);
+  body.position.y = 0.2;
+  const head = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.15, 0.15), fur);
+  head.position.set(-0.22, 0.32, 0);
+  for (const dz of [-0.05, 0.05]) {
+    const ear = new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.08, 4), fur);
+    ear.position.set(-0.22, 0.43, dz);
+    cat.add(ear);
+  }
+  cat.add(body, head);
+  balcony.add(slab, rail, cat);
+  balcony.position.copy(v3(ANCHORS.balcony)).setX(W - 0.45);
+  scene.add(balcony);
+}
+// Buveurs debout (samedi)
+const standingViews = S.standing.map((g) => {
+  const grp = new THREE.Group();
+  for (let i = 0; i < g.size; i++) {
+    const p = person(COLORS[(i * 3 + g.size) % COLORS.length]);
+    const a = (i / g.size) * Math.PI * 2;
+    p.position.set(Math.cos(a) * 0.45, 0.25, Math.sin(a) * 0.45);
+    p.rotation.y = -a + Math.PI / 2;
+    grp.add(p);
+  }
+  grp.position.set(g.x, 0, g.z);
+  grp.visible = false;
+  scene.add(grp);
+  return { g, grp };
+});
+// Pipis dans les portes : une petite réserve de silhouettes
+const peeViews = Array.from({ length: 4 }, (_, i) => {
+  const p = person(COLORS[(i * 2 + 1) % COLORS.length]);
+  p.position.y = 0.25;
+  const hit = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 1.8, 6), new THREE.MeshBasicMaterial({ visible: false }));
+  hit.position.y = 0.9;
+  p.add(hit);
+  p.visible = false;
+  scene.add(p);
+  return { p, hit };
+});
+// Patrouille
+const officers = [-0.4, 0.4].map(() => {
+  const o = person(0x1b2847);
+  const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.08, 10), mat(0x0d1426));
+  cap.position.y = 1.33;
+  o.add(cap);
+  o.scale.setScalar(1.1);
+  o.visible = false;
+  scene.add(o);
+  return o;
+});
+// Vue "légale" (L) : zones de terrasse (vert) et couloir de passage (rouge), invisibles par défaut
+const ghost = new THREE.Group();
+{
+  const ghostMat = (color) => new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.22, depthWrite: false });
+  const corridor = new THREE.Mesh(new THREE.PlaneGeometry(ZONES.corridorHalfWidth * 2, STREET.length), ghostMat(0xff4040));
+  corridor.rotation.x = -Math.PI / 2;
+  corridor.position.y = 0.03;
+  ghost.add(corridor);
+  for (const r of sim.restaurants) {
+    const depth = W - ZONES.corridorHalfWidth;
+    const zone = new THREE.Mesh(new THREE.PlaneGeometry(depth, r.z1 - r.z0), ghostMat(0x40ff70));
+    zone.rotation.x = -Math.PI / 2;
+    zone.position.set(r.side * (ZONES.corridorHalfWidth + depth / 2), 0.035, (r.z0 + r.z1) / 2);
+    ghost.add(zone);
+  }
+  const ringGeo = new THREE.RingGeometry(ZONES.tableFootprint - 0.06, ZONES.tableFootprint, 24);
+  const ringMat = new THREE.MeshBasicMaterial({ color: 0xff2020, transparent: true, opacity: 0.8, depthWrite: false });
+  for (const t of S.tables) {
+    if (sim.encroachment(t) <= 0) continue;
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.rotation.x = -Math.PI / 2;
+    ring.userData.tableId = t.id;
+    ghost.add(ring);
+  }
+  ghost.visible = false;
+  scene.add(ghost);
 }
 
+const spawn = v3(ANCHORS.policeSpawn);
+const tmpA = new THREE.Vector3(), tmpB = new THREE.Vector3();
+function syncActors() {
+  for (const t of S.tables) {
+    const v = viewTables.get(t.id);
+    v.group.visible = t.out;
+    v.group.position.x = t.x; // la police peut recaler une table hors du couloir
+    v.people.forEach((p, i) => { p.visible = i < t.count; });
+  }
+  for (const r of ghost.children) {
+    if (!r.userData.tableId) continue;
+    const t = sim.table(r.userData.tableId);
+    r.visible = t.out && sim.encroachment(t) > 0;
+    r.position.set(t.x, 0.04, t.z);
+  }
+  const wp = sim.waiterPos();
+  world.waiter.visible = sim.waiterOnDuty();
+  world.waiter.position.set(wp.x, 0, wp.z);
+  world.waiter.rotation.y = Math.cos(S.min * ANCHORS.waiter.speed) > 0 ? 0 : Math.PI;
+  klaas.userData.figure.visible = sim.klaasAwake();
+  cat.visible = sim.catPresent();
+  for (const { g, grp } of standingViews) grp.visible = S.min >= g.arriveAt && S.min < g.leaveAt;
+  const pees = sim.activePees();
+  peeViews.forEach((v, i) => {
+    const p = pees[i];
+    v.p.visible = !!p;
+    v.hit.userData.target = p ? { kind: 'pee', id: p.id } : null;
+    if (!p) return;
+    const side = Math.sign(p.doorway.x);
+    v.p.position.set(p.doorway.x - side * 0.45, 0.25, p.doorway.z);
+    v.p.rotation.y = side > 0 ? Math.PI / 2 : -Math.PI / 2;
+  });
+  // Patrouille : position interpolée sur l'horloge de la simulation
+  const P = S.police;
+  officers.forEach((o, i) => {
+    o.visible = !!P && P.phase !== 'pending';
+    if (!o.visible) return;
+    const r = sim.rest(P.restId);
+    const dx = i ? 0.4 : -0.4;
+    let a = tmpA.set(spawn.x + dx, 0, spawn.z), b = tmpB.set(r.side * 0.4 + dx, 0, (r.z0 + r.z1) / 2), k = 1;
+    if (P.phase === 'walking') k = (S.min - P.enterAt) / Math.max(0.01, P.arriveAt - P.enterAt);
+    if (P.phase === 'leaving') { [a, b] = [b, a]; k = (S.min - P.leaveAt) / Math.max(0.01, P.exitAt - P.leaveAt); }
+    k = clamp(k, 0, 1);
+    o.position.lerpVectors(a, b, k);
+    o.position.y = k < 1 ? Math.abs(Math.sin(now * 8)) * 0.04 : 0;
+    o.rotation.y = Math.atan2(b.x - a.x, b.z - a.z);
+  });
+}
+
+// ---------- Joueur ----------
+const player = { pos: new THREE.Vector3(1.2, 0, 12), yaw: 0, pitch: 0, loc: 'street' };
+const keys = new Set();
+let locked = false;
+let started = false;
+let overlay = null;
+const timer = new THREE.Timer();
+let now = 0;
+
 // ---------- HUD / log ----------
-function log(msg, cls = '') {
+function log(msg, cls = '', min = S.min) {
   const el = document.createElement('div');
   el.className = cls;
-  el.textContent = `${fmt(S.min)} · ${msg}`;
+  el.textContent = `${fmt(min)} · ${msg}`;
   const box = $('log');
   box.append(el);
   while (box.children.length > 5) box.firstChild.remove();
@@ -103,319 +260,82 @@ function flash() {
   f.classList.remove('on'); void f.offsetWidth; f.classList.add('on');
 }
 const bar = (id, v) => { $(id).style.width = `${clamp(v, 0, 100)}%`; };
+let noiseDb = NOISE.ambientDb;
 function updateHud() {
   $('clock').textContent = fmt(S.min);
   $('clock').classList.toggle('late', S.min >= CLOSE);
-  bar('bar-noise', ((S.noiseDb - NOISE.hudMinDb) / (NOISE.hudMaxDb - NOISE.hudMinDb)) * 100);
-  $('val-noise').textContent = `${Math.round(S.noiseDb)} dB`;
+  bar('bar-noise', ((noiseDb - NOISE.hudMinDb) / (NOISE.hudMaxDb - NOISE.hudMinDb)) * 100);
+  $('val-noise').textContent = `${Math.round(noiseDb)} dB`;
   bar('bar-sleep', S.sleep);
-  bar('bar-dossier', (dossierScore() / EVIDENCE.dossierTarget) * 100);
+  bar('bar-dossier', (sim.dossierScore() / EVIDENCE.dossierTarget) * 100);
   bar('bar-asso', S.asso);
   bar('bar-risk', S.risk);
-  $('where').textContent = S.loc === 'apt' ? (nearWindow() ? 'Chez Pilou · à la fenêtre' : 'Chez Pilou') : 'Rue des Bouchers';
+  $('where').textContent = player.loc === 'apt' ? (nearWindow() ? 'Chez Pilou · à la fenêtre' : 'Chez Pilou') : 'Rue des Bouchers';
   const hints = [];
   const it = interaction();
   if (S.sleeping) hints.push('Pilou essaie de dormir…  [E] se relever');
   else if (it) hints.push(`[E] ${it.label}`);
-  if (S.loc === 'apt' && nearWindow() && !S.sleeping) hints.push('[P] photo · [F] seau d\'eau (illégal)');
+  if (nearWindow() && !S.sleeping) hints.push('[P] photo · [F] seau d\'eau (illégal)');
   $('prompt').textContent = hints.join('   ');
-}
-
-// ---------- Bruit ----------
-const tmpV = new THREE.Vector3();
-const dbAt = (L, p, src) => L - 20 * Math.log10(Math.max(1, p.distanceTo(src)));
-const clatters = [];
-function noiseAt(p, indoor) {
-  const boost = (S.min >= NOISE.lateBoostAfter ? NOISE.lateBoostDb : 0) + (S.min >= NOISE.drunkAfter ? NOISE.drunkBoostDb : 0);
-  let outside = 0;
-  for (const t of tables) {
-    if (!t.out) continue;
-    tmpV.copy(t.group.position).setY(1.1);
-    outside += 10 ** (dbAt(NOISE.personDb + boost + 10 * Math.log10(t.count), p, tmpV) / 10);
+  // À la fenêtre : qui pourrait me voir ?
+  let wit = '';
+  if (nearWindow() && !S.sleeping) {
+    const ws = sim.potentialWitnesses(ANCHORS.pilouWindow);
+    const named = [...new Set(ws.filter((w) => w.kind !== 'customers').map((w) => w.name))];
+    const groups = ws.filter((w) => w.kind === 'customers').length;
+    if (groups) named.push(`${groups} groupe(s) de clients`);
+    wit = named.length ? `👁 Témoins possibles : ${named.join(', ')}` : '👁 Personne ne regarde.';
   }
-  for (const c of clatters) outside += 10 ** (dbAt(NOISE.clatterDb, p, c.pos) / 10);
-  if (S.min < NOISE.exhaustOffMinute) outside += 10 ** (dbAt(NOISE.exhaustDb, p, world.exhaust) / 10);
-  const att = indoor ? 10 ** (-NOISE.indoorAttenuationDb / 10) : 1;
-  return 10 * Math.log10(10 ** (NOISE.ambientDb / 10) + outside * att);
-}
-const bedEar = world.bed.clone().setY(apt.floor + 0.6);
-
-// ---------- Dossier ----------
-const dossierScore = (restId) => S.evidence.filter((e) => !restId || e.restId === restId).reduce((s, e) => s + e.value, 0);
-function addEvidence(e) {
-  S.evidence.push({ time: S.min, shared: false, legal: true, ...e });
-  if (S.overlay === 'dossier') renderDossier();
-}
-const qualityLabel = (q) => (q >= 0.85 ? 'nette' : q >= 0.6 ? 'correcte' : 'floue');
-function renderDossier() {
-  const items = S.evidence.map((e) => `<li><b>${fmt(e.time)}</b> ${e.text} <span class="q">· ${e.type === 'photo' || e.photo ? `photo ${qualityLabel(e.quality)}` : 'pièce'}${e.legal ? ' · légale' : ' · illégale'}</span></li>`);
-  $('dossier-list').innerHTML = items.length ? items.join('') : '<li>Rien pour l\'instant. Visez une table et appuyez sur P.</li>';
-  $('dossier-score').textContent = `Score : ${dossierScore().toFixed(1)} / ${EVIDENCE.dossierTarget} · ${S.evidence.length} pièce(s)`;
+  $('witness').textContent = wit;
 }
 
+// ---------- Photo ----------
 const raycaster = new THREE.Raycaster();
 const CENTER = new THREE.Vector2(0, 0);
 function photo() {
-  if (S.loc === 'apt' && !nearWindow()) return log('Depuis l\'appartement, il faut être à la fenêtre.');
+  if (player.loc === 'apt' && !nearWindow()) return log('Depuis l\'appartement, il faut être à la fenêtre.');
   flash();
   syncCamera();
   scene.updateMatrixWorld();
   raycaster.setFromCamera(CENTER, camera);
   raycaster.far = EVIDENCE.photoRange;
-  const hit = raycaster.intersectObjects(tables.filter((t) => t.out).map((t) => t.hit), false)[0];
-  if (!hit) return log('Photo… rien d\'exploitable dans le cadre.');
-  const t = hit.object.userData.table;
-  const base = EVIDENCE.minQuality + (1 - EVIDENCE.minQuality) * (S.sleep / 100);
-  const quality = clamp(base * (hit.distance > EVIDENCE.sharpRange ? 0.75 : 1), EVIDENCE.minQuality, 1);
-  const db = Math.round(S.noiseDb);
-  const found = [];
-  if (t.count > RULES.maxPeoplePerTable && !t.evidence.has('over')) {
-    found.push({ kind: 'over', text: `${t.label} : ${t.count} personnes (max ${RULES.maxPeoplePerTable}), ${db} dB`, value: EVIDENCE.overLimitValue });
-  }
-  if (S.min >= LATE && !t.evidence.has('late')) {
-    found.push({ kind: 'late', text: `${t.label} encore dehors à ${fmt(S.min)}, ${db} dB`, value: EVIDENCE.lateValue });
-  }
-  if (!found.length) {
-    return log(t.evidence.size ? `${t.label} : déjà dans le dossier.` : `${t.label} : rien d'illégal (pour l'instant).`);
-  }
-  for (const f of found) {
-    t.evidence.add(f.kind);
-    addEvidence({ type: 'photo', kind: f.kind, restId: t.rest.id, text: f.text, quality, value: f.value * quality });
-  }
-  log(`📸 Preuve ajoutée (${qualityLabel(quality)}) : ${found.map((f) => f.text).join(' · ')}`, 'good');
+  const hits = [
+    ...S.tables.filter((t) => t.out).map((t) => viewTables.get(t.id).hit),
+    ...peeViews.filter((v) => v.p.visible).map((v) => v.hit),
+  ];
+  const hit = raycaster.intersectObjects(hits, false)[0];
+  sim.act({ type: 'photo', target: hit?.object.userData.target, distance: hit?.distance, fromWindow: player.loc === 'apt', noiseDb });
 }
 
-// ---------- Terrasses ----------
-function infractions(rest) {
-  return tables.filter((t) => t.rest === rest && t.out && (S.min >= LATE || t.count > RULES.maxPeoplePerTable));
-}
-function clearTable(t, by) {
-  if (!t.out) return;
-  t.out = false;
-  t.group.visible = false;
-  t.clearedAt = S.min;
-  t.clearedBy = by;
-  clatters.push({ pos: t.group.position.clone().setY(0.5), until: now + NOISE.clatterSeconds });
-  // Raclement des chaises métalliques sur les pavés : un message par resto, pas un par table
-  if (by === 'resto' && !(t.rest.lastClatterLog > S.min - 5)) {
-    t.rest.lastClatterLog = S.min;
-    log(`Raclement de chaises sur les pavés : ${t.rest.name} rentre sa terrasse${S.min >= LATE ? '… enfin' : ''}.`);
-  }
-}
-function updateTerraces() {
-  for (const t of tables) if (t.out && S.min >= t.clearAt) clearTable(t, t.pendingBy || 'resto');
-  for (let i = clatters.length - 1; i >= 0; i--) if (clatters[i].until < now) clatters.splice(i, 1);
-}
-
-// ---------- Serveur ----------
-function askWaiter() {
-  const rest = REST.bernadette;
-  if (S.min < CLOSE) return log(`Le serveur : « Il est pas encore ${RULES.terraceCloseHour}h, monsieur. On rentre à ${RULES.terraceCloseHour}h. »`);
-  if (S.min < S.waiterReadyAt) return log('Le serveur : « Je vous ai dit, je vais voir avec le patron… »');
-  const late = tables.filter((t) => t.rest === rest && t.out);
-  if (!late.length) return log('Le serveur : « C\'est déjà rentré, monsieur. Bonne nuit ! »');
-  const p = clamp(WAITER.base + WAITER.complianceWeight * rest.compliance + WAITER.assoWeight * (S.asso / 100), 0.05, 0.95);
-  const ok = Math.random() < p;
-  S.waiterReadyAt = S.min + WAITER.cooldownMinutes;
-  S.waiterAsks.push({ time: S.min, ok });
-  if (ok) {
-    late.forEach((t, i) => { t.clearAt = S.min + 1 + i * 1.5; t.pendingBy = 'waiter'; });
-    log('Le serveur soupire : « OK, OK… je rentre tout. » (demande légale et polie)', 'good');
-  } else {
-    log('Le serveur revient : « Le patron dit que les clients finissent leur verre. »', 'bad');
-  }
-}
-
-// ---------- Téléphone ----------
-function callPolice() {
-  if (S.police) return log('Police : « Une patrouille est déjà en route, monsieur. »');
-  S.calls++;
-  if (S.calls > POLICE.maxCalls) {
-    S.policeLog.push({ calledAt: S.min, outcome: 'ignored' });
-    return log('Police : « Ah, c\'est encore vous… On note. » Personne ne viendra.', 'bad');
-  }
-  // La patrouille va vers le resto qui a le plus d'infractions au moment de l'appel
-  const target = Object.values(REST).sort((a, b) => infractions(b).length - infractions(a).length)[0];
-  const delay = rand(POLICE.delayMin, POLICE.delayMax) * (1 + POLICE.delayPerExtraCall * (S.calls - 1));
-  S.police = { rest: target, calledAt: S.min, arriveAt: S.min + delay, phase: 'pending', officers: [] };
-  log(`Police municipale : « On envoie quelqu'un. » (appel n°${S.calls}, pour ${target.name})`);
-}
-function callAsso() {
-  const fresh = S.evidence.filter((e) => !e.shared && e.type === 'photo');
-  if (!fresh.length) {
-    S.asso = clamp(S.asso - ASSO.spamPenalty, 0, 100);
-    return log('WhatsApp de l\'asso : « Des photos, Pilou. Des PHOTOS. » 🐈', 'bad');
-  }
-  fresh.forEach((e) => { e.shared = true; });
-  S.asso = clamp(S.asso + fresh.length * ASSO.shareGainPerPiece, 0, 100);
-  log(`WhatsApp : ${fresh.length} photo(s) partagée(s). « 😱 On imprime tout pour la commission ! »`, 'good');
-}
-function callMairie() {
-  if (S.mairieSent) return log('Mairie : « Votre signalement est en cours de traitement (délai : 15 jours ouvrés). »');
-  S.mairieSent = true;
-  const n = S.evidence.filter((e) => e.type === 'photo').length;
-  if (!n) return log('Signalement envoyé sans pièce jointe. Accusé de réception automatique.');
-  addEvidence({ type: 'mairie', restId: null, text: `Signalement à la mairie avec ${n} pièce(s) jointe(s)`, quality: 1, value: EVIDENCE.mairieValue });
-  log(`Signalement envoyé à la mairie avec ${n} pièce(s) jointe(s). Le service ouvre à 8h30.`, 'good');
-}
-
-// ---------- Police ----------
-const POLICE_SPAWN = new THREE.Vector3(0, 0, -HALF + 2);
-function spawnOfficers(rest) {
-  const out = [];
-  for (const dx of [-0.4, 0.4]) {
-    const o = person(0x1b2847);
-    const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.08, 10), mat(0x0d1426));
-    cap.position.y = 1.33;
-    o.add(cap);
-    o.scale.setScalar(1.1);
-    o.position.copy(POLICE_SPAWN).setX(dx);
-    o.userData.target = new THREE.Vector3(rest.side * 0.4 + dx, 0, (rest.z0 + rest.z1) / 2);
-    scene.add(o);
-    out.push(o);
-  }
-  return out;
-}
-function walk(o, target, dt) {
-  const d = tmpV.copy(target).sub(o.position).setY(0);
-  const len = d.length();
-  if (len < 0.1) return true;
-  o.position.addScaledVector(d.normalize(), Math.min(len, POLICE.walkSpeed * dt));
-  o.rotation.y = Math.atan2(d.x, d.z);
-  o.position.y = Math.abs(Math.sin(now * 8)) * 0.04;
-  return false;
-}
-function resolvePolice(P) {
-  const rest = P.rest;
-  const inf = infractions(rest);
-  const entry = { calledAt: P.calledAt, arrivedAt: S.min, rest: rest.name };
-  S.policeLog.push(entry);
-  if (!inf.length) {
-    entry.outcome = 'nothing';
-    return log(`Les agents passent devant ${rest.name} : « Tout est en ordre, monsieur. »`);
-  }
-  const p = clamp(POLICE.baseAct + POLICE.dossierWeight * dossierScore(rest.id) + POLICE.assoWeight * (S.asso / 100) - POLICE.influenceWeight * rest.influence, 0.05, 0.95);
-  if (Math.random() < p) {
-    entry.outcome = 'act';
-    let fined = 0, cleared = 0;
-    for (const t of inf) {
-      if (S.min >= LATE) { t.clearAt = S.min + 0.5 + cleared * 0.8; t.pendingBy = 'police'; cleared++; }
-      else if (t.count > RULES.maxPeoplePerTable) {
-        t.people.slice(RULES.maxPeoplePerTable).forEach((q) => { q.visible = false; });
-        t.count = RULES.maxPeoplePerTable;
-        fined++;
-      }
-    }
-    rest.compliance = Math.max(rest.compliance, POLICE.complianceAfterAct);
-    for (const t of tables) if (t.rest === rest && t.out && t.clearAt > LATE) t.clearAt = Math.max(S.min + 1, CLOSE);
-    entry.detail = `${cleared} table(s) rentrée(s), ${fined} table(s) ramenée(s) à ${RULES.maxPeoplePerTable}`;
-    log(`PV pour ${rest.name} : ${entry.detail}.`, 'good');
-  } else {
-    entry.outcome = 'complaisance';
-    addEvidence({ type: 'complaisance', restId: rest.id, quality: 1, value: EVIDENCE.complaisanceValue, text: `Police venue chez ${rest.name}, café offert, 0 PV (${inf.length} infraction(s) visibles)` });
-    log(`Les agents prennent un café chez ${rest.name}… 0 PV. Noté dans le dossier (complaisance).`, 'bad');
-  }
-}
-function updatePolice(dt) {
-  const P = S.police;
-  if (!P) return;
-  if (P.phase === 'pending' && S.min >= P.arriveAt) {
-    P.officers = spawnOfficers(P.rest);
-    P.phase = 'walkIn';
-    log('Une patrouille entre dans la rue.');
-  } else if (P.phase === 'walkIn') {
-    const done = P.officers.map((o) => walk(o, o.userData.target, dt)).every(Boolean);
-    if (done) { resolvePolice(P); P.phase = 'stay'; P.leaveAt = S.min + POLICE.stayMinutes; }
-  } else if (P.phase === 'stay' && S.min >= P.leaveAt) {
-    P.phase = 'walkOut';
-  } else if (P.phase === 'walkOut') {
-    const done = P.officers.map((o, i) => walk(o, POLICE_SPAWN.clone().setX(i ? 0.4 : -0.4), dt)).every(Boolean);
-    if (done) { P.officers.forEach((o) => scene.remove(o)); S.police = null; }
-  }
-}
-
-// ---------- Seau d'eau ----------
-const splash = (() => {
-  const N = 140;
-  const geo = new THREE.BufferGeometry();
-  const pos = new Float32Array(N * 3), vel = new Float32Array(N * 3);
-  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  const points = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0x9fd3ff, size: 0.12, transparent: true, opacity: 0.8, depthWrite: false }));
-  points.visible = false;
-  points.frustumCulled = false;
-  scene.add(points);
-  let life = 0;
-  return {
-    fire(origin) {
-      for (let i = 0; i < N; i++) {
-        pos.set([origin.x + rand(-0.2, 0.2), origin.y, origin.z + rand(-0.3, 0.3)], i * 3);
-        vel.set([rand(0.8, 2.2), rand(-0.5, 1), rand(-1.2, 1.2)], i * 3);
-      }
-      life = 1.6;
-      points.visible = true;
-    },
-    update(dt) {
-      if (life <= 0) return;
-      life -= dt;
-      for (let i = 0; i < N; i++) {
-        vel[i * 3 + 1] -= 9.8 * dt;
-        for (let k = 0; k < 3; k++) pos[i * 3 + k] += vel[i * 3 + k] * dt;
-        if (pos[i * 3 + 1] < 0.02) { pos[i * 3 + 1] = 0.02; vel[i * 3] *= 0.5; vel[i * 3 + 1] = 0; vel[i * 3 + 2] *= 0.5; }
-      }
-      geo.attributes.position.needsUpdate = true;
-      if (life <= 0) points.visible = false;
-    },
-  };
-})();
-function addRisk(n) {
-  const before = S.risk;
-  S.risk = clamp(S.risk + n, 0, 100);
-  if (before < RISK.warning && S.risk >= RISK.warning) log('Des clients ont filmé la fenêtre. Ça circule déjà.', 'bad');
-  if (before < RISK.complaint && S.risk >= RISK.complaint) log('Dédé crie qu\'il va porter plainte. Il le fera.', 'bad');
-  if (S.risk >= RISK.custody) endNight('custody');
-}
-function bucket() {
-  if (S.loc !== 'apt' || !nearWindow()) return log('Le seau, c\'est depuis la fenêtre.');
-  if (S.min < S.bucketReadyAt) return log(`Le seau se remplit… (prêt à ${fmt(S.bucketReadyAt)})`);
-  const below = tables.filter((t) => t.out && t.rest.side === -1 && Math.abs(t.group.position.z - world.window.pos.z) < BUCKET.radius);
-  splash.fire(world.window.pos.clone().setX(-W - 0.1));
-  below.forEach((t) => clearTable(t, 'bucket'));
-  S.bucketUses++;
-  S.bucketReadyAt = S.min + BUCKET.refillMinutes;
-  S.asso = clamp(S.asso - BUCKET.assoPenalty, 0, 100);
-  log(`SPLASH ! ${below.length} table(s) évacuée(s). Cris, téléphones sortis. (illégal)`, 'bad');
-  addRisk(BUCKET.risk);
-}
-
-// ---------- Interactions ----------
+// ---------- Interactions (la même portée sert à l'invite et à l'action) ----------
 const flat = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
-const nearWindow = () => S.loc === 'apt' && player.pos.x > apt.x1 - 1.6 && Math.abs(player.pos.z - world.window.pos.z) < 1.5;
+const nearWindow = () => player.loc === 'apt' && player.pos.x > apt.x1 - 1.6 && Math.abs(player.pos.z - ANCHORS.pilouWindow.z) < INTERACT.window;
 function interaction() {
-  if (S.loc === 'street') {
-    if (flat(player.pos, world.streetDoor) < 1.6) return { label: 'Monter chez Pilou', act: () => teleport('apt') };
-    if (flat(player.pos, world.waiter.position) < WAITER.range) return { label: 'Demander au serveur de rentrer les tables', act: askWaiter };
+  if (player.loc === 'street') {
+    if (flat(player.pos, ANCHORS.streetDoor) < INTERACT.door) return { label: 'Monter chez Pilou', act: () => teleport('apt') };
+    if (sim.waiterOnDuty() && flat(player.pos, sim.waiterPos()) < INTERACT.waiter) return { label: 'Demander au serveur de rentrer les tables', act: () => sim.act({ type: 'waiter' }) };
   } else {
-    if (flat(player.pos, world.aptDoor) < 1.4) return { label: 'Descendre dans la rue', act: () => teleport('street') };
-    if (flat(player.pos, world.bed) < 1.7) return { label: S.sleeping ? 'Se relever' : 'Essayer de dormir (accélère la nuit)', act: toggleSleep };
+    if (flat(player.pos, world.aptDoor) < INTERACT.aptDoor) return { label: 'Descendre dans la rue', act: () => teleport('street') };
+    if (flat(player.pos, world.bed) < INTERACT.bed) return { label: S.sleeping ? 'Se relever' : 'Essayer de dormir (accélère la nuit)', act: toggleSleep };
   }
   return null;
 }
 function teleport(where) {
-  S.loc = where;
+  player.loc = where;
   if (where === 'apt') player.pos.set(world.aptDoor.x + 0.5, apt.floor, world.aptDoor.z);
-  else player.pos.set(world.streetDoor.x + 0.8, 0, world.streetDoor.z);
+  else player.pos.set(ANCHORS.streetDoor.x + 0.6, 0, ANCHORS.streetDoor.z);
   player.yaw = -Math.PI / 2;
   player.pitch = 0;
 }
 function toggleSleep() {
-  S.sleeping = !S.sleeping;
-  if (S.sleeping) { player.pitch = 0.9; log('Pilou se couche. Le temps file…'); }
-  else player.pitch = 0;
+  sim.act({ type: 'sleep', on: !S.sleeping });
+  player.pitch = S.sleeping ? 0.9 : 0;
+  if (S.sleeping) log('Pilou se couche. Le temps file…');
 }
 
 // ---------- Overlays ----------
 function openOverlay(name) {
-  S.overlay = name;
+  overlay = name;
   $(name).classList.remove('hidden');
   if (name === 'dossier') renderDossier();
   if (name === 'phone') {
@@ -425,35 +345,44 @@ function openOverlay(name) {
   document.exitPointerLock?.();
 }
 function closeOverlay() {
-  if (!S.overlay) return;
-  $(S.overlay).classList.add('hidden');
-  S.overlay = null;
+  if (!overlay) return;
+  $(overlay).classList.add('hidden');
+  overlay = null;
   lock();
 }
 function lock() {
   if (NOLOCK || S.ended) return;
   try { canvas.requestPointerLock()?.catch?.(() => {}); } catch { /* geste utilisateur requis */ }
 }
+const qualityLabel = (q) => (q >= 0.85 ? 'nette' : q >= 0.6 ? 'correcte' : 'floue');
+function renderDossier() {
+  const items = S.evidence.map((e) => `<li><b>${fmt(e.time)}</b> ${e.text} <span class="q">· ${e.type === 'photo' ? `photo ${qualityLabel(e.quality)}` : 'pièce'}${e.legal ? ' · légale' : ' · illégale'}${e.shared ? ' · partagée' : ''}</span></li>`);
+  $('dossier-list').innerHTML = items.length ? items.join('') : '<li>Rien pour l\'instant. Visez une table et appuyez sur P.</li>';
+  $('dossier-score').textContent = `Score : ${sim.dossierScore().toFixed(1)} / ${EVIDENCE.dossierTarget} · ${S.evidence.length} pièce(s)`;
+}
 for (const b of document.querySelectorAll('#phone button')) {
   b.addEventListener('click', () => {
     const c = b.dataset.call;
     closeOverlay();
-    if (c === 'police') callPolice();
-    else if (c === 'asso') callAsso();
-    else if (c === 'mairie') callMairie();
+    if (c === 'police') sim.act({ type: 'police' });
+    else if (c === 'police-asso') sim.act({ type: 'police', asso: true });
+    else if (c === 'asso') sim.act({ type: 'asso' });
+    else if (c === 'mairie') sim.act({ type: 'mairie' });
+    drainSim();
   });
 }
 
 // ---------- Entrées ----------
+$('day').textContent = sim.day.label;
 $('start').addEventListener('click', () => {
   $('title').classList.add('hidden');
   $('hud').classList.remove('hidden');
-  S.started = true;
+  started = true;
   timer.update();
-  log('Lundi soir. Les terrasses doivent rentrer à 22h. En théorie.');
+  log(`${sim.day.label.split(' ·')[0]} soir. Les terrasses doivent rentrer à ${RULES.terraceCloseHour}h. En théorie.`);
   lock();
 });
-canvas.addEventListener('click', () => { if (S.started && !S.overlay) lock(); });
+canvas.addEventListener('click', () => { if (started && !overlay) lock(); });
 $('pause').addEventListener('click', () => lock());
 document.addEventListener('pointerlockchange', () => { locked = document.pointerLockElement === canvas; });
 let dragging = false;
@@ -468,16 +397,21 @@ const MOVE = { KeyW: 'f', ArrowUp: 'f', KeyS: 'b', ArrowDown: 'b', KeyA: 'l', Ar
 addEventListener('keydown', (e) => {
   // e.code = position physique : Z/Q/S/D sur AZERTY = W/A/S/D sur QWERTY.
   if (e.code === 'Tab') e.preventDefault();
-  if (!S.started || S.ended) return;
+  if (!started || S.ended) return;
   if (e.code === 'Escape') return closeOverlay();
-  if (e.code === 'Tab') return S.overlay === 'dossier' ? closeOverlay() : !S.overlay && openOverlay('dossier');
-  if (e.code === 'KeyT') return S.overlay === 'phone' ? closeOverlay() : !S.overlay && openOverlay('phone');
-  if (S.overlay || e.repeat) return keys.add(e.code);
+  if (e.code === 'Tab') return overlay === 'dossier' ? closeOverlay() : !overlay && openOverlay('dossier');
+  if (e.code === 'KeyT') return overlay === 'phone' ? closeOverlay() : !overlay && openOverlay('phone');
+  if (overlay || e.repeat) return keys.add(e.code);
   keys.add(e.code);
   if (e.code === 'KeyE') interaction()?.act();
+  else if (e.code === 'KeyL') ghost.visible = !ghost.visible;
   else if (S.sleeping) return;
   else if (e.code === 'KeyP') photo();
-  else if (e.code === 'KeyF') bucket();
+  else if (e.code === 'KeyF') {
+    if (!nearWindow()) log('Le seau, c\'est depuis la fenêtre.');
+    else sim.act({ type: 'bucket' });
+  }
+  drainSim();
 });
 addEventListener('keyup', (e) => keys.delete(e.code));
 addEventListener('blur', () => keys.clear());
@@ -495,112 +429,115 @@ function move(dt) {
   const speed = keys.has('ShiftLeft') || keys.has('ShiftRight') ? 5.5 : 3.2;
   player.pos.addScaledVector(mv.normalize(), speed * dt);
   const p = player.pos;
-  if (S.loc === 'street') {
+  if (player.loc === 'street') {
     p.x = clamp(p.x, -W + 0.35, W - 0.35);
     p.z = clamp(p.z, -HALF + 1, HALF - 1);
-    for (const t of tables) {
+    const r = ZONES.tableFootprint + 0.1;
+    for (const t of S.tables) {
       if (!t.out) continue;
-      const dx = p.x - t.group.position.x, dz = p.z - t.group.position.z, d = Math.hypot(dx, dz);
-      if (d < 1.15 && d > 0.001) { p.x = t.group.position.x + (dx / d) * 1.15; p.z = t.group.position.z + (dz / d) * 1.15; }
+      const dx = p.x - t.x, dz = p.z - t.z, d = Math.hypot(dx, dz);
+      if (d < r && d > 0.001) { p.x = t.x + (dx / d) * r; p.z = t.z + (dz / d) * r; }
     }
   } else {
     // On peut s'avancer dans l'embrasure de la fenêtre pour regarder en bas
-    const atWindow = Math.abs(p.z - world.window.pos.z) < 0.75;
+    const atWindow = Math.abs(p.z - ANCHORS.pilouWindow.z) < 0.75;
     p.x = clamp(p.x, apt.x0 + 0.3, atWindow ? -W - 0.2 : apt.x1 - 0.25);
     p.z = clamp(p.z, apt.z0 + 0.3, apt.z1 - 0.3);
   }
 }
 
+// ---------- Événements de la simulation ----------
+const splash = (() => {
+  const N = 140;
+  const geo = new THREE.BufferGeometry();
+  const pos = new Float32Array(N * 3), vel = new Float32Array(N * 3);
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  const points = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0x9fd3ff, size: 0.12, transparent: true, opacity: 0.8, depthWrite: false }));
+  points.visible = false;
+  points.frustumCulled = false;
+  scene.add(points);
+  let life = 0;
+  const rnd = (a, b) => a + Math.random() * (b - a); // purement visuel, hors simulation
+  return {
+    fire(o) {
+      for (let i = 0; i < N; i++) {
+        pos.set([o.x + rnd(-0.2, 0.2), o.y, o.z + rnd(-0.3, 0.3)], i * 3);
+        vel.set([rnd(0.8, 2.2), rnd(-0.5, 1), rnd(-1.2, 1.2)], i * 3);
+      }
+      life = 1.6;
+      points.visible = true;
+    },
+    update(dt) {
+      if (life <= 0) return;
+      life -= dt;
+      for (let i = 0; i < N; i++) {
+        vel[i * 3 + 1] -= 9.8 * dt;
+        for (let k = 0; k < 3; k++) pos[i * 3 + k] += vel[i * 3 + k] * dt;
+        if (pos[i * 3 + 1] < 0.02) { pos[i * 3 + 1] = 0.02; vel[i * 3] *= 0.5; vel[i * 3 + 1] = 0; vel[i * 3 + 2] *= 0.5; }
+      }
+      geo.attributes.position.needsUpdate = true;
+      if (life <= 0) points.visible = false;
+    },
+  };
+})();
+function drainSim() {
+  for (const e of sim.drainEvents()) {
+    if (e.type === 'log') log(e.text, e.cls, e.min);
+    else if (e.type === 'splash') splash.fire(v3(ANCHORS.pilouWindow).setX(-W - 0.1));
+    else if (e.type === 'end') showEnd();
+  }
+  if (overlay === 'dossier') renderDossier();
+}
+
 // ---------- Fin de nuit ----------
-function endNight(reason) {
-  if (S.ended) return;
-  S.ended = true;
+function showEnd() {
   document.exitPointerLock?.();
   for (const id of ['phone', 'dossier', 'pause']) $(id).classList.add('hidden');
+  overlay = null;
   $('hud').classList.add('hidden');
-  const titles = {
-    time: `${fmt(S.min)} · la rue se tait (enfin)`,
-    custody: 'Garde à vue',
-    sleep: 'Pilou craque',
-  };
-  const outcome = { act: 'PV', complaisance: 'café offert, 0 PV', nothing: 'rien à signaler', ignored: '« c\'est encore vous », personne' };
-  const restLines = Object.values(REST).map((r) => {
-    const ts = tables.filter((t) => t.rest === r);
-    const onTime = ts.filter((t) => t.clearedAt !== null && t.clearedAt < LATE && t.clearedBy === 'resto').length;
-    const still = ts.filter((t) => t.out).length;
-    const last = Math.max(...ts.filter((t) => t.clearedAt !== null).map((t) => t.clearedAt), -1);
-    const by = ['police', 'waiter', 'bucket'].map((k) => [k, ts.filter((t) => t.clearedBy === k).length]).filter(([, n]) => n)
-      .map(([k, n]) => `${n} par ${{ police: 'la police', waiter: 'le serveur', bucket: 'le seau' }[k]}`);
-    return `<li><b>${r.name}</b> : ${onTime}/${ts.length} rentrée(s) à l'heure${by.length ? ` · ${by.join(', ')}` : ''}${still ? ` · <span class="bad">${still} encore dehors</span>` : last >= 0 ? ` · dernière à ${fmt(last)}` : ''}</li>`;
-  });
-  const policeLines = S.policeLog.map((p) => `<li>Appel ${fmt(p.calledAt)}${p.arrivedAt ? ` → arrivée ${fmt(p.arrivedAt)} chez ${p.rest}` : ''} : ${outcome[p.outcome]}${p.detail ? ` (${p.detail})` : ''}</li>`);
-  if (S.police && S.police.phase === 'pending') policeLines.push(`<li>Appel ${fmt(S.police.calledAt)} : la patrouille n'est jamais arrivée</li>`);
-
-  const verdict = [];
-  const ratio = dossierScore() / EVIDENCE.dossierTarget;
-  if (reason === 'custody') verdict.push('Le seau d\'eau de trop. Pilou passe la nuit au commissariat. Klaas a tout noté.');
-  else if (reason === 'sleep') verdict.push('Sommeil à zéro. Pilou cherche un appart à Wazemmes. « Au moins au marché de Wazemmes, le bruit c\'est le matin. »');
-  else if (ratio >= 0.75) verdict.push('Dossier solide. La commission du jour 14 va devoir l\'écouter.');
-  else if (ratio >= 0.35) verdict.push('Ça avance. Il faudra plus de preuves pour la commission.');
-  else verdict.push('Pas grand-chose à montrer à la commission. Demain, sortez l\'appareil photo.');
-  if (reason !== 'custody') {
-    if (S.risk >= RISK.complaint) verdict.push('Dédé a porté plainte. Ça va revenir.');
-    else if (S.risk >= RISK.warning) verdict.push('Une vidéo de la fenêtre circule sur les réseaux.');
-  }
-  if (S.asso < 30) verdict.push('L\'Association prend ses distances.');
-
-  $('end-title').textContent = titles[reason];
+  const R = sim.summary();
+  const titles = { time: `${R.time} · la rue se tait (enfin)`, custody: 'Garde à vue', sleep: 'Pilou craque' };
+  const li = (s) => `<li>${s}</li>`;
+  const rest = R.restaurants.map((r) => li(`<b>${r.name}</b> : ${r.onTime}/${r.total} rentrée(s) à l'heure${r.by.length ? ` · ${r.by.map(([k, n]) => `${n} par ${k}`).join(', ')}` : ''}${r.stillOut ? ` · <span class="bad">${r.stillOut} encore dehors</span>` : r.last ? ` · dernière à ${r.last}` : ''}`));
+  const police = R.police.map((p) => li(`Appel ${p.called}${p.asso ? ' (au nom de l\'asso)' : ''}${p.arrived ? ` → ${p.patrol} chez ${p.rest} à ${p.arrived}` : ''} : ${p.outcome}${p.detail ? ` (${p.detail})` : ''}`));
+  const wit = R.witnesses.map((w) => li(`${w.time} · ${w.name} a vu le ${w.act}${w.filmed ? ' (et a filmé)' : ''}`));
+  $('end-title').textContent = titles[R.reason];
   $('end-body').innerHTML = `
-    <p class="verdict">${verdict.join('<br/>')}</p>
+    <p class="verdict">${R.verdict.join('<br/>')}</p>
     <h3>Pilou</h3>
-    <ul><li>Sommeil ${Math.round(S.sleep)}/100 · Association ${Math.round(S.asso)}/100 · Risque ${Math.round(S.risk)}/100</li>
-    <li>Dossier : ${dossierScore().toFixed(1)}/${EVIDENCE.dossierTarget} (${S.evidence.length} pièce(s))</li>
-    <li>Serveur sollicité ${S.waiterAsks.length} fois (${S.waiterAsks.filter((a) => a.ok).length} succès) · Seau d'eau : ${S.bucketUses} · Mairie : ${S.mairieSent ? 'signalée' : 'non'}</li></ul>
-    <h3>Terrasses</h3><ul>${restLines.join('')}</ul>
-    <h3>Police municipale</h3><ul>${policeLines.join('') || '<li>Jamais appelée.</li>'}</ul>`;
+    <ul>${li(`Sommeil ${R.stats.sleep}/100 · Association ${R.stats.asso}/100 · Risque ${R.stats.risk}/100`)}
+    ${li(`Dossier : ${R.dossier.score.toFixed(1)}/${R.dossier.target} (${R.dossier.pieces} pièce(s))`)}
+    ${li(`Serveur sollicité ${R.waiter.asks} fois (${R.waiter.ok} succès) · Seau d'eau : ${R.bucketUses} · Mairie : ${R.mairie ? 'signalée' : 'non'}`)}</ul>
+    <h3>Terrasses</h3><ul>${rest.join('')}</ul>
+    <h3>Police municipale</h3><ul>${police.join('') || li('Jamais appelée.')}${li(`<span class="q">De service ce soir : ${R.shifts[0]} jusqu'à ${fmt(POLICE.shiftChange)}, puis ${R.shifts[1]}</span>`)}</ul>
+    ${wit.length ? `<h3>Témoins</h3><ul>${wit.join('')}</ul>` : ''}`;
   $('end').classList.remove('hidden');
 }
 
 // ---------- Boucle ----------
 let hudTimer = 0;
+const camPos = new THREE.Vector3();
 function update(dt) {
-  const running = S.started && !S.ended && !S.overlay && (locked || NOLOCK);
-  $('pause').classList.toggle('hidden', !S.started || S.ended || !!S.overlay || locked || NOLOCK);
+  const running = started && !S.ended && !overlay && (locked || NOLOCK);
+  $('pause').classList.toggle('hidden', !started || S.ended || !!overlay || locked || NOLOCK);
   if (!running) return;
-  const dMin = dt * RULES.gameMinutesPerSecond * (S.sleeping ? RULES.sleepTimeMultiplier : 1);
-  S.min += dMin;
-
   move(dt);
-  updateTerraces();
-  updatePolice(dt);
-
-  // Bruit à l'oreille de Pilou, et au lit (c'est lui qui compte pour le sommeil)
-  camera.position.set(player.pos.x, player.pos.y + 1.65, player.pos.z);
-  S.noiseDb = noiseAt(camera.position, S.loc === 'apt');
-  if (S.min >= SLEEP.drainAfter) {
-    const bedDb = noiseAt(bedEar, true);
-    let d = -Math.max(0, bedDb - SLEEP.thresholdDb) * SLEEP.drainPerDbMinute;
-    if (S.min < NOISE.exhaustOffMinute) d -= SLEEP.exhaustDrainPerMinute;
-    if (S.sleeping && bedDb < SLEEP.thresholdDb) d += SLEEP.recoverPerMinute;
-    S.sleep = clamp(S.sleep + d * dMin, 0, 100);
-    if (S.sleep <= 0) endNight('sleep');
-  }
-  if (S.min >= RULES.nightEnd) endNight('time');
+  sim.tick(dt * RULES.gameMinutesPerSecond * (S.sleeping ? RULES.sleepTimeMultiplier : 1));
+  drainSim();
+  camPos.set(player.pos.x, player.pos.y + 1.65, player.pos.z);
+  noiseDb = sim.noiseAt(camPos, player.loc === 'apt');
 }
 
 function animate(dt) {
-  // Serveur : fait les cent pas devant la terrasse
-  const w = world.waiter;
-  const wz = -0.5 + Math.sin(now * 0.12) * 6;
-  w.rotation.y = Math.cos(now * 0.12) > 0 ? 0 : Math.PI;
-  w.position.z = wz;
-  for (const t of tables) {
+  for (const t of S.tables) {
     if (!t.out) continue;
-    for (const p of t.people) p.rotation.y = Math.sin(now * 0.7 + p.userData.phase) * 0.4;
+    for (const p of viewTables.get(t.id).people) p.rotation.y = Math.sin(now * 0.7 + p.userData.phase) * 0.4;
   }
   world.steam.intensity = S.min < NOISE.exhaustOffMinute ? 1 : Math.max(0, world.steam.intensity - dt * 0.3);
   world.steam.update(dt);
   splash.update(dt);
+  cat.rotation.y = Math.sin(now * 0.5) * 0.25;
+  klaas.userData.pane.material.emissiveIntensity = sim.klaasAwake() ? 0.9 : 0;
 }
 
 function syncCamera() {
@@ -617,14 +554,31 @@ function frame(ts) {
 function tick(dt) {
   now += dt;
   update(dt);
+  syncActors();
   animate(dt);
   syncCamera();
   updateSky();
   hudTimer -= dt;
-  if (hudTimer <= 0 && S.started && !S.ended) { updateHud(); hudTimer = 0.1; }
+  if (hudTimer <= 0 && started && !S.ended) { updateHud(); hudTimer = 0.1; }
   renderer.render(scene, camera);
 }
-// Tests automatisés (onglet en arrière-plan = pas de requestAnimationFrame) : __rdb.step(n) avance n frames de 1/30 s
-window.__rdb.step = (n = 1, dt = 1 / 30) => { for (let i = 0; i < n; i++) tick(dt); return S.min; };
+
+// Hooks de test (onglet en arrière-plan = pas de requestAnimationFrame) : step(n) avance n frames de 1/30 s ;
+// aimAt(tableId) place Pilou dans la rue à 2,5 m de la table, en la regardant ; key(code) simule une touche.
+window.__rdb = {
+  sim, player, world, seed: SEED,
+  step(n = 1, dt = 1 / 30) { for (let i = 0; i < n; i++) tick(dt); return S.min; },
+  aimAt(tableId) {
+    const t = sim.table(tableId);
+    player.loc = 'street';
+    player.pos.set(clamp(t.x - Math.sign(t.x) * 2.5, -W + 0.4, W - 0.4), 0, t.z);
+    player.yaw = Math.atan2(-(t.x - player.pos.x), -(t.z - player.pos.z));
+    player.pitch = -0.3;
+  },
+  key(code) {
+    dispatchEvent(new KeyboardEvent('keydown', { code }));
+    dispatchEvent(new KeyboardEvent('keyup', { code }));
+  },
+};
 updateSky();
 requestAnimationFrame(frame);
