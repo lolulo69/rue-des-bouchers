@@ -146,7 +146,7 @@ export const POLICE_LINES = {
     ],
     tipoff: [
       'Lemaire devant {rest} : « Tout est en ordre ici, monsieur. » Comme par hasard, les tables viennent d’être rentrées.',
-      'Lemaire arrive devant {rest}, d’une sagesse exemplaire. Il s’en étonne à peine.',
+      'Lemaire arrive devant {rest}, soudain d’une sagesse exemplaire. Il ne s’en étonne même pas.',
     ],
     nothing: [
       'Lemaire, devant {rest} : « Je ne vois rien d’anormal, monsieur. » Pour une fois, c’est vrai.',
@@ -386,7 +386,7 @@ export const WAITER_LINES = {
       'Théo : « Pas ce soir, Pilou. Dédé est sur les nerfs. Demain, peut-être. »',
       'Théo, sans s’arrêter : « J’ai six tables et un patron. Plus tard. »',
       'Théo hausse les épaules vers la vitrine, où Dédé le regarde. Ça veut dire non.',
-      'Théo : « Je te jure, j’ai essayé. Il m’a répondu « encore une tournée ». »',
+      'Théo : « Je te jure, j’ai essayé. Il m’a répondu ‹ encore une tournée ›. »',
     ],
   },
 };

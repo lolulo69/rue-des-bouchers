@@ -666,7 +666,7 @@ export const EVENTS = [
     once: true,
     title: 'Biloute flaire une livraison',
     text:
-      "Pendant la ronde, Biloute s’arrête net devant la porte de service de l’estaminet et grogne. Une camionnette décharge, en pleine ronde, douze chaises pliantes neuves. *Biloute s’assoit. Biloute fixe les chaises. Biloute juge.*",
+      "Pendant la ronde, Biloute s’arrête net devant la porte de service de l’estaminet et grogne. Une camionnette décharge douze chaises pliantes neuves. *Biloute s’assoit. Biloute fixe les chaises. Biloute juge.*",
     choices: [
       {
         label: 'Photographier la livraison',

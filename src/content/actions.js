@@ -370,8 +370,8 @@ export const ACTIONS = [
     once: true,
     cost: { time: 1 },
     requires: { stats: { dossier: '>=3' } },
-    effects: { setFlags: ['aot_requested', 'legal_view', 'met_jeremie'], dossier: +1 },
-    result: "Jérémie dépose la demande au nom de l’association, article et alinéa à l’appui. Le plan arrive en PDF, scanné de travers. Les zones ne sont toujours pas peintes au sol, mais vous, maintenant, vous les voyez.",
+    effects: { setFlags: ['aot_requested', 'met_jeremie'], dossier: +1 },
+    result: "Jérémie dépose la demande au nom de l’association, article et alinéa à l’appui. Accusé de réception automatique : « Votre demande sera traitée dans les meilleurs délais. » Jérémie note la date. Et l’heure.",
   },
   {
     id: 'pm_ars_complaint',
