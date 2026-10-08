@@ -135,7 +135,7 @@ export function humanoid(o = {}) {
 
   // Corps en poire
   add('torso', 'body', [0, -0.03, 0], [tw, th, td], shirt);
-  add('sphere', 'body', [0, 0.05, 0], [tw * 0.5, 0.12, td * 0.52], o.skirt && !sit ? o.skirt : pants);
+  add('ball', 'body', [0, 0.05, 0], [tw * 0.5, 0.12, td * 0.52], o.skirt && !sit ? o.skirt : pants);
   if (o.belly) add('sphere', 'body', [0, th * 0.4, td * 0.22], [tw * 0.42 * o.belly, th * 0.42 * o.belly, td * 0.45 * o.belly], shirt);
   if (o.skirt && !sit) add('skirt', 'body', [0, -0.13, 0], [tw * 1.15, 0.36, td * 1.25], o.skirt);
   // Tête et visage
@@ -143,13 +143,13 @@ export function humanoid(o = {}) {
   add('head', 'head', [0, cy, 0], r, skin);
   for (const [sx, eb, bb] of [[1, 'eyeL', 'browL'], [-1, 'eyeR', 'browR']]) {
     add('ball', eb, [0, 0, 0], [0.1 * r, 0.15 * r, 0.07 * r], DARK);
-    add('ball', eb, [-sx * 0.03 * r, 0.06 * r, 0.06 * r], [0.035 * r, 0.035 * r, 0.02 * r], 0xffffff, null, true);
+    add('dot', eb, [-sx * 0.03 * r, 0.06 * r, 0.06 * r], [0.035 * r, 0.035 * r, 0.02 * r], 0xffffff, null, true);
     add('box', bb, [0, 0, 0], [0.26 * r, 0.055 * r, 0.05 * r], o.brows ?? new THREE.Color(look.hairColor).multiplyScalar(0.7).getHex());
-    if (o.blush !== false) add('ball', 'head', [sx * 0.56 * r, cy - 0.2 * r, 0.77 * r], [0.15 * r, 0.08 * r, 0.05 * r], new THREE.Color(skin).lerp(new THREE.Color(0xff7f86), 0.45).getHex());
-    add('ball', 'head', [sx * 0.97 * r, cy, 0], [0.12 * r, 0.2 * r, 0.12 * r], skin); // oreilles
+    if (o.blush !== false) add('dot', 'head', [sx * 0.56 * r, cy - 0.2 * r, 0.77 * r], [0.15 * r, 0.08 * r, 0.05 * r], new THREE.Color(skin).lerp(new THREE.Color(0xff7f86), 0.45).getHex());
+    add('dot', 'head', [sx * 0.97 * r, cy, 0], [0.12 * r, 0.2 * r, 0.12 * r], skin); // oreilles
   }
-  add('ball', 'head', [0, cy - 0.1 * r, 0.98 * r], 0.1 * r, new THREE.Color(skin).multiplyScalar(0.88).getHex());
-  add('ball', 'mouth', [0, 0, 0], [0.11 * r, 0.06 * r, 0.04 * r], 0x6a2a2a);
+  add('dot', 'head', [0, cy - 0.1 * r, 0.98 * r], 0.1 * r, new THREE.Color(skin).multiplyScalar(0.88).getHex());
+  add('dot', 'mouth', [0, 0, 0], [0.11 * r, 0.06 * r, 0.04 * r], 0x6a2a2a);
   hair(add, o.hair ?? 'short', r, look.hairColor);
   if (o.beard) { // grosse barbe (blanche pour Klaas)
     add('sphere', 'head', [0, cy - 0.55 * r, 0.42 * r], [0.95 * r, 0.9 * r, 0.62 * r], o.beard);
@@ -167,14 +167,14 @@ export function humanoid(o = {}) {
   // Bras (manches + mains)
   for (const [b, hb] of [['armL', 'handL'], ['armR', 'handR']]) {
     add('limb', b, [0, 0, 0], [0.13 * Math.sqrt(g), k.armLen, 0.13 * Math.sqrt(g)], o.sleeves ?? shirt);
-    add('ball', hb, [0, 0, 0], 0.068, o.gloves ?? skin);
+    add('dot', hb, [0, 0, 0], 0.068, o.gloves ?? skin);
   }
   // Jambes (cuisse + tibia : assis, debout, à vélo, tombé)
   if (!lean) for (const b of ['legL', 'legR']) {
     const lc = o.skirt ? skin : pants;
     add('limb', b, [0, 0, 0], [0.15 * Math.min(g, 1.2), 0.36 * h, 0.15 * Math.min(g, 1.2)], o.skirt ?? pants);
     add('limb', b === 'legL' ? 'shinL' : 'shinR', [0, 0, 0], [0.13, 0.36 * h, 0.13], lc);
-    add('ball', b === 'legL' ? 'shinL' : 'shinR', [0, -0.36 * h + 0.01, 0.04], [0.08, 0.06, 0.12], shoes);
+    add('dot', b === 'legL' ? 'shinL' : 'shinR', [0, -0.36 * h + 0.01, 0.04], [0.08, 0.06, 0.12], shoes);
   }
   heldItems(addW, k, o);
   o.extras?.(add, k, addW);
@@ -295,6 +295,9 @@ function animHuman(rig, t, dt, proxy) {
       raiseL += Math.max(0, Math.sin(ph * 13)) * 0.06; raiseR += Math.max(0, Math.sin(ph * 13 + 1.7)) * 0.06;
       break;
     case 'meeting': break;
+    case 'fan': // s'évente devant le nez (odeur)
+      raiseR = -2.1 + Math.sin(ph * 14) * 0.3; yawR = 0.7; spreadR = 0.1; nod = -0.15; turn = Math.sin(ph * 2) * 0.4;
+      break;
     case 'ride': // à vélo : assis sur la selle, mains au guidon, pédalage selon la vitesse
       hipY = 0.86; leanX = 0.3; raiseL = raiseR = -1.25; yawL = -0.15; yawR = 0.15; spreadL = spreadR = 0.12; turn *= 0.3;
       break;

@@ -14,11 +14,11 @@ function merged(list) {
   return mergeGeometries(parts);
 }
 function chairGeo() {
-  const l = [[new THREE.CylinderGeometry(0.21, 0.2, 0.04, 10), 0, 0.46, 0]]; // assise
-  for (const [x, z] of [[0.13, 0.13], [-0.13, 0.13], [0.13, -0.13], [-0.13, -0.13]]) l.push([new THREE.CylinderGeometry(0.016, 0.014, 0.46, 4), x * 1.05, 0.23, z * 1.05, z * 0.15, -x * 0.15]);
-  for (const x of [0.15, -0.15]) l.push([new THREE.CylinderGeometry(0.016, 0.016, 0.42, 4), x, 0.67, -0.17, -0.12]);
-  l.push([new THREE.TorusGeometry(0.15, 0.024, 4, 8, Math.PI), 0, 0.84, -0.195, -0.12]); // dossier arrondi
-  l.push([new THREE.TorusGeometry(0.15, 0.014, 3, 8, Math.PI), 0, 0.7, -0.18, -0.12]);
+  const l = [[new THREE.CylinderGeometry(0.21, 0.2, 0.04, 8, 1), 0, 0.46, 0]]; // assise
+  for (const [x, z] of [[0.13, 0.13], [-0.13, 0.13], [0.13, -0.13], [-0.13, -0.13]]) l.push([new THREE.CylinderGeometry(0.016, 0.014, 0.46, 3, 1, true), x * 1.05, 0.23, z * 1.05, z * 0.15, -x * 0.15]);
+  for (const x of [0.15, -0.15]) l.push([new THREE.CylinderGeometry(0.016, 0.016, 0.42, 3, 1, true), x, 0.67, -0.17, -0.12]);
+  l.push([new THREE.TorusGeometry(0.15, 0.024, 3, 6, Math.PI), 0, 0.84, -0.195, -0.12]); // dossier arrondi
+  l.push([new THREE.BoxGeometry(0.3, 0.025, 0.025), 0, 0.72, -0.185, -0.12]);
   return merged(l);
 }
 defineGeo('chair', chairGeo());

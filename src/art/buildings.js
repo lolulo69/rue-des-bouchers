@@ -120,9 +120,9 @@ export function makeKit(city, W, rng) {
     }
     fbox(side, -0.1, y0 + rise + 0.35, zc, 0.24, 0.5, 0.24, mats.stone); // pinacle
     // oculus
-    const oc = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.32, 0.06, 14), rng() < 0.35 ? mats.lit[0] : mats.dark);
+    const oc = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.32, 0.06, 10), rng() < 0.35 ? mats.lit[0] : mats.dark);
     oc.rotation.set(0, 0, Math.PI / 2); oc.position.set(X(side, 0.06), y0 + sh * 1.4, zc); city.add(oc);
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.36, 0.06, 5, 16), mats.stone);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.36, 0.06, 3, 10), mats.stone);
     ring.rotation.y = Math.PI / 2; ring.position.set(X(side, 0.08), y0 + sh * 1.4, zc); city.add(ring);
     roofPrism(side, z0, z1, y0, rise * 0.92);
   }
@@ -209,7 +209,7 @@ export function makeKit(city, W, rng) {
     city.add(cloth);
     const yb = y - Math.cos(tilt) * slope;
     const vm = new THREE.MeshStandardMaterial({ color: new THREE.Color(a), roughness: 0.85 });
-    const scal = new THREE.SphereGeometry(0.12, 10, 6);
+    const scal = new THREE.SphereGeometry(0.12, 6, 3);
     for (let z = z0 + 0.12; z < z1; z += 0.24) {
       const s = new THREE.Mesh(scal, vm);
       s.scale.set(0.1, 1, 1);

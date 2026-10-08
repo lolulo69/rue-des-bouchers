@@ -2,16 +2,24 @@
 // clients, raclement des chaises métalliques sur les pavés quand une table rentre (ou ressort), ronronnement de
 // la hotte (plus fort chez Pilou), cloche lointaine à 22:00. Démarre au premier geste (règle des navigateurs).
 // Touche M : couper / remettre le son.
+// v0.5 : moteur unique `audio` (singleton) : audio.play('whatsapp'), audio.loop('lofi', true), audio.mode('day').
+// La rue (brouhaha, hotte) est branchée par world.js via audio.attachStreet(...). Voir src/art/README.md.
 import * as THREE from 'three';
+import { makeSfx, SFX_NAMES } from './sfx.js';
+import { makeMusic, LOOP_NAMES } from './music.js';
 
 const BELL_MINUTE = 22 * 60;
 
-export function createAudio({ tables, exhaust, steam, apt, getMinutes }) {
+function createEngine() {
   let ctx = null, master = null, muted = false;
   let crowd = null, hum = null, bellBus = null, sfx = null, noise = null;
+  let streetBus = null, musicBus = null, sounds = null, music = null, lastCamera = null, modeName = 'night';
+  // Rue branchée par world.js (attachStreet)
+  let street = null, tables = [], exhaust = new THREE.Vector3(), steam = null, apt = { x1: -1e9, floor: 1e9 }, getMinutes = null;
   // Une table est "dehors" tant que son groupe est visible (le gameplay le cache quand elle rentre)
   const isOut = (t) => t.group.visible && t.out !== false;
-  const prevOut = new Map(tables.map((t) => [t, isOut(t)]));
+  let prevOut = new Map();
+  const pendingLoops = new Map(); // boucles demandées avant le premier geste
   let lastMin = null, chatterT = 0;
   const tmp = new THREE.Vector3(), right = new THREE.Vector3();
 
@@ -37,9 +45,15 @@ export function createAudio({ tables, exhaust, steam, apt, getMinutes }) {
     const d = noise.getChannelData(0);
     for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
     sfx = ctx.createGain(); sfx.connect(master);
+    streetBus = ctx.createGain(); streetBus.gain.value = modeName === 'night' ? 1 : 0; streetBus.connect(master);
+    musicBus = ctx.createGain(); musicBus.gain.value = 0.8; musicBus.connect(master);
     crowd = makeCrowd();
     hum = makeHum();
     bellBus = makeReverbBus(4.5, 0.55);
+    sounds = makeSfx(ctx, sfx, noise, bellBus.input);
+    music = makeMusic(ctx, musicBus, noise, makeReverbBus);
+    for (const [name, on] of pendingLoops) music.loop(name, on);
+    pendingLoops.clear();
   }
   for (const ev of ['pointerdown', 'keydown']) addEventListener(ev, start, { capture: true });
   addEventListener('keydown', (e) => {
@@ -62,7 +76,7 @@ export function createAudio({ tables, exhaust, steam, apt, getMinutes }) {
     const out = ctx.createGain(); out.gain.value = 0;
     const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 3200;
     const pan = ctx.createStereoPanner();
-    out.connect(lp).connect(pan).connect(master);
+    out.connect(lp).connect(pan).connect(streetBus);
     const voices = [];
     for (let i = 0; i < 6; i++) {
       const src = loopNoise();
@@ -87,7 +101,7 @@ export function createAudio({ tables, exhaust, steam, apt, getMinutes }) {
     const out = ctx.createGain(); out.gain.value = 0;
     const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 900;
     const pan = ctx.createStereoPanner();
-    out.connect(lp).connect(pan).connect(master);
+    out.connect(lp).connect(pan).connect(streetBus);
     for (const [f, a] of [[50, 0.35], [100, 0.25], [150, 0.12], [300, 0.05]]) {
       const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f * (1 + (Math.random() - 0.5) * 0.004);
       const g = ctx.createGain(); g.gain.value = a * 0.25;
@@ -202,11 +216,43 @@ export function createAudio({ tables, exhaust, steam, apt, getMinutes }) {
     return { d, pan: Math.max(-1, Math.min(1, tmp.dot(right) / d)) };
   }
 
+  // Position → gain et panoramique relatifs à la dernière caméra vue
+  function spatial(pos) {
+    if (!pos || !lastCamera) return { gain: 1, pan: 0 };
+    const { d, pan } = relPan(pos.isVector3 ? pos : new THREE.Vector3(pos.x, pos.y ?? 1, pos.z), lastCamera);
+    return { gain: Math.min(1, 4 / (1 + d * 0.3)), pan };
+  }
+
   return {
     get muted() { return muted; },
     get state() { return ctx ? ctx.state : 'off'; },
+    sounds: SFX_NAMES,
+    loops: LOOP_NAMES,
+    attachStreet(o) {
+      ({ tables, exhaust, steam, apt, getMinutes } = o);
+      street = o;
+      prevOut = new Map(tables.map((t) => [t, isOut(t)]));
+      return this;
+    },
+    // Bruitage ponctuel : opts { pos (Vector3, spatialisé), gain, delay (s), repeat... } (voir sfx.js)
+    play(name, opts = {}) {
+      if (!sounds || ctx.state !== 'running') return false;
+      const sp = spatial(opts.pos);
+      return sounds.play(name, { ...opts, gain: (opts.gain ?? 1) * sp.gain, pan: opts.pan ?? sp.pan, when: ctx.currentTime + (opts.delay ?? 0) });
+    },
+    // Boucle continue : 'lofi' (jour), 'hall' (commission J14), 'typing' (clavier Koddex)
+    loop(name, on = true) {
+      if (!music) { pendingLoops.set(name, on); return; }
+      music.loop(name, on);
+    },
+    // 'night' : la rue s'entend · 'day' / 'hall' / 'off' : la rue se tait (les boucles se gèrent avec loop())
+    mode(m) {
+      modeName = m;
+      if (streetBus) streetBus.gain.setTargetAtTime(m === 'night' ? 1 : 0, ctx.currentTime, 0.4);
+    },
     update(dt, camera) {
-      if (!ctx || ctx.state !== 'running') return;
+      lastCamera = camera;
+      if (!ctx || ctx.state !== 'running' || !street) return;
       const now = ctx.currentTime;
       const inApt = camera.position.x < apt.x1 + 0.3 && camera.position.y > apt.floor;
       // Terrasses : niveau ~ somme des têtes / distance², panoramique pondéré
@@ -263,5 +309,10 @@ export function createAudio({ tables, exhaust, steam, apt, getMinutes }) {
       }
     },
     bell: (n = 1) => ctx && ringBells(n, false), // pour tester : __rdb.world.audio.bell(3)
+    start,
   };
 }
+
+export const audio = createEngine();
+// Compatibilité v0.3
+export const createAudio = (o) => audio.attachStreet(o);

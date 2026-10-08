@@ -20,28 +20,29 @@ const torsoGeo = (seg) => new THREE.LatheGeometry(
 );
 
 export const GEO = {
-  head: new THREE.SphereGeometry(1, 12, 9),
+  head: new THREE.SphereGeometry(1, 10, 7),
   sphere: new THREE.SphereGeometry(1, 9, 6),
   ball: new THREE.SphereGeometry(1, 6, 4),
+  dot: new THREE.SphereGeometry(1, 5, 3), // détails du visage (reflet, joues, nez)
   hemi: new THREE.SphereGeometry(1, 12, 5, 0, Math.PI * 2, 0, Math.PI / 2),
-  limb: limbGeo(2, 6),
+  limb: limbGeo(2, 5),
   torso: torsoGeo(10),
   cyl: new THREE.CylinderGeometry(0.5, 0.5, 1, 10),
   cone: new THREE.ConeGeometry(0.5, 1, 8),
   skirt: new THREE.CylinderGeometry(0.3, 0.5, 1, 10),
   box: new THREE.BoxGeometry(1, 1, 1),
-  torus: new THREE.TorusGeometry(1, 0.16, 4, 12),
+  torus: new THREE.TorusGeometry(1, 0.16, 3, 10),
   // versions lointaines (LOD)
   headLo: new THREE.SphereGeometry(1, 7, 5),
   hemiLo: new THREE.SphereGeometry(1, 7, 3, 0, Math.PI * 2, 0, Math.PI / 2),
-  limbLo: new THREE.CylinderGeometry(0.5, 0.5, 1, 4, 1).translate(0, -0.5, 0),
+  limbLo: new THREE.CylinderGeometry(0.5, 0.5, 1, 3, 1, true).translate(0, -0.5, 0),
   torsoLo: torsoGeo(6),
   cylLo: new THREE.CylinderGeometry(0.5, 0.5, 1, 5),
 };
 export const defineGeo = (name, geo) => { GEO[name] = geo; };
 // Géométrie de remplacement au-delà de LOD_DIST (null = morceau omis de loin)
-const FAR = { head: 'headLo', sphere: 'ball', hemi: 'hemiLo', limb: 'limbLo', torso: 'torsoLo', cyl: 'cylLo', skirt: 'cylLo', chair: 'chairLo', ball: 'ball', box: 'box', cone: 'cone' };
-export const LOD_DIST = 15;
+const FAR = { dot: null, head: 'headLo', sphere: 'ball', hemi: 'hemiLo', limb: 'limbLo', torso: 'torsoLo', cyl: 'cylLo', skirt: 'cylLo', chair: 'chairLo', ball: 'ball', box: 'box', cone: 'cone' };
+export const LOD_DIST = 10;
 export const defineFar = (geo, farGeo) => { FAR[geo] = farGeo; };
 
 const MATS = {
@@ -64,7 +65,7 @@ export function matrix(pos = [0, 0, 0], scale = 1, rot) {
 // keep = gardé de loin même s'il est petit (ex. la braise d'une cigarette).
 export function part(geo, bone, pos, scale, color, rot, glow = false, keep = false) {
   const s = typeof scale === 'number' ? scale : Math.max(...scale);
-  const farGeo = keep ? geo : s < 0.1 || geo === 'torus' ? null : FAR[geo] ?? geo;
+  const farGeo = keep ? geo : s < 0.1 || geo === 'torus' ? null : geo in FAR ? FAR[geo] : geo;
   return { key: geo + (glow ? '*' : ''), farKey: farGeo && farGeo + (glow ? '*' : ''), geo, farGeo, glow, bone, m: matrix(pos, scale, rot), c: new THREE.Color(color) };
 }
 
@@ -168,6 +169,7 @@ export function attachRigs(scene, { main = false, lod = true } = {}) {
       if (sceneOf(proxy) !== sc) continue;
       n++;
       const rig = proxy.userData.rig;
+      if (rig.hidden) continue; // caché par l'art (ex. client parti aux toilettes) sans toucher à .visible du gameplay
       const e = proxy.matrixWorld.elements;
       const sy = Math.hypot(e[4], e[5], e[6]);
       _sph.center.set(e[12] + e[4] * 0.8, e[13] + e[5] * 0.8, e[14] + e[6] * 0.8);

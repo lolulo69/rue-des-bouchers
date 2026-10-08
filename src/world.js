@@ -10,7 +10,8 @@ import { CAST, customer, dachshund, cat, person as artPerson } from './art/chara
 import { chair, bistroTable, barrelTable } from './art/props.js';
 import { makeKit, house, GROUND, FLOOR, winY } from './art/buildings.js';
 import { cobbleTex, slabTex, seeded, puffTex } from './art/textures.js';
-import { createAudio } from './audio/index.js';
+import { audio } from './audio/index.js';
+import { attachArt } from './art/index.js';
 
 const W = STREET.halfWidth;
 const HALF = STREET.length / 2;
@@ -479,6 +480,21 @@ export function buildWorld(scene, opts = {}) {
   putChar('pilou', CAST.pilou(), scene, new THREE.Vector3(-(W - 0.6), 0, bz + 6.6), Math.PI / 2).visible = false;
   putChar('delphine', CAST.delphine(), scene, new THREE.Vector3(0, 0, -HALF + 3), 0).visible = false;
   anchors.endA = new THREE.Vector3(0, 0, -HALF);
+  // Points de mise en scène (art v0.5) : accessoires et états des personnages (voir src/art/README.md)
+  const P = (x, y, z) => new THREE.Vector3(x, y, z);
+  Object.assign(anchors, {
+    pilouSill: P(-(W - 0.12), F + 0.05, bz + 0.6),          // rebord de la fenêtre de Pilou
+    pilouBanner: P(-(W - 0.02), F - 0.45, bz),               // sous sa fenêtre
+    balconyRail: P(W - 0.83, anchors.balcony.y + 0.55, bz + 0.4), // devant la rambarde de Seb & Nico
+    smokeSpot: P(-(W - 0.5), 0, bz + 4.4),                  // pause clope du serveur, sous le store
+    awningCleanSpot: P(-(W - 0.55), 0, bz - 2),             // escabeau de Ghislain sous le store
+    chainSpot: P(-(W - 0.6), 0, P0 + 0.6),                  // pile de chaises cadenassée la nuit
+    coffeeSpot: P(-(W - 1.4), 0, P0 - 2.6),                 // table des policiers, devant l'estaminet
+    petitionSpot: P(-(W - 0.7), 0, bz + 10.5),              // table de pétition, devant chez Pilou et Jérémie
+    uritrottoirSpot: P(W - 0.45, 0, -12),                   // si la ville l'installe (face au porche)
+    roundPath: [P(-(W - 0.9), 0, bz + 9.3), P(-1.0, 0, bz + 14), P(-1.0, 0, bz + 26), P(0.9, 0, bz + 27), P(0.9, 0, bz - 14), P(-0.9, 0, bz - 16), P(-0.9, 0, bz + 6), P(-(W - 0.9), 0, bz + 9.3)],
+    patrolPath: [P(0, 0, -HALF + 2), P(0.4, 0, bz - 8), P(0.4, 0, bz + 3), P(-0.4, 0, bz + 20), P(0, 0, HALF - 3)],
+  });
   anchors.square = new THREE.Vector3(0, 0, (sq.z0 + sq.z1) / 2);
 
   mergeStatic(city);
@@ -500,19 +516,21 @@ export function buildWorld(scene, opts = {}) {
     setCatVisible(v) { cast.cat.visible = v; },
     standingCrowd: (o) => standingCrowd(scene, o),
   };
-  world.audio = createAudio({ tables, exhaust, steam, apt, getMinutes: () => world.gameMinutes ?? window.__rdb?.sim?.state?.min ?? window.__rdb?.S?.min });
-  onFrame((dt, t, camera) => world.audio.update(dt, camera));
+  world.audio = audio.attachStreet({ tables, exhaust, steam, apt, getMinutes: () => world.gameMinutes ?? window.__rdb?.sim?.state?.min ?? window.__rdb?.S?.min });
+  onFrame((dt, t, camera) => audio.update(dt, camera));
+  world.art = attachArt(scene, world);
   return world;
 }
 
-// Fusionne toutes les meshes statiques du décor par matériau : quelques dizaines de draw calls au lieu de milliers.
-// Les matériaux briquetés reçoivent des UV "monde" (taille de brique constante quelle que soit la boîte).
+// Fusionne toutes les meshes statiques du décor par matériau ET par tronçon de rue (z), pour que le frustum
+// culling écarte les tronçons hors champ. Les matériaux briquetés reçoivent des UV "monde" (taille de brique constante).
+const CHUNK = 22;
 function mergeStatic(group) {
   group.updateMatrixWorld(true);
-  const byMat = new Map();
+  const byKey = new Map();
   const meshes = [];
   group.traverse((o) => { if (o.isMesh) meshes.push(o); });
-  const n = new THREE.Vector3();
+  const n = new THREE.Vector3(), c = new THREE.Vector3();
   for (const o of meshes) {
     let g = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone();
     g.applyMatrix4(o.matrixWorld);
@@ -531,11 +549,16 @@ function mergeStatic(group) {
         else uv.setXY(i, x / s, z / s);
       }
     }
-    if (!byMat.has(o.material)) byMat.set(o.material, []);
-    byMat.get(o.material).push(g);
+    g.computeBoundingBox();
+    g.boundingBox.getCenter(c);
+    // les très grandes pièces (sol, longues façades) restent dans un tronçon à part
+    const big = g.boundingBox.max.z - g.boundingBox.min.z > CHUNK;
+    const key = o.material.uuid + (big ? ':big' : ':' + Math.floor(c.z / CHUNK));
+    if (!byKey.has(key)) byKey.set(key, { m: o.material, geos: [] });
+    byKey.get(key).geos.push(g);
     o.parent.remove(o);
   }
-  for (const [m, geos] of byMat) group.add(new THREE.Mesh(mergeGeometries(geos), m));
+  for (const { m, geos } of byKey.values()) group.add(new THREE.Mesh(mergeGeometries(geos), m));
 }
 
 function makeSteam(origin) {
