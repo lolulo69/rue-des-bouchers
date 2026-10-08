@@ -13,7 +13,8 @@
     "check:bundle": "vite build && node scripts/check-bundle.js",
     "qa:screens": "QA_SCREENS=1 playwright test screens",
     "story": "node scripts/story.js",
-    "test:fullrun": "QA_FULLRUN=1 playwright test fullrun --workers=1"
+    "test:fullrun": "QA_FULLRUN=1 playwright test fullrun --workers=1",
+    "qa:album": "QA_ALBUM=1 playwright test fullrun -g album --workers=1"
   },
   "keywords": [],
   "author": "Lucas Lefort",

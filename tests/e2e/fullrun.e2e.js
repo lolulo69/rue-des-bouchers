@@ -11,8 +11,6 @@ import { watchErrors, hhmm } from './helpers.js';
 // qui reflète la partie, « Fins découvertes » (la fin secrète reste cachée), sauvegarde / reprise en cours de partie.
 // Mesure aussi la durée « humaine » estimée (lecture à 200 mots/min + 2 s par clic + 14 nuits réelles) → qa/duration.md.
 // Lent (≈ 10–20 min par style en CI) : tourne dans le workflow « Full runs » (nightly + manuel), pas à chaque push.
-test.skip(!process.env.QA_FULLRUN, 'campagnes complètes : `npm run test:fullrun` (workflow nightly « Full runs »)');
-
 const WPM = 200;
 const CLICK_S = 2;
 const NIGHT_S = (RULES.nightEnd - RULES.nightStart) / RULES.gameMinutesPerSecond; // durée réelle d'une nuit, en s
@@ -48,6 +46,42 @@ const STYLES = {
     actions: { prefer: /meeting|reunion|réunion|dialog|delphine|dinner|tatie|hippolyte|petition|whatsapp|recruit|lescaut|waiter|charte|media/i, groups: ['legal', 'grey'] },
     night: 'diplomat',
   },
+  stealthy: {
+    title: 'illégal discret',
+    seed: 404,
+    choices: [/Improviser/i, /Noter/i, /Photographier/i],
+    avoid: [/action directe/i, /habitué/i],
+    koddex: (opts) => pickProjects(opts, (p) => p.legality === 'illegal', 1, (p) => (p.legality ?? 'legal') !== 'legal'),
+    actions: { groups: ['illegal', 'grey'] },
+    night: 'stealthy',
+  },
+  mixed: {
+    title: 'mixte malin',
+    seed: 505,
+    choices: [/voie légale/i, /dossier complet/i, /Plaider/i, /Brandir/i, /Photographier/i, /Noter/i, /soupe/i],
+    avoid: [/action directe/i, /habitué/i],
+    koddex: (opts) => pickProjects(opts, (p) => (p.legality ?? 'legal') === 'legal', 1),
+    actions: { prefer: /mairie|press|lawyer|avocat|petition|delphine|inspector|lescaut|ars|hygiene/i, groups: ['legal', 'grey'] },
+    night: 'mixed',
+  },
+  passive: {
+    title: 'passif',
+    seed: 606,
+    choices: [],
+    avoid: [],
+    koddex: (opts) => Array(opts.prompts).fill('work'),
+    actions: { groups: [] }, // n'agit jamais : « fin d'après-midi » tout de suite
+    night: 'passive',
+  },
+};
+// Ce que chaque style fait la nuit (minutes de jeu) : photos, appels, serveur, seau, actes illégaux du contenu
+const NIGHT_PLANS = {
+  legal: { at: hhmm(22, 12), photos: 4, police: 1 },
+  diplomat: { at: hhmm(22, 12), photos: 1, waiter: true },
+  reckless: { at: hhmm(22, 12), bucket: true, illegal: 2, police: 1, bucketAgain: hhmm(23, 30) },
+  stealthy: { at: hhmm(25, 5), bucket: true, illegal: 1 }, // après 1h : Klaas couché, chat rentré, serveur parti
+  mixed: { at: hhmm(22, 12), photos: 3, police: 1, late: { at: hhmm(25, 10), bucket: true } },
+  passive: {},
 };
 // Choisit jusqu'à `n` projets perso (filtre principal, puis repli), complète avec du vrai travail
 function pickProjects(opts, main, n, fallback = () => false) {
@@ -124,7 +158,8 @@ async function playCard(page, clock, style, log, s) {
   if (hasResult && after && !after.result && after.step !== before) log.lostResults.push({ day: s.day, id: s.card.id, step: after.step });
 }
 
-async function playKoddex(page, clock, style, log) {
+async function playKoddex(page, clock, style, log, album) {
+  if (album) await album.snap(page, 'koddex-start');
   const opts = await page.evaluate(() => window.__rdb.ui.campaign.koddexOptions());
   const picks = style.koddex(opts);
   log.koddex.push(picks);
@@ -136,6 +171,7 @@ async function playKoddex(page, clock, style, log) {
   }
   if (await page.locator('[data-testid=koddex-done]').count()) {
     for (let i = 0; i < 60 && await page.locator('[data-testid=koddex-done]').isDisabled(); i++) await page.click('[data-testid=terminal]');
+    if (album) await album.snap(page, 'koddex-end');
     await clickTestId(page, clock, '[data-testid=koddex-done]');
   }
 }
@@ -161,37 +197,40 @@ async function playAfternoon(page, clock, style, log, day) {
 }
 
 // La nuit 3D, accélérée : quelques actes typiques du style, puis la fin de nuit (l'interface reprend sur le bilan).
-async function playNight(page, clock, style, log, day) {
+async function playNight(page, clock, style, log, day, album) {
   await clickTestId(page, clock, '[data-testid=night-go]');
   await page.waitForURL(/mode=night/);
   // La nuit de campagne démarre seule (HUD visible) ; les anciennes versions demandaient « Commencer la nuit »
   await page.locator('#hud:visible, #start:visible').first().waitFor({ timeout: 60_000 });
   if (await page.locator('#start').isVisible()) await page.click('#start');
   await page.waitForFunction(() => window.__rdb?.sim && window.__rdb.campaign, null, { timeout: 60_000 });
-  const acts = await page.evaluate(({ kind, t1, t2 }) => {
+  if (album) {
+    await page.evaluate((t) => { const r = window.__rdb; for (let i = 0; r.sim.state.min < t && i < 4000; i++) r.sim.tick(0.5); r.step(6); }, hhmm(22, 0));
+    await album.snap(page, 'night-hud');
+    await page.evaluate(() => { window.__rdb.key('KeyN'); window.__rdb.step(2); });
+    if (await page.locator('#nightmenu').isVisible()) { await album.snap(page, 'night-menu'); await page.evaluate(() => { window.__rdb.key('KeyN'); window.__rdb.step(1); }); }
+  }
+  const acts = await page.evaluate((plan) => {
     const r = window.__rdb, { sim } = r, c = r.campaign;
     const run = (min) => { for (let i = 0; sim.state.min < min && !sim.state.ended && i < 4000; i++) { sim.tick(0.5); if (i % 60 === 0) r.step(1); } };
     const done = [];
-    run(t1);
-    if (kind === 'legal' || kind === 'diplomat') {
-      for (const t of sim.state.tables.filter((x) => x.out).slice(0, kind === 'legal' ? 4 : 1)) { r.aimAt(t.id); r.step(1); r.key('KeyP'); done.push('photo'); }
-      if (kind === 'legal' && sim.state.calls < 1) { sim.act({ type: 'police' }); done.push('police'); }
-      if (kind === 'diplomat') { sim.act({ type: 'waiter' }); done.push('waiter'); }
-    } else {
-      const W = sim.cfg.STREET.halfWidth, win = sim.cfg.ANCHORS.pilouWindow;
-      r.player.loc = 'apt'; r.player.pos.set(-W - 0.2, r.world.apt.floor, win.z); r.step(1);
-      r.key('KeyF'); done.push('bucket');
-      for (const a of (c?.nightActions(sim) ?? []).filter((x) => x.legality === 'illegal' && x.available !== false).slice(0, 2)) {
+    const toWindow = () => { const W = sim.cfg.STREET.halfWidth, win = sim.cfg.ANCHORS.pilouWindow; r.player.loc = 'apt'; r.player.pos.set(-W - 0.2, r.world.apt.floor, win.z); r.step(1); };
+    const act = (p) => {
+      for (const t of sim.state.tables.filter((x) => x.out).slice(0, p.photos ?? 0)) { r.aimAt(t.id); r.step(1); r.key('KeyP'); done.push('photo'); }
+      if (p.waiter) { sim.act({ type: 'waiter' }); done.push('waiter'); }
+      if (p.bucket) { toWindow(); r.key('KeyF'); done.push('bucket'); }
+      for (const a of (c?.nightActions(sim) ?? []).filter((x) => x.legality === 'illegal').slice(0, p.illegal ?? 0)) {
         try { c.doNightAction(sim, a.id); done.push(a.id); } catch { /* indisponible ici */ }
       }
-      sim.act({ type: 'police' }); done.push('police');
-    }
-    run(t2);
-    if (kind === 'reckless' && !sim.state.ended) { r.key('KeyF'); done.push('bucket'); }
+      for (let k = 0; k < (p.police ?? 0); k++) { sim.act({ type: 'police' }); done.push('police'); }
+    };
+    if (plan.at) { run(plan.at); act(plan); }
+    if (plan.bucketAgain) { run(plan.bucketAgain); act({ bucket: true }); }
+    if (plan.late) { run(plan.late.at); act(plan.late); }
     for (let i = 0; !sim.state.ended && i < 6000; i++) { sim.tick(0.5); if (i % 60 === 0) r.step(1); }
     r.step(2);
     return done;
-  }, { kind: style.night, t1: hhmm(22, 12), t2: hhmm(23, 30) });
+  }, NIGHT_PLANS[style.night]);
   log.nights.push({ day, acts });
   await page.waitForFunction(() => window.__rdb?.ui?.campaign && !window.__rdb.ui.root.classList.contains('ui-hidden'), null, { timeout: 60_000 });
 }
@@ -213,14 +252,15 @@ async function reloadAndCompare(page, style, log) {
 function writeDuration() {
   const rows = readdirSync(OUT).filter((f) => f.endsWith('.json')).map((f) => JSON.parse(readFileSync(`${OUT}/${f}`, 'utf8')));
   const m = (s) => `${Math.floor(s / 3600)}h${String(Math.round((s % 3600) / 60)).padStart(2, '0')}`;
-  const lines = rows.map((r) => `| ${r.title} | ${r.ending} (jour ${r.lastDay}) | ${r.nights} | ${r.words} | ${r.clicks} | ${m(r.daySeconds)} | ${m(r.nightSeconds)} | **${m(r.totalSeconds)}** | ${r.totalSeconds >= 9000 && r.totalSeconds <= 14400 ? '✅' : '⚠️'} |`);
+  const lines = rows.map((r) => `| ${r.title} | ${r.ending} (jour ${r.lastDay}) | ${r.nights} | ${r.words} | ${r.clicks} | ${m(r.daySeconds)} | ${m(r.nightSeconds)} | **${m(r.totalSeconds)}** | ${r.early ? `⏹ fin anticipée (jour ${r.lastDay})` : r.totalSeconds < 9000 ? '⚠️ trop court' : r.totalSeconds > 14400 ? '⚠️ trop long' : '✅'} |`);
   writeFileSync('qa/duration.md', `# Durée d'une campagne (GAME_DESIGN §13.A : 2h30 à 4h)
 
 Généré par \`tests/e2e/fullrun.e2e.js\` (\`npm run test:fullrun\`). Estimation, pas un chronométrage :
 - **phases de jour** : texte affiché à l'écran (hors en-tête de stats) lu à **${WPM} mots/min**, plus **${CLICK_S} s par clic** ;
 - **nuits** : ${NIGHT_S / 60} min réelles chacune (\`RULES\` : ${RULES.nightStart / 60}h → ${RULES.nightEnd / 60 - 24}h, ${RULES.gameMinutesPerSecond} min de jeu par seconde),
   sans « dormir » (qui accélère ×${RULES.sleepTimeMultiplier}) : c'est donc un **plafond** pour la nuit.
-- La fin anticipée (casse-cou) raccourcit la partie : elle s'arrête à la garde à vue.
+- Une fin anticipée (garde à vue, déménagement, licenciement) raccourcit la partie : marquée ⏹, elle n'est pas comparée à la cible.
+- ⚠️ trop court = campagne menée jusqu'au J14 en moins de 2h30.
 
 | Style | Fin | Nuits | Mots lus | Clics | Jour | Nuits | Total | Cible |
 |---|---|---|---|---|---|---|---|---|
@@ -230,85 +270,149 @@ Dernière mise à jour : ${new Date().toISOString().slice(0, 16).replace('T', ' 
 `);
 }
 
-// ── Les trois campagnes ──────────────────────────────────────────────────────
+// ── Une campagne complète (partagée par les styles et l'album) ──────────────
+async function runCampaign(page, key, style, album = null) {
+  const errors = watchErrors(page);
+  const clock = makeClock();
+  const log = { cards: [], koddex: [], actions: [], nights: [], lostResults: [], commission: null, reload: null };
+
+  await page.goto(`/?nolock=1&seed=${style.seed}`);
+  await page.evaluate(() => localStorage.clear());
+  await page.reload();
+  if (album) await album.snap(page, 'title', { mobile: true });
+  await clickTestId(page, clock, '#campaign');
+  if (album) await album.snap(page, 'title-campaign');
+  await clickTestId(page, clock, '[data-testid=title-new]');
+  if (album && await page.locator('[data-testid=intro]').count()) await album.snap(page, 'intro');
+  while (await page.locator('[data-testid=intro-next]').count()) await clickTestId(page, clock, '[data-testid=intro-next]');
+
+  let s;
+  for (let guard = 0; guard < 800; guard++) {
+    s = await state(page);
+    if (!s) { await page.waitForTimeout(200); continue; }
+    if (s.step === 'ended') break;
+    if (s.result) {
+      if (album) await album.snap(page, 'result');
+      await clickTestId(page, clock, '[data-testid=result-next]');
+      continue;
+    }
+    if (s.step === 'cards') {
+      if (album) await album.snap(page, s.card.id === 'd14_commission' ? 'commission' : `card-${s.card.type}`, { mobile: s.card.type === 'event' });
+      await playCard(page, clock, style, log, s);
+    } else if (s.step === 'koddex') await playKoddex(page, clock, style, log, album);
+    else if (s.step === 'actions') {
+      // Sauvegarde / reprise au milieu de la partie (jour 8, début d'après-midi)
+      if (s.day === 8 && !log.reload) await reloadAndCompare(page, style, log);
+      if (album) {
+        await album.snap(page, 'afternoon', { mobile: true });
+        if (!album.has('phone')) { await page.click('[data-testid=phone-open]'); await album.snap(page, 'phone'); await page.click('[data-testid=phone-close]'); }
+        if (!album.has('carnet') && await page.locator('[data-testid=carnet-open]').count()) { await page.click('[data-testid=carnet-open]'); await album.snap(page, 'carnet'); await page.click('[data-testid=carnet-close]'); }
+      }
+      await playAfternoon(page, clock, style, log, s.day);
+    } else if (s.step === 'night') {
+      if (album) await album.snap(page, 'night-card');
+      await playNight(page, clock, style, log, s.day, album);
+    } else if (s.step === 'recap') {
+      if (album) await album.snap(page, 'recap', { mobile: true });
+      await clickTestId(page, clock, '[data-testid=recap-next]');
+    }
+  }
+  expect(s?.step, 'la campagne arrive à une fin').toBe('ended');
+
+  // ── Écran de fin ──
+  const ending = page.locator('[data-testid=ending]');
+  await expect(ending).toBeVisible();
+  await clock.read(page);
+  const end = s.ending;
+  await expect(ending).toHaveAttribute('data-id', end.id);
+  await expect(ending).toContainText(end.title);
+  // Épilogue : au moins 2 parties qui dépendent de ce que la partie a réellement fait (drapeaux)
+  const def = ENDINGS.find((e) => e.id === end.id);
+  const shown = await page.locator('.ui-epilogue p').allInnerTexts();
+  const flags = new Set(s.flags);
+  const specific = (def.epilogue ?? []).filter((p) => (p.when?.flags ?? []).length && p.when.flags.every((f) => flags.has(f)))
+    .filter((p) => shown.some((t) => t.startsWith(p.text.split('{')[0].slice(0, 30))));
+  if (key !== 'passive') expect(specific.length, `parties d'épilogue liées à la partie (${end.id})`).toBeGreaterThanOrEqual(2);
+  // Fins découvertes : la fin atteinte est débloquée, les fins secrètes non atteintes restent cachées
+  await expect(page.locator(`[data-testid=endings] [data-ending="${end.id}"]`)).not.toHaveClass(/locked/);
+  for (const e of ENDINGS.filter((x) => x.secret && x.id !== end.id)) await expect(page.locator(`[data-testid=endings] [data-ending="${e.id}"]`)).toHaveCount(0);
+  if (album) { await album.snap(page, 'ending', { mobile: true }); await page.locator('[data-testid=endings]').scrollIntoViewIfNeeded(); await album.snap(page, 'endings-list'); }
+  mkdirSync(OUT, { recursive: true });
+  await page.screenshot({ path: `${OUT}/${key}-ending.png`, timeout: 90_000 });
+
+  // ── Calendrier : chaque événement fixe à son jour (jours atteints) ──
+  for (const [day, id] of Object.entries(FIXED)) {
+    if (Number(day) > s.day) continue;
+    const seen = log.cards.filter((c) => c.id === id);
+    expect(seen.length, `${id} vu`).toBeGreaterThan(0);
+    for (const c of seen) expect(c.day, `${id} au jour ${day}`).toBe(Number(day));
+  }
+  if (!end.early) {
+    expect(log.commission, 'la commission du J14 a eu lieu').not.toBeNull();
+    expect(log.commission.sceneFromEngine, 'le moteur prépare la scène de la commission').toBeGreaterThan(1);
+  } else {
+    expect(s.day, 'pas de fin anticipée avant la nuit 5 (§13.A)').toBeGreaterThanOrEqual(5);
+  }
+
+  // ── Durée ──
+  const nights = log.nights.length;
+  const r = {
+    title: style.title, ending: end.id, early: !!end.early, lastDay: s.day, nights, words: clock.t.words, clicks: clock.t.clicks,
+    daySeconds: Math.round(clock.seconds()), nightSeconds: nights * NIGHT_S, totalSeconds: Math.round(clock.seconds() + nights * NIGHT_S),
+  };
+  console.log(`[fullrun] ${style.title} :`, r, 'résultats perdus :', log.lostResults.length, 'commission :', log.commission);
+  expect(errors).toEqual([]);
+  return { r, log, end };
+}
+
+// ── Les six campagnes ────────────────────────────────────────────────────────
 for (const [key, style] of Object.entries(STYLES)) {
   test(`campagne complète · ${style.title}`, async ({ page }) => {
+    test.skip(!process.env.QA_FULLRUN, 'campagnes complètes : `npm run test:fullrun` (workflow nightly « Full runs »)');
     test.setTimeout(60 * 60_000);
-    const errors = watchErrors(page);
-    const clock = makeClock();
-    const log = { cards: [], koddex: [], actions: [], nights: [], lostResults: [], commission: null, reload: null };
-
-    await page.goto(`/?nolock=1&seed=${style.seed}`);
-    await page.evaluate(() => localStorage.clear());
-    await page.reload();
-    await clickTestId(page, clock, '#campaign');
-    await clickTestId(page, clock, '[data-testid=title-new]');
-    while (await page.locator('[data-testid=intro-next]').count()) await clickTestId(page, clock, '[data-testid=intro-next]');
-
-    let s;
-    for (let guard = 0; guard < 600; guard++) {
-      s = await state(page);
-      if (!s) { await page.waitForTimeout(200); continue; }
-      if (s.step === 'ended') break;
-      if (s.result) { await clickTestId(page, clock, '[data-testid=result-next]'); continue; }
-      if (s.step === 'cards') await playCard(page, clock, style, log, s);
-      else if (s.step === 'koddex') await playKoddex(page, clock, style, log);
-      else if (s.step === 'actions') {
-        // Sauvegarde / reprise au milieu de la partie (jour 8, début d'après-midi)
-        if (s.day === 8 && !log.reload) await reloadAndCompare(page, style, log);
-        await playAfternoon(page, clock, style, log, s.day);
-      } else if (s.step === 'night') await playNight(page, clock, style, log, s.day);
-      else if (s.step === 'recap') await clickTestId(page, clock, '[data-testid=recap-next]');
-    }
-    expect(s?.step, 'la campagne arrive à une fin').toBe('ended');
-
-    // ── Écran de fin ──
-    const ending = page.locator('[data-testid=ending]');
-    await expect(ending).toBeVisible();
-    await clock.read(page);
-    const end = s.ending;
-    await expect(ending).toHaveAttribute('data-id', end.id);
-    await expect(ending).toContainText(end.title);
-    // Épilogue : au moins 2 parties qui dépendent de ce que la partie a réellement fait (drapeaux / stats)
-    const def = ENDINGS.find((e) => e.id === end.id);
-    const shown = await page.locator('.ui-epilogue p').allInnerTexts();
-    const flags = new Set(s.flags);
-    const specific = (def.epilogue ?? []).filter((p) => (p.when?.flags ?? []).length && p.when.flags.every((f) => flags.has(f)))
-      .filter((p) => shown.some((t) => t.startsWith(p.text.split('{')[0].slice(0, 30))));
-    expect(specific.length, `parties d'épilogue liées à la partie (${end.id})`).toBeGreaterThanOrEqual(2);
-    // Fins découvertes : la fin atteinte est débloquée, la fin secrète reste cachée
-    await expect(page.locator(`[data-testid=endings] [data-ending="${end.id}"]`)).not.toHaveClass(/locked/);
-    for (const e of ENDINGS.filter((x) => x.secret && x.id !== end.id)) await expect(page.locator(`[data-testid=endings] [data-ending="${e.id}"]`)).toHaveCount(0);
-    await page.screenshot({ path: `${OUT}/${key}-ending.png`, timeout: 90_000 });
-
-    // ── Calendrier : chaque événement fixe à son jour (jours atteints) ──
-    for (const [day, id] of Object.entries(FIXED)) {
-      if (Number(day) > s.day) continue;
-      const seen = log.cards.filter((c) => c.id === id);
-      expect(seen.length, `${id} vu`).toBeGreaterThan(0);
-      for (const c of seen) expect(c.day, `${id} au jour ${day}`).toBe(Number(day));
-    }
-    if (!end.early) {
-      expect(log.commission, 'la commission du J14 a eu lieu').not.toBeNull();
-      expect(log.commission.sceneFromEngine, 'le moteur prépare la scène de la commission').toBeGreaterThan(1);
-    }
-    if (key === 'reckless') expect(end.id).toBe('custody');
-    if (key === 'legal') expect(end.id).not.toBe('custody');
-
-    // ── Durée ──
-    const nights = log.nights.length;
-    const r = {
-      title: style.title, ending: end.id, lastDay: s.day, nights, words: clock.t.words, clicks: clock.t.clicks,
-      daySeconds: Math.round(clock.seconds()), nightSeconds: nights * NIGHT_S, totalSeconds: Math.round(clock.seconds() + nights * NIGHT_S),
-    };
-    mkdirSync(OUT, { recursive: true });
+    const { r, log, end } = await runCampaign(page, key, style);
     writeFileSync(`${OUT}/${key}.json`, JSON.stringify({ ...r, log }, null, 2));
     writeDuration();
-    console.log(`[fullrun] ${style.title} :`, r, 'résultats perdus :', log.lostResults.length, 'commission :', log.commission);
     test.info().annotations.push({ type: 'duration', description: `${style.title} : ${Math.round(r.totalSeconds / 60)} min (${end.id})` });
-    expect(errors).toEqual([]);
+    if (key === 'reckless') expect(end.id).toBe('custody');
+    if (key === 'legal') expect(end.id).not.toBe('custody');
+    // Passif : soit la campagne dure au moins 2h30, soit elle finit par un déménagement après la nuit 5
+    if (key === 'passive') expect(r.totalSeconds >= 9000 || (end.id === 'moving_out' && r.lastDay >= 5), `passif : ${end.id} au jour ${r.lastDay}, ${Math.round(r.totalSeconds / 60)} min`).toBe(true);
+    // Une campagne menée jusqu'au J14 en moins de 2h30 est signalée (§13.A)
+    if (!r.early && r.totalSeconds < 9000) test.info().annotations.push({ type: 'warning', description: `${style.title} : campagne complète en ${Math.round(r.totalSeconds / 60)} min (< 2h30)` });
   });
 }
+
+// ── Album du parcours : chaque type d'écran, la première fois qu'il apparaît ────
+test('album du parcours (légal, graine 3) → qa/screens/flow/', async ({ page }) => {
+  test.skip(!process.env.QA_ALBUM, 'album : `npm run qa:album`');
+  test.setTimeout(90 * 60_000);
+  const DIR = 'qa/screens/flow';
+  mkdirSync(DIR, { recursive: true });
+  const taken = new Map();
+  const album = {
+    has: (name) => taken.has(name),
+    async snap(pg, name, { mobile = false } = {}) {
+      if (taken.has(name)) return;
+      const n = String(taken.size + 1).padStart(2, '0');
+      taken.set(name, n);
+      await pg.waitForTimeout(300); // fin des transitions CSS
+      await pg.screenshot({ path: `${DIR}/${n}-${name}.png`, timeout: 90_000 });
+      if (mobile) {
+        const vp = pg.viewportSize();
+        await pg.setViewportSize({ width: 390, height: 844 });
+        await pg.waitForTimeout(300);
+        await pg.screenshot({ path: `${DIR}/${n}-${name}-mobile.png`, timeout: 90_000 });
+        await pg.setViewportSize(vp);
+      }
+    },
+  };
+  await runCampaign(page, 'album', { ...STYLES.legal, seed: 3 }, album);
+  console.log('[album]', [...taken].map(([k, n]) => `${n}-${k}`).join(' '));
+  for (const must of ['title', 'koddex-start', 'koddex-end', 'card-event', 'card-dialogue', 'afternoon', 'phone', 'night-hud', 'recap', 'commission', 'ending']) {
+    expect(taken.has(must), `écran « ${must} » capturé`).toBe(true);
+  }
+});
 
 // BUG-003 (corrigé, qa/bugs.md) : la scène de la commission (répliques de Jérémie, Ghislain, Delphine, Colette, du maire)
 // est calculée par le moteur (card.scene) mais l'interface ne l'affiche pas.
