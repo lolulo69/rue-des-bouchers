@@ -1,0 +1,21 @@
+{
+  "name": "rue-des-bouchers",
+  "version": "1.0.0",
+  "description": "Jeu 3D (three.js) : Pilou contre les terrasses de la rue des Bouchers, Lille",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": "Lucas Lefort",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "three": "^0.186.1"
+  },
+  "devDependencies": {
+    "vite": "^8.3.4"
+  },
+  "private": true
+}
