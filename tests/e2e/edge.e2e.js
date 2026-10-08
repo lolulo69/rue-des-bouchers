@@ -125,7 +125,7 @@ test('M coupe et rétablit le son (avec un message à l’écran)', async ({ pag
 
 // BUG-006 (qa/bugs.md) : le build met src/ui/standalone.js (entrée de ui.html) dans le chunk « ui » partagé ;
 // son effet de bord monte une 2e interface de jour, sans 3D, par-dessus celle du jeu sur index.html.
-(process.env.QA_RUN_FIXME ? test : test.fixme)('BUG-006 · le jeu (index.html) ne monte qu’une seule interface de jour, celle du jeu 3D', async ({ page }) => {
+test('BUG-006 (corrigé) · le jeu (index.html) ne monte qu’une seule interface de jour, celle du jeu 3D', async ({ page }) => {
   await page.goto('/?nolock=1&seed=3');
   await page.evaluate(() => localStorage.clear());
   await page.reload();
