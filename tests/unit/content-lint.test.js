@@ -7,6 +7,8 @@ import { REAL } from './realNames.js';
 import * as fixture from '../fixtures/content.js';
 
 const DIR = join(import.meta.dirname, '..', '..', 'src', 'content');
+// Fichiers annoncés par les auteurs : tant qu'il en manque, "drapeau jamais posé" reste un avertissement
+const EXPECTED = ['flags.js', 'characters.js', 'dialogue.js', 'events.js', 'actions.js', 'countermoves.js', 'koddex.js', 'endings.js', 'media.js', 'night.js', 'intro.js'];
 async function loadRealContent() {
   if (!existsSync(DIR)) return null;
   const files = readdirSync(DIR).filter((f) => f.endsWith('.js'));
@@ -39,7 +41,9 @@ describe('linter de contenu (§14)', () => {
   it('src/content (écrit en parallèle) passe le linter', async () => {
     const K = await loadRealContent();
     if (!K) return;
-    const { errors, warnings } = lintContent(K, { realNames: REAL, incomplete: isIncomplete(K) });
+    const missing = EXPECTED.filter((f) => !existsSync(join(DIR, f)));
+    const { errors, warnings } = lintContent(K, { realNames: REAL, incomplete: isIncomplete(K) || missing.length > 0 });
+    if (missing.length) console.warn(`contenu attendu mais absent : ${missing.join(', ')}`);
     if (warnings.length) console.warn(`linter de contenu : ${warnings.length} avertissement(s)\n  ${warnings.slice(0, 30).join('\n  ')}`);
     expect(errors).toEqual([]);
   });
