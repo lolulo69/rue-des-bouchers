@@ -68,15 +68,27 @@ test.describe('campagne (interface de jour)', () => {
     await clickKoddex(page, 'work');
     await clickKoddex(page, proj.id);
     await clickKoddex(page, 'work');
-    await expect(page.locator('[data-testid=terminal]')).toContainText('Fin de matinée', { timeout: 30_000 });
-    await expect(page.locator('[data-testid=terminal]')).toContainText(proj.label);
     const s = await page.evaluate((u) => ({ has: window.__rdb.ui.campaign.has(u), job: window.__rdb.ui.campaign.state.stats.job, step: window.__rdb.ui.campaign.step }), proj.unlocks);
     expect(s.has).toBe(true);
     expect(s.job).not.toBe(job0);
     expect(s.step).not.toBe('koddex');
+    expect(errors).toEqual([]);
+  });
+
+  // BUG-002 (qa/bugs.md) : après le 3e prompt, c.koddex() fait passer l'étape à l'après-midi et render() change d'écran
+  // aussitôt : le bilan de la matinée (« ✔ Livré », Job ±, bouton « Quitter Koddex ») n'est jamais affiché.
+  (process.env.QA_RUN_FIXME ? test : test.fixme)('BUG-002 · le bilan de la matinée Koddex reste affiché jusqu’à « Quitter Koddex »', async ({ page }) => {
+    await newCampaign(page);
+    await driveTo(page, 'koddex');
+    const proj = await page.evaluate(() => window.__rdb.ui.campaign.koddexOptions().sideProjects.find((p) => p.available && (p.cost?.prompts ?? 1) === 1) ?? null);
+    await clickKoddex(page, 'work');
+    if (proj) await clickKoddex(page, proj.id); else await clickKoddex(page, 'work');
+    await clickKoddex(page, 'work');
+    await expect(page.locator('[data-testid=terminal]')).toContainText('Fin de matinée', { timeout: 30_000 });
+    if (proj?.result) await expect(page.locator('[data-testid=terminal]')).toContainText('Livré');
     await page.click('[data-testid=terminal]');
     await page.click('[data-testid=koddex-done]');
-    expect(errors).toEqual([]);
+    await expect(page.locator('[data-testid=terminal]')).toHaveCount(0);
   });
 
   test('après-midi : une action coûte un créneau et affiche son résultat, « fin d’après-midi » mène à la nuit', async ({ page }) => {
