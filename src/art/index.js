@@ -12,12 +12,13 @@ import { createWeather } from './weather.js';
 import { createQuality, QUALITY_PRESETS, QUALITY_LEVELS } from './quality.js';
 import { createView } from './view.js';
 import { createTwists } from './twists.js';
+import { createDay } from './day.js';
 import { audio } from '../audio/index.js';
 import { portrait, portraitIds, portraitExpressions } from './portraits.js';
 import { scenes } from './scenes.js';
 
 // portrait et scenes marchent sans la rue (phases de jour) : disponibles dès l'import
-export const art = { portrait, portraitIds, portraitExpressions, scenes, audio, qualityPresets: QUALITY_PRESETS, qualityLevels: QUALITY_LEVELS };
+export const art = { portrait, portraitIds, portraitExpressions, scenes, audio, qualityPresets: QUALITY_PRESETS, qualityLevels: QUALITY_LEVELS, day: createDay() };
 
 export function attachArt(scene, world) {
   let director = null;

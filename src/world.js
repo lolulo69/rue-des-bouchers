@@ -106,8 +106,11 @@ function rotatedKit(parent, rng, x, z, faceDir) {
 }
 
 // opts.tables : disposition des terrasses tirée par la simulation (src/sim/layout.js) : { id, restId, x, z, count }
+// opts.role = 'day' : une seconde copie de la rue pour la phase de jour (art.day) — sans audio ni art global,
+// rendue par son propre renderer ; world.onFrame accroche des animations à cette scène seulement.
 export function buildWorld(scene, opts = {}) {
-  attachRigs(scene, { main: true });
+  const dayRole = opts.role === 'day';
+  const rigHooks = attachRigs(scene, { main: !dayRole });
   const rng = seeded(1729); // la rue date de 1729
   const city = new THREE.Group();
   scene.add(city);
@@ -538,6 +541,8 @@ export function buildWorld(scene, opts = {}) {
     windowSpots: kit.windows,
     standingCrowd: (o) => standingCrowd(scene, o),
   };
+  world.onFrame = rigHooks.onFrame;
+  if (dayRole) return world;
   world.audio = audio.attachStreet({ tables, exhaust, steam, apt, getMinutes: () => world.gameMinutes ?? window.__rdb?.sim?.state?.min ?? window.__rdb?.S?.min });
   onFrame((dt, t, camera) => audio.update(dt, camera));
   world.art = attachArt(scene, world);

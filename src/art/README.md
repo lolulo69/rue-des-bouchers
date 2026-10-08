@@ -144,3 +144,13 @@ Props and small scenes for the night twists (§12b.A). The scene director places
 
 Manual: `art.twists.show(id)` / `hide(id)` / `trigger(id, moment)` / `clear()`. `sync(ids)` (director) only touches what it placed itself.
 
+## The day in 3D (`art.day`, v1.1)
+```js
+const ok = await art.day.start('koddex', { host });  // false at quality « Bas »: keep the 2D vignettes (opts.force to ignore)
+art.day.onScreenRect((r) => place(terminal, r));     // every frame: { x, y, width, height, corners[4] } in CSS px
+art.day.screenRect();                                // the last rectangle (null when the scene has no screen)
+art.day.stop();
+```
+Scenes: **`koddex`** (seated first-person at Pilou's desk: the main monitor faces the camera, which is the rectangle the terminal aligns to; Clode Kode on the second, angled screen; colleagues typing; Stéphane walking past every ~35 s; the window over Lille's rooftops), **`street`** (the street by day: daylight, terraces being set up, a delivery, Klaas and Tatie at their windows, Jérémie and Biloute walking, a slow camera move; it's a second copy of the street, built once, `buildWorld(scene, { role: 'day' })`), **`atelier`** and **`mairie`** (the existing vignettes, same loop). `home` and `commute` follow (§12b.D).
+Its own renderer and canvas (fixed, full screen, `z-index: 0`, `pointer-events: none`) at the quality's pixel ratio, up to 60 fps, paused when the tab is hidden. Measured: 2–6 ms per frame (Chrome, Mac).
+
