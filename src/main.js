@@ -523,7 +523,6 @@ function update(dt) {
   if (!running) return;
   move(dt);
   sim.tick(dt * RULES.gameMinutesPerSecond * (S.sleeping ? RULES.sleepTimeMultiplier : 1));
-  drainSim();
   camPos.set(player.pos.x, player.pos.y + 1.65, player.pos.z);
   noiseDb = sim.noiseAt(camPos, player.loc === 'apt');
 }
@@ -554,6 +553,7 @@ function frame(ts) {
 function tick(dt) {
   now += dt;
   update(dt);
+  drainSim(); // à chaque frame, même en pause : aucun événement de la simulation n'est perdu
   syncActors();
   animate(dt);
   syncCamera();

@@ -45,15 +45,20 @@ test('une nuit complète : chargement, photo, police, porte, bilan', async ({ pa
   await expect(page.locator('#prompt')).toContainText('Monter chez Pilou');
   await page.evaluate(() => { window.__rdb.key('KeyE'); window.__rdb.step(1); });
   expect(await page.evaluate(() => window.__rdb.player.loc)).toBe('apt');
-  await page.screenshot({ path: 'test-results/apartment.png' });
+  await page.screenshot({ path: 'test-results/apartment.png', timeout: 60_000 });
 
   // Jusqu'au bout de la nuit
-  await page.evaluate(() => { for (let i = 0; i < 400 && !window.__rdb.sim.state.ended; i++) window.__rdb.step(1, 2); });
+  // La simulation avance par pas d'une demi-minute ; on rend une frame toutes les ~30 min de jeu (SwiftShader est lent en CI)
+  await page.evaluate(() => {
+    const { sim, step } = window.__rdb;
+    for (let i = 0; !sim.state.ended && i < 2000; i++) { sim.tick(0.5); if (i % 60 === 0) step(1); }
+    step(1);
+  });
   await expect(page.locator('#end')).toBeVisible();
   await expect(page.locator('#end-body')).toContainText('Terrasses');
   await expect(page.locator('#end-body')).toContainText('Police municipale');
   await expect(page.locator('#end-title')).toContainText('la rue se tait');
-  await page.screenshot({ path: 'test-results/end.png' });
+  await page.screenshot({ path: 'test-results/end.png', timeout: 60_000 });
   expect(errors).toEqual([]);
 });
 
@@ -70,6 +75,6 @@ test('samedi : la foule se charge sans erreur', async ({ page }) => {
   expect(s.label).toContain('Samedi');
   expect(s.standing).toBeGreaterThan(0);
   expect(s.pees).toBeGreaterThan(0);
-  await page.screenshot({ path: 'test-results/saturday.png' });
+  await page.screenshot({ path: 'test-results/saturday.png', timeout: 60_000 });
   expect(errors).toEqual([]);
 });
