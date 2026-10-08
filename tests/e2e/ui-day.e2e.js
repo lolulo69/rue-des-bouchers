@@ -210,6 +210,9 @@ test('menu (Échap) : réglages persistés, aide, carnet, quitter vers le titre'
   await expect(page.locator('[data-speed=instant]')).toHaveAttribute('aria-checked', 'true');
   await page.click('[data-testid=menu-mute]');
   await expect(page.locator('[data-testid=menu-mute]')).toHaveAttribute('aria-checked', 'true');
+  await page.click('[data-quality=haut]');
+  await expect(page.locator('[data-quality=haut]')).toHaveAttribute('aria-checked', 'true');
+  expect(await page.evaluate(() => localStorage.getItem('rdb.quality'))).toBe('haut');
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('rdb.settings.v1')));
   expect(saved).toMatchObject({ bigText: true, textSpeed: 'instant', muted: true });
   await page.click('[data-testid=menu-carnet]');

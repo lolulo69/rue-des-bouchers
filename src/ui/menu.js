@@ -7,13 +7,19 @@ import './ui.css';
 import { h, clear } from './dom.js';
 import { carnetView, helpView, aboutView } from './codex.js';
 import { loadSettings, saveSettings, applySettings, TEXT_SPEEDS, audioCan } from './settings.js';
+import { QUALITY_PRESETS, QUALITY_LEVELS } from '../art/quality.js';
+
+// Qualité graphique (agent art) : mémorisée dans localStorage['rdb.quality'] ; appliquée tout de suite si l'hôte
+// passe l'instance art de la rue (art.setQuality), sinon à la prochaine nuit.
+const QUALITY_KEY = 'rdb.quality';
+const getQuality = (art) => art?.quality?.level ?? (() => { try { return localStorage.getItem(QUALITY_KEY); } catch { return null; } })() ?? 'moyen';
 
 let current = null;
 
 export const isMenuOpen = () => !!current;
 export function closeMenu() { current?.close(); }
 
-export function openMenu({ campaign = null, meta = {}, onResume, onQuit, quitLabel = 'Quitter vers le titre' } = {}) {
+export function openMenu({ campaign = null, meta = {}, art = null, onResume, onQuit, quitLabel = 'Quitter vers le titre' } = {}) {
   if (current) return current;
   let root = document.getElementById('ui-menu');
   if (!root) { root = h('div#ui-menu.ui-root'); document.body.append(root); }
@@ -32,6 +38,16 @@ export function openMenu({ campaign = null, meta = {}, onResume, onQuit, quitLab
       Object.entries(TEXT_SPEEDS).map(([id, t]) => h(`button${settings.textSpeed === id ? '.on' : ''}`, {
         role: 'radio', 'aria-checked': String(settings.textSpeed === id), dataset: { speed: id }, onclick: () => set('textSpeed', id),
       }, t.label)));
+    const q = getQuality(art);
+    const quality = h('div.ui-seg.q3', { role: 'radiogroup', 'aria-label': 'Qualité graphique' },
+      QUALITY_LEVELS.map((lv) => h(`button${q === lv ? '.on' : ''}`, {
+        role: 'radio', 'aria-checked': String(q === lv), dataset: { quality: lv },
+        onclick: () => {
+          try { localStorage.setItem(QUALITY_KEY, lv); } catch { /* navigation privée */ }
+          art?.setQuality?.(lv);
+          render();
+        },
+      }, QUALITY_PRESETS[lv]?.label ?? lv)));
     const vol = h('input', { type: 'range', min: '0', max: '1', step: '0.05', value: String(settings.volume), id: 'ui-volume', 'aria-describedby': can.volume ? undefined : 'ui-volume-note' });
     vol.addEventListener('change', () => set('volume', Number(vol.value)));
     const toggle = (k, label, testid) => h('button.ui-switch', { role: 'switch', 'aria-checked': String(!!settings[k]), dataset: { testid }, onclick: () => set(k, !settings[k]) },
@@ -49,7 +65,9 @@ export function openMenu({ campaign = null, meta = {}, onResume, onQuit, quitLab
         can.volume ? null : h('p.ui-note#ui-volume-note', 'Le volume sera appliqué dès que le moteur audio le permettra.'),
         toggle('muted', 'Son coupé (M)', 'menu-mute'),
         h('div.ui-field', h('span', 'Vitesse du texte'), speed),
-        toggle('bigText', 'Grand texte', 'menu-bigtext')),
+        toggle('bigText', 'Grand texte', 'menu-bigtext'),
+        h('div.ui-field', h('span', 'Qualité graphique'), quality),
+        art ? null : h('p.ui-note', 'Appliquée à la rue dès la prochaine nuit.')),
       h('div.ui-menu-links',
         h('button.ui-btn.ghost', { dataset: { testid: 'menu-help' }, onclick: () => go('help') }, '❓ Aide'),
         campaign ? h('button.ui-btn.ghost', { dataset: { testid: 'menu-carnet' }, onclick: () => go('carnet') }, '📓 Carnet') : null,

@@ -279,3 +279,4 @@
 :is(#ui-root, #dayui, #ui-menu) .ui-ending-hero > * { justify-self: start; background: #2a1714e6; border-radius: 14px; padding: 4px 12px; }
 :is(#ui-root, #dayui, #ui-menu) .ui-ending-hero .ui-big { padding: 8px 16px; }
 :is(#ui-root, #dayui, #ui-menu) .ui-ending-hero > .ui-new { background: var(--ui-gold); color: #3a2622; padding: 4px 12px; font-size: 13px; }
+:is(#ui-root, #dayui, #ui-menu) .ui-seg.q3 { grid-template-columns: repeat(3, 1fr); }
