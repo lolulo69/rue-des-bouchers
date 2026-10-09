@@ -247,6 +247,7 @@ function updateHud() {
   $('prompt').textContent = hints.join('   ');
   // « Qui regarde ? » (§12d) : qui pourrait voir Pilou là où il est, en direct (diversions et fenêtres comprises)
   let wit = '';
+  let away = '';
   const here = placeWhere();
   if (!S.sleeping) {
     if (here === 'apt') wit = '👁 Qui regarde\u00a0? Personne\u00a0: vous êtes chez vous.';
@@ -254,11 +255,15 @@ function updateHud() {
       const ws = whoWatches(sim, here === 'window' ? ANCHORS.pilouWindow : { x: player.pos.x, y: 1.2, z: player.pos.z });
       const name = (w) => `${w.icon ? `${w.icon} ` : ''}${w.label}${w.count > 1 && w.key === 'customers' ? ` ×${w.count}` : ''}`;
       const look = ws.filter((w) => !w.distracted);
-      const away = ws.filter((w) => w.distracted);
-      wit = `👁 Qui regarde\u00a0? ${look.length ? look.map(name).join(' · ') : 'personne'}${away.length ? ` — ailleurs\u00a0: ${away.map(name).join(', ')}` : ''}`;
+      const turned = ws.filter((w) => w.distracted);
+      wit = `👁 Qui regarde\u00a0? ${look.length ? look.map(name).join(' · ') : 'personne'}`;
+      if (turned.length) away = ` — ailleurs\u00a0: ${turned.map(name).join(', ')}`;
     }
   }
-  $('witness').textContent = wit;
+  // #watchers : seulement ceux qui regardent ; ceux qu'une diversion détourne sont à part (#watchers-away)
+  $('watchers').textContent = wit;
+  $('watchers-away').textContent = away;
+  $('witness').classList.toggle('hidden', !wit);
   // « Fenêtre propice » : une diversion ou un moment du twist détourne des regards (l'horloge repasse à ×1)
   const open = activeAttention(sim);
   const win = $('window');

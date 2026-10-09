@@ -19,7 +19,7 @@ canvas#game { display: block; width: 100vw; height: 100vh; }
 /* Sous le réticule : jamais masqué par le journal en bas à gauche (QA v0.2) */
 #prompt { position: absolute; top: calc(50% + 28px); width: 100%; text-align: center; font-size: 18px; text-shadow: 0 2px 6px #000; }
 #witness { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); max-width: min(560px, 46vw); text-align: center; font-size: 14px; background: #0d0d12a6; border-radius: 8px; padding: 6px 12px; text-shadow: 0 2px 6px #000; }
-#witness:empty { display: none; }
+#watchers-away { opacity: .6; }
 #window { position: absolute; top: 56px; left: 50%; transform: translateX(-50%); color: #ffe08a; font-weight: 700; font-size: 15px; text-shadow: 0 2px 6px #000; animation: pulse 1.2s ease-in-out infinite alternate; }
 @keyframes pulse { from { opacity: .7; } to { opacity: 1; } }
 #log { position: absolute; bottom: 16px; left: 16px; width: min(520px, 90vw); display: flex; flex-direction: column; gap: 4px; font-size: 14px; }

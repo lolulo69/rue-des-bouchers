@@ -7,7 +7,7 @@ import { createRng } from './rng.js';
 import { generateLayout } from './layout.js';
 import { setupTwist, updateTwist } from './twistNight.js';
 import { noiseAt } from './noise.js';
-import { potentialWitnesses, rollWitnesses, klaasDetection } from './witness.js';
+import { potentialWitnesses, rollWitnesses, klaasDetection, activeAttention } from './witness.js';
 import { callPolice, updatePolice, patrolOnDuty } from './police.js';
 import { dist3, lineOfSight, corridorEncroachment } from './geometry.js';
 import { buildSummary } from './summary.js';
@@ -119,6 +119,8 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
     activePees: () => S.pees.filter((p) => S.min < p.end),
     noiseAt: (p, indoor) => noiseAt(sim, p, indoor),
     potentialWitnesses: (pos) => potentialWitnesses(sim, pos),
+    // « Fenêtre propice » (§12d) : la fenêtre d'attention détournée ouverte maintenant (diversion ou twist), ou null
+    windowNow: () => { const a = activeAttention(sim); return a.length ? { id: a[0].id, source: a[0].source, until: Math.max(...a.map((x) => x.until)), turns: [...new Set(a.flatMap((x) => x.turns))] } : null; },
     patrolOnDuty: () => patrolOnDuty(sim),
     restCenter: (r) => ({ x: r.side * 2, y: 1, z: (r.z0 + r.z1) / 2 }),
     // Ronde de Jérémie et du teckel : une traversée de la rue entre DOG.start et DOG.end
