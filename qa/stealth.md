@@ -1,0 +1,18 @@
+# Discrétion jouable (§12d.6, §13.N)
+
+Généré par `scripts/stealth-measure.js` (`npm run measure:stealth -- --write --label "…"`). Une section par passage, la plus récente en haut.
+Un essai est **réussi** quand l'acte illégal visé n'est vu par personne (`doNightAction(...).seen` vide). La diversion est jouée juste avant
+l'acte (½ minute de jeu). Chaque essai repart d'une nuit neuve de la même campagne.
+
+## Référence avant le modèle d’attention (stealth-v2 partiel : nuit à 2h30, diversions en contenu) · 2026-10-09 · main @ d9c39cb
+
+200 graines (0 sans essai possible), nuit du J3, actes visés : night_stink_bomb, night_sabotage_chairs, night_sabotage_parasols, night_sabotage_locks, night_cardboard_exhaust.
+
+| Situation | Essais | Réussis sans être vu | Cible |
+|---|---|---|---|
+| Sans aide, avant 1h (rue pleine) | 158 | 17 % | ❌ ≤ 10 % |
+| Sans aide, après 1h (la rue s’est vidée : fenêtre voulue, §12d.4) | 42 | 64 % | (pas de cible) |
+| Juste après une diversion | 1000 | 28 % | ❌ ≥ 30 % |
+| Dans une fenêtre propice | 0 | – | – ≥ 30 % (pas de sim.windowNow : fenêtres pas encore exposées) |
+
+Par diversion : firecracker 30 % (200) · call_landline 28 % (200) · fake_alert 28 % (200) · biloute_bark 27 % (200) · wrong_pizza 28 % (200)

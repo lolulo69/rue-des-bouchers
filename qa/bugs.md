@@ -5,6 +5,15 @@ When a bug is fixed, remove the `fixme` (the test then guards against regression
 
 ## Open
 
+### BUG-011 · A disguise put on during the night has no effect that night
+- **Test**: `tests/e2e/stealth.e2e.js` › « BUG-011 · dans l’appartement, le menu de nuit propose la capuche… » (`QA_RUN_FIXME=1` to run it; fails on main).
+- **Files**: `src/sim/sim.js:79`: `disguise` is computed **once** in `createSim` from the night's starting flags; `night_disguise` / `night_disguise_vest` (§12d.5) set `disguise_hood` / `disguise_vest` on the campaign during the night, but the running sim keeps `sim.disguise = 1`, and every witness roll (`witness.js:37`, `:72`, `nightActions.js:180`) reads that frozen value.
+- **Steps**: campaign night 3, go up to the apartment, N → « Mettre la capuche du portemanteau » (offered, works: the flag is set).
+- **Expected**: from that moment, non-ally witnesses notice Pilou less (`sim.disguise` 0.6 with the hood, 0.5 with the vest).
+- **Actual**: `sim.disguise` stays 1 for the rest of the night: the disguise only helps from the next night, so the §12d.5 « disguise reachable » does nothing when the player needs it.
+- **Owner guess**: build agent: make `sim.disguise` a getter over the night's flags (`get disguise() { return Math.min(1, …DISGUISE for flags in sim.flags) }`) and have the night action add its flag to `sim.flags` too.
+
+
 ## Notes (not bugs, for the design agent)
 - **Campaign length after §12c.5 (night pacing)**: with the adaptive clock and ×40 sleep, the build agent's `npm run measure:nights` (in `qa/duration.md`) puts the full-length styles at **2h32–2h46 awake** (target 2h30–4h ✅), but at **2h08–2h22** for a player who goes to bed around 23:30 and uses « Passer à demain matin », which the bedtime hint invites. That is below the 2h30 floor of §13.A. Owner: design agent (decide whether the floor applies to the « sleep early » player, or add day-side content / later bedtime hint).
 - **`?day=`** in the standalone night now accepts all 7 days (`mon…sun` or `lundi…dimanche`), which picks the police roster. The night e2e still tests tip-offs on Monday after 23:00 (Lemaire's shift).
