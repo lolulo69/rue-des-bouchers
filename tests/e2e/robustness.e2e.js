@@ -128,3 +128,22 @@ test('une scène de jour en 3D (art.day) met en pause le rendu de la nuit', asyn
   if (r.ok) expect(r.paused).toBe(0);
   expect(r.resumed).toBe(3);
 });
+
+test('s’assoupir sur le canapé (world.sofa) : invite et sommeil « canapé »', async ({ page }) => {
+  await page.goto('/?nolock=1&seed=2');
+  await page.click('#start');
+  const r = await page.evaluate(() => {
+    const { world, player, step, sim } = window.__rdb;
+    if (!world.sofa?.position) return { skip: true };
+    player.loc = 'apt';
+    player.pos.set(world.sofa.position.x, world.apt.floor, world.sofa.position.z - 1.2);
+    step(5);
+    const prompt = document.getElementById('prompt').textContent;
+    window.__rdb.key('KeyE');
+    step(1);
+    return { prompt, spot: sim.state.sleepSpot, sleeping: sim.state.sleeping };
+  });
+  if (r.skip) return;
+  expect(r.prompt).toContain('canapé');
+  expect(r).toMatchObject({ spot: 'sofa', sleeping: true });
+});

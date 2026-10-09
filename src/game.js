@@ -117,7 +117,8 @@ Object.assign(ANCHORS, {
   pilouWindow: xyz(world.window.pos),
   streetDoor: xyz(world.streetDoor),
   bed: { ...xyz(world.bed), y: world.bed.y + 0.6 }, // la chambre côté cour (art-v1.1)
-  ...(world.sofa && { sofa: { ...xyz(world.sofa), y: world.sofa.y + 0.6 } }), // le canapé du séjour, côté rue
+  // le canapé du séjour, côté rue : world.sofa = { position, seat, doze: { position, yaw, head }, box } ; on écoute à la tête
+  ...(world.sofa && { sofa: xyz(world.sofa.doze?.head ?? world.sofa.position) }),
   ...(world.exhaust && { exhaust: xyz(world.exhaust) }),
   ...(world.anchors?.balcony && { balcony: { ...xyz(world.anchors.balcony), y: world.anchors.balcony.y + 1.5 } }), // [art v0.3] yeux de Seb & Nico
 });
@@ -296,7 +297,7 @@ function interaction() {
     if (flat(player.pos, world.aptDoor) < INTERACT.aptDoor) return { label: 'Descendre dans la rue', act: () => teleport('street') };
     if (flat(player.pos, world.bed) < INTERACT.bed) return { label: S.sleeping ? 'Se relever' : 'Essayer de dormir (accélère la nuit)', act: () => toggleSleep('bed') };
     // S'assoupir sur le canapé du séjour (côté rue) : plus de bruit, moins de repos que la chambre côté cour
-    if (world.sofa && flat(player.pos, world.sofa) < INTERACT.bed) return { label: S.sleeping ? 'Se relever' : 'S’assoupir sur le canapé (côté rue, on dort mal)', act: () => toggleSleep('sofa') };
+    if (world.sofa?.position && flat(player.pos, world.sofa.position) < INTERACT.bed) return { label: S.sleeping ? 'Se relever' : 'S’assoupir sur le canapé (côté rue, on dort mal)', act: () => toggleSleep('sofa') };
   }
   return null;
 }
