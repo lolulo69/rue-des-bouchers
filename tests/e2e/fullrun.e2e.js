@@ -316,6 +316,8 @@ async function runCampaign(page, key, style, album = null) {
 
   let s;
   for (let guard = 0; guard < 800; guard++) {
+    // L'écran d'erreur fatale (main.js) bloque tout : échouer tout de suite avec son rapport plutôt qu'attendre le délai
+    if (await page.locator('#fatal').isVisible()) throw new Error(`écran d’erreur fatale au jour ${s?.day} (${s?.step}) : ${(await page.locator('#fatal').innerText()).slice(0, 1500)}`);
     s = await state(page);
     if (!s) { await page.waitForTimeout(200); continue; }
     if (s.step === 'ended') break;
