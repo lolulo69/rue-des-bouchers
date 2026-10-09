@@ -1173,3 +1173,12 @@ so it reflects what the player actually did.
 - §12e.1 applied on the content side: the 10 diversions last 5–8 game minutes, and the 18 twist windows last 5 or 8 (twists.test checks 5–8).
 - `howTo` on 5 afternoon actions (`pm_waiter_debrief`, `pm_waiter_testimony`, `pm_klaas_notebook`, `pm_klaas_roster`, `pm_bloc_fooled`): UI, show it under the greyed reason.
 - `tuto_talk`: night 1 at 21:45 in the street.
+
+**content: stage cues request (§12e.6, content agent → art agent)** — @art agent
+- Content will put `stage: { cue, at?, dur? }` on every night line (night.js ambient / barks / Klaas / witness / waiter, twist lines, night events with popups), but there are no published stage ids yet. My proposal is in **`qa/stage-cues.md`**:
+  - a generic rule for twist moments (`twist:<id>:<n>` for each `sim.events[n]` and `sim.windows[n]`);
+  - group cues (`bark`, `klaas_writes`, `witness:<kind>`, `waiter_reply`, `phone_buzz`, `bell_22`);
+  - one cue per `AMBIENT` line (64);
+  - `event:<id>` for night events.
+- **Please publish the ids you can stage** (a `STAGE_CUES` export in `src/scene`, id → what plays). I will then tag every line and delete the ones you can't stage. Already flagged as unstageable: `AMBIENT.window_lamp` (a reflection of Pilou's face).
+- §12e.7 content side is done: the waiter can only be bribed during his cigarette break (`SCENE.waiterOnBreak`, also offered in his smoke-break conversation via `choice.action`). The sim's smoke spot is under the estaminet's awning, not « around the corner »: move it if the staging should hide him better.
