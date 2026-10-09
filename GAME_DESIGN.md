@@ -293,6 +293,21 @@ removed: unlocks only gate *when*, and the balance agent re-checks §13.H after.
   Source: Lucas's own description and his apartment page (layout only).
 Checklist additions (v1.1) are in §13.J.
 
+## 12c. Playtest 1 (Lucas, 2026-10-09): verdict « bon globalement », fixes
+1. **Sound design is random.** The ventilation hum is loud from the start, even far from it; after ~day 2 there is no sound at all.
+   Target mix: the exhaust hum is heard **only in Pilou's apartment** (loud at the street-side window, muffled in the bedroom,
+   absent in the street except a faint hiss right under the duct); the street has a real ambience (positional crowd murmur by
+   table and by headcount, chairs on cobbles, glasses, footsteps, distant city, the Saint-Maurice bell at 22:00, rain on drache
+   nights, each twist's own sounds: accordion, football cheers, megaphone, singing…); clear UI sounds (phone, coach mark,
+   Nouveau). Audio must survive every transition (day ↔ night, pause, 14 days): a regression test checks the audio graph is alive
+   on day 5+.
+2. **Music**: a soft, chill procedural soundtrack (a lo-fi day loop, a quieter night ambient bed), with separate volume sliders
+   (Musique / Ambiance / Effets) and on/off in the pause/settings menu, persisted.
+3. **Notification badges** (phone, Carnet…) light up when nothing is new: unread counts must only count genuinely new,
+   unseen items, and clear when opened.
+4. **The night action menu is hard to understand**: rework it so it's obvious what you can do *here and now* and why other
+   things aren't possible (where to go / what's needed), with legality, risk and time cost readable at a glance, and a coach mark.
+
 ## 13. v1.0 acceptance checklist
 v1.0 ships only when **every** box is ticked. Nothing is dropped silently: anything cut or simplified is listed under "Deviations" with Lucas's OK.
 Proof: **T** = automated test (vitest / Playwright / campaign simulator, runs in CI) · **Q** = design agent's QA session in Chrome (screenshots in `qa/`) · **L** = Lucas playtest.
@@ -368,6 +383,12 @@ The campaign simulator plays 1000 seeded campaigns per strategy bot. Targets:
 - [ ] Morning at Koddex in 3D (seated, terminal on the in-world monitor, readable); afternoon in the daytime street / workshop / town hall in 3D; keyboard + gamepad flow intact. **T Q**
 - [ ] Office vs home days (e-bike commute, home desk in the living room) and Pilou's apartment modelled per §12b.D, walkable at night. **Q**
 - [ ] Story transcripts refreshed: two runs of the same style differ night by night (twists), and the night recap mentions the twist. **Q**
+
+### K. Playtest 1 fixes (§12c)
+- [ ] Sound: exhaust only in the apartment (spatial), full street ambience + twist sounds, audio alive across all 14 days (regression test). **T Q L**
+- [ ] Chill music (day/night), Musique/Ambiance/Effets sliders + on/off, persisted. **Q L**
+- [ ] Notification badges only for genuinely new items, cleared on open (test). **T Q**
+- [ ] Night action menu reworked for clarity (here-and-now, why not, legality/risk/time at a glance, coach mark). **Q L**
 
 ### Release tasks (done by the design agent when v1.0 lands)
 - [ ] Set `WHATSAPP_GROUP` in `src/content/characters.js` to **« La Gaystapo »** (Lucas's choice: the real group's own name).
