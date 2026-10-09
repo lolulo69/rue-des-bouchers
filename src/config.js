@@ -300,4 +300,19 @@ export const CAMPAIGN = {
   workdays: { homePerWeek: 2, homeJobPenalty: 1, officeSceneChance: 0.5 }, // Tatie, flattée par le bloc, peut laisser fuiter le vrai plan à Colette
 };
 
-export const CONFIG = { RULES, DAYS, SKY, STREET, ZONES, RESTAURANTS, ANCHORS, INTERACT, NOISE, SLEEP, EVIDENCE, POLICE, WAITER, WITNESS, BUCKET, RISK, ASSO, DOG, DISGUISE, ENGINE_FLAGS, CAMPAIGN };
+// Menu de nuit (N, §12c.4) : tout ce que le menu affiche vient d'ici et des données (actions.js, nightActions.js)
+export const NIGHT_MENU = {
+  // Légalité → étiquette, icône de catégorie, couleur (le rouge = illégal, le gris = limite : tutorials.js le dit ainsi)
+  legality: {
+    legal: { tag: 'légal', icon: '⚖', color: '#7bd88f' },
+    grey: { tag: 'limite', icon: '◐', color: '#b8b8c8' },
+    illegal: { tag: 'illégal', icon: '⚠', color: '#ff6b5b' },
+  },
+  // Risque d'être vu : probabilité qu'au moins un témoin possible voie l'acte, maintenant, à cet endroit
+  risk: { medium: 0.25, high: 0.55, labels: { none: 'sans risque', low: 'faible', medium: 'moyen', high: 'élevé' } },
+  stats: { sleep: 'Sommeil', asso: 'Asso', dossier: 'Dossier', risk: 'Risque', job: 'Job' }, // comme src/ui/dom.js STAT_LABELS
+  evidence: 'Pièce au dossier',
+  maxWho: 3, // témoins nommés au plus, puis « … »
+};
+
+export const CONFIG = { RULES, DAYS, SKY, STREET, ZONES, RESTAURANTS, ANCHORS, INTERACT, NOISE, SLEEP, EVIDENCE, POLICE, WAITER, WITNESS, BUCKET, RISK, ASSO, DOG, DISGUISE, ENGINE_FLAGS, CAMPAIGN, NIGHT_MENU };

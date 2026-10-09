@@ -12,3 +12,5 @@ export { runCampaign, playNight } from './campaignRunner.js';
 export { CAMPAIGN_BOTS, TARGETS, ENDING_SCORE, baseEnding } from './campaignBots.js';
 export { checkCampaignInvariants } from './campaignInvariants.js';
 export { availableNightActions, performNightAction } from './nightActions.js';
+export { nightMenu, witnessRisk, effectHint } from './nightMenu.js';
+export { LOCATIONS } from './nightActions.js';
