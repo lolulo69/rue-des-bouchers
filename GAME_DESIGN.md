@@ -470,6 +470,16 @@ export const TWISTS = [{
 // unlocks.js (v1.1): progressive tools. Engine: src/sim/unlocks.js. Content: src/content/unlocks.js.
 export const UNLOCKS = [{ id: 'db_reading', unlocks: { keys: ['B'], actions: ['night_db'] }, when: { day: [1, 14] },
   card: { title: 'Nouveau : le relevé de décibels', text: '…', hint: 'B / RB' } }];
+// objectives.js (v1.1, §12c.5): « Ce soir » briefing + « Objectifs du soir » HUD list. Engine picks 2–4 per night.
+export const OBJECTIVES = [{
+  id: 'o_tw_colette', text: '…',                 // ≤ 90 chars; illegal ones are options with their risk, never orders
+  stance: 'legal',                               // 'legal' | 'grey' | 'illegal' | 'info' (info: done = null, nothing to tick)
+  when: { twist: 'colette_dinner' },             // §14 conditions + twist (tonight's twist), newTool (unlocked tonight), onDuty ('lemaire'|'benali')
+  done: { event: 'photo_taken', table: 'la table de Colette' },  // or { flag: 'x' }; events = TUTORIAL_EVENTS or 'action:<id>'
+  priority: 10, group: 'photo',                  // highest first, at most one per group
+}];
+// done filters: photo_taken { overLimit, late (after 22:00), table (twist table label), corridor } · db_taken { min } ·
+// police_called { patrol, asso }.
 ```
 Rules: all text is in French; **no real restaurant names**; every `speaker` exists in `characters.js`; every flag is declared;
 every action, event and ending is reachable (the linter + the campaign simulator check this). An epilogue is built from the parts whose `when` matches,
@@ -996,3 +1006,8 @@ so it reflects what the player actually did.
 - Keys: ↑ ↓ + Entrée, 1–9 for the « ici » rows, N / Échap to close; pad: spatial focus + Ⓐ (unavailable rows are focusable `aria-disabled` buttons, Ⓐ on one logs its reason). The `night_menu_opened` coach-mark event is unchanged. `nightActions.js` now also exports `SIM_KIND` (one word, no behaviour change).
 - Tests: tests/unit/nightMenu.test.js, robustness.e2e.js › « menu de nuit », and QA's playtest1 › « §12c.4 · menu de nuit » now runs (no longer skipped).
 - **Build note audio-v2 (§12c.1–2, §13.K)** — Pourquoi le son « mourait » : le moteur ne savait pas quand on quittait la nuit. Personne n'appelait `audio.mode()` : à l'écran titre, la rue de nuit (rendue derrière) jouait la hotte à plein ; à la fin d'une nuit, la nuit cesse d'être rendue pendant le jour (art.day) et le moteur restait figé sur les niveaux de fin de nuit (terrasses rentrées, hotte coupée), donc le silence ; il n'y avait pas de musique de jour. Le contexte ne se relançait aussi que sur pointerdown / keydown (Safari « interrupted », geste non reconnu → plus rien). Correctifs : la scène sonore suit l'écran toute seule (titre / jour / nuit, 4 fois par seconde, même sans rendu) ; relance à chaque geste, retour d'onglet et changement d'état ; aucune valeur non finie vers WebAudio ; une erreur de son ne casse plus la boucle. Mixage : la hotte **uniquement chez Pilou** (fort à la fenêtre du séjour, étouffée au fond, un souffle sous la gaine dans la rue, jamais au titre ni le jour) ; rue complète (brouhaha positionnel par table selon le nombre de convives, verres, couverts, rires, chaises, pas de Pilou et des passants, ville au loin, cloche de 22h, pluie) ; sons de chaque twist par id de twist. Musique : lo-fi le jour, nappe de nuit discrète qui s'efface sous les événements. **Pour l'agent UI** (réglages Musique / Ambiance / Effets, §12c.2) : `audio.setVolume('music' | 'ambience' | 'sfx', v)`, `audio.setEnabled('music', bool)`, `audio.setVolume(v)` (général) et `audio.setMuted(b)` existent maintenant ; valeurs lisibles par `audio.mix`, déjà persistées par le moteur (`rdb.audio.v1`). Tests : `tests/unit/audio-mix.test.js`, `tests/e2e/audio.e2e.js` (jour 5 → nuit 5 → jour 6 : contexte en marche, bus branchés et audibles). Au passage, `art.twists` reconnaît les ids de props du contenu (`big_screen`, `tour_group_flag`, `streetlights_off`, `trestle_table`…).
+
+**content-objectives (v1.1 §12c.5, content agent → build and UI agents)** — @build agent @ui agent
+- `src/content/objectives.js`: 64 objectives. One per lockable unlock's first night (`newTool`), one per twist (26, its own opportunity), the fixed days (D1, D6, D9, D13), and state-aware generics (photo, dB, corridor, round, WhatsApp, waiter, Benali on duty) plus « info » lines (Lemaire and complaisance, Klaas asleep at 1h, low Sleep, high Risk). Format in §14.
+- **Engine**: evaluate `when` at night start with three extra keys, `twist`, `newTool`, `onDuty`. Pick 2–4 (priority, one per `group`, the twist and the new tool first), then tick `done` from the night's events. Event filters: `photo_taken` needs `overLimit`, `late`, `table` (the twist's table label) and `corridor` on the event payload; `db_taken` needs the dB value; `police_called` needs `patrol` and `asso`. `action:<id>` and the event ids are the ones from `tutorials.js` (`TUTORIAL_EVENTS`).
+- Tests: `tests/unit/objectives.test.js` (≥ 40, ≤ 90 chars, every twist and every lockable unlock covered, events and flags known and settable, illegal objectives phrased as options with their risk).
