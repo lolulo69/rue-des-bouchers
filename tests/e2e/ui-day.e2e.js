@@ -179,11 +179,12 @@ test('Carnet (C), Aide et À propos (U10)', async ({ page }) => {
   await page.keyboard.press('Escape');
   await page.click('[data-testid=title-new]');
   await page.click('[data-testid=intro-skip]');
-  await expect(page.locator('[data-testid=carnet-open] .ui-badge')).toBeVisible();
+  // §12c.3 : les fiches connues dès le départ ne sont pas des nouveautés → pas de pastille au jour 1
+  await expect(page.locator('[data-testid=carnet-open] .ui-badge')).toHaveCount(0);
   await page.keyboard.press('KeyC');
   await expect(page.locator('[data-testid=carnet]')).toBeVisible();
   await expect(page.locator('[data-testid=carnet] [data-codex=c_pilou]')).toBeVisible();
-  await expect(page.locator('[data-testid=carnet] [data-codex=c_pilou] .ui-new')).toBeVisible();
+  await expect(page.locator('[data-testid=carnet] [data-codex=c_pilou] .ui-new')).toHaveCount(0);
   await page.click('[data-testid=carnet] [data-tab=rules]');
   await expect(page.locator('[data-testid=carnet] .ui-codex-card').first()).toBeVisible();
   await page.waitForTimeout(600);
@@ -346,4 +347,40 @@ test('BUG-007 · le verdict de la commission du J14 est affiché avant l’écra
   await expect(page.locator('[data-testid=ending]')).toHaveCount(0);
   await page.click('[data-testid=result-next]');
   await expect(page.locator('[data-testid=ending]')).toBeVisible();
+});
+
+// §12c.3 : les pastilles ne comptent que le vraiment nouveau, s'effacent à l'ouverture, et le lendemain seul le neuf compte
+test('pastilles : ouvrir le téléphone l’efface ; le lendemain, seuls les nouveaux messages comptent ; Carnet idem', async ({ page }) => {
+  test.setTimeout(300_000);
+  await page.goto('/ui.html?fresh=1&fast=1&seed=3');
+  await page.click('[data-testid=title-new]');
+  await page.click('[data-testid=intro-skip]');
+  const badge = (id) => page.locator(`[data-testid=${id}] .ui-badge`);
+  await expect(badge('phone-open')).toBeVisible();
+  await page.click('[data-testid=phone-open]');
+  await page.click('[data-testid=phone-close]');
+  await expect(badge('phone-open')).toHaveCount(0);
+  // Carnet : ouvert une fois, la pastille disparaît et ne revient pas sans nouveauté
+  if (await badge('carnet-open').count()) {
+    await page.click('[data-testid=carnet-open]');
+    await page.click('[data-testid=carnet-close]');
+  }
+  await expect(badge('carnet-open')).toHaveCount(0);
+  // Le lendemain : la pastille compte exactement les messages arrivés depuis
+  const before = await page.evaluate(() => (window.__rdbUi.campaign.state.uiSeen?.phone ?? []).length);
+  await page.evaluate(() => {
+    const ui = window.__rdbUi; const c = ui.campaign; const day = c.state.day;
+    for (let i = 0; i < 400 && !(c.state.day > day && c.state.phase === 'morning'); i++) {
+      if (c.step === 'cards') c.resolveCard(c.card().choices.find((x) => x.available)?.i ?? 0);
+      else if (c.step === 'koddex') c.koddex(['work', 'work', 'work']);
+      else if (c.step === 'actions') c.endAfternoon();
+      else if (c.step === 'night') { const sim = c.createNight(); for (let k = 0; !sim.state.ended && k < 3000; k++) sim.tick(1); c.finishNight(sim); }
+      else if (c.step === 'recap') c.nextDay();
+    }
+    ui.render();
+  });
+  const fresh = await page.evaluate(() => window.__rdbUi.campaign.state.journal.filter((j) => j.type === 'media' && j.day === window.__rdbUi.campaign.state.day).length);
+  if (fresh) await expect(badge('phone-open')).toHaveText(String(fresh));
+  else await expect(badge('phone-open')).toHaveCount(0);
+  expect(before).toBeGreaterThan(0);
 });

@@ -14,10 +14,11 @@ import { createCampaign as defaultCreate, contentFromGlob } from '../sim/index.j
 import { NIGHT_END, KLAAS_NOTEBOOK } from '../content/night.js';
 import { h, clear, portrait, nameOf, typewrite, effectChips, STAT_LABELS, setPortraitProvider } from './dom.js';
 import { WEEKDAYS, WEEKDAYS_SHORT, PHASE_LABELS, LEGALITY, explain, afternoonMenu, upcomingEvent, eventDays, witnessName } from './rules.js';
-import { phoneView, pullFeed, unreadItems, messageNode } from './phone.js';
+import { phoneView, pullFeed, messageNode } from './phone.js';
+import { phoneUnread, markPhoneSeen, carnetUnread, openCarnet } from './badges.js';
 import { createVignette } from './vignette.js';
 import { homography, toMatrix3d, quadSize } from './project.js';
-import { carnetView, helpView, aboutView, carnetNews } from './codex.js';
+import { carnetView, helpView, aboutView } from './codex.js';
 // Indice manette d'une carte « Nouveau » : « RB » → glyphe de la manette en cours (RB/R1…)
 const padHint = (t) => t.replace(/\b(LB|RB|LT|RT|A|B|X|Y)\b/g, (b) => padGlyph(b));
 import { openMenu, isMenuOpen } from './menu.js';
@@ -226,7 +227,7 @@ export function mount(engine = {}, opts = {}) {
     const wrap = h('div.ui-wrap');
     if (c.step !== 'ended') wrap.append(header());
     if (phone.open) {
-      wrap.append(phoneView(c, meta, { tab: phone.tab, onTab: (t) => { phone.tab = t; render(); }, onClose: closePhone }));
+      wrap.append(phoneView(c, meta, { tab: phone.tab, seenBefore: phoneBefore, onTab: (t) => { phone.tab = t; render(); }, onClose: closePhone }));
       saveMeta();
     } else if (panel) {
       wrap.append(panelView());
@@ -280,11 +281,22 @@ export function mount(engine = {}, opts = {}) {
     for (const sel of PRIMARY) { const el = layer.querySelector(sel); if (el) { el.focus({ preventScroll: true }); return; } }
   }
   const introCards = () => (typeof c?.introCards === 'function' ? c.introCards() : narrative.introCards()) ?? [];
-  function openPhone(tab) { panel = null; phone = { open: true, tab: tab ?? phone.tab }; view.notif = null; render(); }
-  function openPanel(name) { phone.open = false; panel = name; render(); }
+  // Ouvrir le téléphone / le Carnet efface leurs pastilles (§12c.3) : tout ce qui y est devient « vu » (sauvegardé)
+  let phoneBefore = new Set();
+  let carnetBefore = new Set();
+  function openPhone(tab) {
+    panel = null; phone = { open: true, tab: tab ?? phone.tab }; view.notif = null;
+    phoneBefore = new Set(c.state.uiSeen?.phone ?? []);
+    markPhoneSeen(c, meta); save(); render();
+  }
+  function openPanel(name) {
+    phone.open = false; panel = name;
+    if (name === 'carnet' && c) { carnetBefore = openCarnet(c); save(); }
+    render();
+  }
   function closePanel() { panel = null; render(); }
   function panelView() {
-    if (panel === 'carnet' && c) return carnetView(c, meta, { tab: carnetTab, onTab: (t) => { carnetTab = t; render(); }, onClose: closePanel });
+    if (panel === 'carnet' && c) return carnetView(c, meta, { tab: carnetTab, seenBefore: carnetBefore, onTab: (t) => { carnetTab = t; render(); }, onClose: closePanel });
     if (panel === 'help') return helpView({ onClose: closePanel, campaign: c });
     return aboutView({ onClose: closePanel });
   }
@@ -304,7 +316,7 @@ export function mount(engine = {}, opts = {}) {
 
   // ── notification du téléphone (entre deux phases) ─────────────────
   function notification() {
-    const unread = unreadItems(c, meta);
+    const unread = phoneUnread(c, meta);
     if (!unread.length || c.step === 'recap' || c.step === 'ended') return null;
     // Le matin : les messages de la nuit sur le groupe, en aperçu
     const preview = unread.filter((m) => m.channel === 'whatsapp').slice(-2);
@@ -364,7 +376,8 @@ export function mount(engine = {}, opts = {}) {
     const S = c.state;
     const evDays = eventDays(c);
     const up = upcomingEvent(c);
-    const unread = unreadItems(c, meta).length;
+    const unread = phoneUnread(c, meta).length;
+    const news = carnetUnread(c).length;
     const stats = Object.entries(STAT_LABELS).map(([k, label]) => h(`div.ui-stat${k === 'risk' ? '.danger' : ''}`, { dataset: { stat: k } },
       `${label} ${Math.round(S.stats[k])}`, h('i', h('b', { style: { width: `${S.stats[k]}%` } }))));
     return h('header.ui-header', { dataset: { testid: 'day-header', day: S.day, step: shown() } },
@@ -376,7 +389,7 @@ export function mount(engine = {}, opts = {}) {
           h('button.ui-btn.ghost.ui-icon', { onclick: () => (phone.open ? closePhone() : openPhone()), dataset: { testid: 'phone-open', unread }, 'aria-label': `Téléphone (${keyHint('T')})`, title: `Téléphone (${keyHint('T')})` },
             '📱', unread ? h('span.ui-badge', unread) : null),
           h('button.ui-btn.ghost.ui-icon', { onclick: () => (panel === 'carnet' ? closePanel() : openPanel('carnet')), dataset: { testid: 'carnet-open' }, 'aria-label': `Carnet (${keyHint('C')})`, title: `Carnet (${keyHint('C')})` },
-            '📓', carnetNews(c, meta) ? h('span.ui-badge', carnetNews(c, meta)) : null),
+            '📓', news ? h('span.ui-badge', news) : null),
           h('button.ui-btn.ghost.ui-icon', { onclick: () => (panel === 'help' ? closePanel() : openPanel('help')), dataset: { testid: 'help-open' }, 'aria-label': 'Comment jouer', title: 'Comment jouer' }, '❓'),
           h('button.ui-btn.ghost.ui-icon', { onclick: () => showMenu(), dataset: { testid: 'menu-open' }, 'aria-label': `Menu et réglages (${keyHint('Échap')})`, title: `Menu (${keyHint('Échap')})` }, '☰'))),
       h('div.ui-cal', Array.from({ length: 14 }, (_, k) => h(`i${k + 1 < S.day ? '.done' : ''}${k + 1 === S.day ? '.now' : ''}${evDays.has(k + 1) ? '.ev' : ''}`, { title: `Jour ${k + 1}` }))),
@@ -681,7 +694,7 @@ export function mount(engine = {}, opts = {}) {
     const nightEv = S.evidence.filter((e) => e.day === S.day);
     const klaas = nightEv.filter((e) => /Klaas|carnet/i.test(e.label) || ['complaisance', 'tipoff'].includes(e.nightType)).slice(0, 2).map((e) => e.label);
     if (!klaas.length) { const l = klaasLine(KLAAS_NOTEBOOK?.bedtime?.precise ?? KLAAS_NOTEBOOK?.bedtime ?? [], S.day); if (l) klaas.push(l); }
-    const unread = unreadItems(c, meta).slice(-3);
+    const unread = phoneUnread(c, meta).slice(-3);
     return h('div.ui-card.ui-recap', { dataset: { testid: 'recap' } },
       h('span.ui-kicker', `La Voix du Nordiste · lendemain de la nuit ${night.day ?? S.day}`),
       head ? h('h2.ui-headline', { dataset: { testid: 'recap-headline' } }, head.text) : null,

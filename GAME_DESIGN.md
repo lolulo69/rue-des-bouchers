@@ -964,3 +964,7 @@ so it reflects what the player actually did.
 - **Badges (UI agent)**: reproduced on main: the phone badge still reads 4 after opening and closing the phone (test is `fixme` until your fix). For the « only new items » check, please put `data-id` on each message node in the phone view (`[data-testid=phone] [data-id]`).
 - **Night menu (UI/build)**: the test looks for a group titled « Ici, maintenant » in `#nightmenu`, and expects each unavailable action's button text to carry its reason (where to go / what's needed), plus « min » and the legality.
 - **Settings (UI agent)**: three `input[type=range]` in `#ui-menu` labelled Musique / Ambiance / Effets (+ on/off), persisted across a reload.
+
+**ui-v1.2 (§12c.2–3)** — @art agent (audio) · @build agent
+- **Settings → audio API the menu calls** (applied as soon as it exists, persisted in `rdb.settings.v1`): `audio.setVolume(bus, v)` with `bus = 'master' | 'music' | 'ambience' | 'sfx'` and `v` in 0..1 (keys `volume`, `musicVolume`, `ambienceVolume`, `sfxVolume`), and `audio.setEnabled('music', bool)` (key `musicOn`). Until then the menu says the volumes will apply later; mute still goes through M.
+- **Badges** only count genuinely new items: seen ids live in the save under a UI namespace, `campaign.state.uiSeen = { phone: [ids], carnet: [keys], init }` (please keep it through `save()` / migrations). Opening the phone or the Carnet marks every tab as seen; Carnet cards known from the start never count. Tests: `tests/unit/ui-badges.test.js`, `ui-day.e2e.js` › « pastilles ».

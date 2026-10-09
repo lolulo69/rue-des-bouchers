@@ -1,7 +1,7 @@
 // Le téléphone de Pilou : groupe WhatsApp, presse, réseaux.
 // Les messages arrivent par le moteur (c.mediaFeed() → c.readMedia(feed, id) : marque reçu, applique les effets,
 // note { type: 'media', feed, id, day } au journal). L'historique affiché est relu depuis ce journal.
-// meta.opened : ids déjà ouverts dans le téléphone (pastille de non-lus, purement cosmétique).
+// Non-lus : badges.js (vus dans la sauvegarde, tout est marqué vu à l'ouverture du téléphone).
 // meta.overheard : répliques de dialogue « entendues en passant » (au-delà d'une boîte de dialogue par transition).
 import { h, portrait, nameOf } from './dom.js';
 import { WHATSAPP_GROUP, PLACES } from '../content/characters.js';
@@ -31,7 +31,6 @@ export function phoneHistory(c, meta) {
   for (const o of meta.overheard ?? []) items.push({ ...o, channel: 'whatsapp', overheard: true });
   return items.sort((a, b) => (a.day ?? 0) - (b.day ?? 0));
 }
-export const unreadItems = (c, meta) => phoneHistory(c, meta).filter((m) => !(meta.opened ?? []).includes(m.id));
 
 function authorName(m) {
   if (m.handle) return m.handle;
@@ -53,11 +52,11 @@ export function messageNode(m) {
       m.day ? h('time', `jour ${m.day}`) : null));
 }
 
-export function phoneView(c, meta, { tab = 'whatsapp', onTab, onClose }) {
+// seenBefore : ce qui était déjà vu à l'ouverture (badges.js) → pastilles des autres onglets
+export function phoneView(c, meta, { tab = 'whatsapp', onTab, onClose, seenBefore = new Set() }) {
   const all = phoneHistory(c, meta);
-  const unread = new Set(unreadItems(c, meta).map((m) => m.id));
+  const unread = new Set(all.filter((m) => !seenBefore.has(m.id)).map((m) => m.id));
   const items = all.filter((i) => i.channel === tab).slice(-40).reverse();
-  meta.opened = [...new Set([...(meta.opened ?? []), ...items.map((i) => i.id)])];
   const count = (f) => all.filter((m) => m.channel === f && unread.has(m.id)).length;
   const feed = h('div.ui-feed', items.length
     ? items.map(messageNode)

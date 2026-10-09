@@ -1,6 +1,6 @@
 // Le Carnet de Pilou (touche C), l'Aide et l'À propos (qa/ui-review U10), depuis src/content/codex.js.
 // Une fiche n'apparaît que si son `when` est vrai ; ses `updates` aussi (règle des spoilers).
-// meta.codexSeen : clés déjà vues (fiche ou mise à jour) → pastille « nouveau » la première fois.
+// « Nouveau » : badges.js (vus dans la sauvegarde, tout est marqué vu à l'ouverture du Carnet).
 import { h, portrait } from './dom.js';
 import { CODEX } from '../content/codex.js';
 import { keyHint, padControlsText } from '../input/hints.js';
@@ -23,16 +23,9 @@ export function carnetEntries(c, tab) {
     updates: (card.updates ?? []).map((u, i) => ({ ...u, key: `${card.id}#${i}` })).filter((u) => ok(c, u.when)),
   }));
 }
-// Nombre de nouveautés (fiches ou mises à jour jamais ouvertes), tous onglets
-export function carnetNews(c, meta) {
-  const seen = new Set(meta.codexSeen ?? []);
-  let n = 0;
-  for (const t of CARNET_TABS) for (const e of carnetEntries(c, t.id)) n += (seen.has(e.key) ? 0 : 1) + e.updates.filter((u) => !seen.has(u.key)).length;
-  return n;
-}
-
-export function carnetView(c, meta, { tab = 'characters', onTab, onClose }) {
-  const seen = new Set(meta.codexSeen ?? []);
+// seenBefore : ce qui était déjà vu à l'ouverture (badges.js › openCarnet) → étiquettes « nouveau »
+export function carnetView(c, meta, { tab = 'characters', onTab, onClose, seenBefore = new Set() }) {
+  const seen = seenBefore;
   const entries = carnetEntries(c, tab);
   const news = (t) => carnetEntries(c, t).reduce((n, e) => n + (seen.has(e.key) ? 0 : 1) + e.updates.filter((u) => !seen.has(u.key)).length, 0);
   const tabs = CARNET_TABS.map((t) => h(`button${t.id === tab ? '.on' : ''}`, { onclick: () => onTab(t.id), dataset: { tab: t.id } },
@@ -45,8 +38,6 @@ export function carnetView(c, meta, { tab = 'characters', onTab, onClose }) {
     card.position ? h('p.ui-codex-pos', card.position) : null,
     card.quote ? h('p.ui-codex-quote', card.quote) : null,
     updates.length ? h('ul.ui-list', updates.map((u) => h('li', u.text, seen.has(u.key) ? null : h('span.ui-new', 'nouveau')))) : null));
-  // Ce qui est affiché est désormais « vu »
-  meta.codexSeen = [...new Set([...seen, ...entries.flatMap((e) => [e.key, ...e.updates.map((u) => u.key)])])];
   return h('div.ui-codex', { dataset: { testid: 'carnet' } },
     h('div.ui-codex-head', h('h2', '📓 Le Carnet de Pilou'), h('p', 'Ce que vous savez de la rue, des gens et des règles. Il se remplit au fil des jours.')),
     h('div.ui-phone-tabs', tabs),

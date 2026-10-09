@@ -6,6 +6,7 @@
 import './ui.css';
 import { h, clear } from './dom.js';
 import { carnetView, helpView, aboutView } from './codex.js';
+import { openCarnet } from './badges.js';
 import { loadSettings, saveSettings, applySettings, TEXT_SPEEDS, audioCan } from './settings.js';
 import { QUALITY_PRESETS, QUALITY_LEVELS } from '../art/quality.js';
 
@@ -27,6 +28,8 @@ export function openMenu({ campaign = null, meta = {}, art = null, page: startPa
   const before = document.activeElement;
   let page = startPage === 'carnet' && !campaign ? 'main' : startPage;
   let carnetTab = 'characters';
+  let carnetBefore = new Set();
+  if (startPage === 'carnet' && campaign) carnetBefore = openCarnet(campaign);
   let settings = loadSettings();
   let armedQuit = false;
 
@@ -67,8 +70,13 @@ export function openMenu({ campaign = null, meta = {}, art = null, page: startPa
       h('h2#ui-menu-title', 'Pause'),
       h('button.ui-btn.center', { dataset: { testid: 'menu-resume', autofocus: '1' }, onclick: () => { close(); onResume?.(); } }, 'Reprendre'),
       h('section.ui-menu-settings', { 'aria-label': 'Réglages' },
-        h('label.ui-field', { for: 'ui-volume' }, h('span', 'Volume'), vol),
-        can.volume ? null : h('p.ui-note#ui-volume-note', 'Le volume sera appliqué dès que le moteur audio le permettra.'),
+        h('h3.ui-menu-sub', '🔊 Son'),
+        h('label.ui-field', { for: 'ui-volume' }, h('span', 'Volume général'), vol),
+        toggle('musicOn', 'Musique', 'menu-music'),
+        slider('musicVolume', 'Musique', 0, 1, 0.05),
+        slider('ambienceVolume', 'Ambiance de la rue', 0, 1, 0.05),
+        slider('sfxVolume', 'Effets', 0, 1, 0.05),
+        can.volume ? null : h('p.ui-note#ui-volume-note', 'Les volumes seront appliqués dès que le moteur audio le permettra.'),
         toggle('muted', 'Son coupé (M)', 'menu-mute'),
         h('div.ui-field', h('span', 'Vitesse du texte'), speed),
         toggle('bigText', 'Grand texte', 'menu-bigtext'),
@@ -79,7 +87,7 @@ export function openMenu({ campaign = null, meta = {}, art = null, page: startPa
         art ? null : h('p.ui-note', 'Appliquée à la rue dès la prochaine nuit.')),
       h('div.ui-menu-links',
         h('button.ui-btn.ghost', { dataset: { testid: 'menu-help' }, onclick: () => go('help') }, '❓ Aide'),
-        campaign ? h('button.ui-btn.ghost', { dataset: { testid: 'menu-carnet' }, onclick: () => go('carnet') }, '📓 Carnet') : null,
+        campaign ? h('button.ui-btn.ghost', { dataset: { testid: 'menu-carnet' }, onclick: () => { carnetBefore = openCarnet(campaign); go('carnet'); } }, '📓 Carnet') : null,
         h('button.ui-btn.ghost', { dataset: { testid: 'menu-about' }, onclick: () => go('about') }, 'À propos')),
       onQuit ? quit : null,
     ];
@@ -96,7 +104,7 @@ export function openMenu({ campaign = null, meta = {}, art = null, page: startPa
     let body;
     if (page === 'help') body = helpView({ onClose: back, campaign });
     else if (page === 'about') body = aboutView({ onClose: back });
-    else if (page === 'carnet' && campaign) body = carnetView(campaign, meta, { tab: carnetTab, onTab: (t) => { carnetTab = t; render(); }, onClose: back });
+    else if (page === 'carnet' && campaign) body = carnetView(campaign, meta, { tab: carnetTab, seenBefore: carnetBefore, onTab: (t) => { carnetTab = t; render(); }, onClose: back });
     else body = h('div.ui-card.ui-menu', mainPage());
     root.append(h('div.ui-menu-backdrop', { onclick: (e) => { if (e.target === e.currentTarget) { close(); onResume?.(); } } },
       h('div.ui-menu-box', { role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'ui-menu-title', dataset: { testid: 'menu' } }, body)));
