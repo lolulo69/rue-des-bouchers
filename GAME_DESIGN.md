@@ -345,6 +345,29 @@ without**:
 6. Balance: the stealthy bot uses diversions and windows; target « illegal stealthy » ≤ 40% custody still, but the illegal acts must
    now be achievable unseen in ≥ 30% of attempts made with a diversion or in a window (and ≤ 10% without). Re-run 1000 × 7.
 
+## 12e. Playtest 3 (Lucas, 2026-10-09): realism script ↔ live, talking to people, sound
+1. **« Fenêtre propice » is too short.** A window of 2 game minutes is 4 real seconds. Windows and diversions last 5–8 game
+   minutes, and while one is active the night clock slows to ×0.5 (≈ 20–30 real seconds of opportunity), with a visible countdown.
+2. **Twists must be real in the 3D street, not just text.** Every twist is SEEN and HEARD: the student party at Régis's (n°27):
+   music thumping from his lit windows, students on the doorstep/smoking outside, bottles; the football match: the big screen
+   playing, the crowd reacting live on goals; the birthday: the cake with candles carried out, the song; the EVJF: sashes,
+   megaphone; the influencer: the ring light glowing, the phone filming; the busker: playing under the window; the power cut:
+   lamps off, candles; the guide's group walking with the flag; the TV crew with a camera and a boom… Each twist moment in the
+   text happens on screen at that time (the director drives NPCs/props/anims/audio from the twist data). A per-twist audit in
+   qa/twists-live.md: what you see, what you hear, at which time, vs the text.
+3. **Talking to people in the night.** Pilou can walk up to people and press E to TALK: Jérémie (on his round), Tatie (at her
+   window), Seb & Nico (on their balcony), the waiter, Dédé, Ghislain, customers at a table, the patrol, Klaas (at his window, far:
+   a wave and a phone call). A short dialogue with 2–3 choices, setting the flags the story needs (met_*, talked_waiter, rapport,
+   etc.). The afternoon actions that depend on « having talked to someone » must say how (« Parlez au serveur pendant la nuit (E) »),
+   and the tutorial introduces talking on night 1.
+4. **Ally diversions** (the residents help, if Asso is high enough, costing Asso and making them accomplices): ask Seb & Nico to
+   take the cat in and go inside for ten minutes; Tatie keeps Dédé busy talking at her door; Jérémie walks Biloute to the far end;
+   and for the owners: a call about « un problème de livraison » that sends Dédé to the back, a fake hygiene-inspection rumour that
+   sends Ghislain to the kitchen. Visible in the night menu and the briefing when relevant.
+5. **The crowd « brouhaha » sounds terrible** (« like rain in Minecraft »). Remove the noise-based murmur. Use sparse, discrete,
+   pleasant cues instead (laughter bursts, glasses clinking, a chair, a snippet of conversation tone), or a short CC0 restaurant
+   ambience at low volume, or nothing. Better silence than noise.
+
 ## 13. v1.0 acceptance checklist
 v1.0 ships only when **every** box is ticked. Nothing is dropped silently: anything cut or simplified is listed under "Deviations" with Lucas's OK.
 Proof: **T** = automated test (vitest / Playwright / campaign simulator, runs in CI) · **Q** = design agent's QA session in Chrome (screenshots in `qa/`) · **L** = Lucas playtest.
@@ -437,6 +460,13 @@ The campaign simulator plays 1000 seeded campaigns per strategy bot. Targets:
 ### N. Stealth playable (playtest 2)
 - [ ] Diversions (≥ 5) with an attention model, natural twist windows (« Fenêtre propice »), « Qui regarde ? » HUD, the night extended to 02:30, the disguise reachable, the bedtime hint aware of illegal plans. **T Q L**
 - [ ] Unseen success ≥ 30% with a diversion/window, ≤ 10% without; stealthy bot ≤ 40% custody; §13.H still met. **T**
+
+### O. Playtest 3 fixes (§12e)
+- [ ] Windows/diversions 5–8 game min, clock ×0.5 during, a countdown. **T Q L**
+- [ ] Every twist seen + heard at the right times (per-twist audit, 0 text-only twists). **Q L**
+- [ ] Talk to people (E) with choices; afternoon prerequisites say how; night-1 tutorial. **T Q L**
+- [ ] Ally diversions (Seb & Nico, Tatie, Jérémie) + owner diversions (Dédé, Ghislain). **T Q L**
+- [ ] No more noise « brouhaha »: discrete pleasant cues or a CC0 ambience. **Q L**
 
 ### Release tasks (done by the design agent, 2026-10-09)
 - [x] `WHATSAPP_GROUP` in `src/content/characters.js` = **« La Gaystapo »** (Lucas's choice: the real group's own name). Only the
