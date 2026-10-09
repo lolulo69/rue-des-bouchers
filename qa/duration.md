@@ -9,8 +9,8 @@ Généré par `tests/e2e/fullrun.e2e.js` (`npm run test:fullrun`). Estimation, p
 
 | Style | Fin | Nuits | Mots lus | Clics | Jour | Nuits | Total | Cible | Mesuré le |
 |---|---|---|---|---|---|---|---|---|---|
-| diplomate | negotiated_peace (jour 14) | 13 | 11358 | 270 | 1h06 | 2h10 | **3h16** | ✅ | 2026-10-09 |
-| légal prudent | moving_out (jour 14) | 13 | 12389 | 313 | 1h12 | 2h10 | **3h22** | ✅ | 2026-10-09 |
+| diplomate | negotiated_peace (jour 14) | 13 | 11351 | 270 | 1h06 | 2h10 | **3h16** | ✅ | 2026-10-09 |
+| légal prudent | moving_out (jour 14) | 13 | 12388 | 313 | 1h12 | 2h10 | **3h22** | ✅ | 2026-10-09 |
 | mixte malin | moving_out (jour 14) | 13 | 12547 | 316 | 1h13 | 2h10 | **3h23** | ✅ | 2026-10-09 |
 | passif | moving_out (jour 14) | 13 | 10561 | 207 | 1h00 | 2h10 | **3h10** | ✅ | 2026-10-09 |
 | casse-cou | custody (jour 5) | 4 | 6207 | 118 | 0h35 | 0h40 | **1h15** | ⏹ fin anticipée (jour 5) | 2026-10-09 |

@@ -278,6 +278,9 @@ async function reloadAndCompare(page, style, log) {
 }
 
 function writeDuration() {
+  // Les sections ajoutées par d'autres agents sous le tableau (« ## … ») sont conservées telles quelles
+  let tail = '';
+  try { const prev = readFileSync('qa/duration.md', 'utf8'); const k = prev.indexOf('\n## '); if (k >= 0) tail = prev.slice(k); } catch { /* premier passage */ }
   const rows = readdirSync(SUMMARY).filter((f) => f.endsWith('.json')).map((f) => JSON.parse(readFileSync(`${SUMMARY}/${f}`, 'utf8')));
   const m = (s) => { const t = Math.round(s / 60); return `${Math.floor(t / 60)}h${String(t % 60).padStart(2, '0')}`; };
   const lines = rows.map((r) => `| ${r.title} | ${r.ending} (jour ${r.lastDay}) | ${r.nights} | ${r.words} | ${r.clicks} | ${m(r.daySeconds)} | ${m(r.nightSeconds)} | **${m(r.totalSeconds)}** | ${r.early ? `⏹ fin anticipée (jour ${r.lastDay})` : r.totalSeconds < 9000 ? '⚠️ trop court' : r.totalSeconds > 14400 ? '⚠️ trop long' : '✅'} | ${r.at ?? ''} |`);
@@ -295,7 +298,7 @@ Généré par \`tests/e2e/fullrun.e2e.js\` (\`npm run test:fullrun\`). Estimatio
 ${lines.join('\n')}
 
 Résumés par style : \`qa/fullrun/*.json\` (date du dernier passage dans \`at\`). Dernière mise à jour : ${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC.
-`);
+${tail}`);
 }
 
 // ── Une campagne complète (partagée par les styles et l'album) ──────────────
