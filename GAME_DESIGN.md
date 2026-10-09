@@ -491,6 +491,13 @@ so it reflects what the player actually did.
 
 **Content-side additions (content-v0.4, all optional and backward-compatible; details in Build notes):**
 - `characters.js` exports `CHARACTERS` as an **object keyed by speaker id** (`{ name, fullName?, title?, group, home, bio, voice }`), plus `WHATSAPP_GROUP` (the group's display name, one constant) and `PLACES` (the street's businesses, fictional names).
+- **State guards (v1.1, §13.L).** A night line whose wording depends on the street at that instant is written `{ text, state }` instead of a plain string. Plain strings stay valid everywhere. AMBIENT and PHONE_PINGS entries and twist events also take `state`; a twist event can add `else` (the text to show when the guard fails). `src/sim/stateGuard.js` evaluates the guard **when the line is shown**, and narrative.js, pacing.js and twistNight.js only pick lines whose guard holds. Vocabulary (all keys optional, AND-ed):
+  - `tablesOut` / `estaminetOut` / `customers`: a comparison (`'>0'`, `'0'`) on the tables out (all restaurants), the estaminet's tables out, or tables out plus standing groups.
+  - `after` / `before`: game time `'HH:MM'` (hours < 12 = after midnight).
+  - `rain`, `exhaust` (the duct running), `saturday`, `dark` (power cut): `true` / `false`.
+  - `present` / `absent`: ids among `serveur`, `patrouille`, `klaas`, `biloute` (on his round), `chat` (Gaufre on the balcony, hence Seb & Nico), `debout`.
+  - **Twist extras:** `props` entries can be `{ id, from, until }`, so a prop leaves when the text says it does. `tables[]` can take `until` (cleared at that time, unaffected by `closeDelay`). `sim.dog: false` cancels Jérémie's round.
+  - **Day lines** (dialogue, media, cards) don't take state guards: there's no live street in the day phases, and their references to the night are gated by flags.
 - ACTIONS: `witnessed: { exposure, by, effects }`, `sim`, `once`, `result`, `cost.minutes` (night). EVENTS: `when` (random events), `once`, `speaker`. COUNTERMOVES: `title`, `speaker`, `once`. ENDINGS: `whenAny`, `continue`.
 - **media.js** (content-media): the phone feed read between phases. `export const MEDIA = { whatsapp: [...], press: [...], social: [...] }`, entries `{ id, when, author, text, effects?, setFlags? }`. Each entry shows **once**, the first time its `when` matches. `author` = a `CHARACTERS` id, a `PLACES` id (a business's account) or `'reviewer'` (anonymous customer, with `handle`). Optional: `photo` (caption), `headline` (press), `kind` ('post' | 'review' | 'petition'), `stars` (1–5), and `ending: '<ending id>'` = shown only on that ending's end screen (one press front page per ending). The WhatsApp group name always comes from `WHATSAPP_GROUP`.
 
@@ -1015,3 +1022,21 @@ so it reflects what the player actually did.
 - `src/content/objectives.js`: 64 objectives. One per lockable unlock's first night (`newTool`), one per twist (26, its own opportunity), the fixed days (D1, D6, D9, D13), and state-aware generics (photo, dB, corridor, round, WhatsApp, waiter, Benali on duty) plus « info » lines (Lemaire and complaisance, Klaas asleep at 1h, low Sleep, high Risk). Format in §14.
 - **Engine**: evaluate `when` at night start with three extra keys, `twist`, `newTool`, `onDuty`. Pick 2–4 (priority, one per `group`, the twist and the new tool first), then tick `done` from the night's events. Event filters: `photo_taken` needs `overLimit`, `late`, `table` (the twist's table label) and `corridor` on the event payload; `db_taken` needs the dB value; `police_called` needs `patrol` and `asso`. `action:<id>` and the event ids are the ones from `tutorials.js` (`TUTORIAL_EVENTS`).
 - Tests: `tests/unit/objectives.test.js` (≥ 40, ≤ 90 chars, every twist and every lockable unlock covered, events and flags known and settable, illegal objectives phrased as options with their risk).
+**Text ↔ state coherence (text-state-coherence, §13.L) — for the build agent and the UI agent**
+- **Guards:** `src/sim/stateGuard.js` (pure) provides `nightSnapshot(sim)`, `holds(guard, sim|snapshot)` and `usable(pool, sim)`.
+  - `narrative.js` picks guarded lines everywhere (`pickNightLine`, `streetLine`, `policeLine`) and gains **`twistLine('barks', sim, rng)`**. `game.js › ambientLines` now uses it for the twist barks instead of picking raw strings. That is the only line I touched in game.js.
+  - `pacing.js` filters by guards in `choose` (its no-repeat memory is now keyed by text), in the ambient lines and in the WhatsApp pings.
+- **Engine changes (smallest possible):**
+  - `twistNight.js`:
+    - twist props with time windows: `sim.twist.props` is updated as the clock passes, and the director already re-syncs it every frame;
+    - twist tables with `until`;
+    - `dog: false` sets `S.dogOff`;
+    - a twist event can carry `state` / `else`;
+    - when a moment carries the rain, there's no random rain draw (the drache text and the rain now coincide);
+    - `S.twistRainedAt`.
+  - `sim.js`: `dogActive()` honours `S.dogOff`.
+  - `nightActions.js`: Jérémie's round needs `roundTonight` (no round on the lost-dog night).
+  - `twists.js` / `contentLint`: `dog` added to `TWIST_SIM_KEYS`.
+- **The playtest bug:** the Fête des voisins table, bunting and tart now leave at 22:00 (`until: H(22, 0)`), as the text says. Colette's table stays until 23:30 (her toast is at 23:05). Twist events that claimed tables « ressortent » or « Dédé range » now fall back to an `else` text when the street is already empty.
+- **Checker:** `npm run check:coherence` (`scripts/coherence-check.js`) plays 200 campaigns × 7 bots (about 1.2 million lines, ~30 s) with the game's emission points, and writes `qa/coherence-state.md`. **Today: 0 contradictions.** `tests/unit/stateGuard.test.js` runs a strict 8-campaign sample in CI so it stays at 0.
+

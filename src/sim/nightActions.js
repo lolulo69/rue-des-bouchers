@@ -48,7 +48,7 @@ export const LOCATIONS = {
 // Une action de nuit du contenu sans fiche reste jouable : lieu 'street', toute la nuit, sans crochet.
 // ════════════════════════════════════════════════════════════════════════════
 export const NIGHT_ACTION_SPECS = {
-  night_ronde_jeremie: { at: 'street', window: [H(21, 30), H(22, 30)], art: { anim: ['jeremie', 'walk'] } },
+  night_ronde_jeremie: { at: 'street', window: [H(21, 30), H(22, 30)], needs: 'roundTonight', art: { anim: ['jeremie', 'walk'] } },
   night_camera_window: { at: 'window', window: [H(20, 30), H(25, 30)], art: { prop: 'gadget' } },
   night_film_faces: { at: 'street', window: [H(20, 30), H(25)], needs: 'terraceOut', repeat: true, art: { terrace: 'film' } },
   night_flood_police: { at: 'apartment', window: [H(20, 30), H(25)] },
@@ -77,6 +77,7 @@ export const SCENE = {
   kitchenOpen: { test: (sim) => sim.state.min < H(23), reason: 'La cuisine est fermée.' },
   waiterOnDuty: { test: (sim) => sim.waiterOnDuty(), reason: 'Le serveur est parti.' },
   policeOnsite: { test: (sim) => sim.state.police?.phase === 'onsite', reason: 'Aucune patrouille sur place.' },
+  roundTonight: { test: (sim) => !sim.state.dogOff, reason: 'Pas de ronde ce soir : Biloute a disparu.' }, // twist lost_dog (dog: false)
 };
 
 // Effets mécaniques sur la nuit (sim). Ils passent par les fonctions de la sim (journal + invariants respectés).

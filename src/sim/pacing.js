@@ -105,7 +105,7 @@ export function attachPacing(sim, { carry = {} } = {}) {
   }
 
   function phonePing() {
-    const texts = PHONE_PINGS.map((p) => p.text.replace('{group}', WHATSAPP_GROUP));
+    const texts = PHONE_PINGS.filter((p) => !p.state || holds(p.state, sim)).map((p) => p.text.replace('{group}', WHATSAPP_GROUP)); // garde d'état (§13.L)
     const fresh = texts.filter((t) => !seen.has(t) && !prev.has(t));
     const pool = fresh.length ? fresh : texts.filter((t) => !seen.has(t));
     if (!pool.length) return;

@@ -24,15 +24,16 @@ const clock = (hhmm) => { const [h, m] = String(hhmm).split(':').map(Number); re
 // Instantané de la nuit (ce que les gardes regardent) ; aussi utilisé par le vérificateur (scripts/coherence-check.js)
 export function nightSnapshot(sim) {
   const S = sim.state;
-  const tables = S.tables.filter((t) => t.out);
+  const tables = (S.tables ?? []).filter((t) => t.out);
   const standing = sim.activeStanding ? sim.activeStanding().length : 0;
   const raining = !!weatherNow?.(S) || (S.twistRainedAt !== undefined && S.min - S.twistRainedAt < 30);
-  const exhaust = S.min < sim.cfg.NOISE.exhaustOffMinute && !S.exhaustOff && !S.exhaustBlocked;
+  const exhaust = S.min < (sim.cfg?.NOISE?.exhaustOffMinute ?? 23 * 60 + 30) && !S.exhaustOff && !S.exhaustBlocked;
   const police = S.police?.phase;
   return {
     min: S.min,
     tablesOut: tables.length,
     estaminetOut: tables.filter((t) => t.restId === 'bernadette').length,
+    props: sim.twist?.props ?? [], // accessoires du twist présents (sim.twist.props, datés par twistNight.js)
     standing,
     customers: tables.length + standing,
     rain: raining,
@@ -64,4 +65,8 @@ export function holds(guard, at) {
 }
 
 // Les lignes d'une réserve dont la garde tient (sans sim : toutes)
-export const usable = (list, sim) => (!list ? list : sim?.state ? list.filter((l) => holds(guardOf(l), sim)) : list);
+export function usable(list, sim) {
+  if (!list || !sim?.state || !list.some(guardOf)) return list; // aucune ligne gardée : rien à évaluer (chemin courant)
+  const snap = nightSnapshot(sim);
+  return list.filter((l) => holds(guardOf(l), snap));
+}

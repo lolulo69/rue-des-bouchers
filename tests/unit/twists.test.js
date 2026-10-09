@@ -5,7 +5,7 @@ import { FLAGS } from '../../src/content/flags.js';
 import { ACTIONS } from '../../src/content/actions.js';
 import { MEDIA } from '../../src/content/media.js';
 
-const SIM_KEYS = ['crowd', 'noise', 'closeDelay', 'tables', 'witnesses', 'darkness', 'rain', 'exhaustOff', 'corridorBlocked', 'events', 'opportunities'];
+const SIM_KEYS = ['crowd', 'noise', 'closeDelay', 'tables', 'witnesses', 'darkness', 'rain', 'exhaustOff', 'corridorBlocked', 'events', 'opportunities', 'dog'];
 const GAMEPLAY = ['crowd', 'noise', 'closeDelay', 'tables', 'witnesses', 'darkness', 'rain', 'exhaustOff', 'corridorBlocked'];
 const NIGHT = [20 * 60 + 30, 25 * 60 + 30];
 const FIXED_DAYS = [4, 6, 9, 10, 11, 13];

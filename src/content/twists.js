@@ -4,7 +4,7 @@
 // applique `sim` à cette nuit seulement, montre `intro` avant 20h30, glisse `lines` dans la narration, fait poser `props`
 // par le directeur de scène, puis applique `after` les jours suivants.
 //
-// sim : crowd / noise (multiplicateurs), closeDelay (minutes ajoutées au rangement, négatif = plus tôt),
+// sim : crowd / noise (multiplicateurs), closeDelay (minutes ajoutées au rangement, négatif = plus tôt), dog: false (pas de ronde),
 //       tables (tables ajoutées ou modifiées), witnesses (témoins en plus, ids listés dans la Build note),
 //       darkness (0–1), rain, exhaustOff, corridorBlocked, events ({ at, text, simEffect }), opportunities (ids d'actions).
 // Plusieurs rebondissements fixes peuvent partager un jour : le premier dont `when` correspond l'emporte (variantes J9, J11).
@@ -22,12 +22,12 @@ export const TWISTS = [
     day: 4,
     intro: "Ce soir, l’estaminet a sorti la nappe blanche et la table qui mord sur le couloir. Colette Verhaeghe vient dîner. Huit couverts, une table de six. Dédé a ciré ses chaussures.",
     sim: {
-      tables: [{ rest: 'bernadette', count: 8, label: 'la table de Colette' }],
+      tables: [{ rest: 'bernadette', count: 8, label: 'la table de Colette', until: H(23, 30) }],
       closeDelay: 25,
       witnesses: [{ id: 'colette', at: 'terrace', filming: false }],
       events: [
         { at: H(20, 50), text: "Une berline se gare rue de la Barre, là où rien ne se gare. Colette descend, foulard au vent." },
-        { at: H(23, 5), text: "Colette lève son verre : « À la convivialité, mes chers amis ! » Toute la terrasse trinque. Les fenêtres aussi, à leur façon.", simEffect: { noise: 6 } },
+        { at: H(23, 5), text: "Colette lève son verre : « À la convivialité, mes chers amis ! » Toute la terrasse trinque. Les fenêtres aussi, à leur façon.", simEffect: { noise: 6 }, state: { estaminetOut: '>0' }, else: 'Colette lève son verre à l’intérieur, derrière la vitrine : « À la convivialité ! » La rue, dehors, n’entend qu’un tintement.' },
       ],
       opportunities: ['night_photo'],
     },
@@ -92,11 +92,11 @@ export const TWISTS = [
       crowd: 0.85,
       noise: 0.85,
       closeDelay: -20,
-      events: [{ at: H(23, 30), text: "La rumeur court que « la dame de la mairie est rentrée chez elle ». Deux tables ressortent, timidement.", simEffect: { noise: 5 } }],
+      events: [{ at: H(23, 30), text: "La rumeur court que « la dame de la mairie est rentrée chez elle ». Deux tables ressortent, timidement.", simEffect: { noise: 5 }, state: { tablesOut: '>0' }, else: 'La rumeur court que « la dame de la mairie est rentrée chez elle ». Trop tard : tout est déjà rangé. Dédé soupire.' }],
       opportunities: ['night_db'],
     },
     lines: {
-      barks: ['« Pourquoi on est que six ? On est toujours dix. »', "« Le serveur a dit qu’on rentrait à 21h40. Je comprends pas. »"],
+      barks: ['« Pourquoi on est que six ? On est toujours dix. »', { text: "« Le serveur a dit qu’on rentrait à 21h40. Je comprends pas. »", state: { before: '23:00', present: ['serveur'] } }],
       klaas: ['21h40 : toutes les tables rentrées. Première fois. Je souligne. Ce n’est pas un compliment.'],
       recap: ["Une nuit exemplaire, pour cause d’inspection annoncée. Même Colette n’aurait pas mieux organisé."],
     },
@@ -274,7 +274,7 @@ export const TWISTS = [
     sim: {
       rain: true,
       crowd: 0.65,
-      events: [{ at: H(21, 15), text: 'La drache tombe, droite, épaisse. Les tables du milieu se vident ; celles sous le store se serrent, à quatorze sur trois tables.' }],
+      events: [{ at: H(21, 15), text: 'La drache tombe, droite, épaisse. Les tables du milieu se vident ; celles sous le store se serrent, à quatorze sur trois tables.' , simEffect: { rain: true }}],
       opportunities: ['night_photo'],
     },
     lines: {
@@ -451,7 +451,8 @@ export const TWISTS = [
       klaas: ['Fête des voisins. 22h00 : rangée. Je l’écris en gros, pour qu’on puisse comparer.'],
       recap: ["La fête des voisins s’est terminée à 22h00 pile. Les terrasses, elles, ont continué. La comparaison était le but."],
     },
-    props: ['trestle_table', 'bunting', 'sugar_tart'],
+    // la fête de l'association range sa table à 22h00, comme le dit le texte : les accessoires partent à cette heure-là
+    props: [{ id: 'trestle_table', until: H(22, 0) }, { id: 'bunting', until: H(22, 0) }, { id: 'sugar_tart', until: H(22, 0) }],
     after: { setFlags: ['twist_fete_voisins'], media: ['wa_twist_fete_voisins'] },
   },
   {
@@ -482,7 +483,7 @@ export const TWISTS = [
     sim: {
       witnesses: [{ id: 'lescaut', at: 'street', filming: false }],
       closeDelay: -15,
-      events: [{ at: H(23, 0), text: "Le maire remonte la rue. Dédé range trois tables en courant, les bras pleins de chaises. Le maire le regarde faire. « Je vous en prie, ne vous dérangez pas pour moi. »" }],
+      events: [{ at: H(23, 0), text: "Le maire remonte la rue. Dédé range trois tables en courant, les bras pleins de chaises. Le maire le regarde faire. « Je vous en prie, ne vous dérangez pas pour moi. »", state: { tablesOut: '>0' }, else: 'Le maire remonte une rue déjà rangée, chaises empilées, couloir libre. Il a l’air presque déçu.' }],
       opportunities: ['night_photo', 'night_db'],
     },
     lines: {
@@ -500,6 +501,7 @@ export const TWISTS = [
     when: { flags: ['met_jeremie'] },
     intro: "Ce soir, pas de ronde : Biloute s’est échappé à 21h30, sa laisse à la patte. Jérémie fait toute la rue en criant son nom, d’une voix de président. Toutes les terrasses cherchent sous les tables.",
     sim: {
+      dog: false, // pas de ronde ce soir (twistNight.js : sim.dogActive() reste faux)
       witnesses: [{ id: 'jeremie_searching', at: 'street', filming: false }],
       events: [
         { at: H(21, 30), text: 'Jérémie, au milieu du couloir : « BILOUTE ! » Trois clients répondent « oui ? ».' },
@@ -525,7 +527,7 @@ export const TWISTS = [
       closeDelay: 20,
       events: [
         { at: H(21, 0), text: "Dédé, au micro : « Ici, on respecte nos voisins. C’est notre ADN. » Il fait un clin d’œil à votre fenêtre, à l’antenne." },
-        { at: H(22, 30), text: 'Fin du tournage. En trois minutes, deux tables ressortent et le couloir disparaît.', simEffect: { noise: 6 } },
+        { at: H(22, 30), text: 'Fin du tournage. En trois minutes, deux tables ressortent et le couloir disparaît.', simEffect: { noise: 6 }, state: { tablesOut: '>0' }, else: 'Fin du tournage. La terrasse, déjà rangée, ne ressort pas : Dédé a raté le coche, et il le sait.' },
       ],
       opportunities: ['night_photo', 'night_db'],
     },

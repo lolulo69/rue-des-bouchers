@@ -5,7 +5,7 @@
 import { evalCondition } from './conditions.js';
 
 // Champs de `sim` compris par le moteur (le linter signale les autres)
-export const TWIST_SIM_KEYS = ['crowd', 'noise', 'closeDelay', 'tables', 'witnesses', 'darkness', 'rain', 'exhaustOff', 'corridorBlocked', 'events', 'opportunities'];
+export const TWIST_SIM_KEYS = ['crowd', 'noise', 'closeDelay', 'tables', 'witnesses', 'darkness', 'rain', 'exhaustOff', 'corridorBlocked', 'events', 'opportunities', 'dog'];
 
 // ctx : contexte de conditions de la campagne (c.ctx()) ; history : ids déjà joués ; rng : RNG de la campagne
 export function pickTwist(TWISTS, ctx, history, rng) {

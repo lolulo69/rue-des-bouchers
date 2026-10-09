@@ -57,7 +57,8 @@ export function setupTwist(sim, twist) {
   // Les restos rangent plus tard ce soir-là
   if (T.closeDelay) for (const t of S.tables) if (!t.until) t.clearAt += T.closeDelay; // une table « jusqu'à 22h » reste à l'heure dite
   // La drache (twist) : elle tombe entre 21:00 et 22:00 ; sous le store de Bernadette, on reste
-  if (T.rain) S.twistRainAt = rng.range(21 * 60, 22 * 60);
+  // (un moment du twist qui porte la pluie, ex. « La drache tombe » à 21h15, fixe l'heure : pas de tirage)
+  if (T.rain && !(T.events ?? []).some((e) => e.simEffect?.rain)) S.twistRainAt = rng.range(21 * 60, 22 * 60);
 }
 
 // Pluie : les terrasses rentrent en quatre minutes (sauf, au besoin, sous le store), les buveurs debout s'abritent

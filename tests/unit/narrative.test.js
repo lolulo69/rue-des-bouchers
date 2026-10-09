@@ -5,6 +5,7 @@ import {
   dialogueFor, mediaFeed, mediaEnding, mediaEndingFeed, waiterReason, bellAfterKey,
 } from '../../src/sim/narrative.js';
 import { compare } from '../../src/sim/conditions.js';
+import { holds, guardOf, textOf } from '../../src/sim/stateGuard.js';
 import { runNight } from '../../src/sim/runner.js';
 import { POLICIES } from '../../src/sim/policies.js';
 import { KLAAS_NOTEBOOK, POLICE_LINES, WITNESS_LINES, BARKS, BELL, WAITER_LINES, RECAP_HEADLINES, NIGHT_END } from '../../src/content/night.js';
@@ -100,7 +101,9 @@ describe('narrative.js : chaque entrée de contenu est atteignable', () => {
       const outs = new Set();
       for (let i = 0; i < pool.length * 3; i++) outs.add(pickNightLine(kind, sim, rng, extra));
       for (const l of pool) {
-        const ok = [...outs].some((o) => o === l || o === fill(l, { n: 10 }));
+        if (guardOf(l) && !holds(guardOf(l), sim)) continue; // ligne gardée (§13.L) : hors de cet état de nuit
+        const tl = textOf(l);
+        const ok = [...outs].some((o) => o === tl || o === fill(tl, { n: 10 }));
         expect(ok, `${kind} → ${l}`).toBe(true);
       }
     }
