@@ -8,7 +8,8 @@ import { scenes } from '../art/scenes.js';
 import { art } from '../art/index.js';
 
 // art.day de l'agent art (tests : globalThis.__rdbArtDay le remplace)
-const artDay = () => globalThis.__rdbArtDay ?? art?.day ?? null;
+// (ui.html, banc d'essai 2D : __rdbNoArtDay coupe la 3D de jour, trop lourde sous SwiftShader en CI)
+const artDay = () => globalThis.__rdbArtDay ?? (globalThis.__rdbNoArtDay ? null : art?.day ?? null);
 const dayHas = (kind) => { const d = artDay(); return !!d?.start && (!d.scenes || d.scenes.includes(kind)); };
 // Vignette 2D de repli pour chaque écran
 const FALLBACK = { koddex: 'koddex', home: 'koddex', street: 'atelier', atelier: 'atelier', mairie: 'mairie' };
