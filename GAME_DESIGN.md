@@ -390,6 +390,9 @@ The campaign simulator plays 1000 seeded campaigns per strategy bot. Targets:
 - [ ] Notification badges only for genuinely new items, cleared on open (test). **T Q**
 - [ ] Night action menu reworked for clarity (here-and-now, why not, legality/risk/time at a glance, coach mark). **Q L**
 
+### L. Text ↔ state coherence (Lucas, playtest 1)
+- [ ] Every line shown (barks, Klaas, police, twist events, recap, dialogue, media) is consistent with the simulation state at the moment it's shown: no « en terrasse » when no table is out, no « les tables rentrent » when they're already in, no daytime line at night, no line about someone absent, twist props/tables obey what the text says (the Fête des voisins tables go home at 22:00). Lines carry state guards; a checker scans 200 seeded campaigns and reports 0 mismatches. **T Q L**
+
 ### Release tasks (done by the design agent when v1.0 lands)
 - [ ] Set `WHATSAPP_GROUP` in `src/content/characters.js` to **« La Gaystapo »** (Lucas's choice: the real group's own name).
   Only the label changes; the writing around Seb & Nico stays role-based.
