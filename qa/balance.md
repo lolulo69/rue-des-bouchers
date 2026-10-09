@@ -279,3 +279,9 @@ dialogue (20/211) : klaas_persuaded, klaas_saturday2, klaas_cardboard, tatie_mai
 
 No dominant action (1000 runs, base 98 %): `pm_klaas_roster` −18, `pm_klaas_notebook` −13, `pm_press_contact` −5. Max 18 < 25 ✅.
 Twists over 48 campaigns (4 bots × 12 seeds): 25/26 come up (`carbonnade_contest` 19×, `guide_tour` every campaign). Never: **`inspector_quiet_night`**, day 9's fallback for when neither `inspector_surprise` nor `inspector_announced` is set. Every choice of `d9_inspector` sets one of the two, so it can only fire if the day-9 event is skipped (content agent's call: unreachable by design, or let choice 3 « laisser la procédure » lead to a quiet night).
+
+## 2026-10-09 04:30 · design agent verification · v1.1 (twists + gated tools) · main fbe90b6 · 1000 × 7 on CT 106 (123 s)
+All §13.H / §13.F targets ✅; every action (68), event (28), ending (8) and counter-move (42) reached; invariants ✅.
+Legal careful 49% legal / 48% scandal, never custody · reckless 100% custody (night 5) · stealthy 19% custody, 34% scandal · mixed 89% legal, best score 95 · diplomat 27% peace + 35% the return + 14% turncoat · slacker 89% fired · passive 100% moving out.
+17/211 dialogue lines never surface in simulation (rare combinations, by design or acceptable).
+Note: inspector_quiet_night (D9 fallback twist) can't trigger because every D9 inspector choice sets a flag; kept as a safety fallback.
