@@ -195,15 +195,24 @@ export function mount(engine = {}, opts = {}) {
   // Repli : la mise en page 2D si pas de scène de jour, qualité « Bas », ou écran trop petit pour être lisible.
   const MON_W = 760;
   const MON_H = 475;
+  // Stabilité : la caméra assise « respire » ; on ne recale le terminal que si un coin a bougé de plus de 4 px
+  // (coordonnées arrondies au pixel), sinon il tremblerait sous le curseur (et un clic ne trouverait jamais sa cible).
+  let lastQuad = null;
+  const moved = (a, b) => !a || !b || a.some((p, i) => Math.abs(p.x - b[i].x) > 4 || Math.abs(p.y - b[i].y) > 4);
   function placeMonitor() {
     const mon = layer.querySelector('.ui-monitor');
+    lastQuad = null;
     const fit = () => {
-      const q = mon?.isConnected ? vignette.screenQuad() : null;
+      const raw = mon?.isConnected ? vignette.screenQuad() : null;
+      const q = raw && raw.map((p) => ({ x: Math.round(p.x), y: Math.round(p.y) }));
       const sz = q && quadSize(q);
       const ok = q && sz.w >= 420 && sz.h >= 240;
       root.classList.toggle('on-monitor', !!ok);
       if (!mon) return;
-      const H = ok && homography(MON_W, MON_H, q);
+      if (!ok) { lastQuad = null; mon.style.transform = ''; return; }
+      if (!moved(q, lastQuad)) return;
+      lastQuad = q;
+      const H = homography(MON_W, MON_H, q);
       mon.style.transform = H ? toMatrix3d(H) : '';
     };
     vignette.onFrame(mon ? fit : null);
@@ -335,7 +344,8 @@ export function mount(engine = {}, opts = {}) {
     const d = card.data ?? card;
     const speaker = d.speaker;
     // « Nouveau » : une carte info du moteur avec une charge `unlock` (ou un futur type 'unlock')
-    if (card.unlock || card.type === 'unlock') return unlockCard(card, card.unlock ?? card.data ?? card);
+    // (moteur v1.1 : `unlock` = l'id de l'outil, title/text/hint au premier niveau ; accepte aussi un objet)
+    if (card.unlock || card.type === 'unlock') return unlockCard(card, typeof card.unlock === 'object' ? card.unlock : (card.data ?? card));
     const kicker = { event: typeof d.day === 'number' ? 'Événement' : 'Imprévu', dialogue: 'Conversation', countermove: 'Le bloc contre-attaque', info: 'Nouvelles' }[card.type];
     const body = h(`div.ui-card.ui-card-${card.type}`, { dataset: { testid: 'card', type: card.type, id: card.id } }, h('span.ui-kicker', kicker));
     let merged = 0;

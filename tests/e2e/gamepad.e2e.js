@@ -123,18 +123,24 @@ test('manette dans la nuit 3D : invite Ⓐ, actions de nuit à la croix, seau à
   await expect(page.locator('#prompt')).toContainText('[Ⓐ]', { timeout: 20_000 });
   await expect(page.locator('#prompt')).not.toContainText('[E]');
 
-  // 2. Ⓨ ouvre les actions de nuit ; la croix déplace le focus dans la liste ; Ⓑ referme
+  // 2. Ⓨ ouvre les actions de nuit, Ⓑ referme ; la croix navigue dans un overlay de nuit (le téléphone, LB : les outils
+  //    du menu de nuit arrivent au fil des déblocages, la nuit 1 n'en a qu'un ou deux)
   await tap(page, 'Y');
   await expect(page.locator('#nightmenu')).toBeVisible();
-  const n = await page.locator('#nightmenu button:visible').count();
-  expect(n, 'des actions de nuit à choisir').toBeGreaterThan(1);
-  await tap(page, 'DOWN');
-  const first = await page.evaluate(() => document.activeElement?.textContent);
-  expect(await page.evaluate(() => document.getElementById('nightmenu').contains(document.activeElement))).toBe(true);
-  await tap(page, 'DOWN');
-  expect(await page.evaluate(() => document.activeElement?.textContent)).not.toBe(first);
   await tap(page, 'B');
   await expect(page.locator('#nightmenu')).toBeHidden();
+  await tap(page, 'LB');
+  await expect(page.locator('#phone')).toBeVisible();
+  expect(await page.locator('#phone button:visible').count(), 'des boutons au téléphone').toBeGreaterThan(1);
+  await tap(page, 'DOWN');
+  expect(await page.evaluate(() => document.getElementById('phone').contains(document.activeElement))).toBe(true);
+  const first = await page.evaluate(() => document.activeElement?.textContent);
+  await tap(page, 'DOWN');
+  // déjà sur le dernier bouton (« Raccrocher ») : la croix vers le haut
+  if (await page.evaluate(() => document.activeElement?.textContent) === first) await tap(page, 'UP');
+  expect(await page.evaluate(() => document.activeElement?.textContent)).not.toBe(first);
+  await tap(page, 'B');
+  await expect(page.locator('#phone')).toBeHidden();
 
   // 3. À la fenêtre : RT bref = rien ; RT maintenu = barre de confirmation, puis le seau
   await page.evaluate(() => {

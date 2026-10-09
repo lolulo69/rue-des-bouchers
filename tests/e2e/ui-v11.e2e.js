@@ -94,14 +94,14 @@ test('après-midi : carnet sur la rue de jour, résultat à la mairie ; carte «
   await page.evaluate(() => {
     const ui = window.__rdbUi;
     ui.campaign.endAfternoon();
-    ui.campaign.state.cards.unshift({ type: 'info', id: 'unlock:db_reading', unlock: { title: 'Nouveau : le relevé de décibels', text: 'Visez la rue et mesurez.', hint: 'B / RB' } });
+    ui.campaign.state.cards.unshift({ type: 'info', id: 'unlock:test_tool', unlock: 'test_tool', title: 'Nouveau : le relevé de décibels', text: 'Visez la rue et mesurez.', hint: 'B / RB' });
     ui.campaign.state.step = 'cards';
     ui.render();
   });
   await expect(page.locator('[data-testid=card][data-type=unlock]')).toContainText('relevé de décibels');
   await expect(page.locator('[data-testid=unlock-hint] kbd')).toHaveText('B');
   await page.keyboard.press('Digit1');
-  await expect(page.locator('[data-testid=card][data-type=unlock]')).toHaveCount(0);
+  await expect(page.locator('[data-testid=card][data-id="unlock:test_tool"]')).toHaveCount(0);
   // Le rebondissement de la nuit, en carte d'ouverture
   await page.evaluate(() => {
     const ui = window.__rdbUi;
@@ -135,6 +135,8 @@ test('dans le jeu, avec la vraie art.day : terminal posé sur le moniteur de Kod
   await expect(page.locator('[data-testid=terminal]')).toBeVisible();
   await expect(page.locator('#ui-root')).toHaveAttribute('data-stage', 'day3d', { timeout: 60_000 });
   await expect(page.locator('#ui-root')).toHaveClass(/on-monitor/, { timeout: 60_000 });
+  // le terminal garde sa hauteur sur le moniteur (régression : une grille l'écrasait à 0 px)
+  expect(await page.locator('[data-testid=terminal]').evaluate((el) => el.getBoundingClientRect().height)).toBeGreaterThan(60);
   await page.waitForTimeout(1500);
   await page.screenshot({ path: 'test-results/v11-real-koddex.png' });
   expect(errors).toEqual([]);

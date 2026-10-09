@@ -308,10 +308,13 @@ html[data-input=pad] :focus { outline: 3px solid #24406b !important; outline-off
 /* Le terminal sur le moniteur : élément net, déformé par matrix3d (project.js), sinon mise en page normale */
 :is(#ui-root, #dayui, #ui-menu).on-monitor .ui-monitor {
   position: fixed; left: 0; top: 0; width: 760px; height: 475px; transform-origin: 0 0; z-index: 2;
-  overflow: auto; display: grid; gap: 10px; align-content: start; padding: 10px; background: #14181c; border-radius: 6px;
+  overflow: auto; display: block; padding: 10px; background: #14181c; border-radius: 6px;
   box-shadow: 0 0 40px #7fe0ff40; backface-visibility: hidden;
 }
 :is(#ui-root, #dayui, #ui-menu).on-monitor .ui-monitor .ui-term { box-shadow: none; border: 0; border-radius: 4px; }
+/* Bloc et non grille : une boîte en overflow hidden y serait écrasée à 0 px de haut (taille minimale automatique) */
+:is(#ui-root, #dayui, #ui-menu).on-monitor .ui-monitor > * + * { margin-top: 10px; }
+:is(#ui-root, #dayui, #ui-menu).on-monitor .ui-monitor .ui-term-body { max-height: 190px; }
 :is(#ui-root, #dayui, #ui-menu).on-monitor .ui-monitor .ui-prompts { color: #c4f5d2; }
 :is(#ui-root, #dayui, #ui-menu).on-monitor .ui-monitor .ui-prompt-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
 :is(#ui-root, #dayui, #ui-menu).on-monitor .ui-monitor .ui-btn { text-align: center; }
@@ -336,9 +339,7 @@ html[data-input=pad] :focus { outline: 3px solid #24406b !important; outline-off
 :is(#ui-root, #dayui, #ui-menu) .ui-commute { border-color: #cfe9bd; }
 :is(#ui-root, #dayui, #ui-menu) .ui-card-unlock { border-color: var(--ui-gold); background: linear-gradient(160deg, #fff6e6 60%, #fde8b4); }
 :is(#ui-root, #dayui, #ui-menu) .ui-unlock-hint kbd { background: var(--ui-ink); color: #fff3e0; border-radius: 8px; padding: 2px 10px; font-weight: 900; font-family: inherit; }
-/* Terminal sur le moniteur : notification et astuce en petit, en bas à droite (jamais sous le terminal) */
-:is(#ui-root, #dayui, #ui-menu).on-monitor .ui-notif,
-:is(#ui-root, #dayui, #ui-menu).on-monitor .ui-tip { position: fixed; right: 16px; width: min(340px, 40vw); z-index: 3; font-size: 14px; }
-:is(#ui-root, #dayui, #ui-menu).on-monitor .ui-notif { bottom: 16px; }
-:is(#ui-root, #dayui, #ui-menu).on-monitor .ui-notif .ui-feed.mini { display: none; }
-:is(#ui-root, #dayui, #ui-menu).on-monitor .ui-tip { bottom: 120px; }
+/* Terminal sur le moniteur : rien ne doit passer par-dessus (clics, lisibilité). La notification disparaît (la pastille
+   du 📱 reste), l'astuce se range sous l'en-tête, derrière le moniteur et sans capter les clics. */
+:is(#ui-root, #dayui, #ui-menu).on-monitor .ui-notif { display: none; }
+:is(#ui-root, #dayui, #ui-menu).on-monitor .ui-tip { position: fixed; right: 16px; top: 120px; width: min(320px, 30vw); z-index: 1; font-size: 13px; pointer-events: none; opacity: .95; }
