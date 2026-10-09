@@ -324,6 +324,27 @@ Checklist additions (v1.1) are in §13.J.
      (« Dossier à jour : au lit », « Vous tombez de sommeil : allez vous allonger »), pointing at the bed/E, also as the last
      « Objectifs du soir » item. Never nags more than once every ~20 game minutes; disappears if something new happens.
 
+## 12d. Playtest 2 (Lucas, 2026-10-09): « way better »; illegal acts feel impossible
+Someone is always watching, so the illegal actions can never be done unseen. Stealth must be **possible with preparation, risky
+without**:
+1. **Diversions** (night actions, mostly grey, each with a cost, a cooldown, and its own risk of being traced): a firecracker at the
+   far end of the street (everyone turns, customers film the wrong spot), calling the estaminet's landline (the waiter and Dédé go
+   inside), a fake alert on the WhatsApp group (Seb & Nico go in to read it; costs Asso if overused), Biloute barking at the corner
+   (with Jérémie's help), a pizza delivered to the wrong door (a confused rider: a crowd at the wrong door). Each one removes or turns
+   away specific witnesses for a few game minutes (an attention model: each witness has a focus point; a diversion moves it).
+2. **Natural windows** in the twists: the goal during the match, the cake arriving at table 4, the guide's speech, the power cut, the
+   EVJF's megaphone number: for 1–2 game minutes attention is elsewhere; the HUD shows « Fenêtre propice » (and the night clock
+   slows down to ×1 during it).
+3. **« Qui regarde ? »**: a compact HUD indicator, live, listing who could see Pilou right now and from where (eyes icons:
+   Klaas 🔭, Seb & Nico 🐈, the waiter, the customers, the patrol), updating as he moves and as diversions act; a
+   one-time coach mark explains it.
+4. **The late window is real**: the night ends at 02:30 instead of 01:30 (×3 clock after 22:30 so it's quick); after 01:00 the
+   terraces are empty, Klaas is asleep, and few witnesses remain. The bedtime hint must not push to bed when the player has
+   illegal actions available and the stance is not « légal » (it says « la rue se vide après 1h… » instead, once).
+5. The disguise (a hood / a hi-vis vest) must be reachable and explained (a night action or an item from the apartment).
+6. Balance: the stealthy bot uses diversions and windows; target « illegal stealthy » ≤ 40% custody still, but the illegal acts must
+   now be achievable unseen in ≥ 30% of attempts made with a diversion or in a window (and ≤ 10% without). Re-run 1000 × 7.
+
 ## 13. v1.0 acceptance checklist
 v1.0 ships only when **every** box is ticked. Nothing is dropped silently: anything cut or simplified is listed under "Deviations" with Lucas's OK.
 Proof: **T** = automated test (vitest / Playwright / campaign simulator, runs in CI) · **Q** = design agent's QA session in Chrome (screenshots in `qa/`) · **L** = Lucas playtest.
@@ -412,6 +433,10 @@ The campaign simulator plays 1000 seeded campaigns per strategy bot. Targets:
 ### M. Night pacing (playtest 1)
 - [ ] Adaptive night clock (×3 after 22:30 unless something is happening/imminent, ⏩ indicator, manual toggle) and faster sleep (×40 + « Passer à demain matin »); campaign duration re-measured. **T Q L**
 - [ ] « Ce soir » briefing + « Objectifs du soir » HUD list, state-aware, self-ticking; bedtime hint after 22:30 when done or tired. **T Q L**
+
+### N. Stealth playable (playtest 2)
+- [ ] Diversions (≥ 5) with an attention model, natural twist windows (« Fenêtre propice »), « Qui regarde ? » HUD, the night extended to 02:30, the disguise reachable, the bedtime hint aware of illegal plans. **T Q L**
+- [ ] Unseen success ≥ 30% with a diversion/window, ≤ 10% without; stealthy bot ≤ 40% custody; §13.H still met. **T**
 
 ### Release tasks (done by the design agent, 2026-10-09)
 - [x] `WHATSAPP_GROUP` in `src/content/characters.js` = **« La Gaystapo »** (Lucas's choice: the real group's own name). Only the
