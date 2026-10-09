@@ -8,6 +8,7 @@
 //   trigger : quand le repère peut apparaître
 //             { night: 1, after: minutes, where?: 'street' | 'apt' | 'window' } : outils de départ, étalés sur la 1re nuit
 //             { unlock: '<id d'UNLOCKS>', after?, where? } : à la première nuit où l'outil est débloqué
+//             { window: true } : à la première « Fenêtre propice » d'un twist (§12d)
 //   steps   : text ≤ 2 lignes, avec {key} et {pad} remplacés par `key` (clavier) et `pad` (bouton de manette, NIGHT_MAP
 //             de src/input/gamepad.js) ; `done` = id d'événement moteur qui valide l'étape (liste dans la Build note)
 //   congrats: une ligne, affichée quand la dernière étape est faite
@@ -111,6 +112,29 @@ export const TOOL_TUTORIALS = [
       { text: 'Fatigué ? Le lit, {key} / {pad}, fait passer le temps. Mais ce qui se passe dehors pendant ce temps-là, vous le ratez.', key: 'E', pad: 'A', done: 'bed_tried' },
     ],
     congrats: 'Dormir est aussi une stratégie. La rue, elle, ne dort pas.',
+  },
+
+  // ════════════════════════════════════════════════════════════════════════
+  // DISCRÉTION (§12d) : qui regarde, et quand personne ne regarde
+  // ════════════════════════════════════════════════════════════════════════
+  {
+    id: 'tuto_who_watches',
+    tool: 'who_watches',
+    trigger: { night: 2, after: 21 * 60, where: 'street' },
+    steps: [
+      { text: "En haut de l’écran, « Qui regarde ? » : Klaas 🔭, Seb et Nico 🐈, le serveur, les clients. Ça change quand vous bougez.", key: '', pad: '', done: 'who_watches_seen' },
+      { text: 'Trop de regards ? Une diversion (menu {key} / {pad}) les détourne quelques minutes. Chacune a son prix.', key: 'N', pad: 'Y', done: 'night_menu_opened' },
+    ],
+    congrats: 'Vous savez qui regarde. C’est déjà la moitié de la discrétion.',
+  },
+  {
+    id: 'tuto_window_moment',
+    tool: 'window_moment',
+    trigger: { window: true },
+    steps: [
+      { text: '« Fenêtre propice » : pendant une minute ou deux, tout le monde regarde ailleurs. Le temps ralentit.', key: '', pad: '', done: 'window_seen' },
+    ],
+    congrats: 'Ces moments-là reviennent. Ce que vous en faites ne regarde que vous.',
   },
 
   // ════════════════════════════════════════════════════════════════════════
@@ -291,5 +315,7 @@ export const TUTORIAL_EVENTS = {
   legal_view_toggled: 'la vue des zones légales a été activée (L / LT)',
   corridor_measured: 'un débordement sur le couloir a été mesuré (photo dans la rue, < 5 m)',
   bed_tried: 'le joueur s’est mis au lit (E / A près du lit)',
+  who_watches_seen: 'l’indicateur « Qui regarde ? » a été affiché au moins 3 s dans la rue',
+  window_seen: 'une « Fenêtre propice » d’un twist a commencé (HUD affiché)',
 };
 

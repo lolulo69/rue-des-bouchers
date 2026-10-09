@@ -1080,3 +1080,18 @@ so it reflects what the player actually did.
 - **Bedtime hint**: `c.bedtimeHint(sim, { busy })` → `{ id, why: 'done' | 'tired', text }` or null. After `RULES.bedtime.after` (22:30), when every tickable objective is done or Sleep ≤ `tiredSleep` (25), and only while `busyReason` is null; shown `show` (8) game minutes, then not again before `every` (20), with another variant. Last line of the HUD list: « 🛏 … (↖ lit à 6 m, puis [E]) », or « montez chez vous » in the street; the key turns into the pad glyph. Six variants in `BEDTIME` (src/content/objectives.js, my block at the end; content agents may add more: `{ id, why, text }`).
 - **Duration** (`npm run measure:nights`, appended to `qa/duration.md`): a night now takes **~7 min** awake (was 10 min fixed), **~5 min 15 s** if Pilou goes to bed at 23:30 and skips to morning. J14 campaigns: **2h32–2h46** awake, **2h08–2h22** with an early bed + skip, against the §13.A 2h30–4h target. **@balance agent**: the clock only changes real time, not game minutes, so the sim and the bots' numbers don't move; but sleeping is now cheap in real time, so players will likely sleep more nights through (more Sleep, fewer late photos). Knobs if the floor matters: `RULES.clock.fastScale` (×2.5 ≈ +6 min per campaign), `fastAfter` (23:00 ≈ +8 min), `sleepTimeMultiplier`, `skipMinutesPerFrame`. **@QA agent**: `fullrun.e2e.js` still counts 10-minute nights (`NIGHT_S`); please switch to the measured value.
 - Tests: `tests/unit/nightClock.test.js`, `tests/unit/objectivesEngine.test.js`; e2e in `robustness.e2e.js` (clock + ⏩ + V, sleep veil + skip to morning, « Ce soir » + HUD list ticking).
+
+**content-stealth (v1.1 §12d, content agent → build, UI and balance agents)** — @build agent @ui agent @balance agent
+- `actions.js`: 5 diversions with the §14 `diversion` contract. Each lists `turns` (witnesses who look away), minutes, cooldown and `traceRisk`.
+  - `night_firecracker` (illegal): klaas, seb_nico, waiter, dede, customers; 2 min; cooldown 60; trace 0.25.
+  - `night_call_landline` (grey): waiter, dede, ghislain; 3 min; cooldown 45; trace 0.15.
+  - `night_fake_alert` (grey, Asso −2 each time): seb_nico; 4 min; cooldown 90; trace 0.3.
+  - `night_biloute_bark` (grey, needs `joined_rounds`, during the round): customers, waiter, klaas; 2 min; cooldown 60; trace 0.1.
+  - `night_wrong_pizza` (grey): customers, waiter, dede; 4 min; cooldown 120; trace 0.2.
+  - If traced, the engine applies `witnessed.effects`.
+  - Disguises: `night_disguise` (hood → `disguise_hood`) and `night_disguise_vest` (vest → `disguise_vest`), both at the coat rack (`at: 'apartment'`). Both flags are now declared in `flags.js`.
+  - Specs added to `NIGHT_ACTION_SPECS`; the window ends at H(26) / H(26, 30), the night now runs to 02:30.
+- `twists.js`: `sim.windows` on 17 twists (18 windows), each on an existing timed moment. `'windows'` is added to `TWIST_SIM_KEYS` in `src/sim/twists.js` so the linter accepts it; the engine still has to read it (HUD « Fenêtre propice », clock ×1).
+- `tutorials.js`: `tuto_who_watches` (night 2, street) and `tuto_window_moment` (new trigger `{ window: true }`: the first twist window). Two new events for the engine and UI: `who_watches_seen` (the « Qui regarde ? » indicator shown ≥ 3 s in the street) and `window_seen` (a window started).
+- `objectives.js`: 6 stealth objectives for a non-legal stance (disguise, landline, pizza, firecracker, « Fenêtre propice », after 1:00). They share `group: 'stealth'`, so at most one is picked per night, plus the two info lines.
+- **Balance**: the diversion numbers are first guesses for the « unseen ≥ 30 % with a diversion or window, ≤ 10 % without » target (§13.N). Retune freely.

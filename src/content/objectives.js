@@ -177,4 +177,20 @@ export const BEDTIME = [
   { id: 'bed_tired_fall', why: 'tired', text: 'Vous tombez de sommeil : allez vous allonger, même mal, même tard.' },
   { id: 'bed_tired_eyes', why: 'tired', text: 'Les yeux qui piquent, la nuque qui lâche. Le lit, maintenant ?' },
   { id: 'bed_tired_tomorrow', why: 'tired', text: 'Demain, Koddex vous attend à 9h. Une heure de sommeil vaut une photo.' },
+
+  // ════════════════════════════════════════════════════════════════════════
+  // DISCRÉTION (§12d) : pour qui n'a pas choisi la voie strictement légale
+  // ════════════════════════════════════════════════════════════════════════
+  { id: 'o_st_disguise', stance: 'grey', priority: 5, group: 'stealth', when: { day: [3, 14], notFlags: ['stance_legal', 'disguise_hood'] }, done: { event: 'action:night_disguise' },
+    text: 'Option : la capuche du portemanteau avant de descendre. De loin, vous êtes « un jeune ».' },
+  { id: 'o_st_landline', stance: 'grey', priority: 5, group: 'stealth', when: { day: [3, 14], notFlags: ['stance_legal'] }, done: { event: 'action:night_call_landline' },
+    text: 'Option : un appel au fixe de l’estaminet rentre le personnel trois minutes.' },
+  { id: 'o_st_pizza', stance: 'grey', priority: 4, group: 'stealth', when: { day: [4, 14], notFlags: ['stance_legal'] }, done: { event: 'action:night_wrong_pizza' },
+    text: 'Option : des pizzas à la mauvaise porte. Une table entière se lève pour aider.' },
+  { id: 'o_st_firecracker', stance: 'illegal', priority: 5, group: 'stealth', when: { day: [5, 14], flags: ['stance_direct'] }, done: { event: 'action:night_firecracker' },
+    text: 'Option illégale : un pétard côté place, deux minutes de regards ailleurs. Et un risque.' },
+  { id: 'o_st_window', stance: 'info', priority: 6, when: { flags: ['stance_direct'] }, done: null,
+    text: 'Guettez « Fenêtre propice » : une minute où toute la rue regarde ailleurs.' },
+  { id: 'o_st_late', stance: 'info', priority: 5, when: { day: [3, 14], flags: ['stance_direct'] }, done: null,
+    text: 'Après 1h : terrasses vides, Klaas endormi. La rue est à vous… et au Risque.' },
 ];
