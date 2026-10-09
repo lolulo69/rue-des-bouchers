@@ -149,7 +149,7 @@ test.describe('v1.1 · le jour en 3D', () => {
 
 // BUG-010 (qa/bugs.md) : les tables ajoutées par un twist (id « bernadette-x1 ») n'ont pas de vue 3D sous leur id
 // (world.js dérive l'index de l'id → « bernadette-NaN ») ; une photo (P) cette nuit-là plante le jeu. Le J4 en a une.
-(process.env.QA_RUN_FIXME ? test : test.fixme)('BUG-010 · nuit à twist (J4) : photographier les tables ne plante pas le jeu', async ({ page }) => {
+test('BUG-010 · nuit à twist (J4) : photographier les tables ne plante pas le jeu', async ({ page }) => {
   test.setTimeout(240_000);
   const errors = watchErrors(page);
   await newCampaign(page, 3);

@@ -416,9 +416,14 @@ export function buildWorld(scene, opts = {}) {
   // ---------- Terrasses ----------
   const tables = [];
   if (opts.tables) {
-    for (const l of opts.tables) {
+    for (const [i, l] of opts.tables.entries()) {
       const r = RESTAURANTS.find((x) => x.id === l.restId);
-      tables.push(buildTable(r, l.x, l.z, Number(l.id.split('-').pop()) - 1, scene, l.count));
+      // Les tables ajoutées par un rebondissement ont des ids non numériques (« bernadette-x1 ») : la vue garde l'id de la sim (BUG-010)
+      const n = Number(l.id.split('-').pop());
+      const v = buildTable(r, l.x, l.z, Number.isFinite(n) ? n - 1 : i, scene, l.count);
+      v.id = l.id;
+      if (l.label) v.label = `${r.name}, ${l.label}`;
+      tables.push(v);
     }
   } else for (const r of RESTAURANTS) {
     const x = r.side * (W - 1.25);

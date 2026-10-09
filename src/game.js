@@ -273,7 +273,7 @@ function photo() {
   raycaster.setFromCamera(CENTER, camera);
   raycaster.far = EVIDENCE.photoRange;
   const hits = [
-    ...S.tables.filter((t) => t.out).map((t) => viewTables.get(t.id).hit),
+    ...S.tables.filter((t) => t.out).map((t) => viewTables.get(t.id)?.hit).filter(Boolean),
     ...director.hitTargets(), // pipis, policiers
     ...(S.corridorBlocked ? [vanHit] : []),
   ];
