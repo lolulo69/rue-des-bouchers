@@ -379,6 +379,13 @@ without**:
    Face-to-face acts get their natural cover: e.g. bribing the waiter is done during his smoke break around the corner, out of
    sight of the terrace (talk to him there).
 
+8. **Photo spam must cost something** (Lucas): photographing a table that is NOT in breach (≤ 6 people, inside its zone, before
+   22:00 or already in) gives no evidence and has consequences, escalating within a night: the customers notice (« Il nous prend en
+   photo, lui ? »), which is a witness memory + hostility; from the 3rd useless photo in a night, a « harcèlement » counter rises (Risk,
+   feeding the bloc's harassment-complaint counter-move), Seb & Nico grumble on the group (« on n'est pas des paparazzi », −Asso);
+   and the dossier gets a **credibility** malus at the commission (« un dossier gonflé de photos de gens qui dînent »). Immediate,
+   clear feedback after the shot (« Photo sans intérêt : table en règle. Un client vous a vu. »). A legitimate photo stays free.
+
 ## 13. v1.0 acceptance checklist
 v1.0 ships only when **every** box is ticked. Nothing is dropped silently: anything cut or simplified is listed under "Deviations" with Lucas's OK.
 Proof: **T** = automated test (vitest / Playwright / campaign simulator, runs in CI) · **Q** = design agent's QA session in Chrome (screenshots in `qa/`) · **L** = Lucas playtest.
@@ -479,6 +486,7 @@ The campaign simulator plays 1000 seeded campaigns per strategy bot. Targets:
 - [ ] Ally diversions (Seb & Nico, Tatie, Jérémie) + owner diversions (Dédé, Ghislain). **T Q L**
 - [ ] Every night line staged in 3D/audio (stage cues; unstageable lines removed; checker fails on an unstaged line). **T Q L**
 - [ ] « Faire diversion » for a given action: shows its witnesses and covers exactly them in one click; bribing the waiter at his smoke break. **T Q L**
+- [ ] Useless photos are penalised (customers notice, harassment counter, −Asso, dossier credibility), with clear feedback; balance re-checked. **T Q L**
 - [ ] No more noise « brouhaha »: discrete pleasant cues or a CC0 ambience. **Q L**
 
 ### Release tasks (done by the design agent, 2026-10-09)
