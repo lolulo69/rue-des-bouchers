@@ -102,9 +102,14 @@ for (let r = 0; r < RUNS; r++) {
   // 3) dans une fenêtre propice (si le moteur l'expose : sim.windowNow() → { id, until } | null)
   {
     const { cc, sim } = nightAt(c, 21 * 60);
-    if (typeof sim.windowNow === 'function') {
-      for (let k = 0; !sim.state.ended && k < 400 && !sim.windowNow(); k++) sim.tick(1);
-      if (sim.windowNow() && usable(cc, sim, target)) {
+    // Fenêtre du twist ouverte (attention détournée, source 'window', stealth-v2 fa0dce5)
+    const windowNow = () => (sim.state.attention ?? []).some((a) => a.source === 'window' && sim.state.min >= a.from && sim.state.min < a.until);
+    if (Array.isArray(sim.state.twistWindows) && sim.state.twistWindows.length) {
+      for (let k = 0; !sim.state.ended && k < 400 && !windowNow(); k++) {
+        for (let ev = cc.nightEventDue?.(sim); ev; ev = cc.nightEventDue(sim)) cc.resolveNightEvent(sim, 0);
+        sim.tick(0.5);
+      }
+      if (windowNow() && usable(cc, sim, target)) {
         windowsSeen = true;
         const res = cc.doNightAction(sim, target);
         tally.window[1]++; if (unseen(res)) tally.window[0]++;
@@ -127,7 +132,7 @@ ${RUNS} graines (${skipped} sans essai possible), nuit du J${DAY}, actes visés 
 | Sans aide, avant 1h (rue pleine) | ${tally.noneEarly[1]} | ${pct(tally.noneEarly)} | ${okNone ? '✅' : '❌'} ≤ 10 % |
 | Sans aide, après 1h (la rue s’est vidée : fenêtre voulue, §12d.4) | ${tally.noneLate[1]} | ${pct(tally.noneLate)} | (pas de cible) |
 | Juste après une diversion | ${tally.diversion[1]} | ${pct(tally.diversion)} | ${okDiv ? '✅' : '❌'} ≥ 30 % |
-| Dans une fenêtre propice | ${tally.window[1]} | ${pct(tally.window)} | ${windowsSeen ? (rate(tally.window) >= 0.3 ? '✅' : '❌') : '–'} ≥ 30 % ${windowsSeen ? '' : '(pas de sim.windowNow : fenêtres pas encore exposées)'} |
+| Dans une fenêtre propice | ${tally.window[1]} | ${pct(tally.window)} | ${windowsSeen ? (rate(tally.window) >= 0.3 ? '✅' : '❌') : '–'} ≥ 30 % ${windowsSeen ? '' : '(aucune nuit avec une fenêtre de twist utilisable)'} |
 
 Par diversion : ${DIVERSIONS.map((d) => `${d.replace('night_', '')} ${pct(byDiversion[d])} (${byDiversion[d][1]})`).join(' · ')}
 `;

@@ -4,15 +4,7 @@ Maintained by the QA agent. Each bug has a failing test marked `test.fixme` (run
 When a bug is fixed, remove the `fixme` (the test then guards against regressions) and move the entry to "Fixed".
 
 ## Open
-
-### BUG-011 · A disguise put on during the night has no effect that night
-- **Test**: `tests/e2e/stealth.e2e.js` › « BUG-011 · dans l’appartement, le menu de nuit propose la capuche… » (`QA_RUN_FIXME=1` to run it; fails on main).
-- **Files**: `src/sim/sim.js:79`: `disguise` is computed **once** in `createSim` from the night's starting flags; `night_disguise` / `night_disguise_vest` (§12d.5) set `disguise_hood` / `disguise_vest` on the campaign during the night, but the running sim keeps `sim.disguise = 1`, and every witness roll (`witness.js:37`, `:72`, `nightActions.js:180`) reads that frozen value.
-- **Steps**: campaign night 3, go up to the apartment, N → « Mettre la capuche du portemanteau » (offered, works: the flag is set).
-- **Expected**: from that moment, non-ally witnesses notice Pilou less (`sim.disguise` 0.6 with the hood, 0.5 with the vest).
-- **Actual**: `sim.disguise` stays 1 for the rest of the night: the disguise only helps from the next night, so the §12d.5 « disguise reachable » does nothing when the player needs it.
-- **Owner guess**: build agent: make `sim.disguise` a getter over the night's flags (`get disguise() { return Math.min(1, …DISGUISE for flags in sim.flags) }`) and have the night action add its flag to `sim.flags` too.
-
+_(none)_
 
 ## Notes (not bugs, for the design agent)
 - **Campaign length after §12c.5 (night pacing)**: with the adaptive clock and ×40 sleep, the build agent's `npm run measure:nights` (in `qa/duration.md`) puts the full-length styles at **2h32–2h46 awake** (target 2h30–4h ✅), but at **2h08–2h22** for a player who goes to bed around 23:30 and uses « Passer à demain matin », which the bedtime hint invites. That is below the 2h30 floor of §13.A. Owner: design agent (decide whether the floor applies to the « sleep early » player, or add day-side content / later bedtime hint).
@@ -24,6 +16,7 @@ When a bug is fixed, remove the `fixme` (the test then guards against regression
 - **Duration (§13.A)**: see `qa/duration.md`. Both full campaigns land at ~3h05 (target 2h30–4h); the custody run stops at day 5 (1h16), as expected for an early ending.
 
 ## Fixed
+- **BUG-011** · a disguise put on during the night had no effect that night (`sim.disguise` computed once at `createSim`). Fixed in stealth-v2 (build agent); the test in `tests/e2e/stealth.e2e.js` is a regular regression test.
 - **BUG-007** · the D14 commission's verdict text was skipped (straight to the ending). Fixed in `src/ui/index.js` (UI agent): `shown()` checks `view.cardResult` before `ended`, so the pitch's `result` shows, then « Continuer » → the ending. Regression test: `ui-day.e2e.js` › « BUG-007 » (seed 3 reaches the commission); the nightly full run's `lostResults` check covers it too.
 - **BUG-010** · CRITICAL · a photo on a twist night with an extra table crashed the game (night 4 of every campaign). Fixed by the design agent: the 3D table views keep the sim's id (`src/world.js`), and `photo()` tolerates a missing view (`src/game.js`). The test in `tests/e2e/v11.e2e.js` is now a regular regression test.
 - **BUG-008** · the night card never showed the twist (UI called `c.tonightTwist()`, the engine had `c.twistTonight()`). Fixed by the build agent in 13e6ec1 (the engine answers `c.tonightTwist()`). Test: `v11.e2e.js` › « la carte de nuit annonce le twist du soir ».

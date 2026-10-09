@@ -76,8 +76,8 @@ test.describe('§12d.4 · la fenêtre tardive', () => {
 });
 
 test.describe('§12d.5 · le déguisement', () => {
-  // BUG-011 (qa/bugs.md) : le déguisement mis pendant la nuit ne change pas sim.disguise (calculé une fois, au début de la nuit).
-  (process.env.QA_RUN_FIXME ? test : test.fixme)('BUG-011 · dans l’appartement, le menu de nuit propose la capuche ; la mettre rend Pilou moins reconnaissable', async ({ page }) => {
+  // BUG-011 (corrigé) : le déguisement mis pendant la nuit agit tout de suite (sim.disguise suit les drapeaux de la nuit).
+  test('BUG-011 (corrigé) · dans l’appartement, le menu de nuit propose la capuche ; la mettre rend Pilou moins reconnaissable', async ({ page }) => {
     test.setTimeout(300_000);
     await newCampaign(page);
     await nightOf(page, 3);
@@ -109,37 +109,63 @@ test.describe('§12d.1–3 · diversions, fenêtres, « Qui regarde ? »', () =>
     await nightOf(page, 3, (c) => { for (const f of ['met_seb_nico']) if (!c.state.flags.includes(f)) c.state.flags.push(f); });
     await enterNight(page);
     await advance(page, 22 * 60 + 15);
-    const hud = page.locator('#watchers, [data-testid=watchers]');
-    test.skip(!(await hud.count()), '« Qui regarde ? » pas encore sur main (#watchers absent)');
+    const hud = page.locator('#witness');
+    const lookPart = (t) => t.split(' — ailleurs')[0];
+    const awayPart = (t) => t.split(' — ailleurs')[1] ?? '';
     await page.evaluate(() => { const r = window.__rdb; r.player.loc = 'street'; r.player.pos.set(0, 0, r.sim.cfg.ANCHORS.pilouWindow.z + 3); r.step(4); });
     const before = await hud.innerText();
+    test.skip(!/Qui regarde/.test(before), '« Qui regarde ? » pas encore sur main');
     const res = await page.evaluate(() => window.__rdb.campaign.doNightAction(window.__rdb.sim, 'night_fake_alert'));
     expect(res?.ok, JSON.stringify(res)).not.toBe(false);
     await page.evaluate(() => window.__rdb.step(4));
     const during = await hud.innerText();
-    expect(before, 'Seb & Nico regardaient avant').toMatch(/Seb|Nico|🐈/);
-    expect(during, 'Seb & Nico ne regardent plus pendant la fausse alerte').not.toMatch(/Seb|Nico|🐈/);
+    expect(lookPart(before), `Seb & Nico regardaient avant : ${before}`).toMatch(/Seb|Nico|🐈/);
+    expect(lookPart(during), `Seb & Nico ne regardent plus pendant la fausse alerte : ${during}`).not.toMatch(/Seb|Nico|🐈/);
+    expect(awayPart(during), `… et sont listés « ailleurs » : ${during}`).toMatch(/Seb|Nico|🐈/);
+    await expect(page.locator('#window'), '« Fenêtre propice » pendant la diversion').toContainText('Fenêtre propice');
     await advance(page, (await page.evaluate(() => window.__rdb.sim.state.min)) + 6);
     await page.evaluate(() => { const r = window.__rdb; r.player.loc = 'street'; r.player.pos.set(0, 0, r.sim.cfg.ANCHORS.pilouWindow.z + 3); r.step(4); });
     const back = await hud.innerText();
     const catHome = await page.evaluate(() => window.__rdb.sim.catPresent?.() ?? true);
-    if (catHome) expect(back, 'Seb & Nico reviennent après la diversion').toMatch(/Seb|Nico|🐈/);
+    if (catHome) expect(lookPart(back), `Seb & Nico reviennent après la diversion : ${back}`).toMatch(/Seb|Nico|🐈/);
   });
 
   test('un moment de twist ouvre une « Fenêtre propice » (et l’horloge repasse à ×1)', async ({ page }) => {
     test.setTimeout(300_000);
     await newCampaign(page);
-    await nightOf(page, 3);
+    // La première nuit dont le twist a une fenêtre naturelle (but du match, gâteau de la table 4, coupure…)
+    const day = await page.evaluate(() => {
+      const { ui } = window.__rdb, c = ui.campaign;
+      const twistOf = () => (c.tonightTwist ?? c.twistTonight)?.();
+      for (let i = 0; i < 6000 && !c.ended; i++) {
+        if (c.step === 'night' && (twistOf()?.sim?.windows?.length ?? 0) > 0) break;
+        if (c.step === 'cards') c.resolveCard(c.card().choices.find((x) => x.available)?.i ?? 0);
+        else if (c.step === 'koddex') c.koddex(['work', 'work', 'work']);
+        else if (c.step === 'actions') c.endAfternoon();
+        else if (c.step === 'night') { const sim = c.createNight(); for (let k = 0; !sim.state.ended && k < 3000; k++) { for (let ev = c.nightEventDue?.(sim); ev; ev = c.nightEventDue(sim)) c.resolveNightEvent(sim, 0); sim.tick(1); } c.finishNight(sim); }
+        else if (c.step === 'recap') c.nextDay();
+      }
+      localStorage.setItem(window.__rdb.saveKey, JSON.stringify(c.save()));
+      ui.render();
+      return c.step === 'night' ? c.state.day : null;
+    });
+    test.skip(!day, 'aucune nuit à fenêtre de twist dans cette campagne');
     await enterNight(page);
-    const has = await page.evaluate(() => typeof window.__rdb.sim.windowNow === 'function');
-    test.skip(!has, 'fenêtres propices pas encore sur main (sim.windowNow absent)');
+    const has = await page.evaluate(() => Array.isArray(window.__rdb.sim.state.twistWindows));
+    test.skip(!has, 'fenêtres propices pas encore sur main (state.twistWindows absent)');
+    // Une fenêtre du twist (attention détournée, source 'window') ouverte à cet instant
     const found = await page.evaluate(() => {
       const r = window.__rdb, { sim } = r;
-      for (let i = 0; !sim.state.ended && i < 8000; i++) { if (sim.windowNow()) { r.step(2); return true; } sim.tick(0.25); if (i % 60 === 0) r.step(1); }
+      const open = () => (sim.state.attention ?? []).some((a) => a.source === 'window' && sim.state.min >= a.from && sim.state.min < a.until);
+      for (let i = 0; !sim.state.ended && i < 8000; i++) {
+        if (open()) { r.step(2); return true; }
+        if (r.campaign.nightEventDue?.(sim)) r.campaign.resolveNightEvent(sim, 0);
+        sim.tick(0.25); if (i % 60 === 0) r.step(1);
+      }
       return false;
     });
     test.skip(!found, 'pas de fenêtre propice cette nuit-là (twist sans moment)');
-    await expect(page.locator('body')).toContainText('Fenêtre propice');
+    await expect(page.locator('#window')).toContainText('Fenêtre propice');
     await expect(page.locator('#fast')).toBeHidden();
   });
 
