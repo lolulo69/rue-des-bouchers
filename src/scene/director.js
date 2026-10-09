@@ -379,6 +379,7 @@ export function createDirector({ scene, world, art, audio }) {
       state.films.splice(i, 1);
     }
     world.gameMinutes = min; // horloge du jeu pour l'audio (cloche de 22h)
+    if (dt > 0) { const rate = (min - (state.lastMin ?? min)) / dt; stage.fast = rate > 3; } state.lastMin = min;
     stage.update(dt); // en dernier : une scène peut emprunter un acteur que la sim vient de placer
   }
 

@@ -490,6 +490,7 @@ export function createStage({ scene, world, art, audio }) {
 
   return {
     ids: Object.keys(STAGES),
+    fast: false, // le metteur en scène le lève quand l'horloge de la nuit file (plus de 3 min de jeu par seconde)
     get active() { return [...runs].map((r) => r.id); },
     has: (id) => !!STAGES[typeof id === 'string' ? id : id?.id],
     // Joue un repère : 'id' ou { id, …opts }. Une même scène ne se joue pas deux fois en même temps.
@@ -499,6 +500,7 @@ export function createStage({ scene, world, art, audio }) {
       if (!f) { console.warn(`stage : scène inconnue « ${c.id} »`); return null; }
       if ([...runs].some((r) => r.id === c.id)) return null;
       if ([...runs].filter((r) => !r.long).length >= 8) return null;
+      if (this.fast) return null; // nuit en accéléré (Pilou dort, « Passer à demain matin ») : rien à voir, rien à jouer
       try { const r = f({ ...c, ...extra }); runs.add(r); return r; } catch (err) { console.warn('stage :', err); return null; }
     },
     // Une scène sur mesure (twists) avec les mêmes outils : r.add / walk / borrow / em / later / tick / end. dur en s (Infinity : à arrêter)
