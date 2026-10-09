@@ -601,7 +601,7 @@ export function mount(engine = {}, opts = {}) {
         items.map(({ action: a, cost, available, why }) => h('button.ui-action', {
           disabled: !available, dataset: { testid: 'action', id: a.id }, onclick: () => doAction(a),
         }, h('span.lbl', a.label), h('span.cost', '⏱'.repeat(cost), ` ${cost} créneau${cost > 1 ? 'x' : ''}`),
-        available ? hintOf(a) : h('span.why', why[0]?.startsWith('💬') ? null : '🔒 ', why.map((w) => w.replace(/\(E\)/g, `(${keyHint('E')})`)).join(' · ')))));
+        available ? hintOf(a) : h('span.why', why[0]?.startsWith('💬') ? null : '🔒 ', why.map((w) => w.replace(/\(([ETPNBLC])\)/g, (_, k) => `(${keyHint(k)})`)).join(' · ')))));
     });
     // v1.1 : le carnet de l'après-midi, posé sur la rue de jour (panneau à droite sur grand écran)
     return h('div.ui-notebook-panel', { dataset: { testid: 'notebook' } },
