@@ -194,7 +194,7 @@ let nextBark = 20;
 function staged(text, stage, cls = '') {
   if (!text) return;
   log(text, cls);
-  if (stage && stage.cue !== 'sim') director.onEvent({ type: 'stage', min: S.min, text, ...stage });
+  if (stage) director.onEvent({ type: 'stage', min: S.min, text, stage }); // comme une ligne de la sim (director › onEvent)
 }
 function ambientLines(dt) {
   const m = S.min;
@@ -714,7 +714,7 @@ function openNightEvent(ev) {
   openOverlay('nightmenu');
   $('nightmenu').dataset.mode = 'event';
   // §12e.6 : l'événement existe dans la rue au moment où sa carte s'ouvre
-  if (ev.data.stage) director.onEvent({ type: 'stage', min: S.min, text: ev.data.title ?? '', ...(typeof ev.data.stage === 'string' ? { cue: ev.data.stage } : ev.data.stage) });
+  if (ev.data.stage) director.onEvent({ type: 'stage', min: S.min, text: ev.data.title ?? '', stage: ev.data.stage });
   $('nightmenu').querySelector('.note').textContent = '';
   $('nightmenu').querySelector('h2').textContent = ev.data.title ?? 'Cette nuit';
   const list = $('nightmenu-list');

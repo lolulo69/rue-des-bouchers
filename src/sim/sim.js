@@ -135,13 +135,12 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
 
     // ---------- sorties ----------
     // line : une chaîne, ou { text, stage } (§12e.6) ; stage (facultatif) : le repère de mise en scène de la ligne.
-    // Une ligne mise en scène émet aussi { type: 'stage', … } pour le metteur en scène, au même instant.
+    // L'événement 'log' le porte : le metteur en scène (src/scene/director.js › onEvent) le joue au même instant.
     log(line, cls = '', stage = null) {
       const text = typeof line === 'object' && line ? line.text : line;
       if (!text) return;
       const st = stage ?? (typeof line === 'object' ? line.stage ?? null : null);
       sim.events.push({ type: 'log', min: S.min, text, cls, ...(st ? { stage: st } : {}) });
-      if (st && st.cue !== 'sim') sim.events.push({ type: 'stage', min: S.min, text, ...st });
     },
     // Texte narratif (narrator) ou texte par défaut ; le narrateur peut rendre { text, stage } (§12e.6)
     say(kind, args, fallback) {
