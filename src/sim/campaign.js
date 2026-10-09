@@ -19,7 +19,6 @@ import { pickTwist, nightTwist } from './twists.js';
 import { createUnlocks } from './unlocks.js';
 import { performNightAction } from './nightActions.js';
 import { pickObjectives, matchDone, journalEvents, bedtimeHint } from './objectives.js';
-import { evalCondition } from './conditions.js';
 import { fmt } from './time.js';
 
 import { SAVE_VERSION, migrateSave, sanitizeSave } from './saveMigrations.js';
