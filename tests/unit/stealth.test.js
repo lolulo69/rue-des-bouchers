@@ -3,7 +3,7 @@
 import { describe, it, expect } from 'vitest';
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { createCampaign, normalizeContent, createSim, busyReason } from '../../src/sim/index.js';
+import { createCampaign, normalizeContent, createSim, busyReason, whoWatches } from '../../src/sim/index.js';
 import { divertAttention, attentionFactor, activeAttention } from '../../src/sim/witness.js';
 import { RULES, WITNESS } from '../../src/config.js';
 import * as narrative from '../../src/sim/narrative.js';
@@ -158,5 +158,38 @@ describe('déguisement et fenêtre tardive', () => {
     while (!sim.state.ended) sim.tick(1);
     expect(sim.state.min).toBeGreaterThanOrEqual(26 * 60 + 30);
     expect(sim.state.journal.some((e) => e.type === 'table-return' && e.t > RULES.streetEmptyAt)).toBe(false);
+  });
+});
+
+describe('« Qui regarde ? » (HUD) et conseil « au lit » (§12d)', () => {
+  it('whoWatches : qui peut voir Pilou dans la rue, et qui regarde ailleurs pendant une diversion', () => {
+    const { c, sim } = night(8, 22 * 60 + 15);
+    const pos = { x: -1.5, y: 1.2, z: -22 };
+    const before = whoWatches(sim, pos);
+    expect(before.some((w) => w.key === 'customers' && w.count > 0 && !w.distracted)).toBe(true);
+    expect(c.doNightAction(sim, 'night_call_landline').ok).toBe(true);
+    const during = whoWatches(sim, pos);
+    for (const k of ['waiter', 'dede', 'ghislain']) { const w = during.find((x) => x.key === k); if (w) expect(w.distracted, k).toBe(true); }
+    expect(during.find((x) => x.key === 'customers')?.distracted).toBe(false);
+  });
+
+  it('pas de « au lit » à qui a de l’illégal possible sans être « légal » : une fois « la rue se vide après 1h »', () => {
+    const { c, sim } = night(9, 22 * 60 + 40);
+    sim.state.sleep = 10; // épuisé : d'ordinaire, « allez vous allonger »
+    const h = c.bedtimeHint(sim);
+    expect(h?.why).toBe('late');
+    while (sim.state.min < 22 * 60 + 40 + RULES.bedtime.show + 2) sim.tick(1);
+    expect(c.bedtimeHint(sim)).toBeNull(); // dit une fois
+    c.apply({ setFlags: ['stance_legal'] }, 'engine', 'test');
+    expect(c.bedtimeHint(sim)?.why).toBe('tired');
+  });
+
+  it('tutoriel « Fenêtre propice » : dû seulement quand une fenêtre est ouverte', () => {
+    const { c } = night(10, 21 * 60);
+    const t = K.TOOL_TUTORIALS.find((x) => x.trigger?.window);
+    expect(t).toBeTruthy();
+    c.state.tutorials.done = K.TOOL_TUTORIALS.filter((x) => x.id !== t.id).map((x) => x.id);
+    expect(c.toolTutorialDue({ min: 22 * 60, where: 'street', window: false })).toBeNull();
+    expect(c.toolTutorialDue({ min: 22 * 60, where: 'street', window: true })?.id).toBe(t.id);
   });
 });

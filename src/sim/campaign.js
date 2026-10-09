@@ -17,7 +17,7 @@ import { evalCondition, STAT_KEYS, HIDDEN_KEYS } from './conditions.js';
 import { normalizeContent } from './content.js';
 import { pickTwist, nightTwist } from './twists.js';
 import { createUnlocks } from './unlocks.js';
-import { performNightAction } from './nightActions.js';
+import { performNightAction, availableNightActions } from './nightActions.js';
 import { pickObjectives, matchDone, journalEvents, bedtimeHint } from './objectives.js';
 import { fmt } from './time.js';
 
@@ -550,8 +550,10 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     return out;
   };
   // Conseil « au lit » (§12c.5) : { id, why, text } ou null ; busy = nightClock.busyReason (rien d'imminent)
+  // §12d : pas de « au lit » à qui prépare un coup tardif (illégal possible ce soir, ligne pas « légale »)
+  const latePlans = (sim) => !c.has('stance_legal') && availableNightActions(sim, c).some((x) => x.legality === 'illegal');
   c.bedtimeHint = (sim, { busy = null } = {}) => bedtimeHint(sim, {
-    objectives: c.tonightObjectives(), busy, hints: K.BEDTIME ?? [], mem: (sim.bedtimeMemory ??= {}),
+    objectives: c.tonightObjectives(), busy, hints: K.BEDTIME ?? [], mem: (sim.bedtimeMemory ??= {}), latePlans: latePlans(sim),
   });
 
   // ---------- tutoriels pratiques des outils de nuit (v1.1, §12b.B, src/content/tutorials.js) ----------
@@ -559,7 +561,8 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
   // Le jeu (game.js) affiche la marque, appelle tutorialSeen à la 1re apparition (l'horloge se fige quelques secondes),
   // puis tutorialEvent(nom) à chaque geste du joueur : l'étape dont `done` correspond avance ; la dernière termine le tutoriel.
   const T8 = () => (S.tutorials ??= { seen: [], done: [], step: {} });
-  c.toolTutorialDue = ({ min, where } = {}) => {
+  // window (§12d) : une « Fenêtre propice » est ouverte (trigger { window: true })
+  c.toolTutorialDue = ({ min, where, window = false } = {}) => {
     const t = T8();
     const night = S.nightCount + 1;
     return K.TOOL_TUTORIALS.find((x) => {
@@ -569,6 +572,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
       if (g.unlock && !S.unlocked.includes(g.unlock)) return false;
       if (g.after !== undefined && min !== undefined && min < g.after) return false;
       if (g.where && where && g.where !== where) return false;
+      if (g.window && !window) return false;
       return true;
     }) ?? null;
   };

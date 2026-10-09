@@ -167,8 +167,9 @@ export const OBJECTIVES = [
 
 // ════════════════════════════════════════════════════════════════════════════
 // CONSEIL « AU LIT » (§12c.5, bloc de l'agent build) : après 22h30, quand l'essentiel est fait (why: 'done') ou dès que
-// le Sommeil est bas (why: 'tired'). Le moteur (src/sim/objectives.js bedtimeHint) en montre un au plus toutes les
-// ~20 minutes de jeu, en dernière ligne des « Objectifs du soir » ; le jeu ajoute la touche (E / Ⓐ) et la direction du lit.
+// le Sommeil est bas (why: 'tired') ; 'late' (§12d) : dit une fois, à qui prépare un coup illégal, que la rue se vide
+// après 1h. Le moteur (src/sim/objectives.js bedtimeHint) en montre un au plus toutes les ~20 minutes de jeu, en
+// dernière ligne des « Objectifs du soir » ; le jeu ajoute la touche (E / Ⓐ) et la direction du lit.
 // ════════════════════════════════════════════════════════════════════════════
 export const BEDTIME = [
   { id: 'bed_done_dossier', why: 'done', text: 'Dossier à jour : au lit. La rue continuera sans vous.' },
@@ -176,6 +177,8 @@ export const BEDTIME = [
   { id: 'bed_done_klaas', why: 'done', text: 'Klaas veille encore à sa fenêtre : vous pouvez dormir, lui note tout.' },
   { id: 'bed_tired_fall', why: 'tired', text: 'Vous tombez de sommeil : allez vous allonger, même mal, même tard.' },
   { id: 'bed_tired_eyes', why: 'tired', text: 'Les yeux qui piquent, la nuque qui lâche. Le lit, maintenant ?' },
+  { id: 'bed_late_street', why: 'late', text: 'La rue se vide après 1h. Si vous avez un plan, c’est là qu’il se joue.' },
+  { id: 'bed_late_klaas', why: 'late', text: 'Patience : après 1h, terrasses rentrées et Klaas couché. Le lit attendra un peu.' },
   { id: 'bed_tired_tomorrow', why: 'tired', text: 'Demain, Koddex vous attend à 9h. Une heure de sommeil vaut une photo.' },
 
   // ════════════════════════════════════════════════════════════════════════

@@ -61,3 +61,32 @@ export function nightMenu(sim, c, player, M = NIGHT_MENU) {
   }
   return { here, elsewhere };
 }
+
+// « Qui regarde ? » (§12d, HUD) : qui pourrait voir Pilou maintenant, en `pos`, et d'où.
+// → [{ key, label, icon, count, distracted, p }] trié par probabilité ; les clients d'une même rue sont regroupés.
+// Témoins de la sim (witness.js : Klaas, balcon, serveur, clients, teckel, twist) + ceux tirés par nightActions
+// (Dédé, Ghislain, la patrouille sur place), avec l'attention (diversions, fenêtres) déjà appliquée.
+const WHO = {
+  klaas: { label: 'Klaas', icon: '🔭' }, seb_nico: { label: 'Seb & Nico', icon: '🐈' }, waiter: { label: 'le serveur', icon: '' },
+  customers: { label: 'des clients', icon: '👥' }, jeremie: { label: 'Jérémie', icon: '🐕' }, twist: { label: '', icon: '📱' },
+  dede: { label: 'Dédé', icon: '' }, ghislain: { label: 'Ghislain', icon: '' }, police: { label: 'la patrouille', icon: '🚓' },
+};
+export function whoWatches(sim, pos) {
+  const by = new Map();
+  const add = (key, w, label = WHO[key]?.label || shortName(w)) => {
+    const e = by.get(key) ?? { key, label, icon: WHO[key]?.icon ?? '', count: 0, distracted: true, p: 0 };
+    e.count++;
+    e.distracted &&= !!w.distracted;
+    e.p = 1 - (1 - e.p) * (1 - Math.min(1, w.p));
+    by.set(key, e);
+  };
+  for (const w of sim.potentialWitnesses(pos)) add(w.kind === 'twist' ? `twist:${w.id}` : w.kind, w, w.kind === 'twist' ? shortName(w) : undefined);
+  for (const [id, w] of Object.entries(EXTRA_WITNESSES)) {
+    if (!w.present(sim)) continue;
+    const at = id === 'police' ? { x: sim.cfg.ANCHORS.waiter.x, z: sim.restCenter(sim.rest(sim.state.police.restId)).z } : sim.restCenter(sim.rest('bernadette'));
+    if (dist2(at, pos) > w.range) continue;
+    const f = attentionFactor(sim, id);
+    add(id, { name: w.name, p: sim.disguise * f, distracted: f < 1 });
+  }
+  return [...by.values()].sort((a, b) => b.p - a.p);
+}

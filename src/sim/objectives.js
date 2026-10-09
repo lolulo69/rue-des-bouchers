@@ -74,10 +74,20 @@ export function journalEvents(sim, from = 0) {
 // patrouille en route, pas de moment de twist imminent) ou dès que le Sommeil est bas. Pas plus d'une fois toutes les
 // `every` minutes de jeu ; s'efface si quelque chose de neuf arrive (busy).
 // hints = BEDTIME de objectives.js : [{ id, why: 'done' | 'tired', text }] ; mem = { lastAt, lastId } (état de la nuit)
-export function bedtimeHint(sim, { objectives = [], busy = null, hints = [], mem = {}, sleeping = sim.state.sleeping } = {}) {
+// latePlans (§12d.4) : des actions illégales sont possibles ce soir et la ligne n'est pas « légale » → on ne pousse pas au
+// lit ; on dit une fois (why: 'late') que la rue se vide après 1h, puis plus rien.
+export function bedtimeHint(sim, { objectives = [], busy = null, hints = [], mem = {}, sleeping = sim.state.sleeping, latePlans = false } = {}) {
   const B = sim.cfg.RULES.bedtime;
   const S = sim.state;
   if (sleeping || S.ended || S.min < B.after || busy) return null;
+  if (latePlans) {
+    const late = hints.filter((h) => h.why === 'late');
+    if (!late.length || S.min >= (sim.cfg.RULES.streetEmptyAt ?? Infinity)) return null;
+    if (mem.lateAt === undefined) mem.lateAt = S.min;
+    if (S.min - mem.lateAt > B.show) return null;
+    const h = late[Math.floor(mem.lateAt) % late.length];
+    return { id: h.id, why: 'late', text: h.text };
+  }
   const tired = S.sleep <= B.tiredSleep;
   const todo = objectives.filter((o) => o.stance !== 'info' && !o.done);
   const why = tired ? 'tired' : !todo.length ? 'done' : null;
