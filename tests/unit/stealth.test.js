@@ -3,7 +3,7 @@
 import { describe, it, expect } from 'vitest';
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { createCampaign, normalizeContent, createSim, busyReason, whoWatches } from '../../src/sim/index.js';
+import { createCampaign, normalizeContent, createSim, busyReason, whoWatches, nightClock } from '../../src/sim/index.js';
 import { divertAttention, attentionFactor, activeAttention } from '../../src/sim/witness.js';
 import { RULES, WITNESS } from '../../src/config.js';
 import * as narrative from '../../src/sim/narrative.js';
@@ -11,6 +11,7 @@ import * as narrative from '../../src/sim/narrative.js';
 const DIR = join(import.meta.dirname, '..', '..', 'src', 'content');
 const K = normalizeContent(await Promise.all(readdirSync(DIR).filter((f) => f.endsWith('.js')).map((f) => import(join(DIR, f)))));
 const ALL = ['klaas', 'seb_nico', 'waiter', 'dede', 'ghislain', 'customers', 'patrol'];
+const TURN_IDS = [...ALL, 'jeremie', 'biloute', 'tatie']; // §12e.4 : les alliés aussi
 
 // Une nuit de campagne (jour 5, tous les outils, Seb & Nico et la ronde connus) jusqu'à `at`
 function night(seed, at, flags = []) {
@@ -55,8 +56,11 @@ describe('attention des témoins', () => {
       expect(w.p).toBeCloseTo(before[i].p * WITNESS.attention.away, 6);
     }
     expect(attentionFactor(sim, 'klaas')).toBe(1); // pas visé : inchangé
-    expect(busyReason(sim)).toBe('window'); // l'horloge revient à ×1 pendant la fenêtre
-    sim.tick(1); sim.tick(1.01);
+    expect(busyReason(sim)).toBe('window'); // l'horloge ralentit pendant la fenêtre
+    expect(nightClock(sim).scale).toBe(RULES.clock.windowScale);
+    const w = activeAttention(sim)[0];
+    expect(w.until - w.from).toBe(WITNESS.attention.minutes[0]); // §12e.1 : 2 min demandées → 5 min au moins
+    while (sim.state.min < w.until + 0.01) sim.tick(0.5);
     expect(activeAttention(sim)).toEqual([]);
     expect(sim.potentialWitnesses(pos).some((w) => w.distracted)).toBe(false);
   });
@@ -67,6 +71,8 @@ describe('attention des témoins', () => {
     expect(attentionFactor(sim, 'police')).toBe(WITNESS.attention.away);
     expect(attentionFactor(sim, 'dede')).toBe(WITNESS.attention.away);
     expect(attentionFactor(sim, 'ghislain')).toBe(1);
+    divertAttention(sim, { source: 'diversion', id: 'b', turns: ['biloute', 'tatie'], minutes: 5 });
+    expect(attentionFactor(sim, 'jeremie')).toBe(WITNESS.attention.away); // le teckel emmène Jérémie
   });
 });
 
@@ -74,7 +80,7 @@ describe('diversions (contrat §14 : diversion { turns, minutes, cooldown, trace
   const divs = K.ACTIONS.filter((a) => a.diversion);
   it('au moins cinq diversions dans le contenu, aux témoins connus', () => {
     expect(divs.length).toBeGreaterThanOrEqual(5);
-    for (const a of divs) for (const t of a.diversion.turns) expect(ALL, a.id).toContain(t);
+    for (const a of divs) for (const t of a.diversion.turns) expect(TURN_IDS, a.id).toContain(t);
   });
 
   it('une diversion ouvre une fenêtre après sa préparation, puis attend son délai avant de resservir', () => {
@@ -84,7 +90,8 @@ describe('diversions (contrat §14 : diversion { turns, minutes, cooldown, trace
     expect(r.ok).toBe(true);
     const w = activeAttention(sim).find((x) => x.id === a.id);
     expect(w).toMatchObject({ source: 'diversion', turns: a.diversion.turns });
-    expect(w.until - w.from).toBe(a.diversion.minutes);
+    const [lo, hi] = WITNESS.attention.minutes;
+    expect(w.until - w.from).toBe(Math.min(hi, Math.max(lo, a.diversion.minutes)));
     const again = c.doNightAction(sim, a.id);
     expect(again.ok).toBe(false);
     expect(again.reason).toMatch(/Trop tôt pour recommencer/);
@@ -135,7 +142,7 @@ describe('fenêtres naturelles des twists (sim.windows)', () => {
     expect(activeAttention(sim).map((a) => a.source)).toEqual(['window']);
     expect(attentionFactor(sim, 'customers')).toBe(WITNESS.attention.away);
     expect(sim.state.journal.some((e) => e.type === 'attention' && e.source === 'window')).toBe(true);
-    while (sim.state.min < 22 * 60 + 15) sim.tick(0.5);
+    while (sim.state.min < 22 * 60 + 12 + WITNESS.attention.minutes[0] + 0.5) sim.tick(0.5);
     expect(activeAttention(sim)).toEqual([]);
   });
 });

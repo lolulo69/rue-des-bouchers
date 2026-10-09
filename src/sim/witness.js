@@ -24,17 +24,21 @@ export function klaasDetection(sim, d) {
 // naturelle d'un twist (`sim.windows`) détourne certains témoins pendant quelques minutes : ils regardent ailleurs
 // (le pétard côté place) ou s'en vont (le téléphone de l'estaminet). Leur probabilité de voir Pilou tombe alors à
 // WITNESS.attention.away (un coup d'œil reste possible). S.attention = [{ source, id, turns, from, until, text }].
-// turns : 'klaas' | 'seb_nico' | 'waiter' | 'dede' | 'ghislain' | 'customers' | 'patrol' (= le kind 'police').
+// turns : 'klaas' | 'seb_nico' | 'waiter' | 'dede' | 'ghislain' | 'customers' | 'patrol' (= le kind 'police'),
+// 'jeremie' / 'biloute' (§12e.4 : Jérémie emmène Biloute au bout de la rue) et 'tatie'.
+// Alias de `turns` : le teckel suit Jérémie ; Tatie n'est pas un témoin de la sim (accepté, sans effet pour l'instant)
 const TURN_OF = { police: 'patrol' };
+const TURN_ALIAS = { biloute: 'jeremie' };
 export const activeAttention = (sim) => (sim.state.attention ?? []).filter((a) => sim.state.min >= a.from && sim.state.min < a.until);
 export function attentionFactor(sim, kind) {
   const t = TURN_OF[kind] ?? kind;
-  return activeAttention(sim).some((a) => a.turns.includes(t)) ? (sim.cfg.WITNESS.attention?.away ?? 0.08) : 1;
+  return activeAttention(sim).some((a) => a.turns.some((x) => (TURN_ALIAS[x] ?? x) === t)) ? (sim.cfg.WITNESS.attention?.away ?? 0.08) : 1;
 }
 // Ouvre une fenêtre d'attention détournée (diversion ou moment du twist), pour `minutes` minutes de jeu à partir de maintenant
 export function divertAttention(sim, { source, id, turns, minutes, text = null }) {
   const S = sim.state;
-  const a = { source, id, turns: [...turns], from: S.min, until: S.min + minutes, text };
+  const [lo, hi] = sim.cfg.WITNESS.attention?.minutes ?? [0, Infinity];
+  const a = { source, id, turns: [...turns], from: S.min, until: S.min + Math.min(hi, Math.max(lo, minutes)), text };
   (S.attention ??= []).push(a);
   sim.note('attention', { source, id, turns: a.turns, until: a.until });
   sim.events.push({ type: 'attention', ...a });

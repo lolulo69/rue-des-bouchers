@@ -123,7 +123,8 @@ test.describe('§12d.1–3 · diversions, fenêtres, « Qui regarde ? »', () =>
     expect(lookPart(during), `Seb & Nico ne regardent plus pendant la fausse alerte : ${during}`).not.toMatch(/Seb|Nico|🐈/);
     expect(awayPart(during), `… et sont listés « ailleurs » : ${during}`).toMatch(/Seb|Nico|🐈/);
     await expect(page.locator('#window'), '« Fenêtre propice » pendant la diversion').toContainText('Fenêtre propice');
-    await advance(page, (await page.evaluate(() => window.__rdb.sim.state.min)) + 6);
+    // §12e.1 : une fenêtre dure 5–8 min de jeu ; on attend sa vraie fin (sim.windowNow().until)
+    await advance(page, (await page.evaluate(() => window.__rdb.sim.windowNow()?.until ?? window.__rdb.sim.state.min)) + 1);
     await page.evaluate(() => { const r = window.__rdb; r.player.loc = 'street'; r.player.pos.set(0, 0, r.sim.cfg.ANCHORS.pilouWindow.z + 3); r.step(4); });
     const back = await hud.innerText();
     const catHome = await page.evaluate(() => window.__rdb.sim.catPresent?.() ?? true);

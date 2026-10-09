@@ -30,6 +30,8 @@ export function nightClock(sim, c, { manual = false, sleeping = sim.state.sleepi
   const RULES = sim.cfg.RULES;
   const R = RULES.clock;
   if (sleeping) return { scale: RULES.sleepTimeMultiplier, fast: true, reason: 'sleep' };
+  // Fenêtre propice (§12e.1) : la nuit ralentit, pour qu'on ait le temps d'en profiter (même en « accélérer »)
+  if (activeAttention(sim).length) return { scale: R.windowScale ?? 1, fast: false, reason: 'window' };
   const late = sim.state.min >= R.fastAfter;
   if (!late && !manual) return { scale: 1, fast: false, reason: 'normal' };
   const busy = busyReason(sim, c, R);

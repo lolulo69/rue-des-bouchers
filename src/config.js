@@ -15,7 +15,8 @@ export const RULES = {
   // Horloge adaptative (§12c.5, src/sim/nightClock.js) : après fastAfter, ×fastScale sauf si quelque chose se passe ou
   // va se passer (patrouille en route ou sur place, moment de twist / événement de nuit dans les lookahead minutes,
   // témoin / preuve / action dans les calmMinutes dernières minutes). « Accélérer » (manuel) : ×fastScale dès 20h30.
-  clock: { fastAfter: 22 * 60 + 30, fastScale: 3, lookahead: 10, calmMinutes: 5, easeSeconds: 1.2 },
+  // windowScale (§12e.1) : pendant une « Fenêtre propice », la nuit ralentit (×0.5 : 5 min de jeu ≈ 20 s réelles)
+  clock: { fastAfter: 22 * 60 + 30, fastScale: 3, lookahead: 10, calmMinutes: 5, easeSeconds: 1.2, windowScale: 0.5 },
   // Conseil « au lit » (§12c.5, objectives.js bedtimeHint) : après `after`, quand tout est fait ou Sommeil ≤ tiredSleep ;
   // visible `show` minutes de jeu, au plus une fois toutes les `every` minutes
   bedtime: { after: 22 * 60 + 30, tiredSleep: 25, show: 8, every: 20 },
@@ -84,6 +85,7 @@ export const ANCHORS = {
   exhaust: { x: -2.9, y: 7.0, z: -23 },      // la gaine monte jusque sous sa fenêtre
   klaasWindow: { x: 0, y: 5.7, z: 67.6 },    // au fond de la place Maurice-Schumann, en enfilade sur toute la rue
   balcony: { x: 3.0, y: 7.8, z: -22.5 },     // Seb & Nico, juste en face de Pilou
+  tatieWindow: { x: 3.0, y: 4.3, z: 8 },     // Tatie Bouchon au premier, au milieu de la rue (n°19) ; world.cast.tatie fait foi dans le jeu
   waiter: { x: -0.7, z: -24.5, amplitude: 6, speed: 0.24 }, // va-et-vient devant la terrasse
   policeSpawn: { x: 0, z: -43 },
   van: { x: 0.3, y: 1, z: -11 },              // twist corridorBlocked : la camionnette de livraison au milieu du passage             // le commissariat est côté rue de la Barre
@@ -223,7 +225,9 @@ export const WITNESS = {
   saturdayCover: 0.7,
   jeremie: { name: 'Jérémie et son teckel', p: 0.8, weight: 0.3, ally: true },            // la foule du samedi couvre : chaque client remarque moins
   riskCap: 1.6,                  // plafond de la somme des poids
-  attention: { away: 0.08 },     // §12d : un témoin détourné (diversion, fenêtre du twist) ne voit plus qu'avec cette part de sa probabilité
+  // §12d : un témoin détourné (diversion, fenêtre du twist) ne voit plus qu'avec cette part de sa probabilité ;
+  // §12e.1 : une fenêtre dure entre minutes[0] et minutes[1] minutes de jeu, quoi que dise le contenu
+  attention: { away: 0.08, minutes: [5, 8] },
 };
 
 export const BUCKET = {
