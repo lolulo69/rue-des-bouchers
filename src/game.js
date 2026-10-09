@@ -402,14 +402,26 @@ function goNight(c) {
 }
 // Chargée à la demande (import dynamique) : ui.html partage ce module, et un import statique ferait atterrir
 // le code du jeu 3D dans le chunk commun (il s'exécuterait sur ui.html, sans canvas).
-async function showDay({ resume = false } = {}) {
+async function showDay({ resume = false, action = null } = {}) {
   $('title').classList.add('hidden');
   $('hud').classList.add('hidden');
   document.exitPointerLock?.();
-  const UI = await import('./ui/index.js');
-  dayUI ??= UI.mount(engine, { onNight: goNight, seed: SEED, autoContinue: resume });
+  // module déjà chargé par le titre : pas d'attente, l'écran du jour s'affiche dans le même clic
+  const UI = uiModule ?? (uiModule = await import('./ui/index.js'));
+  dayUI ??= UI.mount(engine, { onNight: goNight, seed: SEED, autoContinue: resume, onTitle: showTitle });
+  if (action === 'new') dayUI.newCampaign(); else if (action === 'continue') dayUI.continueCampaign();
   dayUI.show();
 }
+// Un seul écran titre (QA v1.1) : le titre 3D reçoit le menu de l'interface (Continuer / Nouvelle campagne / Nuit libre / Aide)
+async function showTitle() {
+  dayUI?.hide();
+  $('title').classList.remove('hidden');
+  const UI = uiModule ?? (uiModule = await import('./ui/index.js'));
+  UI.titleMenu($('title'), { engine, onNew: () => showDay({ action: 'new' }), onContinue: () => showDay({ action: 'continue' }), onFreeNight: startNight });
+  if (campaignClicked) { campaignClicked = false; $('campaign').click(); } // clic arrivé avant le menu : on le rejoue
+}
+let campaignClicked = false;
+let uiModule = null;
 if (campaign) {
   // Pas d'écran titre en campagne (QA U6) : la nuit démarre tout de suite. Le navigateur exige un clic pour capturer
   // la souris et lancer le son : c'est l'overlay de pause, qui montre les commandes la première nuit seulement.
@@ -434,8 +446,9 @@ if (campaign) {
     $('save-notice').textContent = verdict.message;
     $('save-notice').classList.remove('hidden');
   }
-  $('campaign').addEventListener('click', () => showDay());
+  $('campaign').addEventListener('click', () => { campaignClicked = true; }); // clic avant que le menu ne soit chargé
   $('start').textContent = 'Nuit libre (une soirée isolée)';
+  showTitle();
 }
 canvas.addEventListener('click', () => { if (started && !overlay) lock(); });
 $('pause').addEventListener('click', () => lock());
