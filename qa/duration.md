@@ -9,13 +9,13 @@ Généré par `tests/e2e/fullrun.e2e.js` (`npm run test:fullrun`). Estimation, p
 
 | Style | Fin | Nuits | Mots lus | Clics | Jour | Nuits | Total | Cible | Mesuré le |
 |---|---|---|---|---|---|---|---|---|---|
-| légal prudent | the_return (jour 14) | 14 | 7385 | 287 | 0h47 | 2h20 | **3h07** | ✅ | 2026-10-08 |
-| diplomate | negotiated_peace (jour 14) | 14 | 7075 | 248 | 0h44 | 2h20 | **3h04** | ✅ | 2026-10-08 |
-| mixte malin | scandal (jour 14) | 13 | 10296 | 272 | 1h01 | 2h10 | **3h11** | ✅ | 2026-10-08 |
+| diplomate | negotiated_peace (jour 14) | 13 | 11358 | 270 | 1h06 | 2h10 | **3h16** | ✅ | 2026-10-09 |
+| légal prudent | moving_out (jour 14) | 13 | 12389 | 313 | 1h12 | 2h10 | **3h22** | ✅ | 2026-10-09 |
+| mixte malin | moving_out (jour 14) | 13 | 12547 | 316 | 1h13 | 2h10 | **3h23** | ✅ | 2026-10-09 |
 | passif | moving_out (jour 14) | 13 | 10561 | 207 | 1h00 | 2h10 | **3h10** | ✅ | 2026-10-09 |
 | casse-cou | custody (jour 5) | 4 | 6207 | 118 | 0h35 | 0h40 | **1h15** | ⏹ fin anticipée (jour 5) | 2026-10-09 |
 | illégal discret | custody (jour 7) | 7 | 7684 | 144 | 0h43 | 1h10 | **1h53** | ⏹ fin anticipée (jour 7) | 2026-10-09 |
 
-**v1.1 (main vert fe57180, 2026-10-09)** : casse-cou, illégal discret et passif rejoués. Légal prudent, diplomate et mixte malin datent de v1.0 (2026-10-08) : leur passage v1.1 attend **BUG-010** (une photo la nuit du J4 plante le jeu ; ces trois styles photographient).
+**v1.1** (2026-10-09) : casse-cou, illégal discret et passif à fe57180 ; légal prudent, diplomate et mixte malin à ab94929 (après les correctifs BUG-010 et BUG-007 ; 0 résultat de carte perdu, scène de la commission affichée en entier). Les quatre campagnes menées au J14 tiennent dans 3h10–3h23. À noter : dans ces parties scriptées, légal prudent et mixte malin perdent la commission (déménagement) ; c'est un seul passage par style, l'équilibrage se lit dans `qa/balance.md` (simulateur, 200 campagnes par bot).
 
-Résumés par style : `qa/fullrun/*.json`. Dernière mise à jour : 2026-10-09 03:29 UTC.
+Résumés par style : `qa/fullrun/*.json` (date du dernier passage dans `at`). Dernière mise à jour : 2026-10-09 05:53 UTC.
