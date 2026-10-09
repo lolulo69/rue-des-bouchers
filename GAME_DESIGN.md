@@ -559,6 +559,13 @@ export const OBJECTIVES = [{
 //     back to Pilou, which applies the action's `witnessed.effects`.
 //   sim.windows: [{ at: H(h, m), minutes: N, turns: [...], text: '…' }]  natural moments when attention is elsewhere (HUD « Fenêtre propice »).
 //   Disguise: actions night_disguise (hood → disguise_hood) and night_disguise_vest (hi-vis vest → disguise_vest), DISGUISE config.
+// talk.js (v1.1, §12e.3): night conversations. E / Ⓐ on a person opens the first entry whose `who` and `when` match.
+export const TALK = [{ id: 'talk_waiter_late', who: 'waiter',   // jeremie|tatie|seb_nico|waiter|dede|ghislain|customers|patrol|klaas
+  when: { time: [H(22), H(25)], notFlags: ['met_waiter'] },     // + time [from, to], patrol 'lemaire'|'benali', table (customers archetype)
+  once: false,                                                  // true = once per campaign (first meetings); else once per night
+  exchanges: [{ speaker: 'serveur', say: '…',                   // 1–3 exchanges; speaker null = narration (customers)
+    choices: [{ label: '…', reply: '…', requires: {...}, effects: { setFlags: ['asked_waiter'] }, sim: 'waiter', end: true }] }] }];  // 2–3 choices
+// Afternoon ACTIONS may carry `howTo: '…'`: how to meet their `requires` (e.g. « Parlez au serveur pendant la nuit (E) »), shown when greyed.
 ```
 Rules: all text is in French; **no real restaurant names**; every `speaker` exists in `characters.js`; every flag is declared;
 every action, event and ending is reachable (the linter + the campaign simulator check this). An epilogue is built from the parts whose `when` matches,
