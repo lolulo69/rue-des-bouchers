@@ -1,336 +1,218 @@
-// Ambiance sonore procédurale (WebAudio, aucun fichier) : brouhaha des terrasses proportionnel au nombre de
-// clients, raclement des chaises métalliques sur les pavés quand une table rentre (ou ressort), ronronnement de
-// la hotte (plus fort chez Pilou), cloche lointaine à 22:00. Démarre au premier geste (règle des navigateurs).
-// Touche M : couper / remettre le son.
-// v0.5 : moteur unique `audio` (singleton) : audio.play('whatsapp'), audio.loop('lofi', true), audio.mode('day').
-// La rue (brouhaha, hotte) est branchée par world.js via audio.attachStreet(...). Voir src/art/README.md.
+// Moteur audio procédural (WebAudio, aucun fichier), singleton `audio`.
+//   master ─ compresseur ─ sortie
+//     ├─ music    (Musique)  : lo-fi le jour, nappe nocturne la nuit et sous l'écran titre ; s'efface sous les événements
+//     ├─ ambience (Ambiance) : la rue la nuit (ambience.js : brouhaha, hotte chez Pilou, cloche, pluie, twists),
+//     │                        le clavier de Koddex le jour
+//     └─ sfx      (Effets)   : bruitages ponctuels (sfx.js), interface (téléphone, coach…), pas de Pilou
+// La scène sonore suit l'écran tout seul (mix.js › sceneFrom) : titre, jour (interface ou art.day), nuit (rue rendue).
+// Survit à tout : contexte créé au premier geste et relancé à chaque geste / retour d'onglet / changement d'état,
+// aucune valeur non finie ne part vers WebAudio, une erreur de son ne casse jamais la boucle de jeu.
+// Réglages joueur : audio.setVolume('music' | 'ambience' | 'sfx', v) · setVolume(v) (général) · setEnabled(bus, b)
+// · setMuted(b) · touche M. Persistés (localStorage rdb.audio.v1). Diagnostic : audio.debug().
 import * as THREE from 'three';
 import { makeSfx, SFX_NAMES } from './sfx.js';
 import { makeMusic, LOOP_NAMES } from './music.js';
+import { makeAmbience } from './ambience.js';
+import { BUSES, MUSIC_FOR, busGain, clamp01, loadMix, saveMix, sceneFrom } from './mix.js';
 
-const BELL_MINUTE = 22 * 60;
+const storage = () => { try { return window.localStorage; } catch { return null; } };
+// Ces bruitages font s'effacer la musique quelques secondes
+const DUCKS = { cheer: 3, megaphone: 2.5, radio: 2.5, birthday: 8, crash: 2, splash: 2, bell: 4, whatsapp: 1.5, notify: 1.2 };
+const GESTURES = ['pointerdown', 'mousedown', 'touchend', 'click', 'keydown'];
 
 function createEngine() {
-  let ctx = null, master = null, muted = false;
-  let crowd = null, hum = null, bellBus = null, sfx = null, noise = null;
-  let streetBus = null, musicBus = null, sounds = null, music = null, lastCamera = null, modeName = 'night', rainNode = null, lastInApt = false;
-  // Rue branchée par world.js (attachStreet)
-  let street = null, tables = [], exhaust = new THREE.Vector3(), steam = null, apt = { x1: -1e9, floor: 1e9 }, getMinutes = null;
-  // Une table est "dehors" tant que son groupe est visible (le gameplay le cache quand elle rentre)
-  const isOut = (t) => t.group.visible && t.out !== false;
-  let prevOut = new Map();
-  const pendingLoops = new Map(); // boucles demandées avant le premier geste
-  let lastMin = null, chatterT = 0;
-  const tmp = new THREE.Vector3(), right = new THREE.Vector3();
+  let ctx = null, master = null, noise = null, sounds = null, music = null, street = null;
+  const bus = {}, meters = {};
+  let duckG = null, streetGate = null, dayAmb = null;
+  let mix = loadMix(storage());
+  let forced = null, dayPlace = null, scene = null, track = null, dayLoop = null;
+  let lastNight = -1e9, lastCamera = null, streetOpts = null, warned = false;
+  const pending = new Map(); // boucles demandées avant le premier geste
+  const rnow = () => (typeof performance !== 'undefined' ? performance.now() / 1000 : Date.now() / 1000);
 
-  // --- Toast "son coupé" ---
+  // --- Toast « son coupé » ---
   const toast = document.createElement('div');
   Object.assign(toast.style, { position: 'fixed', right: '16px', bottom: '16px', padding: '6px 12px', borderRadius: '8px', background: 'rgba(10,12,20,.75)', color: '#f6e7c1', font: '14px system-ui, sans-serif', pointerEvents: 'none', opacity: '0', transition: 'opacity .3s', zIndex: 50 });
   document.body.appendChild(toast);
   let toastTimer;
   const say = (txt) => { toast.textContent = txt; toast.style.opacity = '1'; clearTimeout(toastTimer); toastTimer = setTimeout(() => { toast.style.opacity = '0'; }, 1600); };
 
-  function start() {
-    if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return; }
+  const setT = (param, v, tc = 0.1) => { if (ctx && Number.isFinite(v)) param.setTargetAtTime(v, ctx.currentTime, tc); };
+  const resume = () => { if (ctx && ctx.state !== 'running' && ctx.state !== 'closed' && !document.hidden) ctx.resume().catch(() => {}); };
+
+  function makeReverbBus(seconds, wet, dest = bus.ambience) {
+    const len = Math.floor(ctx.sampleRate * seconds);
+    const ir = ctx.createBuffer(2, len, ctx.sampleRate);
+    for (let c = 0; c < 2; c++) { const d = ir.getChannelData(c); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.5); }
+    const conv = ctx.createConvolver(); conv.buffer = ir;
+    const input = ctx.createGain(), lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2200;
+    const dry = ctx.createGain(); dry.gain.value = 1 - wet; const w = ctx.createGain(); w.gain.value = wet;
+    input.connect(lp); lp.connect(dry).connect(dest); lp.connect(conv).connect(w).connect(dest);
+    return { input, lp };
+  }
+  const meter = (node) => { const a = ctx.createAnalyser(); a.fftSize = 1024; node.connect(a); return a; };
+
+  function create() {
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return;
-    ctx = new AC();
-    master = ctx.createGain();
-    master.gain.value = muted ? 0 : 0.9;
-    const comp = ctx.createDynamicsCompressor();
-    comp.threshold.value = -14; comp.ratio.value = 4;
+    try { ctx = new AC({ latencyHint: 'interactive' }); } catch { ctx = new AC(); }
+    master = ctx.createGain(); master.gain.value = mix.muted ? 0 : mix.master;
+    const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 4;
     master.connect(comp).connect(ctx.destination);
-    // Bruit blanc partagé (4 s, en boucle)
+    meters.master = meter(comp);
     noise = ctx.createBuffer(1, ctx.sampleRate * 4, ctx.sampleRate);
     const d = noise.getChannelData(0);
     for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-    sfx = ctx.createGain(); sfx.connect(master);
-    streetBus = ctx.createGain(); streetBus.gain.value = modeName === 'night' ? 1 : 0; streetBus.connect(master);
-    musicBus = ctx.createGain(); musicBus.gain.value = 0.8; musicBus.connect(master);
-    crowd = makeCrowd();
-    hum = makeHum();
-    bellBus = makeReverbBus(4.5, 0.55);
-    // Pluie : souffle large + crépitement (gouttes sur les pavés et les stores), muselé chez Pilou
-    {
-      const src = ctx.createBufferSource(); src.buffer = noise; src.loop = true;
-      const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2800; bp.Q.value = 0.4;
-      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 6000;
-      const g = ctx.createGain(); g.gain.value = 0;
-      const am = ctx.createGain(); am.gain.value = 0.85;
-      const lfo = ctx.createOscillator(); lfo.type = 'square'; lfo.frequency.value = 23; const lg = ctx.createGain(); lg.gain.value = 0.15;
-      lfo.connect(lg).connect(am.gain); lfo.start();
-      src.connect(bp).connect(am).connect(lp).connect(g).connect(master); src.start();
-      rainNode = { g, lp };
-    }
-    sounds = makeSfx(ctx, sfx, noise, bellBus.input);
-    music = makeMusic(ctx, musicBus, noise, makeReverbBus);
-    for (const [name, on] of pendingLoops) music.loop(name, on);
-    pendingLoops.clear();
+    for (const b of BUSES) { bus[b] = ctx.createGain(); bus[b].gain.value = mix.enabled[b] === false ? 0 : mix[b]; bus[b].connect(master); meters[b] = meter(bus[b]); }
+    duckG = ctx.createGain(); duckG.connect(bus.music);
+    streetGate = ctx.createGain(); streetGate.gain.value = 0; streetGate.connect(bus.ambience);
+    dayAmb = ctx.createGain(); dayAmb.gain.value = 0; dayAmb.connect(bus.ambience);
+    const bellBus = makeReverbBus(4.5, 0.55, bus.sfx);
+    sounds = makeSfx(ctx, bus.sfx, noise, bellBus.input);
+    music = makeMusic(ctx, duckG, noise, makeReverbBus);
+    street = makeAmbience(ctx, { out: streetGate, sfxOut: bus.sfx, noise, makeReverbBus, music, play: (n, o) => api.play(n, o), duck: (s) => api.duck(s) });
+    if (streetOpts) street.attach(streetOpts);
+    ctx.onstatechange = () => { if (ctx.state === 'suspended' || ctx.state === 'interrupted') resume(); };
+    for (const [name, on] of pending) music.loop(name, on);
+    pending.clear();
+    scene = null; // la scène sera (ré)appliquée par le chien de garde
+    watch();
   }
-  for (const ev of ['pointerdown', 'keydown']) addEventListener(ev, start, { capture: true });
+  // Démarre (ou relance) au moindre geste : les navigateurs n'autorisent le son qu'après une interaction
+  function ensure() { if (!ctx) create(); else resume(); }
+  for (const ev of GESTURES) addEventListener(ev, ensure, { capture: true, passive: true });
+  document.addEventListener('visibilitychange', () => { if (!ctx) return; if (document.hidden) ctx.suspend().catch(() => {}); else resume(); });
+
+  // Touche M (la lettre, quel que soit le clavier), sauf en tapant dans un champ
   addEventListener('keydown', (e) => {
-    if (e.code !== 'KeyM' || e.repeat) return;
-    muted = !muted;
-    if (master) master.gain.setTargetAtTime(muted ? 0 : 0.9, ctx.currentTime, 0.05);
-    say(muted ? '🔇 Son coupé (M)' : '🔊 Son (M)');
+    if (e.repeat || (e.key !== 'm' && e.key !== 'M') || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.target?.closest?.('input, textarea, select, [contenteditable=""], [contenteditable=true]')) return;
+    api.setMuted(!mix.muted);
+    say(mix.muted ? '🔇 Son coupé (M)' : '🔊 Son (M)');
   });
-  document.addEventListener('visibilitychange', () => { if (!ctx) return; document.hidden ? ctx.suspend() : ctx.resume(); });
 
-  const loopNoise = () => {
-    const s = ctx.createBufferSource();
-    s.buffer = noise; s.loop = true;
-    s.start(0, Math.random() * 3.5);
-    return s;
-  };
+  // --- Scène sonore : on regarde l'écran 4 fois par seconde (même quand la nuit ne se dessine pas) ---
+  const shown = (id) => { const el = document.getElementById(id); return !!el && !el.classList.contains('hidden') && !el.classList.contains('ui-hidden'); };
+  function currentScene() {
+    return sceneFrom({ forced, dayActive: !!dayPlace, titleVisible: shown('title'), dayUiVisible: shown('ui-root'), nightFresh: rnow() - lastNight < 3 }); // 3 s : une image très lente (iGPU, SwiftShader) ne coupe pas la nuit
+  }
+  function applyScene(s) {
+    scene = s;
+    setT(streetGate.gain, s === 'night' ? 1 : 0, s === 'night' ? 0.8 : 0.3);
+    const want = MUSIC_FOR[s] ?? null;
+    if (want !== track) { if (track) music.loop(track, false); if (want) music.loop(want, true); track = want; }
+    const dl = s === 'day' && dayPlace === 'koddex' ? 'typing' : null; // le clavier des collègues à Koddex
+    if (dl !== dayLoop) { if (dayLoop) music.loop(dayLoop, false); if (dl) music.loop(dl, true, dayAmb); dayLoop = dl; }
+    setT(dayAmb.gain, s === 'day' ? 0.45 : 0, 0.5);
+  }
+  let watchId = null;
+  function watch() {
+    if (watchId) return;
+    const tick = () => {
+      try {
+        if (!ctx) return;
+        if (ctx.state !== 'running' && !document.hidden && (navigator.userActivation?.hasBeenActive ?? true)) resume();
+        const s = currentScene();
+        if (s !== scene) applyScene(s);
+      } catch (err) { if (!warned) { warned = true; console.warn('audio :', err); } }
+    };
+    tick();
+    watchId = setInterval(tick, 250);
+  }
+  function applyMix() {
+    if (!ctx) return;
+    setT(master.gain, mix.muted ? 0 : mix.master, 0.05);
+    for (const b of BUSES) setT(bus[b].gain, mix.enabled[b] === false ? 0 : mix[b], 0.05);
+  }
+  const persist = () => saveMix(storage(), mix);
 
-  // --- Brouhaha : plusieurs "voix" de bruit filtré en formants, modulées au rythme des syllabes ---
-  function makeCrowd() {
-    const out = ctx.createGain(); out.gain.value = 0;
-    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 3200;
-    const pan = ctx.createStereoPanner();
-    out.connect(lp).connect(pan).connect(streetBus);
-    const voices = [];
-    for (let i = 0; i < 6; i++) {
-      const src = loopNoise();
-      const f1 = ctx.createBiquadFilter(); f1.type = 'bandpass'; f1.frequency.value = 350 + Math.random() * 500; f1.Q.value = 3;
-      const f2 = ctx.createBiquadFilter(); f2.type = 'bandpass'; f2.frequency.value = 1200 + Math.random() * 900; f2.Q.value = 5;
-      const g = ctx.createGain(); g.gain.value = 0;
-      const mix = ctx.createGain(); mix.gain.value = 0.5;
-      src.connect(f1).connect(g); src.connect(f2).connect(mix).connect(g);
-      g.connect(out);
-      voices.push({ g, f1, f2, rate: 3 + Math.random() * 3, ph: Math.random() * 10, base: 0.5 + Math.random() * 0.5 });
-    }
-    // un fond plus grave et continu
-    const bed = loopNoise();
-    const bf = ctx.createBiquadFilter(); bf.type = 'bandpass'; bf.frequency.value = 450; bf.Q.value = 0.7;
-    const bg = ctx.createGain(); bg.gain.value = 0.25;
-    bed.connect(bf).connect(bg).connect(out);
-    return { out, lp, pan, voices };
-  }
-
-  // --- La hotte : moteur 50 Hz + souffle ---
-  function makeHum() {
-    const out = ctx.createGain(); out.gain.value = 0;
-    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 900;
-    const pan = ctx.createStereoPanner();
-    out.connect(lp).connect(pan).connect(streetBus);
-    for (const [f, a] of [[50, 0.35], [100, 0.25], [150, 0.12], [300, 0.05]]) {
-      const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f * (1 + (Math.random() - 0.5) * 0.004);
-      const g = ctx.createGain(); g.gain.value = a * 0.25;
-      o.connect(g).connect(out); o.start();
-    }
-    const src = loopNoise();
-    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 650; bp.Q.value = 0.8;
-    const g = ctx.createGain(); g.gain.value = 0.35;
-    // battement des pales
-    const lfo = ctx.createOscillator(); lfo.frequency.value = 7.5;
-    const lg = ctx.createGain(); lg.gain.value = 0.12;
-    lfo.connect(lg).connect(g.gain); lfo.start();
-    src.connect(bp).connect(g).connect(out);
-    return { out, lp, pan };
-  }
-
-  function makeReverbBus(seconds, wet) {
-    const len = Math.floor(ctx.sampleRate * seconds);
-    const ir = ctx.createBuffer(2, len, ctx.sampleRate);
-    for (let c = 0; c < 2; c++) {
-      const d = ir.getChannelData(c);
-      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.5);
-    }
-    const conv = ctx.createConvolver(); conv.buffer = ir;
-    const input = ctx.createGain();
-    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2200;
-    const dry = ctx.createGain(); dry.gain.value = 1 - wet;
-    const w = ctx.createGain(); w.gain.value = wet;
-    input.connect(lp);
-    lp.connect(dry).connect(master);
-    lp.connect(conv).connect(w).connect(master);
-    return { input, lp };
-  }
-
-  // --- Cloche (partiels inharmoniques d'une cloche d'église) ---
-  function bell(when, inApt) {
-    const f0 = 196;
-    const out = ctx.createGain(); out.gain.value = inApt ? 0.45 : 0.6;
-    out.connect(bellBus.input);
-    for (const [r, a, dec] of [[0.5, 0.5, 7], [1, 0.8, 5], [1.183, 0.5, 3.5], [1.506, 0.35, 3], [2, 0.4, 2.5], [2.514, 0.25, 1.8], [2.662, 0.2, 1.6], [3.011, 0.15, 1.3], [4.166, 0.1, 0.9]]) {
-      const o = ctx.createOscillator(); o.frequency.value = f0 * r;
-      const g = ctx.createGain();
-      g.gain.setValueAtTime(0, when);
-      g.gain.linearRampToValueAtTime(a * 0.18, when + 0.008);
-      g.gain.exponentialRampToValueAtTime(0.0001, when + dec);
-      o.connect(g).connect(out);
-      o.start(when); o.stop(when + dec + 0.1);
-    }
-  }
-  function ringBells(strokes, inApt) {
-    const t0 = ctx.currentTime + 0.1;
-    for (let i = 0; i < strokes; i++) bell(t0 + i * 2.4, inApt);
-  }
-
-  // --- Chaises métalliques raclées sur les pavés : bruit résonant haché (stick-slip) ---
-  function scrape(when, gain, panV) {
-    const dur = 0.35 + Math.random() * 0.5;
-    const src = ctx.createBufferSource(); src.buffer = noise;
-    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 6;
-    const f = 900 + Math.random() * 1500;
-    bp.frequency.setValueAtTime(f, when); bp.frequency.linearRampToValueAtTime(f * (0.8 + Math.random() * 0.5), when + dur);
-    const env = ctx.createGain();
-    env.gain.setValueAtTime(0, when);
-    env.gain.linearRampToValueAtTime(gain, when + 0.03);
-    env.gain.setValueAtTime(gain, when + dur * 0.7);
-    env.gain.linearRampToValueAtTime(0, when + dur);
-    // cliquetis des pieds sur les joints des pavés
-    const am = ctx.createGain(); am.gain.value = 0.5;
-    const lfo = ctx.createOscillator(); lfo.type = 'square'; lfo.frequency.value = 18 + Math.random() * 30;
-    const lg = ctx.createGain(); lg.gain.value = 0.5;
-    lfo.connect(lg).connect(am.gain);
-    const p = ctx.createStereoPanner(); p.pan.value = panV;
-    src.connect(bp).connect(am).connect(env).connect(p).connect(sfx);
-    src.start(when, Math.random() * 3); src.stop(when + dur + 0.05);
-    lfo.start(when); lfo.stop(when + dur + 0.05);
-    // "clonk" métallique quand on empile
-    const o = ctx.createOscillator(); o.type = 'triangle'; o.frequency.value = 380 + Math.random() * 500;
-    const og = ctx.createGain();
-    og.gain.setValueAtTime(0, when + dur); og.gain.linearRampToValueAtTime(gain * 0.5, when + dur + 0.005); og.gain.exponentialRampToValueAtTime(0.0001, when + dur + 0.25);
-    o.connect(og).connect(p); o.start(when + dur); o.stop(when + dur + 0.3);
-  }
-
-  // Petits bruits de terrasse : verres qui trinquent, éclats de rire
-  function clink(when, gain, panV) {
-    const p = ctx.createStereoPanner(); p.pan.value = panV; p.connect(sfx);
-    for (const f of [2600 + Math.random() * 1500, 3900 + Math.random() * 1200]) {
-      const o = ctx.createOscillator(); o.frequency.value = f;
-      const g = ctx.createGain();
-      g.gain.setValueAtTime(gain, when); g.gain.exponentialRampToValueAtTime(0.0001, when + 0.25);
-      o.connect(g).connect(p); o.start(when); o.stop(when + 0.3);
-    }
-  }
-  function laugh(when, gain, panV) {
-    const p = ctx.createStereoPanner(); p.pan.value = panV; p.connect(sfx);
-    const o = ctx.createOscillator(); o.type = 'sawtooth';
-    const f = 160 + Math.random() * 200;
-    const n = 3 + Math.floor(Math.random() * 4);
-    o.frequency.setValueAtTime(f * 1.15, when); o.frequency.linearRampToValueAtTime(f * 0.9, when + n * 0.16);
-    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 900; bp.Q.value = 2;
-    const g = ctx.createGain(); g.gain.value = 0;
-    for (let i = 0; i < n; i++) {
-      const t = when + i * 0.16;
-      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(gain, t + 0.03); g.gain.linearRampToValueAtTime(0, t + 0.12);
-    }
-    o.connect(bp).connect(g).connect(p); o.start(when); o.stop(when + n * 0.16 + 0.1);
-  }
-
-  function relPan(pos, camera) {
-    right.set(1, 0, 0).applyQuaternion(camera.quaternion);
-    tmp.copy(pos).sub(camera.position);
-    const d = Math.max(1, tmp.length());
-    return { d, pan: Math.max(-1, Math.min(1, tmp.dot(right) / d)) };
-  }
-
-  // Position → gain et panoramique relatifs à la dernière caméra vue
+  // Position → gain et panoramique relatifs à la dernière caméra de la nuit ; étouffé si l'on est chez Pilou
+  const tmp = new THREE.Vector3(), right = new THREE.Vector3();
   function spatial(pos) {
-    if (!pos || !lastCamera) return { gain: 1, pan: 0 };
-    const { d, pan } = relPan(pos.isVector3 ? pos : new THREE.Vector3(pos.x, pos.y ?? 1, pos.z), lastCamera);
-    return { gain: Math.min(1, 4 / (1 + d * 0.3)), pan };
+    if (!pos || !lastCamera || scene !== 'night') return { gain: 1, pan: 0 };
+    tmp.set(pos.x, pos.y ?? 1, pos.z);
+    if (![tmp.x, tmp.y, tmp.z].every(Number.isFinite)) return { gain: 1, pan: 0 };
+    right.set(1, 0, 0).applyQuaternion(lastCamera.quaternion);
+    tmp.sub(lastCamera.position);
+    const d = Math.max(1, tmp.length());
+    const room = street?.room;
+    return { gain: Math.min(1, 4 / (1 + d * 0.3)) * (room && room !== 'window' ? 0.45 : 1), pan: Math.max(-1, Math.min(1, tmp.dot(right) / d)) };
   }
 
-  return {
-    get muted() { return muted; },
+  const api = {
+    get muted() { return mix.muted; },
     get state() { return ctx ? ctx.state : 'off'; },
+    get scene() { return scene ?? currentScene(); },
+    get mix() { return { ...mix, enabled: { ...mix.enabled } }; },
     sounds: SFX_NAMES,
     loops: LOOP_NAMES,
-    attachStreet(o) {
-      ({ tables, exhaust, steam, apt, getMinutes } = o);
-      street = o;
-      prevOut = new Map(tables.map((t) => [t, isOut(t)]));
-      return this;
+    buses: BUSES,
+    // ---- mélangeur (réglages du joueur) ----
+    // setVolume('music' | 'ambience' | 'sfx', 0..1) ou setVolume(0..1) = volume général
+    setVolume(a, b) {
+      if (typeof a === 'number') mix.master = clamp01(a);
+      else if (BUSES.includes(a)) mix[a] = clamp01(b);
+      else return false;
+      applyMix(); persist(); return true;
     },
-    // Bruitage ponctuel : opts { pos (Vector3, spatialisé), gain, delay (s), repeat... } (voir sfx.js)
+    getVolume: (b = 'master') => mix[b],
+    setEnabled(b, on = true) { if (!BUSES.includes(b)) return false; mix.enabled[b] = !!on; applyMix(); persist(); return true; },
+    isEnabled: (b) => mix.enabled[b] !== false,
+    setMuted(m) { mix.muted = !!m; applyMix(); persist(); },
+    // ---- la rue (world.js) ----
+    attachStreet(o) { streetOpts = o; street?.attach(o); return this; },
+    // Appelé à chaque image de la nuit (world.js › onFrame) : c'est aussi ce qui dit « la nuit est à l'écran »
+    update(dt, camera) {
+      lastCamera = camera; lastNight = rnow();
+      if (!ctx || ctx.state !== 'running' || !street) return;
+      try { street.update(Number.isFinite(dt) ? Math.min(dt, 0.1) : 0, camera); } catch (err) { if (!warned) { warned = true; console.warn('audio :', err); } }
+    },
+    // État de la nuit fourni par le metteur en scène : { twist, exhaust (0..1.4), darkness (0..1) }
+    street(st) { try { street?.state(st); } catch (err) { if (!warned) { warned = true; console.warn('audio :', err); } } },
+    twistMoment(e) { street?.moment(e); },
+    rain(level = 0) { street?.rain(level); },
+    // ---- bruitages et boucles ----
+    // play(name, { pos (Vector3, spatialisé), gain, delay (s), … }) — voir sfx.js
     play(name, opts = {}) {
       if (!sounds || ctx.state !== 'running') return false;
-      const sp = spatial(opts.pos);
-      return sounds.play(name, { ...opts, gain: (opts.gain ?? 1) * sp.gain, pan: opts.pan ?? sp.pan, when: ctx.currentTime + (opts.delay ?? 0) });
+      try {
+        const sp = spatial(opts.pos);
+        const gain = (Number.isFinite(opts.gain) ? opts.gain : 1) * sp.gain;
+        const pan = Number.isFinite(opts.pan) ? opts.pan : sp.pan;
+        if (DUCKS[name]) api.duck(DUCKS[name]);
+        return sounds.play(name, { ...opts, gain, pan, when: ctx.currentTime + Math.max(0, Number.isFinite(opts.delay) ? opts.delay : 0) });
+      } catch (err) { if (!warned) { warned = true; console.warn('audio :', err); } return false; }
     },
-    // Boucle continue : 'lofi' (jour), 'hall' (commission J14), 'typing' (clavier Koddex)
-    loop(name, on = true) {
-      if (!music) { pendingLoops.set(name, on); return; }
-      music.loop(name, on);
+    // Boucle à la demande (galerie, J14 : 'hall') ; la musique de fond, elle, suit la scène toute seule
+    loop(name, on = true) { if (!music) { pending.set(name, on); return; } music.loop(name, on); },
+    // La musique s'efface quelques secondes (événement, carte, cloche…)
+    duck(seconds = 3, depth = 0.3) {
+      if (!duckG) return;
+      const t = ctx.currentTime;
+      duckG.gain.cancelScheduledValues(t); duckG.gain.setTargetAtTime(depth, t, 0.15); duckG.gain.setTargetAtTime(1, t + seconds, 1.2);
     },
-    // Pluie (0..1), pilotée par le metteur en scène depuis sim.weather()
-    rain(level = 0) {
-      if (!rainNode) return;
-      const on = modeName === 'night' ? level : 0;
-      rainNode.g.gain.setTargetAtTime(on * 0.45, ctx.currentTime, 0.6);
-      rainNode.lp.frequency.setTargetAtTime(lastInApt ? 1600 : 6000, ctx.currentTime, 0.3);
+    // ---- scène ----
+    // Forcer une scène ('title' | 'day' | 'night' | 'hall' | 'off'), null = automatique (recommandé)
+    setScene(s = null) { forced = s; if (ctx) applyScene(currentScene()); },
+    mode(m) { api.setScene(m === 'night' || m == null ? null : m); }, // compatibilité v0.5
+    // art.day : la scène de jour en 3D en cours ('koddex', 'home', 'commute'…) ou null
+    day(place = null) { dayPlace = place; if (ctx) applyScene(currentScene()); },
+    bell: (n = 1) => street?.bell(n),
+    start: ensure,
+    // ---- diagnostic (tests) ----
+    debug() {
+      const rms = {};
+      const buf = new Float32Array(1024);
+      for (const [k, a] of Object.entries(meters)) { a.getFloatTimeDomainData(buf); let s = 0; for (const x of buf) s += x * x; rms[k] = +Math.sqrt(s / buf.length).toFixed(5); }
+      return {
+        state: this.state, scene: scene ?? currentScene(), music: track, dayLoop, mix: this.mix,
+        buses: Object.fromEntries(BUSES.map((b) => [b, { gain: bus[b] ? +bus[b].gain.value.toFixed(3) : null, effective: busGain(mix, b) }])),
+        street: { attached: !!streetOpts, gate: streetGate ? +streetGate.gain.value.toFixed(3) : null, room: street?.room ?? null, twist: street?.twist ?? null, emitters: street?.emitters ?? 0, hum: street?.hum ?? null },
+        rms, time: ctx ? +ctx.currentTime.toFixed(2) : 0,
+      };
     },
-    // 'night' : la rue s'entend · 'day' / 'hall' / 'off' : la rue se tait (les boucles se gèrent avec loop())
-    mode(m) {
-      modeName = m;
-      if (streetBus) streetBus.gain.setTargetAtTime(m === 'night' ? 1 : 0, ctx.currentTime, 0.4);
-    },
-    update(dt, camera) {
-      lastCamera = camera;
-      if (!ctx || ctx.state !== 'running' || !street) return;
-      const now = ctx.currentTime;
-      const inApt = camera.position.x < apt.x1 + 0.3 && camera.position.y > apt.floor;
-      lastInApt = inApt;
-      // Terrasses : niveau ~ somme des têtes / distance², panoramique pondéré
-      let L = 0, P = 0, heads = 0;
-      for (const t of tables) {
-        const out = isOut(t);
-        if (out) {
-          const n = t.people.filter((p) => p.visible).length;
-          heads += n;
-          const { d, pan } = relPan(t.group.position, camera);
-          const w = n / (1 + d * d * 0.04);
-          L += w; P += w * pan;
-        }
-        const was = prevOut.get(t);
-        if (was !== out) { // rangement (ou retour en douce) de la table : les chaises raclent
-          prevOut.set(t, out);
-          const { d, pan } = relPan(t.group.position, camera);
-          const g = Math.min(0.5, 2.2 / (1 + d * 0.35)) * (inApt ? 0.6 : 1);
-          const chairs = Math.min(8, t.people.length);
-          for (let i = 0; i < chairs; i++) scrape(now + i * 0.22 + Math.random() * 0.15, g * (0.6 + Math.random() * 0.4), pan);
-        }
-      }
-      const level = Math.min(1, Math.sqrt(L) / 6) * (inApt ? 0.55 : 1);
-      crowd.out.gain.setTargetAtTime(level * 0.55, now, 0.4);
-      crowd.pan.pan.setTargetAtTime(L ? Math.max(-0.8, Math.min(0.8, P / L)) : 0, now, 0.5);
-      crowd.lp.frequency.setTargetAtTime(inApt ? 1100 : 3200, now, 0.3);
-      for (const v of crowd.voices) {
-        v.ph += dt * v.rate;
-        const syl = Math.max(0, Math.sin(v.ph * 6.28)) * (0.4 + 0.6 * Math.max(0, Math.sin(v.ph * 0.37 + v.base * 9)));
-        v.g.gain.setTargetAtTime(syl * v.base * (0.4 + Math.min(1, heads / 40)), now, 0.03);
-      }
-      // Rires, verres qui trinquent : plus il y a de monde, plus c'est fréquent
-      chatterT -= dt;
-      if (chatterT <= 0 && heads > 0) {
-        chatterT = 0.4 + Math.random() * 6 / Math.sqrt(heads);
-        const outT = tables.filter(isOut);
-        const t = outT[Math.floor(Math.random() * outT.length)];
-        const { d, pan } = relPan(t.group.position, camera);
-        const g = Math.min(0.12, 0.6 / (1 + d * 0.4)) * (inApt ? 0.5 : 1);
-        Math.random() < 0.5 ? clink(now + 0.01, g * 0.5, pan) : laugh(now + 0.01, g, pan);
-      }
-      // Hotte : plus fort chez Pilou (la gaine passe juste sous sa fenêtre et la pièce résonne)
-      const on = steam?.intensity ?? 1;
-      const { d: dh, pan: ph } = relPan(exhaust, camera);
-      const hl = on * Math.min(1, 3 / (1 + dh * 0.5)) * (inApt ? 1.5 : 0.8);
-      hum.out.gain.setTargetAtTime(hl * 0.35, now, 0.3);
-      hum.pan.pan.setTargetAtTime(inApt ? ph * 0.3 : ph, now, 0.3);
-      hum.lp.frequency.setTargetAtTime(inApt ? 600 : 1000, now, 0.3);
-      // Cloche de 22:00
-      const min = getMinutes?.();
-      if (typeof min === 'number') {
-        if (lastMin !== null && lastMin < BELL_MINUTE && min >= BELL_MINUTE && min - lastMin < 30) ringBells(10, inApt);
-        lastMin = min;
-      }
-    },
-    bell: (n = 1) => ctx && ringBells(n, false), // pour tester : __rdb.world.audio.bell(3)
-    start,
   };
+  return api;
 }
 
 export const audio = createEngine();

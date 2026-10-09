@@ -517,6 +517,7 @@ export function buildWorld(scene, opts = {}) {
     streetLights,
     // Appartement : collision des cloisons (à appeler sur la position de Pilou chez lui), bureau de télétravail
     aptCollide: flat.collide,
+    aptRoomAt: flat.roomAt, // 'living' | 'corridor' | 'bathroom' | 'bedroom' | 'daughter' | 'window' | null
     homeScreen: flat.homeScreen,
     homeSeat: flat.homeSeat,
     sofa: flat.sofa, // { position, seat, doze: { position, yaw, head }, box } — la sieste / nuit sur le canapé
@@ -527,7 +528,7 @@ export function buildWorld(scene, opts = {}) {
   };
   world.onFrame = rigHooks.onFrame;
   if (dayRole) return world;
-  world.audio = audio.attachStreet({ tables, exhaust, steam, apt, getMinutes: () => world.gameMinutes ?? window.__rdb?.sim?.state?.min ?? window.__rdb?.S?.min });
+  world.audio = audio.attachStreet({ tables, exhaust, steam, apt, roomAt: flat.roomAt, anchors, W, window: anchors.pilouWindow, getMinutes: () => world.gameMinutes ?? window.__rdb?.sim?.state?.min ?? window.__rdb?.S?.min });
   onFrame((dt, t, camera) => audio.update(dt, camera));
   world.art = attachArt(scene, world);
   return world;

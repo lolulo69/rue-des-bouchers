@@ -12,6 +12,7 @@ import { canvasTexture, panelTex } from './textures.js';
 import { scenes as vignettes, M, kit as makeKit, codeTex, roofsTex } from './scenes.js';
 import { QUALITY_PRESETS } from './quality.js';
 import { createTwists } from './twists.js';
+import { audio } from '../audio/index.js';
 
 const level = () => { try { return localStorage.getItem('rdb.quality') ?? 'moyen'; } catch { return 'moyen'; } };
 
@@ -264,6 +265,7 @@ export function createDay() {
       renderer.setPixelRatio(Math.min(q.maxPixelRatio, devicePixelRatio || 1) * q.pixelRatio);
       canvas.style.display = '';
       name = next; t = 0; last = 0;
+      audio.day(next); // musique du jour, clavier des collègues à Koddex
       current = await DAY_SCENES[next](opts);
       size();
       if (!raf) raf = requestAnimationFrame(frame);
@@ -272,6 +274,7 @@ export function createDay() {
     stop({ keepCanvas = false } = {}) {
       cancelAnimationFrame(raf); raf = 0;
       current?.dispose?.(); current = null; name = null; rect = null;
+      audio.day(null);
       if (canvas && !keepCanvas) canvas.style.display = 'none';
     },
     screenRect: () => rect,

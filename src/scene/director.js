@@ -102,7 +102,7 @@ export function createDirector({ scene, world, art, audio }) {
   // ---------- événements de la simulation ----------
   function onEvent(e) {
     if (e.type === 'splash') art.fx.splash();
-    else if (e.type === 'twist-moment') art.twists?.trigger(e.prop ?? null, e.moment, e); // ex. { prop: 'tv_screen', moment: 'goal' }
+    else if (e.type === 'twist-moment') { art.twists?.trigger(e.prop ?? null, e.moment, e); audio?.twistMoment?.(e); } // ex. { prop: 'tv_screen', moment: 'goal' }
     else if (e.type === 'art') {
       const pos = toV(e.pos);
       if (e.fx && e.fx !== 'exhaustBlocked') art.fx[e.fx]?.(pos ?? undefined); // la hotte bouchée suit l'état (update)
@@ -324,6 +324,9 @@ export function createDirector({ scene, world, art, audio }) {
     // Twist de la nuit (§12b.A) : les accessoires listés par le contenu (sim.twist.props)
     const tw = sim.twist ?? S.twist ?? null;
     art.twists?.sync(tw?.props ?? []);
+    // L'audio de la nuit : sons du twist, hotte (arrêtée / à fond / bouchée par le carton), coupure de courant
+    const full = tw?.props?.includes('exhaust_full_steam') ? 1.3 : 1;
+    audio?.street?.({ twist: tw?.id ?? null, exhaust: S.exhaustOff ? 0 : world.steam.intensity * full * (blocked ? 0.6 : 1), darkness: S.darkness ?? 0 });
 
     // Drapeaux de campagne (banderoles, uritrottoir, caméras)
     syncFlags(cs?.flags ?? []);

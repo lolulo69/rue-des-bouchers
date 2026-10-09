@@ -177,6 +177,16 @@ export function buildApartment(city, scene, { F, bz, W }) {
   walls.push({ x0: -11.8, x1: -10.2, z0: za, z1: za + 2.1 }, { x0: -13.75, x1: -12.85, z0: za, z1: za + 1.9 }); // les lits
   walls.push({ x0: -9.1, x1: -7.5, z0: za, z1: za + 0.8 }); // la baignoire
   const apt = { x0: xb, x1: xs, z0: za, z1: zb, floor: F, ceil: F + H };
+  // Pièce où se trouve un point (l'audio s'en sert : la hotte s'entend fort au séjour, étouffée au fond) ;
+  // 'window' = penché dehors par LA fenêtre du séjour ; null = pas chez Pilou
+  function roomAt(p) {
+    if (p.y < F - 0.3 || p.y > F + H + 0.3 || p.z < za || p.z > zb) return null;
+    if (p.x > xs) return p.x < xs + 1.2 && Math.abs(p.z - bz) < 1.2 ? 'window' : null;
+    if (p.x < xb) return null;
+    if (p.x >= -7.0) return 'living';
+    if (p.z > zc) return 'corridor';
+    return p.x >= -9.5 ? 'bathroom' : p.x >= -12.5 ? 'bedroom' : 'daughter';
+  }
   // Collision des cloisons (le jeu l'appelle sur la position de Pilou) : repousse hors des murs, rayon r
   function collide(p, r = 0.25) {
     if (p.y < F - 0.5 || p.y > F + H) return p;
@@ -188,5 +198,5 @@ export function buildApartment(city, scene, { F, bz, W }) {
     }
     return p;
   }
-  return { apt, bed, aptDoor, homeScreen, homeSeat, sofa: sofaSpot, collide, light, rooms: { living: [xs, -7.0], corridor: [-7.0, xb], bedroom: [-9.5, -12.5], daughter: [-12.5, xb], bathroom: [-7.0, -9.5] } };
+  return { apt, bed, aptDoor, homeScreen, homeSeat, sofa: sofaSpot, collide, roomAt, light, rooms: { living: [xs, -7.0], corridor: [-7.0, xb], bedroom: [-9.5, -12.5], daughter: [-12.5, xb], bathroom: [-7.0, -9.5] } };
 }

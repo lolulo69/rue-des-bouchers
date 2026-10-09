@@ -18,7 +18,8 @@ const B = (w, h, d) => new THREE.BoxGeometry(w, h, d);
 const C = (a, b, h, s = 10) => new THREE.CylinderGeometry(a, b, h, s);
 const pick = (a) => a[Math.floor(Math.random() * a.length)];
 
-export function createTwists(scene, world, { onFrame, audio, anim }) {
+// Les sons des twists vivent dans src/audio/ambience.js (par id de twist) : ici, que l'image.
+export function createTwists(scene, world, { onFrame, anim }) {
   const A = world.anchors;
   const W = Math.abs(world.window.pos.x) - 0.3;
   const bz = A.pilouWindow.z;
@@ -79,7 +80,7 @@ export function createTwists(scene, world, { onFrame, audio, anim }) {
           if (song > 0 && (song -= dt) <= 0) for (const q of t.people) setState(q, { anim: 'idle' });
         },
         trigger(m) {
-          if (m === 'song') { song = 20; for (const q of t.people) setState(q, { anim: 'sing' }); audio?.play('birthday', { pos: p }); }
+          if (m === 'song') { song = 20; for (const q of t.people) setState(q, { anim: 'sing' }); }
           if (m === 'blow') flames.forEach((f) => { f.visible = false; });
         },
       });
@@ -135,7 +136,6 @@ export function createTwists(scene, world, { onFrame, audio, anim }) {
           if (o.away) state.away++; else state.home++;
           state.flash = 5;
           for (const q of fans()) setState(q, { anim: 'cheer' });
-          audio?.play('cheer', { pos: V(g.position.x, 1, g.position.z) });
         },
       });
     },
@@ -152,10 +152,7 @@ export function createTwists(scene, world, { onFrame, audio, anim }) {
           if (i === 0) { add('hemi', 'head', [0, 0.92 * k.r, -0.35 * k.r], [1.25 * k.r, 1.6 * k.r, 0.9 * k.r], 0xffffff, [-1.9, 0, 0]); add('torus', 'head', [0, 1.85 * k.r, 0], [0.5 * k.r, 0.5 * k.r, 0.5 * k.r], 0xe8c45a, [Math.PI / 2, 0, 0]); }
         },
       }));
-      let shout = 4;
-      return handle('evjf', group, {
-        tick(dt) { if ((shout -= dt) <= 0) { shout = 9 + Math.random() * 10; audio?.play('megaphone', { pos: c }); } },
-      });
+      return handle('evjf', group);
     },
 
     // Camionnette de livraison garée dans le couloir (feux de détresse)
@@ -180,8 +177,7 @@ export function createTwists(scene, world, { onFrame, audio, anim }) {
       const hat = new THREE.Group(); hat.position.set(-W + 1.6, 0, bz - 0.8);
       hat.add(mesh(C(0.16, 0.12, 0.09, 12), M(0x2a2a2a), 0, 0.045, 0), mesh(C(0.22, 0.22, 0.015, 14), M(0x2a2a2a), 0, 0.005, 0));
       for (let i = 0; i < 6; i++) hat.add(mesh(C(0.02, 0.02, 0.004, 8), M(0xe8c45a, { metalness: 0.8, roughness: 0.3 }), (Math.random() - 0.5) * 0.15, 0.06, (Math.random() - 0.5) * 0.15));
-      audio?.loop('musette', true);
-      return handle('busker', [p, hat], { cleanup: () => audio?.loop('musette', false) });
+      return handle('busker', [p, hat]);
     },
 
     // Panne de courant : lanternes et lumières de la rue éteintes, fenêtres presque noires, bougies aux fenêtres
@@ -372,7 +368,6 @@ export function createTwists(scene, world, { onFrame, audio, anim }) {
           if (!dede || !(k === 'moment1' || k === 'award' || k === 'win')) return;
           if (held <= 0) before = { anim: dede.userData.rig.anim, held: dede.userData.rig.held, expr: dede.userData.rig.expr };
           held = 25; setState(dede, { anim: 'cheer', held: null, expr: 'happy' });
-          audio?.play('cheer', { pos: dede.position });
         },
         cleanup() { if (held > 0 && dede) setState(dede, before); },
       });
@@ -380,7 +375,8 @@ export function createTwists(scene, world, { onFrame, audio, anim }) {
   };
 
   // Plusieurs ids de contenu pour la même petite scène
-  const ALIAS = { balloons: 'birthday_cake', candles: 'birthday_cake', influencer: 'ring_light', phone: 'ring_light', football: 'tv_screen', megaphone: 'evjf', sashes: 'evjf', accordion: 'busker', fire_brigade: 'firefighters', tape_measure: 'firefighters', tour_guide: 'tour_group', guide_umbrella: 'tour_group', candles_windows: 'power_cut', fans: 'heatwave', bunting: 'fete_voisins' };
+  const ALIAS = { balloons: 'birthday_cake', candles: 'birthday_cake', influencer: 'ring_light', phone: 'ring_light', football: 'tv_screen', megaphone: 'evjf', sashes: 'evjf', accordion: 'busker', fire_brigade: 'firefighters', tape_measure: 'firefighters', tour_guide: 'tour_group', guide_umbrella: 'tour_group', candles_windows: 'power_cut', fans: 'heatwave', bunting: 'fete_voisins',
+    big_screen: 'tv_screen', tour_group_flag: 'tour_group', streetlights_off: 'power_cut', trestle_table: 'fete_voisins', hat_with_coins: 'busker', bride_veil: 'evjf', pink_tshirts: 'evjf', fire_truck: 'firefighters' };
   const norm = (id) => ALIAS[id] ?? id;
   const active = new Map(); // id → { h, managed }
   return {
