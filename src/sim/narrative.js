@@ -5,6 +5,7 @@
 // Points d'appel : voir GAME_DESIGN.md, Build notes « narrative-wiring ».
 import { evalCondition, compare } from './conditions.js';
 import { usable, textOf } from './stateGuard.js';
+import { lineStage } from './stage.js';
 import { KLAAS_NOTEBOOK, POLICE_LINES, WITNESS_LINES, BARKS, BELL, WAITER_LINES, RECAP_HEADLINES, NIGHT_END, STREET_LINES } from '../content/night.js';
 import { INTRO_CARDS, TUTORIAL } from '../content/intro.js';
 import { MEDIA } from '../content/media.js';
@@ -182,6 +183,34 @@ export function streetLine(kind, sim, ctx = {}, rng) {
   const cap = (v) => (typeof v === 'string' ? v.charAt(0).toUpperCase() + v.slice(1) : v);
   return fill(line, { ...ctx, ...Object.fromEntries(Object.entries(ctx).map(([k, v]) => [k.charAt(0).toUpperCase() + k.slice(1), cap(v)])) });
 }
+
+// ── Narrateur de la nuit (game.js, scripts/coherence-check.js) ─────────────
+// (kind, sim, args) → { text, stage } : chaque ligne avec son repère de mise en scène (§12e.6, LINE_STAGES de night.js).
+// rng : le hasard du texte (jamais celui de la nuit) ; metWaiter(sim) : les variantes « Théo ».
+export function nightNarrator(rng, { metWaiter = () => false } = {}) {
+  const staged = (text, stage) => (text ? { text, stage } : null);
+  return (kind, s, a) => {
+    switch (kind) {
+      case 'police': return staged(policeLine(a.outcome, a.patrolId, { ...nightCtx.police(s, a.entry ?? {}), asso: !!a.asso }, rng, s), lineStage('POLICE_LINES', a.outcome));
+      case 'waiter': return staged(pickNightLine('waiter', s, rng, { result: a.result, metWaiter: metWaiter(s) }), lineStage('WAITER_LINES'));
+      case 'witness': {
+        const w = a.witness;
+        const k = !w ? 'nobody' : w.kind === 'customers' && w.filmed ? 'customers_filmed' : WITNESS_ALIAS[w.kind] ?? w.kind;
+        if (!WITNESS_LINES[k]) return null; // un témoin sans répliques (« on remonte jusqu'à vous ») : pas de « personne n'a rien vu »
+        return staged(pickNightLine('witness', s, rng, w ? { witness: w } : {}), lineStage('WITNESS_LINES', k));
+      }
+      case 'end': return pickNightLine('end', s, rng, { reason: a.reason }); // la fin de nuit va à l'écran de bilan, pas dans la rue
+      case 'klaas': {
+        const e = klaasEntry(a.event, a.detection, rng);
+        return e ? staged(`📓 Carnet de Klaas : ${e.text}`, lineStage('KLAAS_NOTEBOOK', a.event?.about === 'bedtime' ? 'bedtime' : 'default')) : null;
+      }
+      default: return null;
+    }
+  };
+}
+// Repère d'une bribe de terrasse (pickNightLine('bark')) et de la cloche (bell:<sub>)
+export const barkStage = (sim) => lineStage('BARKS', sim.day?.key === 'sat' ? 'saturday' : 'weekday');
+export const bellStage = (sub) => lineStage('BELL', sub);
 
 // ── Police ─────────────────────────────────────────────────────────────────
 // outcome : 'call' | 'arrive' | 'act' | 'complaisance' | 'tipoff' | 'nothing' | 'ignored' | 'busy' | 'never_came' | 'for_pilou'

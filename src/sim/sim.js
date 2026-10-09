@@ -134,8 +134,16 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
     },
 
     // ---------- sorties ----------
-    log(text, cls = '') { if (text) sim.events.push({ type: 'log', min: S.min, text, cls }); },
-    // Texte narratif (narrator) ou texte par défaut
+    // line : une chaîne, ou { text, stage } (§12e.6) ; stage (facultatif) : le repère de mise en scène de la ligne.
+    // Une ligne mise en scène émet aussi { type: 'stage', … } pour le metteur en scène, au même instant.
+    log(line, cls = '', stage = null) {
+      const text = typeof line === 'object' && line ? line.text : line;
+      if (!text) return;
+      const st = stage ?? (typeof line === 'object' ? line.stage ?? null : null);
+      sim.events.push({ type: 'log', min: S.min, text, cls, ...(st ? { stage: st } : {}) });
+      if (st && st.cue !== 'sim') sim.events.push({ type: 'stage', min: S.min, text, ...st });
+    },
+    // Texte narratif (narrator) ou texte par défaut ; le narrateur peut rendre { text, stage } (§12e.6)
     say(kind, args, fallback) {
       if (!narrator) return fallback;
       try { return narrator(kind, sim, args) ?? fallback; } catch { return fallback; }
@@ -299,12 +307,36 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
       const p = { id: `pipi-${++S.peeCount}`, doorway, start: S.min, end: S.min + pee.duration };
       S.pees.push(p);
       sim.note('pee', { peeId: p.id, pos: { x: doorway.x, z: doorway.z } });
-      if (doorway.pilou) sim.log(sim.pacing?.line('pee_door') ?? 'Quelqu’un urine contre votre porte d’entrée. Classique du samedi.', 'bad');
+      if (doorway.pilou) sim.log(sim.pacing?.line('pee_door') ?? 'Quelqu’un urine contre votre porte d’entrée. Classique du samedi.', 'bad', sim.pacing?.stage('pee_door'));
       S.nextPeeAt = S.min + rng.range(...pee.interval);
     }
   }
 
   // target : { kind: 'table', id } | { kind: 'pee', id } ; distance en m ; fromWindow : depuis chez Pilou
+  // §12e.8 : photographier une table en règle n'apporte rien, et ça se voit. Les clients le remarquent (témoin + hostilité) ;
+  // à partir de la `harassFrom`-ième photo inutile de la nuit, c'est du harcèlement (Risque) et Seb & Nico râlent sur le
+  // groupe (Asso, une fois). La campagne en garde le compte : malus de crédibilité du dossier à la commission.
+  function uselessPhoto(t) {
+    const PS = cfg.PHOTO_SPAM;
+    S.uselessPhotos = (S.uselessPhotos ?? 0) + 1;
+    const n = S.uselessPhotos;
+    const w = { id: `clients:${t.id}`, kind: 'customers', name: 'des clients' };
+    S.hostility = clamp(S.hostility + PS.hostility, 0, 100);
+    S.witnessMemories.push({ time: S.min, who: w.id, kind: 'customers', ally: false, name: w.name, act: 'photo sans intérêt', filmed: false });
+    sim.note('witness', { act: 'photo sans intérêt', who: w.id, kind: 'customers', pos: { x: t.x, z: t.z }, filmed: false });
+    sim.note('useless-photo', { tableId: t.id, n });
+    sim.log(sim.pacing?.line('photo_useless', { table: t.label }) ?? `Photo sans intérêt : ${t.label} est en règle. Un client vous a vu.`, 'bad', sim.pacing?.stage('photo_useless') ?? { cue: 'witness:customers' });
+    if (n >= PS.harassFrom) {
+      sim.addRisk(PS.harassRisk, 'photo_harassment', [w]);
+      if (!S.photoGrumbled) {
+        S.photoGrumbled = true;
+        S.asso = clamp(S.asso - PS.grumbleAsso, 0, 100);
+        sim.log(sim.pacing?.line('photo_grumble') ?? `Seb sur le groupe : « Il mitraille des gens qui ne font rien, là ? »`, 'phone', sim.pacing?.stage('photo_grumble') ?? { cue: 'phone_buzz' });
+      }
+    }
+    return { ok: false, found: [], useless: true, n };
+  }
+
   function photo({ target, distance = 10, fromWindow = false, noiseDb = S.noiseBed }) {
     if (!target) { sim.log('Photo… rien d’exploitable dans le cadre.'); return { ok: false, found: [] }; }
     const base = EVIDENCE.minQuality + (1 - EVIDENCE.minQuality) * (S.sleep / 100);
@@ -339,8 +371,8 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
         }
       }
       if (!found.length) {
-        sim.log(t.evidence.size ? `${t.label} : déjà dans le dossier.` : `${t.label} : rien d’illégal (pour l’instant).`);
-        return { ok: false, found };
+        if (t.evidence.size) { sim.log(`${t.label} : déjà dans le dossier.`); return { ok: false, found }; }
+        return uselessPhoto(t);
       }
     }
     const q = quality >= 0.85 ? 'nette' : quality >= 0.6 ? 'correcte' : 'floue';
@@ -454,13 +486,13 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
     const db = Math.round(noiseDb ?? sim.noiseAt(fromWindow ? ANCHORS.pilouWindow : sim.restCenter(sim.rest('bernadette')), false));
     if (S.min < SLEEP.drainAfter || db < EVIDENCE.dbThreshold) {
       const early = S.min < SLEEP.drainAfter;
-      sim.log(sim.pacing?.line(early ? 'db:early' : 'db:low', { db }) ?? `📟 ${db} dB. ${early ? 'Avant 22h, ça ne compte pas.' : 'Pénible, mais pas assez pour un dossier.'}`);
+      sim.log(sim.pacing?.line(early ? 'db:early' : 'db:low', { db }) ?? `📟 ${db} dB. ${early ? 'Avant 22h, ça ne compte pas.' : 'Pénible, mais pas assez pour un dossier.'}`, '', sim.pacing?.stage('db'));
       return { ok: false, db };
     }
-    if (S.lastDbAt !== undefined && S.min - S.lastDbAt < EVIDENCE.dbEvery) { sim.log(sim.pacing?.line('db:again', { db, every: EVIDENCE.dbEvery }) ?? `📟 ${db} dB. Déjà un relevé il y a moins de ${EVIDENCE.dbEvery} min.`); return { ok: false, db }; }
+    if (S.lastDbAt !== undefined && S.min - S.lastDbAt < EVIDENCE.dbEvery) { sim.log(sim.pacing?.line('db:again', { db, every: EVIDENCE.dbEvery }) ?? `📟 ${db} dB. Déjà un relevé il y a moins de ${EVIDENCE.dbEvery} min.`, '', sim.pacing?.stage('db')); return { ok: false, db }; }
     S.lastDbAt = S.min;
     const ev = sim.addEvidence({ type: 'db', kind: 'db', restId: null, quality: 0.8, value: sim.pieceValue(null, 'db', EVIDENCE.dbValue), db, text: `Relevé sonore à ${fmt(S.min)} : ${db} dB${fromWindow ? ' à la fenêtre de Pilou' : ' dans la rue'}` });
-    sim.log(sim.pacing?.line('db:recorded', { db }) ?? `📟 ${db} dB relevés et horodatés.`, 'good');
+    sim.log(sim.pacing?.line('db:recorded', { db }) ?? `📟 ${db} dB relevés et horodatés.`, 'good', sim.pacing?.stage('db'));
     return { ok: true, db, found: [ev] };
   }
 
@@ -516,7 +548,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
       if (!kinds.length) continue;
       S.dogSpotted[t.restId] = true;
       sim.addEvidence({ type: 'round', kind: kinds[0], restId: t.restId, tableId: t.id, quality: 0.8, value: sim.pieceValue(t.restId, kinds[0], EVIDENCE.roundValue), pos: { x: t.x, z: t.z }, count: t.count, encroach: sim.encroachment(t), text: `Ronde de Jérémie : ${t.label} (${kinds.join(', ')}). Le teckel grogne.` });
-      sim.log(sim.pacing?.line('round_note', { table: t.label }) ?? `Jérémie passe avec le teckel et note ${t.label}.`, 'good');
+      sim.log(sim.pacing?.line('round_note', { table: t.label }) ?? `Jérémie passe avec le teckel et note ${t.label}.`, 'good', sim.pacing?.stage('round_note'));
     }
   }
 

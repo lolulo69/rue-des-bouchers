@@ -8,6 +8,7 @@
 import { createRng } from './rng.js';
 import { weatherNow } from './weather.js';
 import { CLATTER, AMBIENT, PHONE_PINGS } from '../content/night.js';
+import { lineStage } from './stage.js';
 import { WHATSAPP_GROUP } from '../content/characters.js';
 import { streetLine } from './narrative.js';
 import { usable, textOf, holds } from './stateGuard.js';
@@ -33,7 +34,11 @@ export function attachPacing(sim, { carry = {} } = {}) {
   // Ce que le joueur VOIT compte comme « il se passe quelque chose » : une ligne du journal de nuit
   const log = sim.log;
   let ambientRun = 0; // micro-moments d'affilée sans autre ligne (jamais 3 de suite : anti-spam)
-  sim.log = (text, cls) => { if (text) { lastMoment = S.min; seen.add(text); ambientRun = cls === 'ambient' ? ambientRun + 1 : 0; } return log(text, cls); };
+  sim.log = (line, cls, stage) => {
+    const text = typeof line === 'object' && line ? line.text : line;
+    if (text) { lastMoment = S.min; seen.add(text); ambientRun = cls === 'ambient' ? ambientRun + 1 : 0; }
+    return log(line, cls, stage);
+  };
 
   // Choisit un gabarit pas encore dit cette nuit ni la précédente ; liste épuisée : celui qui a servi il y a le plus longtemps
   // Garde d'état (§13.L, stateGuard.js) : seules les lignes qui collent à la situation ; la mémoire porte sur le TEXTE
@@ -73,7 +78,7 @@ export function attachPacing(sim, { carry = {} } = {}) {
     }
     const line = choose(CLATTER[key]) ?? choose(CLATTER.one);
     if (!line) return;
-    sim.log(fill(line, { who, Who: cap(who), n: NUM[n] ?? String(n) }));
+    sim.log(fill(line, { who, Who: cap(who), n: NUM[n] ?? String(n) }), '', lineStage('CLATTER')); // 'sim' : les chaises de la nuit
   }
 
   function ambient() {
@@ -93,7 +98,7 @@ export function attachPacing(sim, { carry = {} } = {}) {
     const fresh = pool.filter((a) => !usedAmbient.has(a.id));
     const a = rng.pick(fresh.length ? fresh : pool);
     usedAmbient.add(a.id);
-    sim.log(a.text, 'ambient');
+    sim.log(a.text, 'ambient', a.stage ?? null); // §12e.6 : chaque micro-moment est joué dans la rue
     sim.note('ambient', { id: a.id });
     if (a.effects?.noise) {
       // Un bref pic de bruit dans la rue, comme un raclement (même modèle de bruit, même durée)
@@ -105,11 +110,11 @@ export function attachPacing(sim, { carry = {} } = {}) {
   }
 
   function phonePing() {
-    const texts = PHONE_PINGS.filter((p) => !p.state || holds(p.state, sim)).map((p) => p.text.replace('{group}', WHATSAPP_GROUP)); // garde d'état (§13.L)
+    const texts = PHONE_PINGS.filter((p) => !p.state || holds(p.state, sim)).map((p) => (typeof p === 'string' ? p : p.text).replace('{group}', WHATSAPP_GROUP)); // garde d'état (§13.L)
     const fresh = texts.filter((t) => !seen.has(t) && !prev.has(t));
     const pool = fresh.length ? fresh : texts.filter((t) => !seen.has(t));
     if (!pool.length) return;
-    sim.log(rng.pick(pool), 'phone');
+    sim.log(rng.pick(pool), 'phone', lineStage('PHONE_PINGS'));
     sim.note('phone-ping', {});
   }
 
@@ -131,6 +136,8 @@ export function attachPacing(sim, { carry = {} } = {}) {
     choose,
     // Une ligne de la rue (narrative.streetLine) : sim.pacing?.line('pee_door') ?? texte de repli
     line: (kind, ctx = {}) => streetLine(kind, sim, ctx),
+    // Le repère de mise en scène d'une ligne de la rue (§12e.6, LINE_STAGES.STREET_LINES : 'db', 'round_note'…)
+    stage: (kind) => lineStage('STREET_LINES', String(kind).split(':')[0]),
     // sim.js › clearTable : une table rentrée par son resto (regroupée avec les voisines)
     clatter(restId, { terrace = false } = {}) { pending.push({ restId, terrace, at: S.min }); },
     // À reporter dans carry.pacing de la nuit suivante

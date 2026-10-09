@@ -804,3 +804,25 @@ export const LINE_STAGES = {
   PHONE_PINGS: 'phone_buzz',
   CLATTER: 'sim',
 };
+
+// ════════════════════════════════════════════════════════════════════════════
+// PHOTOS INUTILES (§12e.8, bloc de l'agent build) : une table en règle photographiée. Le client lève la tête
+// (repère witness:customers) ; à la troisième de la nuit, Seb ou Nico râle sur le groupe (phone_buzz, une fois).
+// ════════════════════════════════════════════════════════════════════════════
+Object.assign(STREET_LINES, {
+  photo_useless: [
+    'Photo sans intérêt : {table} est en règle. Un client vous a vu.',
+    'Rien à photographier : {table}, quatre personnes et l’heure. Une cliente fixe votre téléphone.',
+    '{Table} : tout est dans les clous. Un homme lève son verre vers votre objectif, pas pour trinquer.',
+    'Clic. {Table} n’a rien fait de mal, et toute la tablée l’a remarqué.',
+    'Photo inutile : {table} est en règle. « Il nous prend en photo, lui ? » demande quelqu’un, assez fort.',
+  ],
+  photo_grumble: [
+    'Nico sur le groupe : « Pilou, tu mitrailles des gens qui ne font rien. Ça nous dessert. »',
+    'Seb sur le groupe : « Trois clients sont venus se plaindre au balcon. De TOI. »',
+    'Message de Jérémie : « Règle numéro un : on photographie les infractions, pas les gens. »',
+    'Seb sur le groupe : « On a un dossier, pas un album de vacances. Lève le pied ! »',
+  ],
+});
+Object.assign(LINE_STAGES.STREET_LINES, { photo_useless: 'witness:customers', photo_grumble: 'phone_buzz' });
+

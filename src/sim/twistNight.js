@@ -90,7 +90,7 @@ export function updateTwist(sim) {
     // Garde d'état (§13.L), comme les moments : pas de « toute la terrasse trinque » devant une terrasse vide
     if (w.state && !holds(w.state, sim)) continue;
     divertAttention(sim, { source: 'window', id: `${S.twist?.id}:${w.i}`, turns: w.turns ?? [], minutes: w.minutes ?? 2, text: w.text ?? null });
-    if (w.text) sim.log(`👀 ${w.text}`, 'good');
+    if (w.text) sim.log(`👀 ${w.text}`, 'good', w.stage ?? null);
   }
   if (S.twistRainAt !== undefined && S.min >= S.twistRainAt) startRain(sim);
   for (const e of S.twistEvents) {
@@ -101,7 +101,7 @@ export function updateTwist(sim) {
     sim.events.push({ type: 'twist-moment', twistId: S.twist?.id, i: e.i, prop: e.prop ?? null, moment: e.moment ?? `moment${e.i}`, at: e.at, text: e.text ?? null });
     // Garde d'état (§13.L) : le texte ne s'affiche que s'il colle à la rue à cet instant (sinon `else`, ou rien)
     const text = !e.state || holds(e.state, sim) ? e.text : e.else ?? null;
-    if (text) sim.log(text);
+    if (text) sim.log(text, '', e.stage ?? null);
     const fx = e.simEffect ?? {};
     if (fx.noise) S.noiseBoosts.push({ db: fx.noise, until: S.min + (fx.minutes ?? EVENT_NOISE_MINUTES) });
     if (fx.rain) startRain(sim, { spareAwning: fx.rain !== 'all' });

@@ -50,30 +50,40 @@ const RULES = [
   { id: 'debout', why: 'parle de buveurs debout alors qu’il n’y en a pas', test: (t, cat) => cat !== 'twist' && /\b(buveurs debout|on boit debout|groupes debout)\b/.test(t), ok: (s) => s.present.debout },
 ];
 
+// §12e.6 « ça existe ou ça n'existe pas » : une ligne de nuit écrite par le contenu doit porter un repère de mise en scène.
+// Une ligne est « du contenu » si elle vient d'une catégorie narrée, ou si elle contient le début d'un texte de nuit du
+// contenu (night.js, twists, événements de nuit) ; les retours de la sim à un geste du joueur n'en ont pas besoin.
+const NIGHT_TEXTS = (() => {
+  const out = new Set();
+  const walk = (v) => {
+    if (typeof v === 'string') { const head = v.split('{')[0].trim(); if (head.length >= 18) out.add(head.slice(0, 40)); }
+    else if (Array.isArray(v)) v.forEach(walk);
+    else if (v && typeof v === 'object') for (const [k, x] of Object.entries(v)) if (k === 'text' || k === 'else' || typeof x === 'object') walk(x);
+  };
+  // NIGHT_END va à l'écran de bilan, pas dans la rue : pas de repère demandé
+  walk(Object.entries(K.NIGHT ?? {}).filter(([k]) => k !== 'NIGHT_END').map(([, v]) => v));
+  for (const t of K.TWISTS) { walk(t.sim?.events ?? []); walk(t.sim?.windows ?? []); walk(t.lines?.barks ?? []); }
+  return [...out];
+})();
+const NARRATED = new Set(['ambient', 'phone', 'bark', 'bell', 'twist']);
+const narratedLine = (r) => NARRATED.has(r.cat) || NIGHT_TEXTS.some((h) => r.text.includes(h));
+RULES.push({ id: 'scene', why: 'ligne de nuit sans repère de mise en scène (§12e.6)', test: () => true, ok: () => true, line: (r) => !narratedLine(r) || !!r.stage });
+
 // ── Une nuit jouée comme dans game.js, en enregistrant chaque ligne ─────────────────────────────────────────
 function playRecorded(c, bot, seed, rec) {
   const narrRng = createRng((seed * 7919 + c.state.day) >>> 0);
-  const narrator = (kind, s, a) => {
-    switch (kind) {
-      case 'police': return narrative.policeLine(a.outcome, a.patrolId, { ...narrative.nightCtx.police(s, a.entry ?? {}), asso: !!a.asso }, narrRng, s);
-      case 'waiter': return narrative.pickNightLine('waiter', s, narrRng, { result: a.result, metWaiter: c.has('met_waiter') });
-      case 'witness': return narrative.pickNightLine('witness', s, narrRng, a.witness ? { witness: a.witness } : {});
-      case 'end': return narrative.pickNightLine('end', s, narrRng, { reason: a.reason });
-      case 'klaas': { const e = narrative.klaasEntry(a.event, a.detection, narrRng); return e ? `📓 Carnet de Klaas : ${e.text}` : null; }
-      default: return null;
-    }
-  };
+  const narrator = narrative.nightNarrator(narrRng, { metWaiter: () => c.has('met_waiter') });
   const sim = c.createNight({ narrator });
   const policy = bot.night(c, sim);
   const day = c.state.day;
   const twist = sim.twist?.id ?? null;
-  const emit = (text, cat, pre, post, at = post.min) => {
+  const emit = (text, cat, pre, post, at = post.min, stage = null) => {
     if (!text) return;
     // une action de nuit longue fait tourner la sim minute par minute : ses lignes sont relevées après coup, on les juge à leur heure
     const J = sim.state.journal;
     let clearedNear = false;
     for (let i = J.length - 1; i >= 0 && J[i].t >= at - 5; i--) if (J[i].type === 'table-clear' && J[i].t <= at) { clearedNear = true; break; }
-    rec.push({ text, cat, day, twist, min: at, pre, post, clearedNear });
+    rec.push({ text, cat, day, twist, min: at, pre, post, clearedNear, stage });
   };
   const now = () => nightSnapshot(sim);
   const CLOSE = sim.cfg.RULES.terraceCloseHour * 60;
@@ -92,20 +102,20 @@ function playRecorded(c, bot, seed, rec) {
     }
     // La cloche de 22h et les bribes de terrasse, comme game.js › ambientLines
     const m = sim.state.min;
-    if (!bell.before && m >= CLOSE - 5) { bell.before = true; const s = now(); emit(narrative.pickNightLine('bell:before', sim, narrRng), 'bell', s, s); }
-    if (!bell.strike && m >= CLOSE) { bell.strike = true; bell.outAt22 = sim.state.tables.filter((t) => t.out).length; const s = now(); emit(narrative.pickNightLine('bell:strike', sim, narrRng), 'bell', s, s); }
-    if (!bell.after && m >= CLOSE + 5) { bell.after = true; const s = now(); emit(narrative.pickNightLine('bell:after', sim, narrRng, { outAt22: bell.outAt22 }), 'bell', s, s); }
+    if (!bell.before && m >= CLOSE - 5) { bell.before = true; const s = now(); emit(narrative.pickNightLine('bell:before', sim, narrRng), 'bell', s, s, s.min, narrative.bellStage('before')); }
+    if (!bell.strike && m >= CLOSE) { bell.strike = true; bell.outAt22 = sim.state.tables.filter((t) => t.out).length; const s = now(); emit(narrative.pickNightLine('bell:strike', sim, narrRng), 'bell', s, s, s.min, narrative.bellStage('strike')); }
+    if (!bell.after && m >= CLOSE + 5) { bell.after = true; const s = now(); emit(narrative.pickNightLine('bell:after', sim, narrRng, { outAt22: bell.outAt22 }), 'bell', s, s, s.min, narrative.bellStage('after')); }
     if (m >= nextBark) {
       nextBark = m + 10 + narrRng.next() * 10;
       if (sim.state.tables.some((t) => t.out)) {
         const s = now();
         const tw = narrRng.chance(0.5) && narrative.twistLine('barks', sim, narrRng);
-        if (tw) emit(tw, 'twist', s, s); else emit(narrative.pickNightLine('bark', sim, narrRng), 'bark', s, s);
+        if (tw) emit(tw, 'twist', s, s, s.min, { cue: 'bark' }); else emit(narrative.pickNightLine('bark', sim, narrRng), 'bark', s, s, s.min, narrative.barkStage(sim));
       }
     }
     sim.tick(1);
     const post = now();
-    for (const e of sim.drainEvents()) if (e.type === 'log') emit(e.text, e.cls === 'ambient' ? 'ambient' : twistText(sim, e.text) ? 'twist' : e.cls || 'log', pre, post, e.min);
+    for (const e of sim.drainEvents()) if (e.type === 'log') emit(e.text, e.cls === 'ambient' ? 'ambient' : twistText(sim, e.text) ? 'twist' : e.cls || 'log', pre, post, e.min, e.stage ?? null);
   }
   c.finishNight(sim);
 }
@@ -131,8 +141,11 @@ for (const name of BOTS) {
           counts.byCat[r.cat] = (counts.byCat[r.cat] ?? 0) + 1;
           const t = r.text.toLowerCase();
           for (const rule of RULES) {
-            if (!rule.test(t, r.cat)) continue;
-            if (rule.ok(r.post, r.pre, r) || rule.ok(r.pre, r.pre, r)) continue;
+            if (rule.line) { if (rule.line(r)) continue; }
+            else {
+              if (!rule.test(t, r.cat)) continue;
+              if (rule.ok(r.post, r.pre, r) || rule.ok(r.pre, r.pre, r)) continue;
+            }
             mismatches.push({ rule: rule.id, why: rule.why, bot: name, seed, ...r });
           }
         }
