@@ -3,11 +3,11 @@
   "ending": "custody",
   "early": true,
   "lastDay": 5,
-  "nights": 5,
-  "words": 4441,
-  "clicks": 109,
-  "daySeconds": 1550,
-  "nightSeconds": 3000,
-  "totalSeconds": 4550,
-  "at": "2026-10-08"
+  "nights": 4,
+  "words": 6207,
+  "clicks": 118,
+  "daySeconds": 2098,
+  "nightSeconds": 2400,
+  "totalSeconds": 4498,
+  "at": "2026-10-09"
 }

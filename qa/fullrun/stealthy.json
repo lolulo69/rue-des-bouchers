@@ -1,13 +1,13 @@
 {
   "title": "illégal discret",
-  "ending": "moving_out",
+  "ending": "custody",
   "early": true,
-  "lastDay": 11,
-  "nights": 10,
-  "words": 7752,
-  "clicks": 160,
-  "daySeconds": 2646,
-  "nightSeconds": 6000,
-  "totalSeconds": 8646,
-  "at": "2026-10-08"
+  "lastDay": 7,
+  "nights": 7,
+  "words": 7684,
+  "clicks": 144,
+  "daySeconds": 2593,
+  "nightSeconds": 4200,
+  "totalSeconds": 6793,
+  "at": "2026-10-09"
 }

@@ -279,8 +279,8 @@ async function reloadAndCompare(page, style, log) {
 
 function writeDuration() {
   const rows = readdirSync(SUMMARY).filter((f) => f.endsWith('.json')).map((f) => JSON.parse(readFileSync(`${SUMMARY}/${f}`, 'utf8')));
-  const m = (s) => `${Math.floor(s / 3600)}h${String(Math.round((s % 3600) / 60)).padStart(2, '0')}`;
-  const lines = rows.map((r) => `| ${r.title} | ${r.ending} (jour ${r.lastDay}) | ${r.nights} | ${r.words} | ${r.clicks} | ${m(r.daySeconds)} | ${m(r.nightSeconds)} | **${m(r.totalSeconds)}** | ${r.early ? `⏹ fin anticipée (jour ${r.lastDay})` : r.totalSeconds < 9000 ? '⚠️ trop court' : r.totalSeconds > 14400 ? '⚠️ trop long' : '✅'} |`);
+  const m = (s) => { const t = Math.round(s / 60); return `${Math.floor(t / 60)}h${String(t % 60).padStart(2, '0')}`; };
+  const lines = rows.map((r) => `| ${r.title} | ${r.ending} (jour ${r.lastDay}) | ${r.nights} | ${r.words} | ${r.clicks} | ${m(r.daySeconds)} | ${m(r.nightSeconds)} | **${m(r.totalSeconds)}** | ${r.early ? `⏹ fin anticipée (jour ${r.lastDay})` : r.totalSeconds < 9000 ? '⚠️ trop court' : r.totalSeconds > 14400 ? '⚠️ trop long' : '✅'} | ${r.at ?? ''} |`);
   writeFileSync('qa/duration.md', `# Durée d'une campagne (GAME_DESIGN §13.A : 2h30 à 4h)
 
 Généré par \`tests/e2e/fullrun.e2e.js\` (\`npm run test:fullrun\`). Estimation, pas un chronométrage :
@@ -290,8 +290,8 @@ Généré par \`tests/e2e/fullrun.e2e.js\` (\`npm run test:fullrun\`). Estimatio
 - Une fin anticipée (garde à vue, déménagement, licenciement) raccourcit la partie : marquée ⏹, elle n'est pas comparée à la cible.
 - ⚠️ trop court = campagne menée jusqu'au J14 en moins de 2h30.
 
-| Style | Fin | Nuits | Mots lus | Clics | Jour | Nuits | Total | Cible |
-|---|---|---|---|---|---|---|---|---|
+| Style | Fin | Nuits | Mots lus | Clics | Jour | Nuits | Total | Cible | Mesuré le |
+|---|---|---|---|---|---|---|---|---|---|
 ${lines.join('\n')}
 
 Résumés par style : \`qa/fullrun/*.json\` (date du dernier passage dans \`at\`). Dernière mise à jour : ${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC.
