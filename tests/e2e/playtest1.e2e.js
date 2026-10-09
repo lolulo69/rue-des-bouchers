@@ -6,6 +6,7 @@ import { watchErrors } from './helpers.js';
 // qu'elle n'est pas sur main. Contrats attendus (Build note « qa-playtest1 ») :
 //   • window.__rdb.world.audio.state ('running') et, pour le mixage, audio.levels() → { master, music, ambience, sfx, exhaust, crowd }
 //     (gains effectifs 0–1 à cet instant, après spatialisation) ;
+//   • messages du téléphone : data-media sur chaque message (phone.js)
 //   • menu Échap : trois curseurs input[type=range] (Musique / Ambiance / Effets) + on/off, mémorisés ;
 //   • menu de nuit (N) : un groupe « Ici, maintenant », et pour les actions indisponibles une raison lisible.
 
@@ -92,8 +93,8 @@ test.describe('§12c.1 · le son', () => {
 });
 
 test.describe('§12c.3 · pastilles de notification', () => {
-  // §12c.3 (Lucas) : reproduit sur main avant le correctif (pastille du téléphone à 4 après lecture). fixme jusqu'au correctif de l'agent UI.
-  (process.env.QA_RUN_FIXME ? test : test.fixme)('ouvrir le téléphone et le carnet les vide ; elles restent vides après rechargement ; rien de neuf = pas de pastille', async ({ page }) => {
+  // §12c.3 (Lucas) : reproduit sur main avant le correctif (pastille du téléphone à 4 après lecture) ; corrigé par l'agent UI (95104dd).
+  test('ouvrir le téléphone et le carnet les vide ; elles restent vides après rechargement ; rien de neuf = pas de pastille', async ({ page }) => {
     const errors = watchErrors(page);
     await newCampaign(page);
     await playUntil(page, (c) => c.step === 'koddex');
@@ -123,15 +124,24 @@ test.describe('§12c.3 · pastilles de notification', () => {
   test('à la phase suivante, la pastille ne compte que les messages arrivés depuis', async ({ page }) => {
     await newCampaign(page);
     await playUntil(page, (c) => c.step === 'koddex');
+    // Les ids de tous les messages visibles, onglet par onglet (WhatsApp, presse, réseaux)
+    const allIds = async () => {
+      const ids = [];
+      for (const tab of await page.locator('[data-testid=phone] [data-tab]').all()) {
+        await tab.click();
+        ids.push(...await page.evaluate(() => [...document.querySelectorAll('[data-testid=phone] [data-media]')].map((e) => e.dataset.media)));
+      }
+      return [...new Set(ids)];
+    };
     await page.click('[data-testid=phone-open]');
-    const seenIds = await page.evaluate(() => [...document.querySelectorAll('[data-testid=phone] [data-id]')].map((e) => e.dataset.id));
+    const seenIds = await allIds();
     await page.click('[data-testid=phone-close]');
     await playUntil(page, (c) => c.step === 'actions');
     const n = Number((await page.locator('[data-testid=phone-open]').getAttribute('data-unread')) ?? 0);
     await page.click('[data-testid=phone-open]');
-    const nowIds = await page.evaluate(() => [...document.querySelectorAll('[data-testid=phone] [data-id]')].map((e) => e.dataset.id));
+    const nowIds = await allIds();
     const fresh = nowIds.filter((id) => !seenIds.includes(id));
-    test.skip(!nowIds.length, 'les messages du téléphone n’exposent pas data-id (impossible de compter les nouveaux)');
+    test.skip(!nowIds.length, 'les messages du téléphone n’exposent pas data-media (impossible de compter les nouveaux)');
     expect(n, `pastille ${n}, nouveaux messages ${fresh.length}`).toBeLessThanOrEqual(fresh.length);
   });
 });
