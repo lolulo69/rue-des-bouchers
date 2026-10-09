@@ -368,6 +368,17 @@ without**:
    pleasant cues instead (laughter bursts, glasses clinking, a chair, a snippet of conversation tone), or a short CC0 restaurant
    ambience at low volume, or nothing. Better silence than noise.
 
+6. **« It exists or it doesn't »** (Lucas): EVERY narrated thing in the night is staged in 3D (and audio): the night events with a
+   question popup, the ambient street-life lines (« un livreur passe », a scooter, a tourist, the drunk singer…), Klaas's
+   observations, the twist moments. No line may describe something the player can't see or hear at that moment. Each line carries a
+   stage cue (who/what appears, where, for how long, its sound), played by the scene director when the line is shown; lines that
+   can't be staged are removed. The coherence checker fails on any night line without a stage cue.
+7. **Distracting must be easy for a given action** (Lucas): before an illegal action, the night menu shows who would see it
+   (« Vu par : Dédé, Seb & Nico, 3 clients ») and offers ONE button, « Faire diversion », that triggers the cheapest available
+   diversion(s) covering exactly those witnesses (with the combined cost and risk shown), then lets Pilou act during the window.
+   Face-to-face acts get their natural cover: e.g. bribing the waiter is done during his smoke break around the corner, out of
+   sight of the terrace (talk to him there).
+
 ## 13. v1.0 acceptance checklist
 v1.0 ships only when **every** box is ticked. Nothing is dropped silently: anything cut or simplified is listed under "Deviations" with Lucas's OK.
 Proof: **T** = automated test (vitest / Playwright / campaign simulator, runs in CI) · **Q** = design agent's QA session in Chrome (screenshots in `qa/`) · **L** = Lucas playtest.
@@ -466,6 +477,8 @@ The campaign simulator plays 1000 seeded campaigns per strategy bot. Targets:
 - [ ] Every twist seen + heard at the right times (per-twist audit, 0 text-only twists). **Q L**
 - [ ] Talk to people (E) with choices; afternoon prerequisites say how; night-1 tutorial. **T Q L**
 - [ ] Ally diversions (Seb & Nico, Tatie, Jérémie) + owner diversions (Dédé, Ghislain). **T Q L**
+- [ ] Every night line staged in 3D/audio (stage cues; unstageable lines removed; checker fails on an unstaged line). **T Q L**
+- [ ] « Faire diversion » for a given action: shows its witnesses and covers exactly them in one click; bribing the waiter at his smoke break. **T Q L**
 - [ ] No more noise « brouhaha »: discrete pleasant cues or a CC0 ambience. **Q L**
 
 ### Release tasks (done by the design agent, 2026-10-09)
