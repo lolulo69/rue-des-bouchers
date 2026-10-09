@@ -6,7 +6,7 @@ import { SCHEDULE, smokeSpot } from '../../src/sim/schedule.js';
 const at = (sim, min) => { while (sim.state.min < min) sim.tick(0.5); };
 
 describe('présences programmées (schedule)', () => {
-  it('pendant sa pause clope, le serveur est contre la façade, et c’est de là qu’il témoigne', () => {
+  it('pendant sa pause clope, le serveur fume au coin de la rue de la Barre : vu de tout près, pas de la terrasse (§12e.7)', () => {
     const cfg = makeConfig();
     const sim = createSim({ seed: 3, cfg });
     const [a] = SCHEDULE.waiterBreaks[0];
@@ -14,8 +14,11 @@ describe('présences programmées (schedule)', () => {
     expect(sim.waiterOnBreak()).toBe(true);
     const spot = smokeSpot(cfg);
     expect(sim.waiterPos()).toEqual(spot);
-    const w = sim.potentialWitnesses({ x: 0, y: 1, z: spot.z + 1 }).find((x) => x.kind === 'waiter');
-    expect(w?.pos).toMatchObject({ x: spot.x, z: spot.z });
+    expect(Math.abs(spot.z)).toBeGreaterThan(cfg.STREET.length / 2); // hors de la rue des Bouchers
+    const near = sim.potentialWitnesses({ x: spot.x + 1, y: 1, z: spot.z - 1 }).find((x) => x.kind === 'waiter');
+    expect(near?.pos).toMatchObject({ x: spot.x, z: spot.z });
+    const terrace = sim.restCenter(sim.rest('bernadette'));
+    expect(sim.potentialWitnesses(terrace).some((x) => x.kind === 'waiter')).toBe(false);
   });
 
   it('hors pause, le serveur fait ses allers-retours devant la terrasse', () => {

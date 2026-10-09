@@ -12,7 +12,7 @@ export { runCampaign, playNight } from './campaignRunner.js';
 export { CAMPAIGN_BOTS, TARGETS, ENDING_SCORE, baseEnding } from './campaignBots.js';
 export { checkCampaignInvariants } from './campaignInvariants.js';
 export { availableNightActions, performNightAction } from './nightActions.js';
-export { nightMenu, witnessRisk, effectHint, whoWatches } from './nightMenu.js';
+export { nightMenu, witnessRisk, effectHint, whoWatches, diversionPlan } from './nightMenu.js';
 export { activeAttention, divertAttention, attentionFactor } from './witness.js';
 export { talkTargets, tableKind, PEOPLE } from './talk.js';
 export { LOCATIONS } from './nightActions.js';

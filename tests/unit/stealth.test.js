@@ -200,3 +200,45 @@ describe('« Qui regarde ? » (HUD) et conseil « au lit » (§12d)', () => {
     expect(c.toolTutorialDue({ min: 22 * 60, where: 'street', window: true })?.id).toBe(t.id);
   });
 });
+
+describe('« Faire diversion » (§12e.7) et la pause du serveur', () => {
+  it('le plan détourne ceux qui verraient l’acte, avec les diversions disponibles les moins chères', async () => {
+    const { diversionPlan } = await import('../../src/sim/index.js');
+    let tried = 0;
+    for (let seed = 1; seed <= 30; seed++) {
+      const { c, sim } = night(seed, 22 * 60 + 15);
+      const plan = diversionPlan(sim, c, 'night_stink_bomb');
+      if (!plan) continue;
+      tried++;
+      expect(plan.steps.length).toBeGreaterThan(0);
+      expect(plan.steps.length).toBeLessThanOrEqual(2);
+      for (const t of plan.covered) expect(plan.steps.some((d) => K.ACTIONS.find((a) => a.id === d.id).diversion.turns.map((x) => (x === 'biloute' ? 'jeremie' : x)).includes(t))).toBe(true);
+      expect(plan.covered.length + plan.missing.length).toBe(plan.needed.length);
+      // le jouer : les témoins couverts regardent ailleurs
+      for (const d of plan.steps) expect(c.doNightAction(sim, d.id).ok).toBe(true);
+      for (const t of plan.covered) expect(attentionFactor(sim, t === 'patrol' ? 'police' : t)).toBe(WITNESS.attention.away);
+    }
+    expect(tried).toBeGreaterThan(10);
+  });
+
+  it('un acte légal, ou une diversion, n’a pas de plan', async () => {
+    const { diversionPlan } = await import('../../src/sim/index.js');
+    const { c, sim } = night(2, 22 * 60 + 15);
+    expect(diversionPlan(sim, c, 'night_disguise')).toBeNull();
+    expect(diversionPlan(sim, c, 'night_firecracker')).toBeNull();
+  });
+
+  it('le billet au serveur se glisse à sa pause, au coin : la terrasse ne voit rien', () => {
+    let unseen = 0, n = 0;
+    for (let seed = 1; seed <= 60; seed++) {
+      const { c, sim } = night(seed, 22 * 60 + 25, ['asked_waiter']);
+      if (!sim.waiterOnBreak()) continue;
+      const r = c.doNightAction(sim, 'night_bribe_waiter');
+      if (!r.ok) continue;
+      n++;
+      if (!r.seen.some((w) => w.kind === 'customers' || w.kind === 'klaas' || w.kind === 'seb_nico')) unseen++;
+    }
+    expect(n).toBeGreaterThan(10);
+    expect(unseen / n).toBeGreaterThan(0.9);
+  });
+});

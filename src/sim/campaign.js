@@ -526,6 +526,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     const t = talkFor(sim, who, player);
     if (!t) return null;
     (sim.talkedTonight ??= []).push(t.id);
+    sim.talkPlayer = player ?? null; // pour un choix qui joue une action de nuit (choice.action), au bon endroit
     if (t.once && !S.seen.talk.includes(t.id)) S.seen.talk.push(t.id);
     c.note('talk', { id: t.id, who });
     sim.note('talk', { id: t.id, who });
@@ -537,9 +538,12 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     if (!ch || !talkOk(ch.requires, sim, {})) return null;
     applyEffects(sim, c, ch.effects, 'talk', t.id);
     if (ch.sim === 'waiter') sim.act({ type: 'waiter' }); // la demande au serveur, comme la touche E l'a toujours fait
+    // choice.action : une action de nuit jouée comme depuis le menu N (coût, témoins, effets) — ex. le billet à la pause
+    const acted = ch.action ? c.doNightAction(sim, ch.action, sim.talkPlayer ?? undefined) : null;
     c.note('talk-choice', { id: t.id, k: convo.k, i });
     const next = !ch.end && convo.k + 1 < t.exchanges.length ? exchangeView(sim, t, convo.k + 1) : null;
-    return { reply: ch.reply ?? null, speaker: t.exchanges[convo.k].speaker ?? null, next, sim: ch.sim ?? null };
+    const reply = acted && !acted.ok ? acted.reason ?? null : ch.reply ?? null; // l'action n'a pas pu se faire : on dit pourquoi
+    return { reply, speaker: t.exchanges[convo.k].speaker ?? null, next: acted && !acted.ok ? null : next, sim: ch.sim ?? null, action: acted };
   };
 
   // ---------- objectifs du soir (§12c.5, src/sim/objectives.js, src/content/objectives.js) ----------
@@ -783,6 +787,9 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     if (S.step !== 'night') throw new Error(`fin de nuit hors de la nuit (${S.step})`);
     const N = sim.state;
     c.objectivesTick(sim); // §12c.5 : ce qui s'est fait cette nuit, même sans le jeu 3D (bots, nuit passée)
+    // §12e.8 : photos inutiles (harcèlement) : le compte de la campagne, et le drapeau si la nuit en a fait trop
+    S.uselessPhotos = (S.uselessPhotos ?? 0) + (N.uselessPhotos ?? 0);
+    if ((N.uselessPhotos ?? 0) >= cfg.PHOTO_SPAM.harassFrom) setFlag('photo_harassment');
     S.nightEvents = [];
     S.nightCount++;
     S.pacingMemory = sim.pacing?.memory() ?? S.pacingMemory ?? null;
@@ -917,6 +924,10 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     endWith(e, 'early');
   }
   function finalResolution() {
+    // §12e.8 : un dossier gonflé de photos de tables en règle perd de sa crédibilité devant la commission
+    const PC = cfg.PHOTO_SPAM.credibility;
+    const malus = Math.min(PC.cap, Math.max(0, (S.uselessPhotos ?? 0) - PC.free) * PC.per);
+    if (malus > 0) { S.stats.dossier = Math.max(0, S.stats.dossier - malus); c.note('credibility', { malus, useless: S.uselessPhotos }); }
     // La commission du jour 14 a eu lieu (événement du contenu) : on prend la fin de plus haute priorité qui colle.
     const cands = K.ENDINGS.filter((e) => matches(e) || S.pendingEnding === e.id);
     const fallback = [...K.ENDINGS].sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0))[0];

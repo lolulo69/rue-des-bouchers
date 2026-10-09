@@ -26,6 +26,8 @@ export function smokeCorner(cfg) {
   const b = cfg.RESTAURANTS.find((r) => r.id === 'bernadette') ?? cfg.RESTAURANTS[0];
   return { x: b.side * (cfg.STREET.halfWidth - 0.8), z: -cfg.STREET.length / 2 + 0.6 };
 }
+// Au coin d'une rue transversale (hors de la rue des Bouchers) : on n'y est vu que de tout près (§12e.7)
+export const aroundCorner = (cfg, p) => Math.abs(p.z) > cfg.STREET.length / 2 + 0.3 && Math.abs(p.x) > cfg.STREET.halfWidth;
 
 // Positions des deux agents de la patrouille en cours (ou de la visite pour Pilou), [] si personne dans la rue.
 // → [{ x, z, heading, moving }] : la 3D les place là, et rien d'autre.

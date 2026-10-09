@@ -8,6 +8,7 @@
 // Règle d'écriture : un acte illégal n'est qu'un libellé, une conséquence et un crochet visuel. Aucun mode d'emploi.
 
 import { attentionFactor, divertAttention } from './witness.js';
+import { smokeSpot, aroundCorner } from './schedule.js';
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const H = (h, m = 0) => h * 60 + m; // 1h30 du matin = H(25, 30)
@@ -35,6 +36,8 @@ export const LOCATIONS = {
   terrace: { label: 'près de la terrasse', pos: (sim) => sim.restCenter(bern(sim)), player: ['street'], range: 8 },
   awning: { label: 'sous le store', pos: (sim) => ({ x: wallX(sim) * 0.8, y: 2.6, z: (bern(sim).z0 + bern(sim).z1) / 2 }), player: ['street'], range: 3 },
   kitchen_door: { label: 'à la porte de service', pos: (sim) => ({ x: wallX(sim), y: 1, z: bern(sim).z0 + 0.5 }), player: ['street'], range: 3 },
+  // §12e.7 : la pause cigarette du serveur, au coin de la rue de la Barre (hors de vue de la terrasse)
+  smoke: { label: 'au coin, à la pause du serveur', pos: (sim) => ({ ...smokeSpot(sim.cfg), y: 1.2 }), player: ['street'], range: 3 },
   estaminet: { label: "à l’estaminet", pos: (sim) => ({ x: wallX(sim), y: 1, z: (bern(sim).z0 + bern(sim).z1) / 2 }), player: ['street'], range: 4 },
 };
 
@@ -65,7 +68,7 @@ export const NIGHT_ACTION_SPECS = {
   night_sabotage_chairs: { at: 'terrace', window: [H(23, 30), END], art: { terrace: 'collapse' } },
   night_sabotage_parasols: { at: 'terrace', window: [H(23, 30), END], art: { terrace: 'parasols' } },
   night_sabotage_locks: { at: 'terrace', window: [H(24), END] },
-  night_bribe_waiter: { at: 'terrace', window: [H(21, 12), H(24, 38)], needs: 'waiterOnBreak', art: { anim: ['serveur', 'give'] } }, // §12e.7 : à sa pause, hors de vue
+  night_bribe_waiter: { at: 'smoke', window: [H(21, 12), H(24, 38)], needs: 'waiterOnBreak', art: { anim: ['serveur', 'give'] } }, // §12e.7 : à sa pause, hors de vue
   night_backroom_photo: { at: 'estaminet', window: [H(20, 30), H(24, 30)], needs: 'policeOnsite', art: { anim: ['dede', 'give'] } },
   night_bribe_photo_window: { at: 'window', window: [H(20, 30), H(24, 30)], needs: 'policeOnsite' }, // pas d'enveloppe sans patrouille
   night_eat_carbonnade_1: { at: 'estaminet', window: [H(20, 30), H(22, 30)], needs: 'kitchenOpen', art: { anim: ['pilou', 'eat'] } },
@@ -195,7 +198,7 @@ function rollAll(sim, a, pos) {
     const w = EXTRA_WITNESSES[id];
     if (!w.present(sim)) continue;
     const at = id === 'police' ? { x: sim.cfg.ANCHORS.waiter.x, z: sim.restCenter(sim.rest(sim.state.police.restId)).z } : sim.restCenter(bern(sim));
-    if (dist2(at, pos) > w.range) continue;
+    if (dist2(at, pos) > w.range || aroundCorner(sim.cfg, pos)) continue; // au coin de la rue : hors de leur vue
     if (!sim.rng.chance(Math.min(1, exposure * dark * sim.disguise * attentionFactor(sim, id)))) continue;
     const hit = { id, kind: id, name: w.name, pos: at, weight: w.weight, ally: false, filmed: false };
     seen.push(hit);
@@ -252,7 +255,7 @@ export function performNightAction(sim, c, id, player) {
     c.note('witness', { act: id, by: seen.map((w) => w.id), night: true });
     applyEffects(sim, c, { ...we, risk: undefined, asso: undefined }, 'witnessed', id);
   } else if (risky) {
-    sim.log('Personne n’a rien vu… a priori.', 'good');
+    sim.log('Personne n’a rien vu… a priori.', 'good', { cue: 'witness:nobody' });
   }
 
   const simResult = spec.simEffect ? SIM_EFFECTS[spec.simEffect](sim) : {};

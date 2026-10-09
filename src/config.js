@@ -263,6 +263,7 @@ export const DISGUISE = { disguise_hood: 0.6, disguise_vest: 0.5 };
 
 // Drapeaux lus par le moteur : le contenu (src/content/flags.js) doit les déclarer s'il les utilise.
 export const ENGINE_FLAGS = {
+  photo_harassment: 'Pilou a photographié des tables en règle à répétition (harcèlement, §12e.8)',
   disguise_hood: 'Pilou a une capuche (moins reconnaissable)',
   disguise_vest: 'Pilou a un gilet jaune « livreur » (encore moins reconnaissable)',
   camera_awning: 'Caméra cachée sous le store de Bernadette (filme tout, preuves illégales)',
@@ -315,6 +316,11 @@ export const CAMPAIGN = {
   workdays: { homePerWeek: 2, homeJobPenalty: 1, officeSceneChance: 0.5 }, // Tatie, flattée par le bloc, peut laisser fuiter le vrai plan à Martine
 };
 
+// Photos inutiles (§12e.8) : une table en règle photographiée → clients qui remarquent (hostilité), harcèlement à partir de
+// la harassFrom-ième dans la nuit (Risque, une râlerie de Seb & Nico : Asso), malus de crédibilité du dossier à la commission
+// (credibility.per point de Dossier par photo inutile au-delà de credibility.free sur la campagne, au plus credibility.cap)
+export const PHOTO_SPAM = { hostility: 2, harassFrom: 3, harassRisk: 4, grumbleAsso: 3, credibility: { free: 3, per: 1, cap: 10 } };
+
 // Menu de nuit (N, §12c.4) : tout ce que le menu affiche vient d'ici et des données (actions.js, nightActions.js)
 export const NIGHT_MENU = {
   // Légalité → étiquette, icône de catégorie, couleur (le rouge = illégal, le gris = limite : tutorials.js le dit ainsi)
@@ -328,6 +334,9 @@ export const NIGHT_MENU = {
   stats: { sleep: 'Sommeil', asso: 'Asso', dossier: 'Dossier', risk: 'Risque', job: 'Job' }, // comme src/ui/dom.js STAT_LABELS
   evidence: 'Pièce au dossier',
   maxWho: 3, // témoins nommés au plus, puis « … »
+  // « Faire diversion » (§12e.7) : on détourne les témoins dont la chance de voir dépasse divertFrom ; au plus divertMaxSteps
+  // diversions ; leur coût = minutes × minute + traceRisk × trace + Asso perdue × asso
+  divertFrom: 0.03, divertMaxSteps: 2, divertCost: { minute: 1, trace: 10, asso: 2 },
 };
 
-export const CONFIG = { RULES, DAYS, SKY, STREET, ZONES, RESTAURANTS, ANCHORS, INTERACT, NOISE, SLEEP, EVIDENCE, POLICE, WAITER, WITNESS, BUCKET, RISK, ASSO, DOG, DISGUISE, ENGINE_FLAGS, CAMPAIGN, NIGHT_MENU };
+export const CONFIG = { RULES, DAYS, SKY, STREET, ZONES, RESTAURANTS, ANCHORS, INTERACT, NOISE, SLEEP, EVIDENCE, POLICE, WAITER, WITNESS, BUCKET, RISK, ASSO, DOG, DISGUISE, ENGINE_FLAGS, CAMPAIGN, NIGHT_MENU, PHOTO_SPAM };
