@@ -319,6 +319,10 @@ Checklist additions (v1.1) are in §13.J.
      (« Nouveau : la caméra à la fenêtre », « Colette dîne à la table 2 : 8 couverts, à photographier », « 22h : la ronde avec
      Jérémie », « Lemaire est de service : la police risque de prendre un café »), and an « Objectifs du soir » list in the HUD
      that ticks itself as they're done. Data in src/content/objectives.js (§14 style); the engine picks them.
+   - **Bedtime hint** (Lucas): after 22:30, once the night's essentials are done (reports/shares sent, nothing pending: no
+     patrol en route, no twist moment imminent) or as soon as Sleep is low, a gentle, state-aware hint suggests going to bed
+     (« Dossier à jour : au lit », « Vous tombez de sommeil : allez vous allonger »), pointing at the bed/E, also as the last
+     « Objectifs du soir » item. Never nags more than once every ~20 game minutes; disappears if something new happens.
 
 ## 13. v1.0 acceptance checklist
 v1.0 ships only when **every** box is ticked. Nothing is dropped silently: anything cut or simplified is listed under "Deviations" with Lucas's OK.
@@ -407,7 +411,7 @@ The campaign simulator plays 1000 seeded campaigns per strategy bot. Targets:
 
 ### M. Night pacing (playtest 1)
 - [ ] Adaptive night clock (×3 after 22:30 unless something is happening/imminent, ⏩ indicator, manual toggle) and faster sleep (×40 + « Passer à demain matin »); campaign duration re-measured. **T Q L**
-- [ ] « Ce soir » briefing + « Objectifs du soir » HUD list, state-aware, self-ticking. **T Q L**
+- [ ] « Ce soir » briefing + « Objectifs du soir » HUD list, state-aware, self-ticking; bedtime hint after 22:30 when done or tired. **T Q L**
 
 ### Release tasks (done by the design agent when v1.0 lands)
 - [ ] Set `WHATSAPP_GROUP` in `src/content/characters.js` to **« La Gaystapo »** (Lucas's choice: the real group's own name).
