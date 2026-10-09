@@ -477,7 +477,7 @@ The campaign simulator plays 1000 seeded campaigns per strategy bot. Targets:
 
 ### N. Stealth playable (playtest 2)
 - [ ] Diversions (≥ 5) with an attention model, natural twist windows (« Fenêtre propice »), « Qui regarde ? » HUD, the night extended to 02:30, the disguise reachable, the bedtime hint aware of illegal plans. **T Q L**
-- [ ] Unseen success ≥ 30% with a diversion/window, ≤ 10% without; stealthy bot ≤ 40% custody; §13.H still met. **T**
+- [x] Unseen success ≥ 30% with a diversion/window, ≤ 10% without; stealthy bot ≤ 40% custody; §13.H still met. **T** _(balance-stealth: `npm run measure:stealth` 9 % / 31 % / 34 %, qa/stealth.md; stealthy 19 % custody, 1000 × 7, qa/balance.md)_
 
 ### O. Playtest 3 fixes (§12e)
 - [ ] Windows/diversions 5–8 game min, clock ×0.5 during, a countdown. **T Q L**
@@ -1220,3 +1220,16 @@ so it reflects what the player actually did.
 - Campaign: `state.uselessPhotos` (campaign total); a night with ≥ 3 useless photos sets the engine flag **`photo_harassment`** (declared in `ENGINE_FLAGS`). @content agents: it's there for a harassment counter-move (the existing `cm_harassment_hostility` also gets closer through hostility). At the D14 commission, a **credibility malus**: Dossier −`credibility.per` (1) per useless photo beyond `credibility.free` (3) over the campaign, at most `cap` (10), noted `credibility` in the journal.
 - A legitimate photo stays free (no hostility, not counted). `photo()` returns `{ ok: false, useless: true, n }` for a useless one.
 - **@balance agent**: the bots don't photograph legal tables (unit test: legal / diplomat / mixed ≤ 3 useless photos, no flag), so the simulator's numbers and §13.H are unchanged; please confirm on your 1000 × 7 run. Tests: `tests/unit/photoSpam.test.js`.
+
+- **Build note art-live (§12e.2, §12e.5–7, §13.O)** — (1) **Twists en vrai** : `src/scene/twistLive.js` met en scène les 26 twists d'après leurs données (l'id choisit la mise en scène, les heures viennent de `sim.events[n].at`, chaque moment se joue à son heure, à l'image et au son) ; audit par twist dans `qa/twists-live.md` (0 twist « texte seul »), captures dans `qa/art-live/`. (2) **Plus de brouhaha** : le murmure de bruit filtré est supprimé ; à la place, des indices rares et discrets (une phrase en babil tonal, un rire, des verres, des couverts, une chaise), et toutes les voix (guide, commentateur, cris, chants, « ouais ! ») sont tonales. (3) **Bibliothèque de scènes** `src/scene/stage.js` (52 scènes : passants, scooter, livreur à vélo, touristes, ivrogne qui chante, couple, promeneur de chien, balayeuse, taxi, fenêtres, Gaufre, bouteille, cloches…) et repères `src/scene/stageCues.js` (76 repères adoptés de `qa/stage-cues.md` + motifs `twist:` / `event:` / `witness:`) : le metteur en scène joue `event.stage` sur tout événement de la sim, et les lignes d'ambiance via leur note de journal. **Pour l'agent build** : faire porter `stage` aux lignes émises (`sim.log(text, cls)` → passer le repère sur l'événement `log`) pour BARKS, KLAAS_NOTEBOOK, WAITER_LINES, etc. ; le vérificateur peut utiliser `stageCueError()`. Repères encore « stub » (journalisés, pas joués) : `klaas_lamp_off`, `waiter_reply`, `round_note`, `db_meter`, `phone_buzz`, `police_cafe`, `police_tipoff`, `pee`. (4) **Pause clope du serveur** au coin de la rue de la Barre, côté estaminet, hors de vue de la terrasse (`schedule.smokeSpot`, `smokeCorner`) : il y va à pied par l'angle et revient. **Pour l'agent build** : l'action « soudoyer le serveur » doit se faire là (`at` = ce coin, plus 'terrace').
+
+**balance-stealth (balance agent)** — @build agent @content agents
+- `witness.js`: new `WITNESS.attention.commotion` (default 1 = off; set to 0.5). During an open diversion / window, the witnesses it doesn't target see ×commotion. New `isTurned(sim, kind)`, allocation-free like `attentionFactor`. `potentialWitnesses(...).distracted` is now true only for witnesses actually turned (it was `focus < 1`), so the HUD's « ailleurs » list is unchanged. `tests/unit/stealth.test.js`: the « not turned » expectations read `WITNESS.attention.commotion`.
+- `nightActions.js` EXTRA_WITNESSES: Dédé range 18, Ghislain 16.
+- Content numbers / lists only (balance levers, no text):
+  - the `witnessed.exposure` of the late sabotages, the cardboard and the stink bomb;
+  - Dédé + Ghislain in the three sabotages' `witnessed.by`;
+  - every twist window's `turns`;
+  - the `diversion.turns` of the firecracker, the wrong pizza and the bark, aligned with §12d's text.
+- @content agents: the twist contract test still rejects 'jeremie' in window `turns` (fete_voisins), although attention accepts it now. Allow it there too if Jérémie should be turnable by a twist.
+- `scripts/stealth-measure.js`: `--set` overrides, a by-act line for the no-help case, « who sees when it fails », and an act × diversion matrix.

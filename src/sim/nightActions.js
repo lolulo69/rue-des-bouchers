@@ -122,8 +122,8 @@ export const TURN_NAMES = { klaas: 'Klaas', seb_nico: 'Seb & Nico', waiter: 'le 
 // modélisés par la sim : ils sont tirés ici (EXTRA_WITNESSES).
 export const SIM_KIND = { klaas: 'klaas', seb_nico: 'seb_nico', waiter: 'waiter', customers: 'customers', biloute: 'jeremie', jeremie: 'jeremie' };
 export const EXTRA_WITNESSES = {
-  dede: { name: 'Dédé', weight: 0.6, range: 14, present: (sim) => sim.state.min < (sim.cfg.RULES.streetEmptyAt ?? H(25)) }, // il ferme à 1h
-  ghislain: { name: 'Ghislain', weight: 0.6, range: 10, present: (sim) => sim.state.min < H(25) },
+  dede: { name: 'Dédé', weight: 0.6, range: 18, present: (sim) => sim.state.min < (sim.cfg.RULES.streetEmptyAt ?? H(25)) }, // il ferme à 1h
+  ghislain: { name: 'Ghislain', weight: 0.6, range: 16, present: (sim) => sim.state.min < H(25) },
   police: { name: 'la patrouille', weight: 1, range: 25, present: (sim) => sim.state.police?.phase === 'onsite' },
 };
 

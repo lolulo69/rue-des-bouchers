@@ -4,6 +4,7 @@
 // Cibles : ≥ 30 % avec une diversion ou dans une fenêtre, ≤ 10 % sans.
 //   npm run measure:stealth                 (200 graines)
 //   npm run measure:stealth -- --runs 500 --write --label "stealth-v2"   → qa/stealth.md
+//   npm run measure:stealth -- --set WITNESS.attention.away=0.03      surcharge de config (réglage)
 // Protocole, pour chaque graine : une campagne sans 3D jusqu'à la nuit du J3 (jeu passif) ; on y débloque tous les outils
 // et on pose les drapeaux exigés par les actes visés (on mesure la discrétion, pas la progression) ; puis pour chaque essai une NUIT
 // NEUVE de cette campagne (même état de départ), avancée jusqu'à une heure tirée au hasard où l'acte est faisable, où l'on tente :
@@ -26,7 +27,16 @@ const WRITE = !!arg('write', false);
 const LABEL = String(arg('label', 'mesure'));
 const DAY = Number(arg('day', 3));
 
-const cfg = makeConfig();
+// --set A.b=1,C.d=[1,2] : chemins pointés vers des valeurs JSON (comme npm run sim)
+const overrides = {};
+for (const kv of String(arg('set', '')).split(',').filter((x) => x.includes('='))) {
+  const [path, raw] = kv.split('=');
+  const keys = path.split('.');
+  let o = overrides;
+  for (const k of keys.slice(0, -1)) o = o[k] ??= {};
+  o[keys.at(-1)] = JSON.parse(raw);
+}
+const cfg = makeConfig(overrides);
 const dir = join(ROOT, 'src/content');
 const content = normalizeContent(await Promise.all(readdirSync(dir).filter((f) => f.endsWith('.js')).map((f) => import(join(dir, f)))));
 const ACTIONS = Object.fromEntries(content.ACTIONS.map((a) => [a.id, a]));
@@ -68,6 +78,10 @@ const unseen = (res) => res && res.ok !== false && !(res.seen ?? []).length;
 const tally = { none: [0, 0], noneEarly: [0, 0], noneLate: [0, 0], diversion: [0, 0], window: [0, 0] };
 const LATE = 25 * 60; // après 1h : la rue se vide (§12d.4), c'est une fenêtre voulue
 const byDiversion = Object.fromEntries(DIVERSIONS.map((d) => [d, [0, 0]]));
+const seenBy = { none: {}, diversion: {}, window: {} }; // qui a vu, quand l'essai rate
+const noteSeen = (k, res) => { for (const w of res?.seen ?? []) seenBy[k][w.kind ?? w.id] = (seenBy[k][w.kind ?? w.id] ?? 0) + 1; };
+const pair = {}; // acte × diversion
+const byTargetEarly = Object.fromEntries(TARGETS.map((t) => [t, [0, 0]]));
 let skipped = 0, windowsSeen = false;
 for (let r = 0; r < RUNS; r++) {
   const seed = 5000 + r;
@@ -86,7 +100,8 @@ for (let r = 0; r < RUNS; r++) {
   // 1) sans aide
   {
     const { cc, sim } = nightAt(c, at); const res = cc.doNightAction(sim, target); const k = at >= LATE ? 'noneLate' : 'noneEarly';
-    tally.none[1]++; tally[k][1]++; if (unseen(res)) { tally.none[0]++; tally[k][0]++; }
+    tally.none[1]++; tally[k][1]++; if (at < LATE) { byTargetEarly[target][1]++; noteSeen('none', res); }
+    if (unseen(res)) { tally.none[0]++; tally[k][0]++; if (at < LATE) byTargetEarly[target][0]++; }
   }
   // 2) juste après chaque diversion disponible à cette heure
   for (const d of DIVERSIONS) {
@@ -96,7 +111,8 @@ for (let r = 0; r < RUNS; r++) {
     sim.tick(0.5);
     if (!usable(cc, sim, target)) continue;
     const res = cc.doNightAction(sim, target);
-    tally.diversion[1]++; byDiversion[d][1]++;
+    tally.diversion[1]++; byDiversion[d][1]++; noteSeen('diversion', res);
+    const pk = `${target}|${d}`; pair[pk] ??= [0, 0]; pair[pk][1]++; if (unseen(res)) pair[pk][0]++;
     if (unseen(res)) { tally.diversion[0]++; byDiversion[d][0]++; }
   }
   // 3) dans une fenêtre propice (si le moteur l'expose : sim.windowNow() → { id, until } | null)
@@ -112,7 +128,7 @@ for (let r = 0; r < RUNS; r++) {
       if (windowNow() && usable(cc, sim, target)) {
         windowsSeen = true;
         const res = cc.doNightAction(sim, target);
-        tally.window[1]++; if (unseen(res)) tally.window[0]++;
+        tally.window[1]++; noteSeen('window', res); if (unseen(res)) tally.window[0]++;
       }
     }
   }
@@ -133,6 +149,12 @@ ${RUNS} graines (${skipped} sans essai possible), nuit du J${DAY}, actes visés 
 | Sans aide, après 1h (la rue s’est vidée : fenêtre voulue, §12d.4) | ${tally.noneLate[1]} | ${pct(tally.noneLate)} | (pas de cible) |
 | Juste après une diversion | ${tally.diversion[1]} | ${pct(tally.diversion)} | ${okDiv ? '✅' : '❌'} ≥ 30 % |
 | Dans une fenêtre propice | ${tally.window[1]} | ${pct(tally.window)} | ${windowsSeen ? (rate(tally.window) >= 0.3 ? '✅' : '❌') : '–'} ≥ 30 % ${windowsSeen ? '' : '(aucune nuit avec une fenêtre de twist utilisable)'} |
+
+Sans aide avant 1h, par acte : ${TARGETS.map((t) => `${t.replace('night_', '')} ${pct(byTargetEarly[t])} (${byTargetEarly[t][1]})`).join(' · ')}
+
+Qui voit quand c'est raté (nombre d'essais) : ${Object.entries(seenBy).map(([k, o]) => `${k} → ${Object.entries(o).sort((a, b) => b[1] - a[1]).map(([w, n]) => `${w} ${n}`).join(', ') || '–'}`).join(' · ')}
+
+Acte × diversion :\n${TARGETS.map((t) => `  ${t.replace('night_', '').padEnd(18)} ${DIVERSIONS.map((d) => `${d.replace('night_', '')} ${pct(pair[`${t}|${d}`] ?? [0, 0])}`).join(' · ')}`).join('\n')}
 
 Par diversion : ${DIVERSIONS.map((d) => `${d.replace('night_', '')} ${pct(byDiversion[d])} (${byDiversion[d][1]})`).join(' · ')}
 `;

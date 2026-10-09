@@ -4,6 +4,30 @@ Généré par `scripts/stealth-measure.js` (`npm run measure:stealth -- --write 
 Un essai est **réussi** quand l'acte illégal visé n'est vu par personne (`doNightAction(...).seen` vide). La diversion est jouée juste avant
 l'acte (½ minute de jeu). Chaque essai repart d'une nuit neuve de la même campagne.
 
+## balance-stealth · 2026-10-09 · main @ 58305ad
+
+2000 graines (0 sans essai possible), nuit du J3, actes visés : night_stink_bomb, night_sabotage_chairs, night_sabotage_parasols, night_sabotage_locks, night_cardboard_exhaust.
+
+| Situation | Essais | Réussis sans être vu | Cible |
+|---|---|---|---|
+| Sans aide, avant 1h (rue pleine) | 1595 | 9 % | ✅ ≤ 10 % |
+| Sans aide, après 1h (la rue s’est vidée : fenêtre voulue, §12d.4) | 405 | 62 % | (pas de cible) |
+| Juste après une diversion | 12000 | 31 % | ✅ ≥ 30 % |
+| Dans une fenêtre propice | 1830 | 34 % | ✅ ≥ 30 %  |
+
+Sans aide avant 1h, par acte : stink_bomb 8 % (318) · sabotage_chairs 8 % (311) · sabotage_parasols 10 % (311) · sabotage_locks 11 % (328) · cardboard_exhaust 10 % (327)
+
+Qui voit quand c'est raté (nombre d'essais) : none → customers 680, seb_nico 270, waiter 206, klaas 188, ghislain 167, dede 95, jeremie 30 · diversion → customers 1903, klaas 727, waiter 581, seb_nico 559, ghislain 540, dede 393, jeremie 76 · window → customers 79, seb_nico 46, klaas 27, ghislain 24, waiter 24, dede 15, jeremie 11
+
+Acte × diversion :
+  stink_bomb         firecracker 47 % · call_landline 14 % · fake_alert 19 % · biloute_bark 23 % · wrong_pizza 35 % · ally_seb_nico – · ally_tatie – · ally_jeremie – · owner_delivery_call 14 % · owner_hygiene_rumour –
+  sabotage_chairs    firecracker 50 % · call_landline 35 % · fake_alert 35 % · biloute_bark 29 % · wrong_pizza 35 % · ally_seb_nico – · ally_tatie – · ally_jeremie – · owner_delivery_call 34 % · owner_hygiene_rumour –
+  sabotage_parasols  firecracker 49 % · call_landline 33 % · fake_alert 36 % · biloute_bark 30 % · wrong_pizza 35 % · ally_seb_nico – · ally_tatie – · ally_jeremie – · owner_delivery_call 33 % · owner_hygiene_rumour –
+  sabotage_locks     firecracker 42 % · call_landline 28 % · fake_alert 31 % · biloute_bark 27 % · wrong_pizza 28 % · ally_seb_nico – · ally_tatie – · ally_jeremie – · owner_delivery_call 28 % · owner_hygiene_rumour –
+  cardboard_exhaust  firecracker 43 % · call_landline 27 % · fake_alert 28 % · biloute_bark 24 % · wrong_pizza 33 % · ally_seb_nico – · ally_tatie – · ally_jeremie – · owner_delivery_call 20 % · owner_hygiene_rumour –
+
+Par diversion : firecracker 46 % (2000) · call_landline 27 % (2000) · fake_alert 30 % (2000) · biloute_bark 26 % (2000) · wrong_pizza 33 % (2000) · ally_seb_nico – (0) · ally_tatie – (0) · ally_jeremie – (0) · owner_delivery_call 26 % (2000) · owner_hygiene_rumour – (0)
+
 ## stealth-v2 + §12e (fenêtres 5–8 min, diversions alliées) · avant la passe d’équilibrage · 2026-10-09 · main @ 7a0d8d5
 
 200 graines (0 sans essai possible), nuit du J3, actes visés : night_stink_bomb, night_sabotage_chairs, night_sabotage_parasols, night_sabotage_locks, night_cardboard_exhaust.

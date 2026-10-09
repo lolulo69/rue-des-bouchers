@@ -285,3 +285,46 @@ All §13.H / §13.F targets ✅; every action (68), event (28), ending (8) and c
 Legal careful 49% legal / 48% scandal, never custody · reckless 100% custody (night 5) · stealthy 19% custody, 34% scandal · mixed 89% legal, best score 95 · diplomat 27% peace + 35% the return + 14% turncoat · slacker 89% fired · passive 100% moving out.
 17/211 dialogue lines never surface in simulation (rare combinations, by design or acceptable).
 Note: inspector_quiet_night (D9 fallback twist) can't trigger because every D9 inspector choice sets a flag; kept as a safety fallback.
+
+## 2026-10-09 · balance-stealth (balance agent) · playtest 2 + 3: illegal acts possible with preparation, risky without
+On main after playtest 3 (talk-and-windows: windows / diversions of 5–8 game minutes with the clock ×0.5, 10 diversions incl. ally / owner ones, the waiter bribe only on his smoke break). `npm run measure:stealth` (qa/stealth.md, « balance-stealth »), 2000 seeds, night of day 3:
+
+| situation | before (QA 1ae2a78 / my baseline) | after | target |
+|---|---|---|---|
+| without help, before 1:00 | 17 % ❌ | **9 %** | ≤ 10 % ✅ |
+| without help, after 1:00 (the late window) | 64 % | 62 % | (intended) |
+| right after a diversion | 32 % ✅ | **31 %** | ≥ 30 % ✅ |
+| in a twist window | 19–20 % ❌ | **34 %** | ≥ 30 % ✅ |
+
+Per diversion: firecracker 46 %, wrong pizza 33 %, fake alert 30 %, landline 27 %, owner delivery call 26 %, bark 26 %. The ally diversions and the hygiene rumour get no attempt in this protocol: their conditions (asso ≥ 40/50, met_*, kitchen open) aren't met on the measured night. A diversion only clears the witnesses it turns, so the right one for the act matters (stink bomb + landline 7 %, + firecracker 51 %).
+
+### Levers (no text changed)
+- **Twist windows' `turns`**: they turned only customers / the waiter / Dédé, while Seb & Nico (the top miss), Klaas and Ghislain kept watching. Each window now turns whoever would look at its event: the balcony at a goal, a song, the megaphone, the jury; Ghislain wherever the terrace is turned; Klaas for street-wide moments. 20 % → 34 %.
+- **`WITNESS.attention.commotion` = 0.5 (new knob, `witness.js`)**: during a diversion or window, witnesses it doesn't target still see ×0.5. Without it, the per-witness rolls keep success with a diversion at ≈ 3× success without help, so 30 % and 10 % couldn't both hold with any margin. `distracted` (the HUD's « ailleurs ») is now only the witnesses actually turned (`isTurned`).
+- **Late sabotage exposure** chairs 0.4 → 0.7, parasols 0.5 → 0.45, locks 0.35 → 0.45, with **Dédé / Ghislain added as witnesses** of all three (they close the terrace until 1:00). Cardboard 0.5 → 0.65, stink bomb 0.45 → 0.6. Chairs at 23:40 were 25–38 % unseen with no help.
+- **Dédé / Ghislain presence**: range 14 → 18 m / 10 → 16 m. Three diversions send them away, which separates "with" from "without".
+- **Diversion `turns` aligned with §12d's text**: the firecracker turns everyone (+ Ghislain, Jérémie), the wrong pizza draws a crowd at the wrong door (+ Ghislain, the balcony), Biloute barks at the corner with Jérémie (+ the balcony, Jérémie). `WITNESS.attention.away` stays 0.08 (lower changed nothing: the misses are witnesses that aren't turned).
+
+### Bots
+- Stealthy and mixed check witnesses the way the engine does: turned ones don't count (windows), and Dédé / Ghislain block an act that fears them until 1:00.
+- For an act worth doing *if unseen*, the bot plays the narrowest diversion that clears its witnesses, or two narrow ones (landline + fake alert) when that turns fewer people than the firecracker, then acts at once.
+  - Stealthy: any diversion while Risk < 20.
+  - Mixed: grey ones only, Risk < 20.
+- Stealthy joins Jérémie's round as an alibi, and still works the late window (asleep 23:15–00:30).
+- Per campaign: stealthy plays the firecracker 2.3×, the pizza 1.2×, both owner diversions 0.5×, the landline 0.3×; mixed plays the fake alert, the landline and both disguises once each.
+- Never used by a bot: `night_ally_seb_nico`, `night_ally_tatie`. Stealthy's asso (~27) is below their bar, and mixed's asso is ~8 on the night it needs a diversion (day 4) and high only once it has no grey act left. Reachable in play.
+
+### 1000 × 7 (CT 106, 157 s), invariants ✅, 78/80 actions, 28/28 events, 8/8 endings, 42/42 counter-moves
+| bot | custody | fired | legal_victory | moving_out | negotiated_peace | scandal | the_return | turncoat | score | sommeil | asso | risque | job | dossier | garde à vue (nuit méd.) | cibles §13.H |
+| passif | · | · | · | 100% | · | · | · | · | 0 | 47 | 40 | 0 | 97 | 13 | – | ✅ ≥ 90 % déménagement / défaite |
+| légal prudent | · | · | 48% | 3% | · | 49% | · | · | 82 | 57 | 75 | 0 | 99 | 50 | – | ✅ victoire légale 35–60 %<br>✅ jamais de garde à vue |
+| illégal imprudent | 100% | · | · | · | · | · | · | · | -20 | 65 | 0 | 96 | 31 | 14 | 5 | ✅ ≥ 70 % garde à vue / procès |
+| illégal discret | 19% | · | · | 46% | · | 28% | 6% | · | 20 | 19 | 27 | 57 | 79 | 30 | 9 | ✅ ≤ 40 % garde à vue<br>✅ scandale atteignable |
+| mixte malin | · | · | 88% | 2% | · | 10% | · | · | 95 | 32 | 72 | 0 | 75 | 55 | – | ✅ meilleur score moyen |
+| diplomate | · | · | · | 20% | 27% | 2% | 36% | 15% | 60 | 67 | 79 | 0 | 92 | 34 | – | ✅ paix négociée ≥ 40 % |
+| tire-au-flanc | · | 89% | 5% | 2% | · | 4% | · | · | 17 | 75 | 70 | 1 | 13 | 30 | – | ✅ licenciement atteignable (≥ 2 %, §13.F) |
+
+Stealthy custody **19 %** (≤ 40 ✅). The other bots are unchanged.
+Duration: no change to night length or clock values (the ×0.5 window clock is the build agent's).
+
+No dominant action (`--ablate mixed`, 500 runs, base 97 %): `pm_klaas_roster` −17, `pm_klaas_notebook` −14, `pm_press_contact` −7. Max 17 < 25 ✅ (41 actions incl. diversions).

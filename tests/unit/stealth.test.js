@@ -55,7 +55,7 @@ describe('attention des témoins', () => {
       expect(w.distracted).toBe(true);
       expect(w.p).toBeCloseTo(before[i].p * WITNESS.attention.away, 6);
     }
-    expect(attentionFactor(sim, 'klaas')).toBe(1); // pas visé : inchangé
+    expect(attentionFactor(sim, 'klaas')).toBe(WITNESS.attention.commotion ?? 1); // pas visé : seulement le remue-ménage (commotion)
     expect(busyReason(sim)).toBe('window'); // l'horloge ralentit pendant la fenêtre
     expect(nightClock(sim).scale).toBe(RULES.clock.windowScale);
     const w = activeAttention(sim)[0];
@@ -70,7 +70,7 @@ describe('attention des témoins', () => {
     divertAttention(sim, { source: 'window', id: 'w', turns: ['patrol', 'dede'], minutes: 3 });
     expect(attentionFactor(sim, 'police')).toBe(WITNESS.attention.away);
     expect(attentionFactor(sim, 'dede')).toBe(WITNESS.attention.away);
-    expect(attentionFactor(sim, 'ghislain')).toBe(1);
+    expect(attentionFactor(sim, 'ghislain')).toBe(WITNESS.attention.commotion ?? 1);
     divertAttention(sim, { source: 'diversion', id: 'b', turns: ['biloute', 'tatie'], minutes: 5 });
     expect(attentionFactor(sim, 'jeremie')).toBe(WITNESS.attention.away); // le teckel emmène Jérémie
   });

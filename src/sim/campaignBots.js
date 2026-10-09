@@ -32,7 +32,7 @@ const flagWeights = (prefix) => ({
   carbonnade_1: -20, carbonnade_2: -30, carbonnade_3: -60, commission_lost: -20, ...prefix,
 });
 
-function make({ name, weights: w, legality, sideProjects = 1, jobFloor = 35, naps = () => 0, lazyWork = false, nightPolicy, nightContent, maxRisk = 100, continueFired = false, alsoLegal = [] }) {
+function make({ name, weights: w, legality, diversions = null, sideProjects = 1, jobFloor = 35, naps = () => 0, lazyWork = false, nightPolicy, nightContent, maxRisk = 100, continueFired = false, alsoLegal = [] }) {
   const W = (c) => (typeof w === 'function' ? w(c) : w);
   const allowed = (a, c) => (legality.includes(a.legality ?? 'legal') || alsoLegal.includes(a.id)) && (a.legality === 'legal' || c.state.stats.risk < maxRisk);
   return {
@@ -72,9 +72,9 @@ function make({ name, weights: w, legality, sideProjects = 1, jobFloor = 35, nap
     },
     night(c, sim) {
       // Si aucun des témoins de l'acte n'est en vue, il ne reste que l'aléa Dédé / Ghislain / patrouille : risque × 0.3
-      const nightScore = (a, camp, s) => {
+      const nightScore = (a, camp, s, assumeUnseen = false) => {
         const weights = W(camp);
-        const w = a.witnessed && s && a.legality !== 'legal' && unseen(s, a, camp) ? { ...a.witnessed, exposure: (a.witnessed.exposure ?? 0.4) * 0.3 } : a.witnessed;
+        const w = a.witnessed && s && a.legality !== 'legal' && (assumeUnseen || unseen(s, a, camp)) ? { ...a.witnessed, exposure: (a.witnessed.exposure ?? 0.4) * 0.3 } : a.witnessed;
         const sc = score(a.effects, weights, w, camp);
         return a.legality === 'legal' ? sc : sc / (1 + (camp.state.counts.actions[a.id] ?? 0)) - 1;
       };
@@ -87,8 +87,25 @@ function make({ name, weights: w, legality, sideProjects = 1, jobFloor = 35, nap
         content: (s, camp) => {
           if (!nightContent || s.state.sleeping) return [];
           const ACT = Object.fromEntries(camp.content.ACTIONS.map((a) => [a.id, a]));
-          return availableNightActions(s, camp).filter((x) => x.available).map((x) => [ACT[x.id], x])
-            .filter(([a, x]) => allowed(a, camp) && nightScore(a, camp, s) > 0 && nightContent(s, a, camp, x)).map(([a]) => a.id);
+          const avail = availableNightActions(s, camp).filter((x) => x.available).map((x) => [ACT[x.id], x]);
+          const wanted = avail.filter(([a]) => !a.diversion && allowed(a, camp) && nightScore(a, camp, s) > 0);
+          const now = wanted.filter(([a, x]) => nightContent(s, a, camp, x)).map(([a]) => a.id);
+          if (now.length || !diversions) return now;
+          // Ce qui vaudrait le coup si personne ne voyait (après une diversion)
+          const worth = avail.filter(([a]) => !a.diversion && a.legality !== 'legal' && allowed(a, camp) && nightScore(a, camp, s, true) > 0);
+          // §12d : un acte voulu mais vu ? la diversion la plus ciblée qui détourne ces témoins-là (puis la moins traçable), puis l'acte
+          const divs = avail.filter(([d]) => d.diversion && diversions(d, camp)).map(([d]) => d)
+            .sort((x, y) => x.diversion.turns.length - y.diversion.turns.length || (x.diversion.traceRisk ?? 0) - (y.diversion.traceRisk ?? 0));
+          // deux diversions ciblées valent parfois mieux qu'une large (le téléphone + la fausse alerte, plutôt que le pétard)
+          const pairs = divs.flatMap((x, i) => divs.slice(i + 1).map((y) => [x, y]))
+            .sort((p, q) => new Set([...p[0].diversion.turns, ...p[1].diversion.turns]).size - new Set([...q[0].diversion.turns, ...q[1].diversion.turns]).size);
+          for (const [a] of worth) {
+            const d = divs.find((dv) => unseen(s, a, camp, dv.diversion.turns));
+            const pair = pairs.find(([x, y]) => (x.diversion.minutes ?? 0) > (y.cost?.minutes ?? 0) && unseen(s, a, camp, [...x.diversion.turns, ...y.diversion.turns]));
+            if (pair && (!d || new Set([...pair[0].diversion.turns, ...pair[1].diversion.turns]).size < d.diversion.turns.length)) return [pair[0].id, pair[1].id, a.id];
+            if (d) return [d.id, a.id];
+          }
+          return [];
         },
       };
     },
@@ -175,11 +192,15 @@ const diplomatGaveUp = (c) => c.has('carbonnade_1') || (c.state.day >= 8 && c.st
 // Aucun des témoins que l'acte redoute (`witnessed.by`) ne peut voir l'endroit, sauf des clients
 // (le serveur ne « témoigne » pas du pot-de-vin qu'il reçoit ; Dédé / Ghislain restent un aléa qu'on ne voit pas venir)
 const SIM_KIND = { klaas: 'klaas', seb_nico: 'seb_nico', waiter: 'waiter', customers: 'customers', biloute: 'jeremie', jeremie: 'jeremie' };
-function unseen(sim, a, c) {
+// `turned` : témoins qu'une diversion jouée juste avant détournerait (en plus de ceux que la sim marque déjà distraits)
+function unseen(sim, a, c, turned = []) {
   const kinds = new Set((a.witnessed?.by ?? Object.keys(SIM_KIND)).map((w) => SIM_KIND[w]).filter(Boolean));
   if (c?.has('waiter_informant')) kinds.delete('waiter'); // le serveur retourné est complice (le vrai tirage, lui, le garde)
   const pos = LOCATIONS[(NIGHT_ACTION_SPECS[a.id] ?? { at: 'street' }).at].pos(sim);
-  const seen = sim.potentialWitnesses(pos).filter((w) => kinds.has(w.kind));
+  const away = (w) => w.distracted || turned.includes(w.kind === 'police' ? 'patrol' : w.kind);
+  const seen = sim.potentialWitnesses(pos).filter((w) => kinds.has(w.kind) && !away(w));
+  // Dédé et Ghislain (le personnel de l'estaminet) sont là jusqu'à 1h : s'ils font partie des témoins de l'acte, il faut les éloigner
+  for (const id of ['dede', 'ghislain']) if ((a.witnessed?.by ?? []).includes(id) && sim.state.min < (sim.cfg.RULES.streetEmptyAt ?? 25 * 60) && !turned.includes(id) && !(sim.state.attention ?? []).some((x) => sim.state.min >= x.from && sim.state.min < x.until && x.turns.includes(id))) return false;
   return !seen.some((w) => w.kind !== 'customers') && seen.length <= 1; // au plus une tablée de clients en vue
 }
 
@@ -203,14 +224,16 @@ export const CAMPAIGN_BOTS = {
     name: 'illégal discret', legality: ['illegal', 'grey'], sideProjects: 2, maxRisk: 40,
     // La caméra sous le store : en fin de campagne (J9+) et casier vierge (Risque < 10), pour qu'elle filme la commission
     weights: (c) => (c.state.day >= 9 && c.state.stats.risk < 10 ? STEALTHY_CAMERA : STEALTHY),
-    nightPolicy: stealthyNight(), nightContent: (sim, a, camp) => unseen(sim, a, camp),
-    alsoLegal: ['pm_press_contact', 'pm_press_scandal', 'pm_waiter_testimony'], // marchepieds légaux du plan illégal (la presse pour le scandale, le serveur retourné)
+    nightPolicy: stealthyNight(), nightContent: (sim, a, camp) => a.legality === 'legal' || unseen(sim, a, camp),
+    diversions: (d, c) => c.state.stats.risk < 20,
+    alsoLegal: ['pm_press_contact', 'pm_press_scandal', 'pm_waiter_testimony', 'night_ronde_jeremie'], // marchepieds légaux du plan illégal (la presse pour le scandale, le serveur retourné)
   }),
   mixed: () => make({
     name: 'mixte malin', legality: ['legal', 'grey', 'illegal'], sideProjects: 1, maxRisk: 40,
     weights: (c) => (c.state.stats.sleep < 40 ? MIXED_TIRED : MIXED), // fatigué : le sommeil passe avant la preuve
     naps: (c) => (c.state.stats.sleep < 35 && c.state.stats.job > 45 ? 1 : 0),
     nightPolicy: legalNight({ asso: true }), nightContent: (sim, a, camp, x) => a.legality === 'legal' || (camp.state.stats.risk < 30 && unseen(sim, a, camp)),
+    diversions: (d, c) => d.legality === 'grey' && c.state.stats.risk < 20, // parfois : une diversion grise, casier presque vierge
     continueFired: true,
   }),
   diplomat: () => make({

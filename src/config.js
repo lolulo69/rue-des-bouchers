@@ -227,7 +227,7 @@ export const WITNESS = {
   riskCap: 1.6,                  // plafond de la somme des poids
   // §12d : un témoin détourné (diversion, fenêtre du twist) ne voit plus qu'avec cette part de sa probabilité ;
   // §12e.1 : une fenêtre dure entre minutes[0] et minutes[1] minutes de jeu, quoi que dise le contenu
-  attention: { away: 0.08, minutes: [5, 8] },
+  attention: { away: 0.08, minutes: [5, 8], commotion: 0.5 }, // commotion : pendant une diversion / fenêtre, les témoins qu'elle ne vise pas voient ×0.5
 };
 
 export const BUCKET = {
