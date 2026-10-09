@@ -9,16 +9,16 @@ Généré par `tests/e2e/fullrun.e2e.js` (`npm run test:fullrun`). Estimation, p
 
 | Style | Fin | Nuits | Mots lus | Clics | Jour | Nuits | Total | Cible | Mesuré le |
 |---|---|---|---|---|---|---|---|---|---|
-| diplomate | negotiated_peace (jour 14) | 13 | 11351 | 270 | 1h06 | 2h10 | **3h16** | ✅ | 2026-10-09 |
+| diplomate | negotiated_peace (jour 14) | 13 | 11239 | 269 | 1h05 | 2h36 | **3h41** | ✅ | 2026-10-09 |
 | légal prudent | moving_out (jour 14) | 13 | 12401 | 313 | 1h12 | 2h36 | **3h48** | ✅ | 2026-10-09 |
-| mixte malin | moving_out (jour 14) | 13 | 12547 | 316 | 1h13 | 2h10 | **3h23** | ✅ | 2026-10-09 |
+| mixte malin | moving_out (jour 14) | 13 | 12564 | 316 | 1h13 | 2h36 | **3h49** | ✅ | 2026-10-09 |
 | passif | moving_out (jour 14) | 13 | 10561 | 207 | 1h00 | 2h10 | **3h10** | ✅ | 2026-10-09 |
 | casse-cou | custody (jour 5) | 4 | 6207 | 118 | 0h35 | 0h40 | **1h15** | ⏹ fin anticipée (jour 5) | 2026-10-09 |
 | illégal discret | custody (jour 7) | 7 | 7684 | 144 | 0h43 | 1h10 | **1h53** | ⏹ fin anticipée (jour 7) | 2026-10-09 |
 
-**stealth-v2** (nuit jusqu’à 2h30, plafond 12 min par nuit) : légal prudent rejoué le 2026-10-09 ; les autres lignes datent d’avant (nuits jusqu’à 1h30, plafond 10 min) et seront rejouées. Les durées réelles avec l’horloge ×3 après 22h30 sont plus courtes : voir la section du build agent ci-dessous.
+**stealth-v2 / playtest 3** (nuit jusqu’à 2h30, plafond 12 min par nuit) : légal prudent, diplomate et mixte malin rejoués le 2026-10-09 sur main (après la passe d’équilibrage 2c55c77) ; passif, casse-cou et illégal discret datent d’avant (nuits jusqu’à 1h30, plafond 10 min). Les durées réelles avec l’horloge ×3 après 22h30 sont plus courtes : voir la section du build agent ci-dessous.
 
-Résumés par style : `qa/fullrun/*.json` (date du dernier passage dans `at`). Dernière mise à jour : 2026-10-09 11:46 UTC.
+Résumés par style : `qa/fullrun/*.json` (date du dernier passage dans `at`). Dernière mise à jour : 2026-10-09 13:14 UTC.
 
 ## §12c.5 night pacing (build agent, 2026-10-09): nights re-measured
 
