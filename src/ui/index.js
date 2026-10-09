@@ -10,7 +10,7 @@
 // Le moteur fournit la narration (c.tutorial, c.mediaFeed / c.readMedia, S.lastHeadline, S.endingMedia, c.introCards).
 import './ui.css';
 import * as narrative from '../sim/narrative.js';
-import { createCampaign as defaultCreate, contentFromGlob, POLICIES, playNight } from '../sim/index.js';
+import { createCampaign as defaultCreate, contentFromGlob } from '../sim/index.js';
 import { NIGHT_END, KLAAS_NOTEBOOK } from '../content/night.js';
 import { h, clear, portrait, nameOf, typewrite, effectChips, STAT_LABELS, setPortraitProvider } from './dom.js';
 import { WEEKDAYS, WEEKDAYS_SHORT, PHASE_LABELS, LEGALITY, explain, afternoonMenu, upcomingEvent, eventDays, witnessName } from './rules.js';
@@ -125,7 +125,8 @@ export function mount(engine = {}, opts = {}) {
 
   // ── vignette selon l'écran ─────────────────────────────────────────
   // Bureau ou télétravail (§12b D) : le moteur le dit (c.workPlace()), sinon bureau
-  const workPlace = () => (typeof c?.workPlace === 'function' ? c.workPlace() : null);
+  // moteur v1.1 : c.state.workplace ('office' | 'home') ; accepte aussi une fonction (c.workplace / c.workPlace)
+  const workPlace = () => (c ? (c.workplace?.() ?? c.workPlace?.() ?? c.state.workplace ?? null) : null);
   const deskScene = () => (workPlace() === 'home' ? 'home' : 'koddex');
   function sceneFor() {
     if (!c) return null;
@@ -195,8 +196,8 @@ export function mount(engine = {}, opts = {}) {
   }
   // v1.1 : le terminal Koddex posé sur le moniteur de la scène 3D (homographie CSS, recalée à chaque image).
   // Repli : la mise en page 2D si pas de scène de jour, qualité « Bas », ou écran trop petit pour être lisible.
-  const MON_W = 760;
-  const MON_H = 475;
+  const MON_W = 560; // taille de conception : une échelle proche de 1 sur le moniteur (texte ≥ 11 px)
+  const MON_H = 350;
   // Stabilité : la caméra assise « respire » ; on ne recale le terminal que si un coin a bougé de plus de 4 px
   // (coordonnées arrondies au pixel), sinon il tremblerait sous le curseur (et un clic ne trouverait jamais sa cible).
   let lastQuad = null;
@@ -348,7 +349,8 @@ export function mount(engine = {}, opts = {}) {
     // « Nouveau » : une carte info du moteur avec une charge `unlock` (ou un futur type 'unlock')
     // (moteur v1.1 : `unlock` = l'id de l'outil, title/text/hint au premier niveau ; accepte aussi un objet)
     if (card.unlock || card.type === 'unlock') return unlockCard(card, typeof card.unlock === 'object' ? card.unlock : (card.data ?? card));
-    const kicker = { event: typeof d.day === 'number' ? 'Événement' : 'Imprévu', dialogue: 'Conversation', countermove: 'Le bloc contre-attaque', info: 'Nouvelles' }[card.type];
+    const kicker = card.workday === 'commute' ? '🚲 Le trajet' : card.workday === 'office' ? '🏢 Chez Koddex' : card.workday ? '🏠 À la maison'
+      : { event: typeof d.day === 'number' ? 'Événement' : 'Imprévu', dialogue: 'Conversation', countermove: 'Le bloc contre-attaque', info: 'Nouvelles' }[card.type];
     const body = h(`div.ui-card.ui-card-${card.type}`, { dataset: { testid: 'card', type: card.type, id: card.id } }, h('span.ui-kicker', kicker));
     let merged = 0;
     if (card.type === 'dialogue') {
@@ -422,7 +424,8 @@ export function mount(engine = {}, opts = {}) {
     }
     const k = view.k;
     // Jour de bureau : le trajet en vélo électrique, une petite scène qu'on peut passer (§12b D)
-    if (workPlace() === 'office' && meta.commuteDay !== S.day && !k.picks.length && !k.done) return commuteCard();
+    // (le moteur v1.1 pousse déjà sa carte « trajet » dans la file du matin : celle-ci ne sert que si c.commuteBeat existe)
+    if (typeof c.commuteBeat === 'function' && workPlace() === 'office' && meta.commuteDay !== S.day && !k.picks.length && !k.done) return commuteCard();
     const term = h('div.ui-term-body');
     const termBox = h('div.ui-term', { dataset: { testid: 'terminal' }, onclick: () => { skipAll = true; typing?.skip?.(); } },
       h('div.ui-term-bar', h('i'), h('i'), h('i'), h('span', 'clode-kode — koddex/todo-app (main)')), term);
@@ -587,8 +590,13 @@ export function mount(engine = {}, opts = {}) {
         if (c.step !== 'night') { afterEngine(); render(); }
       } else {
         // Repli sans 3D (page autonome, tests) : nuit simulée, Pilou reste à sa fenêtre.
+        // boucle bornée (une nuit v1.1 peut attendre un événement de nuit) : les événements prennent le 1er choix
         const sim = c.createNight();
-        playNight(sim, POLICIES.passive(), c);
+        for (let k = 0; !sim.state.ended && k < 3000; k++) {
+          for (let ev = c.nightEventDue?.(sim); ev; ev = c.nightEventDue(sim)) c.resolveNightEvent(sim, ev.choices.find((x) => x.available)?.i ?? 0);
+          sim.tick(1);
+          sim.events.length = 0;
+        }
         c.finishNight(sim);
         afterEngine();
         view = {};

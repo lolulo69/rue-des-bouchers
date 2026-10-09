@@ -70,7 +70,7 @@ test.describe('v1.1 · twists de nuit', () => {
 
   test('14 nuits : un twist chaque nuit, jamais deux fois le même dans une campagne', async ({ page }) => {
     test.setTimeout(240_000);
-    await newCampaign(page, 101); // la graine 101 va jusqu'au J14 en jeu passif
+    await newCampaign(page, 3); // la graine 3 va jusqu'au J14 en jeu passif (101 déménage au J11 depuis l'équilibrage v1.1)
     test.skip(!(await page.evaluate(() => typeof window.__rdb.ui.campaign.tonightTwist === 'function')), 'twists pas encore sur main : c.tonightTwist() absent');
     const r = await playUntil(page, () => false);
     const ids = Object.values(r.days).filter((d) => d.night).map((d) => d.twist);

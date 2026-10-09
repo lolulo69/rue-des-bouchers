@@ -307,14 +307,15 @@ html[data-input=pad] :focus { outline: 3px solid #24406b !important; outline-off
 
 /* Le terminal sur le moniteur : élément net, déformé par matrix3d (project.js), sinon mise en page normale */
 :is(#ui-root, #dayui, #ui-menu).on-monitor .ui-monitor {
-  position: fixed; left: 0; top: 0; width: 760px; height: 475px; transform-origin: 0 0; z-index: 2;
+  position: fixed; left: 0; top: 0; width: 560px; height: 350px; transform-origin: 0 0; z-index: 2;
   overflow: auto; display: block; padding: 10px; background: #14181c; border-radius: 6px;
   box-shadow: 0 0 40px #7fe0ff40; backface-visibility: hidden;
 }
 :is(#ui-root, #dayui, #ui-menu).on-monitor .ui-monitor .ui-term { box-shadow: none; border: 0; border-radius: 4px; }
 /* Bloc et non grille : une boîte en overflow hidden y serait écrasée à 0 px de haut (taille minimale automatique) */
 :is(#ui-root, #dayui, #ui-menu).on-monitor .ui-monitor > * + * { margin-top: 10px; }
-:is(#ui-root, #dayui, #ui-menu).on-monitor .ui-monitor .ui-term-body { max-height: 190px; }
+:is(#ui-root, #dayui, #ui-menu).on-monitor .ui-monitor .ui-term { min-height: 260px; }
+:is(#ui-root, #dayui, #ui-menu).on-monitor .ui-monitor .ui-term-body { max-height: 220px; }
 :is(#ui-root, #dayui, #ui-menu).on-monitor .ui-monitor .ui-prompts { color: #c4f5d2; }
 :is(#ui-root, #dayui, #ui-menu).on-monitor .ui-monitor .ui-prompt-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
 :is(#ui-root, #dayui, #ui-menu).on-monitor .ui-monitor .ui-btn { text-align: center; }
