@@ -176,29 +176,40 @@ test.describe('§12e.7 · « Faire diversion » et le pot-de-vin à la pause', (
     expect(opened.length, 'des témoins détournés').toBeGreaterThan(0);
   });
 
-  // fixme (côté QA, pas un bogue du jeu) : le refus hors pause est vérifié, mais le harnais ne place pas encore Pilou « au coin »
-  // comme le lieu 'smoke' l'attend (« Il faut être au coin, à la pause du serveur. »). À reprendre.
-  (process.env.QA_RUN_FIXME ? test : test.fixme)('soudoyer le serveur : seulement pendant sa pause cigarette, à l’angle (hors de vue de la terrasse)', async ({ page }) => {
+  test('soudoyer le serveur : seulement pendant sa pause cigarette, à l’angle (hors de vue de la terrasse)', async ({ page }) => {
     test.setTimeout(300_000);
     await newCampaign(page);
     await nightOf(page, 3, PREP_ALL);
     await enterNight(page);
-    const avail = (min) => page.evaluate(async (m) => {
+    let corner = null; // le coin de la pause clope (sim.waiterPos() pendant une pause)
+    const avail = (min) => page.evaluate(async ({ m, corner }) => {
       const r = window.__rdb, { sim } = r, c = r.campaign;
       for (let i = 0; sim.state.min < m && !sim.state.ended && i < 8000; i++) { for (let ev = c.nightEventDue?.(sim); ev; ev = c.nightEventDue(sim)) c.resolveNightEvent(sim, 0); sim.tick(0.25); if (i % 60 === 0) r.step(1); }
       // Le vrai verrou : l'action elle-même (comme depuis le menu N ou la conversation), Pilou à l'angle de la pause
-      const smoke = sim.smokeSpot?.() ?? sim.waiterPos();
-      r.player.loc = 'street'; r.player.pos.set(smoke.x, 0, smoke.z); r.step(2);
-      const res = c.doNightAction(sim, 'night_bribe_waiter', r.player);
-      return { onBreak: sim.waiterOnBreak(), bribe: !!res?.ok, reason: res?.reason ?? null };
-    }, min);
-    const during = await avail(21 * 60 + 14);
-    // Entre deux pauses (21h12–21h18 puis 22h24–22h30), le serveur est en service : refusé, avec la raison
+      const at = corner ?? sim.waiterPos();
+      // Le joueur tel que le jeu le passe (game.js › playerWhere) : { where, pos }
+      const res = c.doNightAction(sim, 'night_bribe_waiter', { where: 'street', pos: { x: at.x, z: at.z } });
+      return { onBreak: sim.waiterOnBreak(), bribe: !!res?.ok, reason: res?.reason ?? null, at: { x: at.x, z: at.z } };
+    }, { m: min, corner });
+    // 1) Le coin de la pause (où fume le serveur à 21h12), sans rien tenter
+    corner = await page.evaluate(() => {
+      const r = window.__rdb, { sim } = r, c = r.campaign;
+      for (let i = 0; sim.state.min < 21 * 60 + 14 && !sim.state.ended && i < 8000; i++) { for (let ev = c.nightEventDue?.(sim); ev; ev = c.nightEventDue(sim)) c.resolveNightEvent(sim, 0); sim.tick(0.25); if (i % 60 === 0) r.step(1); }
+      const p = sim.waiterPos(); return { x: p.x, z: p.z };
+    });
+    // 2) Entre deux pauses (21h18 → 22h24) : refusé, avec la raison (le billet ne se donne qu'une fois : on le garde pour 3)
     const before = await avail(21 * 60 + 25);
     expect(before.onBreak).toBe(false);
     expect(before.bribe, `pas de pot-de-vin pendant le service : ${JSON.stringify(before)}`).toBe(false);
     expect(before.reason ?? '').toMatch(/pause/);
-    expect(during.onBreak, 'pause cigarette de 21h12').toBe(true);
+    // 3) La pause suivante (avancée jusqu'à ce que le serveur sorte fumer) : au coin, ça passe
+    const next = await page.evaluate(() => {
+      const r = window.__rdb, { sim } = r, c = r.campaign;
+      for (let i = 0; !sim.waiterOnBreak() && !sim.state.ended && sim.state.min < 25 * 60 && i < 20000; i++) { for (let ev = c.nightEventDue?.(sim); ev; ev = c.nightEventDue(sim)) c.resolveNightEvent(sim, 0); sim.tick(0.25); if (i % 60 === 0) r.step(1); }
+      return sim.state.min;
+    });
+    const during = await avail(next);
+    expect(during.onBreak, `pause cigarette suivante (${Math.floor(next / 60)}h${String(Math.round(next % 60)).padStart(2, '0')})`).toBe(true);
     expect(during.bribe, `pot-de-vin possible pendant la pause : ${JSON.stringify(during)}`).toBe(true);
     const spot = await page.evaluate(() => { const r = window.__rdb, w = r.sim.waiterPos(), t = r.sim.state.tables.filter((x) => x.restId === 'bernadette'); return { w, nearestTable: Math.min(...t.map((x) => Math.hypot(x.x - w.x, x.z - w.z))) }; });
     expect(spot.nearestTable, `le serveur fume loin de la terrasse : ${JSON.stringify(spot)}`).toBeGreaterThan(3);
