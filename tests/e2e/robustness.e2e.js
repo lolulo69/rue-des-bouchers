@@ -147,3 +147,56 @@ test('s’assoupir sur le canapé (world.sofa) : invite et sommeil « canapé »
   expect(r.prompt).toContain('canapé');
   expect(r).toMatchObject({ spot: 'sofa', sleeping: true });
 });
+
+test('menu de nuit (N, §12c.4) : « Ici, maintenant », « Ailleurs ce soir » replié, une raison par action indisponible', async ({ page }) => {
+  test.setTimeout(240_000);
+  await page.goto('/?nolock=1&seed=12');
+  await page.evaluate(() => localStorage.clear());
+  await page.reload();
+  await page.click('#campaign');
+  await page.click('[data-testid=title-new]');
+  if (await page.locator('[data-testid=intro-skip]').count()) await page.click('[data-testid=intro-skip]');
+  await page.evaluate(() => {
+    const c = window.__rdb.ui.campaign;
+    for (let i = 0; i < 200 && c.step !== 'night'; i++) {
+      if (c.step === 'cards') c.resolveCard(c.card().choices.find((x) => x.available)?.i ?? 0);
+      else if (c.step === 'koddex') c.koddex(['work', 'work', 'work']);
+      else if (c.step === 'actions') c.endAfternoon();
+    }
+    c.state.unlocked = c.content.UNLOCKS.map((u) => u.id); // tous les outils acquis
+    c.state.tutorials.done = c.content.TOOL_TUTORIALS?.map((t) => t.id) ?? []; // pas de marque par-dessus le menu
+    localStorage.setItem(window.__rdb.saveKey, JSON.stringify(c.save()));
+  });
+  await page.goto('/?nolock=1&mode=night&seed=12');
+  await page.locator('#hud').waitFor({ state: 'visible' });
+  await page.evaluate(() => { window.__rdb.step(2); window.__rdb.key('KeyN'); window.__rdb.step(1); });
+  const menu = page.locator('#nightmenu');
+  await expect(menu).toBeVisible();
+  await expect(menu.locator('[data-group=here] h3')).toContainText('Ici, maintenant');
+  const toggle = menu.locator('.nm-toggle');
+  await expect(toggle).toContainText('Ailleurs ce soir');
+  const away = menu.locator('[data-group=elsewhere]');
+  if ((await menu.locator('[data-group=here] .nm-row').count()) > 0) {
+    await expect(away).toBeHidden(); // replié tant qu'il y a quelque chose à faire ici
+    await toggle.click();
+  }
+  await expect(away).toBeVisible();
+  await page.screenshot({ path: 'test-results/night-menu.png' });
+  const rows = await away.locator('.nm-row').evaluateAll((bs) => bs.map((b) => ({
+    disabled: b.getAttribute('aria-disabled'), reason: b.querySelector('.nm-reason')?.textContent ?? '', text: b.innerText,
+  })));
+  expect(rows.length).toBeGreaterThan(0);
+  for (const r of rows) {
+    expect(r.disabled).toBe('true');
+    expect(r.reason, r.text).toMatch(/📍 \S.{4,}/);
+    expect(r.text).toMatch(/\d+ min/);
+    expect(r.text).toMatch(/légal|limite|illégal/);
+    expect(r.text).toMatch(/👁 (sans risque|risque (faible|moyen|élevé))/);
+  }
+  // Clavier : les flèches déplacent le focus d'une ligne à l'autre
+  const f0 = await page.evaluate(() => document.activeElement?.className);
+  await page.evaluate(() => { window.dispatchEvent(new KeyboardEvent('keydown', { code: 'ArrowDown', bubbles: true })); });
+  const f1 = await page.evaluate(() => ({ cls: document.activeElement?.className, inMenu: document.getElementById('nightmenu').contains(document.activeElement) }));
+  expect(f1.inMenu).toBe(true);
+  expect(f0).toBeTruthy();
+});

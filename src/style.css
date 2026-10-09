@@ -59,3 +59,21 @@ kbd { background: #ffffff1a; border: 1px solid #ffffff33; border-radius: 4px; pa
 #coach p { margin: 0; }
 #coach kbd { white-space: nowrap; }
 #coach button { background: transparent; color: #f2ede4; border: 1px solid #ffffff44; border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+/* Menu de nuit (N, §12c.4) : « Ici, maintenant », « Ailleurs ce soir » replié ; couleur = légalité (config NIGHT_MENU) */
+#nightmenu { overflow: auto; justify-content: flex-start; padding-top: 32px; }
+#nightmenu-list { width: min(620px, 94vw); }
+.nm-group { display: flex; flex-direction: column; gap: 8px; }
+.nm-group[hidden] { display: none; }
+.nm-group h3 { margin: 4px 0; color: #e9c46a; font-size: 16px; }
+.screen .nm-row, .screen .nm-toggle { background: #1b1b24; color: #f2efe6; font-weight: 400; font-size: 15px; padding: 10px 14px; min-width: 0; }
+.nm-row { display: flex; flex-direction: column; align-items: stretch; gap: 3px; text-align: left; border-left: 4px solid var(--nm-color, #888); }
+.nm-row[aria-disabled=true] { opacity: .62; cursor: default; }
+.nm-row:focus-visible, .nm-toggle:focus-visible { outline: 2px solid #4cc9f0; outline-offset: 2px; }
+.nm-head { display: flex; align-items: center; gap: 8px; }
+.nm-label { flex: 1; font-weight: 600; }
+.nm-icon { color: var(--nm-color); width: 1.2em; text-align: center; }
+.nm-tag { color: var(--nm-color); border: 1px solid var(--nm-color); border-radius: 999px; padding: 0 8px; font-size: 12px; }
+.nm-key { font-size: 11px; opacity: .7; }
+.nm-reason { display: block; color: #ffd6a0; font-size: 13px; }
+.nm-meta { display: block; font-size: 13px; opacity: .85; }
+.nm-toggle { align-self: flex-start; margin-top: 6px; background: transparent; border: 1px dashed #ffffff44; }

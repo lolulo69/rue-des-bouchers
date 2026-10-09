@@ -3,11 +3,11 @@
 import * as THREE from 'three';
 import { buildWorld } from './world.js';
 import { createDirector } from './scene/director.js';
-import { RULES, SKY, STREET, NOISE, EVIDENCE, INTERACT, ZONES, POLICE } from './config.js';
-import { createSim, makeConfig, fmt, createCampaign, contentFromGlob, checkSave } from './sim/index.js';
+import { RULES, SKY, STREET, NOISE, EVIDENCE, INTERACT, ZONES, POLICE, NIGHT_MENU } from './config.js';
+import { createSim, makeConfig, fmt, createCampaign, contentFromGlob, checkSave, nightMenu, LOCATIONS } from './sim/index.js';
 import * as narrative from './sim/narrative.js';
 import { audio } from './audio/index.js';
-import { padGlyph } from './input/index.js';
+import { padGlyph, moveFocus } from './input/index.js';
 import { createRng } from './sim/rng.js';
 import { WHATSAPP_GROUP } from './content/characters.js';
 import { bindNight } from './input/night.js'; // manette (agent UI, src/input)
@@ -493,6 +493,7 @@ addEventListener('keydown', (e) => {
   if (e.code === 'Tab') return overlay === 'dossier' ? closeOverlay() : !overlay && openOverlay('dossier');
   if (e.code === 'KeyT') return overlay === 'phone' ? closeOverlay() : !overlay && openOverlay('phone');
   if (e.code === 'KeyN' && campaign) return overlay === 'nightmenu' ? closeOverlay() : !overlay && openOverlay('nightmenu');
+  if (overlay === 'nightmenu' && $('nightmenu').dataset.mode === 'actions' && nightMenuKey(e)) return;
   if (overlay || e.repeat) return keys.add(e.code);
   keys.add(e.code);
   if (e.code === 'KeyE') interaction()?.act();
@@ -573,13 +574,12 @@ function endCampaignNight() {
   showDay({ resume: true }); // l'interface reprend la sauvegarde : le bilan de la nuit
 }
 
-// Actions de nuit du contenu (N) : boule puante, carton sur la hotte… selon l'endroit où se trouve Pilou
-function nightActionsHere() {
-  if (!campaign) return [];
-  return campaign.nightActions(sim).filter((a) => (a.at === 'pilouWindow' ? nearWindow() : a.at === 'street' ? player.loc === 'street' : true));
-}
+// Où se tient Pilou, pour les actions de nuit du contenu (nightActions.js : lieu et portée de chaque action)
+const playerWhere = () => ({ where: player.loc === 'street' ? 'street' : nearWindow() ? 'window' : 'apartment', pos: { x: player.pos.x, z: player.pos.z } });
 function openNightEvent(ev) {
   openOverlay('nightmenu');
+  $('nightmenu').dataset.mode = 'event';
+  $('nightmenu').querySelector('.note').textContent = '';
   $('nightmenu').querySelector('h2').textContent = ev.data.title ?? 'Cette nuit';
   const list = $('nightmenu-list');
   list.innerHTML = '';
@@ -599,18 +599,67 @@ function openNightEvent(ev) {
     list.append(b);
   }
 }
-function renderNightMenu() {
-  $('nightmenu').querySelector('h2').textContent = 'Actions de nuit';
+// Menu de nuit (N, §12c.4) : rendu générique. Les lignes viennent de nightMenu() (actions.js, nightActions.js,
+// config NIGHT_MENU) : aucune action n'est nommée ici. « Ici, maintenant » d'abord ; « Ailleurs ce soir » replié, avec la
+// raison du moteur (où aller, ce qu'il faut d'abord).
+let nightMenuElsewhereOpen = false;
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+function nightMenuRow(r, n) {
+  const b = el('button', 'nm-row');
+  Object.assign(b.dataset, { id: r.id, legality: r.legality, risk: r.risk.level });
+  b.style.setProperty('--nm-color', r.color);
+  if (!r.available) b.setAttribute('aria-disabled', 'true');
+  const head = el('span', 'nm-head');
+  if (n) head.append(el('kbd', 'nm-key', String(n)));
+  head.append(el('span', 'nm-icon', r.icon), el('span', 'nm-label', r.label), el('span', 'nm-tag', r.tag));
+  b.append(head);
+  if (!r.available) b.append(el('span', 'nm-reason', `📍 ${r.reason}`));
+  const who = r.risk.who.length ? ` (${r.risk.who.slice(0, NIGHT_MENU.maxWho).join(', ')}${r.risk.who.length > NIGHT_MENU.maxWho ? '…' : ''})` : '';
+  const risk = r.risk.level === 'none' ? `👁 ${r.risk.label}` : `👁 risque ${r.risk.label}${who}`;
+  b.append(el('span', 'nm-meta', [`⏱ ${r.time}`, risk, r.hint].filter(Boolean).join(' · ')));
+  b.addEventListener('click', () => {
+    if (!r.available) return log(r.reason);
+    closeOverlay();
+    const res = campaign.doNightAction(sim, r.id, playerWhere());
+    if (res && !res.ok && res.reason) log(res.reason);
+    tutoEvent(`action:${r.id}`);
+    drainSim();
+  });
+  return b;
+}
+function renderNightMenu(focusToggle = false) {
+  const root = $('nightmenu');
+  root.dataset.mode = 'actions';
+  root.querySelector('h2').textContent = 'Actions de nuit';
   const list = $('nightmenu-list');
   list.innerHTML = '';
-  const acts = nightActionsHere();
-  if (!acts.length) list.innerHTML = '<p class="note">Rien à faire ici pour l’instant.</p>';
-  for (const a of acts) {
-    const b = document.createElement('button');
-    b.textContent = `${a.label}${a.legality === 'illegal' ? ' (illégal)' : a.legality === 'grey' ? ' (limite)' : ''}`;
-    b.addEventListener('click', () => { closeOverlay(); campaign.doNightAction(sim, a.id); tutoEvent(`action:${a.id}`); drainSim(); });
-    list.append(b);
+  const m = nightMenu(sim, campaign, playerWhere());
+  const here = el('section', 'nm-group');
+  here.dataset.group = 'here';
+  here.append(el('h3', null, `Ici, maintenant · ${LOCATIONS[playerWhere().where].label}`));
+  if (!m.here.length) here.append(el('p', 'note', 'Rien à faire ici pour l’instant.'));
+  m.here.forEach((r, i) => here.append(nightMenuRow(r, i < 9 ? i + 1 : 0)));
+  list.append(here);
+  if (m.elsewhere.length) {
+    const open = nightMenuElsewhereOpen || !m.here.length; // rien ici : on montre d'emblée où aller
+    const toggle = el('button', 'nm-toggle', `${open ? '▾' : '▸'} Ailleurs ce soir (${m.elsewhere.length})`);
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.addEventListener('click', () => { nightMenuElsewhereOpen = !open; renderNightMenu(true); });
+    const away = el('section', 'nm-group nm-away');
+    away.dataset.group = 'elsewhere';
+    away.hidden = !open;
+    for (const r of m.elsewhere) away.append(nightMenuRow(r, 0));
+    list.append(toggle, away);
   }
+  root.querySelector('.note').textContent = `↑ ↓ et Entrée (ou 1–9) · ${padGlyph('A')} choisir · N / ${padGlyph('B')} fermer`;
+  (focusToggle ? list.querySelector('.nm-toggle') : list.querySelector('.nm-row:not([aria-disabled])') ?? list.querySelector('button'))?.focus({ preventScroll: true });
+}
+// Clavier dans le menu de nuit : flèches = ligne suivante / précédente, 1–9 = action « ici » n° k
+function nightMenuKey(e) {
+  if (e.code === 'ArrowUp' || e.code === 'ArrowDown') { e.preventDefault(); moveFocus($('nightmenu'), e.code === 'ArrowUp' ? 'up' : 'down'); return true; }
+  const k = /^(?:Digit|Numpad)([1-9])$/.exec(e.code);
+  if (k) { $('nightmenu-list').querySelectorAll('[data-group=here] .nm-row')[k[1] - 1]?.click(); return true; }
+  return false;
 }
 
 function showEnd() {
