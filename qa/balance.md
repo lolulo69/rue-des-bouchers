@@ -43,7 +43,7 @@ Perf: 0.3–1.3 ms per simulated night, so 1000 14-day campaigns × 6 bots ≈ 1
 | mixed smart | **95% turncoat** | best average score | ❌ the secret ending dominates |
 | diplomat | 58% the return, 42% legal victory | negotiated peace ≥ 40% | ❌ **peace 0%** |
 
-Never reached: endings **fired, scandal, negotiated_peace**. 9/64 actions (the whole mayor/Lescaut chain, internal police investigation (IGPN) report, Lemaire transfer, lawyer + formal notice, Tatie's emails, the uritrottoir follow-up), 2/27 events, 19/42 counter-moves (**all 12 Tatie emails**, the bins, the Colette call…), and 34/120 dialogue lines (the sim may not surface dialogue: check).
+Never reached: endings **fired, scandal, negotiated_peace**. 9/64 actions (the whole mayor/Delandre chain, internal police investigation (IGPN) report, Lemaire transfer, lawyer + formal notice, Tatie's emails, the uritrottoir follow-up), 2/27 events, 19/42 counter-moves (**all 12 Tatie emails**, the bins, the Martine call…), and 34/120 dialogue lines (the sim may not surface dialogue: check).
 
 Diagnosis to confirm: dossier/asso still saturate (see the night baseline findings 1–2); "the return" should be an epilogue variant of a win, not an outcome that competes with it; the turncoat condition is too loose for a *secret* ending; the peace/scandal conditions are unreachable; the Tatie email triggers never match.
 → Assigned to the balance agent.
@@ -223,7 +223,7 @@ Baseline on main 13e6ec1 (v1.1 engine: `src/sim/twists.js`, `src/sim/unlocks.js`
 | diplomate | · | · | · | 22% | 24% | 2% | 32% | 19% | 56 | 58 | 71 | 0 | 100 | 32 | – | ✅ paix négociée ≥ 40 % |
 | tire-au-flanc | · | 41% | 15% | 13% | · | 31% | · | · | 40 | 68 | 72 | 1 | 49 | 39 | – | ✅ licenciement atteignable (≥ 2 %, §13.F) |
 
-❌ Legal victory **34 %** (median dossier 48: the twists add crowds/noise but tools such as the dB key, the round and the asso call now arrive later). Never used: `night_sabotage_chairs` / `_parasols` / `_locks`, `night_borrow_power` (unlocked on days 8–9; their user, the reckless bot, is in custody by night 5). Unreached counter-moves: `cm_air_freshener` (stink bomb from day 5), `cm_colette_call_notice` (every formal notice came after a mayor request, which fires the other Colette call first). Mixed burned out (sleep 17, 17 % moving out) and tied with legal (80 / 80).
+❌ Legal victory **34 %** (median dossier 48: the twists add crowds/noise but tools such as the dB key, the round and the asso call now arrive later). Never used: `night_sabotage_chairs` / `_parasols` / `_locks`, `night_borrow_power` (unlocked on days 8–9; their user, the reckless bot, is in custody by night 5). Unreached counter-moves: `cm_air_freshener` (stink bomb from day 5), `cm_martine_call_notice` (every formal notice came after a mayor request, which fires the other Martine call first). Mixed burned out (sleep 17, 17 % moving out) and tied with legal (80 / 80).
 
 **Gating / no cheating**: the build agent's runner already filters every native bot act through `c.nativeAllowed` (unlocks + tonight's twist opportunities), and content night acts go through `availableNightActions`, which only lists unlocked actions or ones a twist opens tonight. So bots can't use a tool before it unlocks, and they use a twist's opportunity (mostly photo / dB / police / waiter, `night_film_faces` with the influencer) as soon as the engine allows it.
 
@@ -244,7 +244,7 @@ After this pass, 1000 × 7, invariants ✅, **68/68 actions, 28/28 events, 8/8 e
 | `CAMPAIGN.assoDecayPerDay` | 5 | 4 | Twists cost asso (fewer shareable nights): legal / mixed fell to 68. |
 | `ASSO.diminishFrom` | 50 | 55 | Same: legal 75, mixed 73 (target 70–85). |
 | stealthy bot | – | wants the three sabotages, the power line, the stink bomb | Late tools (days 5–9) for the only bot awake after 00:30; custody stays 16 %. |
-| slacker bot | – | lawyer + formal notice | A formal notice without a mayor request, so `cm_colette_call_notice` can fire. |
+| slacker bot | – | lawyer + formal notice | A formal notice without a mayor request, so `cm_martine_call_notice` can fire. |
 | mixed bot | dossier 5, flat sleep 0.5 | sleep weight 3 when sleep < 40; lawyer / formal notice / mayor meeting | Its dossier greed took every sleep-costly event choice (−11 sleep from events vs +11 for legal). A smart player rests when exhausted. The extra legal dossier actions give it margin above the commission bar. |
 
 No dominant action (`--ablate mixed`, 1000 runs, base 97 %): `pm_klaas_roster` −24, `pm_klaas_notebook` −20, `pm_press_contact` −8, rest ≤ 6. **Max 24 < 25 ✅, but thin.** The roster is the gateway to the Klaas notebook (and `met_klaas`), and the notebook is the main legal route to `corruption_proof` plus ~3 dossier points next to the commission bar. Suggestion for the content agent: a second way to meet Klaas (the round, the D4 dinner…) would make the roster less of a single point of failure.

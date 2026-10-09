@@ -17,27 +17,27 @@ export const TWISTS = [
   // NUITS FIXES DU CALENDRIER
   // ════════════════════════════════════════════════════════════════════════
   {
-    id: 'colette_dinner',
+    id: 'martine_dinner',
     title: 'Une ancienne maire en terrasse',
     day: 4,
-    intro: "Ce soir, l’estaminet a sorti la nappe blanche et la table qui mord sur le couloir. Colette Verhaeghe vient dîner. Huit couverts, une table de six. Dédé a ciré ses chaussures.",
+    intro: "Ce soir, l’estaminet a sorti la nappe blanche et la table qui mord sur le couloir. Martine Aubrac vient dîner. Huit couverts, une table de six. Dédé a ciré ses chaussures.",
     sim: {
-      tables: [{ rest: 'bernadette', count: 8, label: 'la table de Colette', until: H(23, 30) }],
+      tables: [{ rest: 'bernadette', count: 8, label: 'la table de Martine', until: H(23, 30) }],
       closeDelay: 25,
-      witnesses: [{ id: 'colette', at: 'terrace', filming: false }],
+      witnesses: [{ id: 'martine', at: 'terrace', filming: false }],
       events: [
-        { at: H(20, 50), text: "Une berline se gare rue de la Barre, là où rien ne se gare. Colette descend, foulard au vent." },
-        { at: H(23, 5), text: "Colette lève son verre : « À la convivialité, mes chers amis ! » Toute la terrasse trinque. Les fenêtres aussi, à leur façon.", simEffect: { noise: 6 }, state: { estaminetOut: '>0' }, else: 'Colette lève son verre à l’intérieur, derrière la vitrine : « À la convivialité ! » La rue, dehors, n’entend qu’un tintement.' },
+        { at: H(20, 50), text: "Une berline se gare rue de la Barre, là où rien ne se gare. Martine descend, foulard au vent." },
+        { at: H(23, 5), text: "Martine lève son verre : « À la convivialité, mes chers amis ! » Toute la terrasse trinque. Les fenêtres aussi, à leur façon.", simEffect: { noise: 6 }, state: { estaminetOut: '>0' }, else: 'Martine lève son verre à l’intérieur, derrière la vitrine : « À la convivialité ! » La rue, dehors, n’entend qu’un tintement.' },
       ],
       opportunities: ['night_photo'],
     },
     lines: {
       barks: ["« Madame la maire ! Enfin, l’ancienne, mais quand même ! »", "« On peut faire une photo avec vous ? »", "« Elle a eu un dessert. Personne d’autre n’a eu de dessert. »"],
       klaas: ['Ex-maire. Huit couverts. Table un. Couloir : rétréci. Mon nez est fiable.', "La berline est restée garée deux heures. Personne n’a mis de papillon."],
-      recap: ['Colette Verhaeghe a dîné à huit sur une table de six. La convivialité a des privilèges.'],
+      recap: ['Martine Aubrac a dîné à huit sur une table de six. La convivialité a des privilèges.'],
     },
     props: ['white_tablecloth', 'black_sedan'],
-    after: { setFlags: ['twist_colette_dinner'] },
+    after: { setFlags: ['twist_martine_dinner'] },
   },
   {
     id: 'saturday_van',
@@ -98,7 +98,7 @@ export const TWISTS = [
     lines: {
       barks: ['« Pourquoi on est que six ? On est toujours dix. »', { text: "« Le serveur a dit qu’on rentrait à 21h40. Je comprends pas. »", state: { before: '23:00', present: ['serveur'] } }],
       klaas: ['21h40 : toutes les tables rentrées. Première fois. Je souligne. Ce n’est pas un compliment.'],
-      recap: ["Une nuit exemplaire, pour cause d’inspection annoncée. Même Colette n’aurait pas mieux organisé."],
+      recap: ["Une nuit exemplaire, pour cause d’inspection annoncée. Même Martine n’aurait pas mieux organisé."],
     },
     props: ['new_geraniums'],
     after: { setFlags: ['twist_model_street'] },
@@ -475,13 +475,13 @@ export const TWISTS = [
     after: { setFlags: ['twist_fire_inspection'], media: ['press_twist_fire'] },
   },
   {
-    id: 'lescaut_walk',
+    id: 'delandre_walk',
     title: 'Le maire fait sa ronde',
     pool: true,
-    when: { flags: ['lescaut_meeting'] },
-    intro: "Bertrand Lescaut a promis de « venir voir par lui-même ». Ce soir, à 23h, il remonte la rue à pied, sans écharpe, avec un conseiller et un parapluie. Le bloc l’a appris à 22h55.",
+    when: { flags: ['delandre_meeting'] },
+    intro: "Arnaud Delandre a promis de « venir voir par lui-même ». Ce soir, à 23h, il remonte la rue à pied, sans écharpe, avec un conseiller et un parapluie. Le bloc l’a appris à 22h55.",
     sim: {
-      witnesses: [{ id: 'lescaut', at: 'street', filming: false }],
+      witnesses: [{ id: 'delandre', at: 'street', filming: false }],
       closeDelay: -15,
       events: [{ at: H(23, 0), text: "Le maire remonte la rue. Dédé range trois tables en courant, les bras pleins de chaises. Le maire le regarde faire. « Je vous en prie, ne vous dérangez pas pour moi. »", state: { tablesOut: '>0' }, else: 'Le maire remonte une rue déjà rangée, chaises empilées, couloir libre. Il a l’air presque déçu.' }],
       opportunities: ['night_photo', 'night_db'],
@@ -492,7 +492,7 @@ export const TWISTS = [
       recap: ['Le maire est passé à 23h. Pendant dix minutes, la rue des Bouchers a été exemplaire. Il a vu les dix minutes d’avant.'],
     },
     props: ['mayor_umbrella'],
-    after: { setFlags: ['twist_lescaut_walk'] },
+    after: { setFlags: ['twist_delandre_walk'] },
   },
   {
     id: 'lost_dog',

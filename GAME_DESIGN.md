@@ -23,8 +23,8 @@ about a *situation* (terraces vs residents, complacent institutions, neighbourho
 | **Truffe et Ficelle** | Street corner |
 | **Mug** | Takeaway, customers drink standing in the street |
 | **La Bombance** (closed) | Empty premises. Late-game threat: a new bar wants to open there |
-| **Colette Verhaeghe** | Former mayor, still influential, protects the restaurants. Tatie Bouchon's contact |
-| **Bertrand Lescaut** | Current mayor, **leans toward the residents** (brought in the 22:00 rule) |
+| **Martine Aubrac** | Former mayor, still influential, protects the restaurants. Tatie Bouchon's contact |
+| **Arnaud Delandre** | Current mayor, **leans toward the residents** (brought in the 22:00 rule) |
 | **Clode Kode** | Pilou's AI coding tool at Koddex (wink) |
 | **La Voix du Nordiste** | Local newspaper |
 
@@ -76,8 +76,8 @@ where his job amounts to prompting **Clode Kode** all day and building silly sid
 | **Jérémie** | President, Pilou's neighbour, has a **dachshund** | Leads the evening **rounds** (dog walk = patrol). Unlocks official channels. The dachshund barks: it helps (spots things) and hurts (draws attention when you sneak). |
 | **Klaas** | Elderly, Santa Claus look (big, not fat, white beard). **Sees everything, writes everything down.** | Passive **evidence engine**: his notebook logs infractions automatically. **Double-edged**: he also writes down what *Pilou* does. Only a lie or a bribe keeps an illegal act out of his notebook. |
 | **Hilde**, Klaas's wife | Very kind | Brings food and tisane → restores Sleep and morale. Calms Klaas. |
-| **Tatie Bouchon** | Old lady in the middle of the street who hands out wisdom: *« Si vous voulez quelque chose dans la vie, faut résister et se battre pour. »* Emails Bernadette about the smell. They always answer "it's being fixed"; she doesn't believe it. Also chats with **Colette Verhaeghe**. | Email thread = running gag and evidence ("promise #12 that it's being fixed", the 12-step thread). Her Colette connection makes her an unreliable channel: she can open a door at the mayor's office or leak your plan. |
-| **Seb & Nico** (couple across the street, facing Pilou) | Know all the gossip, talk a lot, run the association's WhatsApp group (**« Radio Balcon »**, provisional name, one constant in `src/content/characters.js`). Their **cat** sits on the balcony. Written by their *role*: no humour based on orientation | The **WhatsApp group** is the association's nervous system: rally the troops, share photos, gossip. **Cat on the balcony = they are home and watching**: allies witness legal actions (+evidence) but also see illegal ones. |
+| **Tatie Bouchon** | Old lady in the middle of the street who hands out wisdom: *« Si vous voulez quelque chose dans la vie, faut résister et se battre pour. »* Emails Bernadette about the smell. They always answer "it's being fixed"; she doesn't believe it. Also chats with **Martine Aubrac**. | Email thread = running gag and evidence ("promise #12 that it's being fixed", the 12-step thread). Her Martine connection makes her an unreliable channel: she can open a door at the mayor's office or leak your plan. |
+| **Seb & Nico** (couple across the street, facing Pilou) | Know all the gossip, talk a lot, run the association's WhatsApp group (**« La Gaystapo »**, provisional name, one constant in `src/content/characters.js`). Their **cat** sits on the balcony. Written by their *role*: no humour based on orientation | The **WhatsApp group** is the association's nervous system: rally the troops, share photos, gossip. **Cat on the balcony = they are home and watching**: allies witness legal actions (+evidence) but also see illegal ones. |
 | **Hippolyte** | Owns an old building where **carriages (calèches)** were made since the 1800s | Old money, knows the old families and the city's heritage department. Late game: heritage-protection angle (exhaust and AC on a historic façade), a meeting room in the former carriage workshop. |
 
 ### The restaurants ("restaurants vs residents")
@@ -96,10 +96,10 @@ The restaurants form a **bloc**: Bernadette's leads it, and the others back her.
 - **The mayor's office inspector** **Delphine Vermeersch**: handles the AC case. **Married to
   Pilou's boss.** Real but compromising lever: a dinner at the boss's place = an informal channel to her
   (a conflict of interest that can come out).
-- **Colette Verhaeghe**: ex-mayor, still influential, protects the restaurants. Reached through Tatie Bouchon.
-- **Bertrand Lescaut**: current mayor, **more on the residents' side** (he brought in the 22:00 rule). City hall is split:
-  the new mayor and the inspector lean toward the residents, while the old Colette network and parts of the municipal police protect the bloc.
-  Getting a meeting with Lescaut is a mid-campaign goal. Colette works to undermine him.
+- **Martine Aubrac**: ex-mayor, still influential, protects the restaurants. Reached through Tatie Bouchon.
+- **Arnaud Delandre**: current mayor, **more on the residents' side** (he brought in the 22:00 rule). City hall is split:
+  the new mayor and the inspector lean toward the residents, while the old Martine network and parts of the municipal police protect the bloc.
+  Getting a meeting with Delandre is a mid-campaign goal. Martine works to undermine him.
 - **Koddex boss**: **Stéphane**, startup founder who is never there and talks about "vibes".
 
 ## 3. Structure: a 14-night campaign
@@ -107,7 +107,7 @@ Each **day** = 3 phases:
 1. **Koddex (morning, 2D/menu, short)**. Pilou has 3 "prompts" a day to give Clode Kode. Options: real work
    (keeps the job), or secretly building side projects that help the fight:
    - a Rust dB-meter daemon → **automatic noise logging** (passive evidence);
-   - a WhatsApp bot for Radio Balcon → association mobilisation costs less;
+   - a WhatsApp bot for La Gaystapo → association mobilisation costs less;
    - a review scraper → finds customers boasting about "terrace until 1am at Bernadette's 🍻";
    - a deepfake / fake reviews → **illegal**, big Risk.
    The boss notices if work output drops (Job meter). Gags: Clode Kode replies too politely, and it rewrote
@@ -118,7 +118,7 @@ Each **day** = 3 phases:
 
 **Calendar** (two weeks, starting on a Monday):
 - **Saturdays (days 6, 13)**: no vehicles → crowds, standing drinkers, peeing.
-- **Day 4**: Colette Verhaeghe comes to dinner at Bernadette's (event).
+- **Day 4**: Martine Aubrac comes to dinner at Bernadette's (event).
 - **Day 7**: association general meeting (vote on strategy: legal or "direct action").
 - **Day 9**: the inspector comes back about the AC.
 - **Day 11**: the exhaust meeting at the city (result depends on the dossier).
@@ -159,7 +159,7 @@ Every illegal act checks for **witnesses** in line of sight + hearing:
 - Dinner at the boss's with the inspector (conflict of interest).
 - Filming customers with their faces (privacy issue).
 - Flooding the police with calls (they stop coming).
-- Pushing Tatie Bouchon to "leak" fake plans to Colette.
+- Pushing Tatie Bouchon to "leak" fake plans to Martine.
 
 ### Illegal (stealth)
 - **Bucket of water** from the window (classic).
@@ -188,19 +188,19 @@ Outcome depends on: patrol on duty, time, how often you've called, whether you m
 - **The reversal**: the police come... for Pilou (a bloc complaint about "harassment", or Pilou doing something stupid).
 - **The bribe itself**: Dédé slips an envelope / invites them to eat. Catching it on camera = **jackpot evidence**, but only if
   you have a clean shot from a legal spot. Leads to an administrative inquiry (« enquête interne », ordered by the mayor / the préfet; not the IGPN, which covers the national police) → Lemaire transferred → Corruption drops.
-- **The mayor's office comes too**: an inspector visit is announced → the restaurants are perfect that night (tip-off via Colette).
+- **The mayor's office comes too**: an inspector visit is announced → the restaurants are perfect that night (tip-off via Martine).
   A surprise visit requires the Delphine channel or Hippolyte.
 
 ## 8. Restaurant bloc counter-moves
 "It's being fixed" emails · tables brought in at 21:59 and back out at 22:20 · staff smoking under Pilou's window ·
 bins in front of his door · free drinks to split the association (Tatie Bouchon) · petition of "happy customers" ·
-complaint for harassment / defamation against Pilou · call to Colette · lobbying for Saturday to become "festive" ·
+complaint for harassment / defamation against Pilou · call to Martine · lobbying for Saturday to become "festive" ·
 recruiting a resident (the traitor) · a fake post "Ch'tite Bernadette is being harassed by a resident, support us ❤️" → a wave of hate.
 
 ## 9. Endings (several)
 1. **Legal victory**: terrace permit (AOT) suspended or withdrawn for Bernadette, exhaust moved. Requires a strong legal dossier and low Risk.
 2. **Negotiated peace**: a good-neighbour charter signed by the bloc, 22:00 respected. Requires high Association and a "dialogue" stance.
-3. **Scandal**: corruption exposed in La Voix du Nordiste, Lemaire transferred, Colette embarrassed. Strong but the bloc hates you.
+3. **Scandal**: corruption exposed in La Voix du Nordiste, Lemaire transferred, Martine embarrassed. Strong but the bloc hates you.
 4. **Custody / trial**: caught red-handed. Variants: the « carbonnade sucrée » trial, and the far worse « carbonnade laxative » case.
 5. **Moving out**: Sleep at 0 → Pilou moves to Wazemmes. ("At least at the Wazemmes market, it's noise in the morning.")
 6. **Fired**: Job at 0. Twist: it unlocks the full-time fight for the remaining days (hard mode).
@@ -227,7 +227,7 @@ Tunable rules live in `src/config.js`.
 |---|---|
 | **v0.2: core tension** | Sim logic split out of rendering + tests. Witnesses and line-of-sight stealth (Klaas, Seb & Nico + cat, waiter, customers filming). Police patrols with personalities, tip-off, "c'est encore vous", complaisance logging. Terrace zone + passage corridor evidence. Saturday variant (crowd, standing drinkers, peeing). |
 | **v0.3: art pass** | Cute low-poly restyle: characters (Pilou, the association, Dédé & Ghislain, the waiter, police, customers), stepped gables, the cat, the dachshund, animations, ambient audio (WebAudio: crowd murmur, chairs on cobbles, the exhaust hum). |
-| **v0.4: campaign** | The 14-day calendar, day phase (Koddex / Clode Kode prompts, afternoon association actions), save in localStorage, scripted events (Colette's dinner, general meeting, inspector, exhaust meeting, commission), bloc counter-moves, dialogue system with the association members. |
+| **v0.4: campaign** | The 14-day calendar, day phase (Koddex / Clode Kode prompts, afternoon association actions), save in localStorage, scripted events (Martine's dinner, general meeting, inspector, exhaust meeting, commission), bloc counter-moves, dialogue system with the association members. |
 | **v0.5: dirty tricks** | Hidden cameras + electricity/wifi hijack, cardboard on the exhaust, stink bomb, kitchen sabotage (salt/sugar), fake reviews, sabotage, bribing the waiter, photographing the bribe. Risk thresholds → complaint, custody, trial. |
 | **v1.0: endings + polish** | The 8 endings, balancing via simulated runs, French copy pass, performance, a full QA run in Chrome. |
 
@@ -241,11 +241,11 @@ lines, props and a short intro card at the start of the night. Pool (≥ 16), fo
 candles, singing at 23:40); an influencer filming the terrace with a ring light (a witness with a phone, and a viral-video
 opportunity for both sides); a football match on a screen outside (noise peaks on goals); a hen party (« EVJF ») with a
 megaphone; a delivery van blocking the corridor on a car-free Saturday; the drache (rain: terraces empty early, but under the
-awning…); a heatwave night (windows open, noise ×1.3, everyone stays out); the tourist guide's evening tour; Colette dining
+awning…); a heatwave night (windows open, noise ×1.3, everyone stays out); the tourist guide's evening tour; Martine dining
 at the estaminet (D4); the inspector's discreet visit (D9); a student party upstairs at Régis's Airbnb; a busker under
 Pilou's window; a power cut (darkness = stealth bonus, the exhaust stops); the waiter's last night before holidays; the
 « Fête des voisins » the association organises (counter-programming); a fire-brigade inspection of the corridor; the
-council's night walk (Lescaut walking the street at 23:00, if lescaut_meeting). Twists can chain into consequences
+council's night walk (Delandre walking the street at 23:00, if delandre_meeting). Twists can chain into consequences
 (flags) the next days, through media and dialogue.
 
 **B. Tools that unlock over time.** The player starts with: watch, photo, the police call, asking the waiter, the bucket
@@ -316,7 +316,7 @@ Checklist additions (v1.1) are in §13.J.
    - **Sleep**: ×12 becomes ×40, with a dim « Pilou dort… » overlay that still shows what wakes him (noise peaks), and a
      « Passer à demain matin » button that resolves the rest of the night instantly (same sim, fast-forwarded).
    - **« Ce soir » briefing**: at night start, under the twist card, 2–4 concrete, state-aware suggestions for tonight
-     (« Nouveau : la caméra à la fenêtre », « Colette dîne à la table 2 : 8 couverts, à photographier », « 22h : la ronde avec
+     (« Nouveau : la caméra à la fenêtre », « Martine dîne à la table 2 : 8 couverts, à photographier », « 22h : la ronde avec
      Jérémie », « Lemaire est de service : la police risque de prendre un café »), and an « Objectifs du soir » list in the HUD
      that ticks itself as they're done. Data in src/content/objectives.js (§14 style); the engine picks them.
    - **Bedtime hint** (Lucas): after 22:30, once the night's essentials are done (reports/shares sent, nothing pending: no
@@ -333,11 +333,11 @@ Proof: **T** = automated test (vitest / Playwright / campaign simulator, runs in
 - [x] Save/continue (localStorage), a new campaign, and one save slot minimum. Reload mid-campaign resumes the same day and state. **T Q** — T: tests/unit/checklist.test.js §13.A2, campaign.test.js, tests/e2e/campaign.e2e.js (Q pending) — Q: A2-save-continue.jpg + design-agent reload test (design agent, 2026-10-08)
 - [ ] **Duration**: a full campaign takes **2h30 to 4h** for a human (14 nights × ~10 min + day phases). Nights can't be skipped without consequence ("go to bed" = you lose what happens). **Q L**
 - [x] Early endings (custody, fired, moving out) can't trigger before **night 5**. The "real" endings are decided at the **Day 14 commission**. **T** _(v0.4: campaign.test.js « fins », campaign invariant « fin anticipée avant la nuit 5 »)_
-- [x] Fixed events happen on their day: Saturdays 6 & 13, Colette's dinner (D4), the general meeting (D7), the inspector (D9), the exhaust meeting (D11), the commission (D14). **T Q** — T: tests/unit/checklist.test.js §13.A5 (Q pending) — Q: qa/screens/q/A5-event-d*.jpg (design agent, 2026-10-08)
+- [x] Fixed events happen on their day: Saturdays 6 & 13, Martine's dinner (D4), the general meeting (D7), the inspector (D9), the exhaust meeting (D11), the commission (D14). **T Q** — T: tests/unit/checklist.test.js §13.A5 (Q pending) — Q: qa/screens/q/A5-event-d*.jpg (design agent, 2026-10-08)
 
 ### B. Characters (all present, recognisable, with a role and dialogue)
 - [x] Pilou · Jérémie + dachshund · Klaas (Santa look, notebook) · Hilde · Tatie Bouchon (+ the "it's being fixed" email thread) · Seb & Nico + the cat · Hippolyte (carriage building). **Q** _(art side done: 3D model + portrait with 7 expressions for each, `qa/art-v0.5/portraits-1.jpg`; role/dialogue = content + wiring)_ — Q: qa/screens/q/B1-B2-carnet-characters.jpg, art-v0.5 screenshots (design agent, 2026-10-08)
-- [x] Dédé · Ghislain (bun) · the waiter · Brigadier Lemaire · Agent Benali · the police chief · inspector Delphine Vermeersch · Stéphane (Koddex boss) · Colette Verhaeghe · mayor Bertrand Lescaut. **Q** _(art side done: models + portraits for all, incl. Lemaire/Benali/chef variants, Stéphane, Colette, Lescaut)_ — Q: qa/screens/q/B1-B2-carnet-characters.jpg, D14 commission scene (design agent, 2026-10-08)
+- [x] Dédé · Ghislain (bun) · the waiter · Brigadier Lemaire · Agent Benali · the police chief · inspector Delphine Vermeersch · Stéphane (Koddex boss) · Martine Aubrac · mayor Arnaud Delandre. **Q** _(art side done: models + portraits for all, incl. Lemaire/Benali/chef variants, Stéphane, Martine, Delandre)_ — Q: qa/screens/q/B1-B2-carnet-characters.jpg, D14 commission scene (design agent, 2026-10-08)
 - [x] Each association member has at least **8 lines** of contextual dialogue (reacting to the current state) and at least 1 action or event tied to them. **T** (content count) **Q** — T: tests/unit/checklist.test.js §13.B3 (Q pending) — Q: qa/screens/q/B3-dialogue-*.jpg (design agent, 2026-10-08)
 
 ### C. Night systems
@@ -345,7 +345,7 @@ Proof: **T** = automated test (vitest / Playwright / campaign simulator, runs in
 - [x] Evidence: photo, dB reading, headcount, corridor encroachment, timestamps. Quality + legality per piece. **T** _(v0.4: rules.test.js, campaign.test.js « preuves »)_
 - [x] Witnesses / line of sight: Klaas (asleep ~01:00), Seb & Nico (cat = home), the waiter, customers filming, the dachshund. Darkness, time and disguise modifiers. **T Q** — T: tests/unit/witness.test.js, campaign.test.js (Q pending) — Q: qa/screens/q/C3-witnesses-2230.jpg / -0110.jpg (design agent, 2026-10-08)
 - [x] Police: 3 patrols with personalities, hidden roster (Klaas can deduce it), tip-off, coffee/complaisance logged, "c'est encore vous", calling as the Association, the police coming for Pilou, the bribe caught on camera → internal investigation. **T** _(v0.4: police.test.js, campaign.test.js « chaîne IGPN » / « la police vient pour Pilou » ; the roster shows on the phone once `roster_known`)_
-- [x] Mayor's office: reports, inspector visits (announced = tip-off via Colette, surprise = via Delphine/Hippolyte). **T** — tests/unit/checklist.test.js §13.C5
+- [x] Mayor's office: reports, inspector visits (announced = tip-off via Martine, surprise = via Delphine/Hippolyte). **T** — tests/unit/checklist.test.js §13.C5
 - [x] Saturday: no vehicles, crowd, standing drinkers, peeing in doorways. **Q** — Q: qa/screens/q/C6-saturday.jpg (design agent, 2026-10-08)
 
 ### D. Day systems
@@ -413,12 +413,13 @@ The campaign simulator plays 1000 seeded campaigns per strategy bot. Targets:
 - [ ] Adaptive night clock (×3 after 22:30 unless something is happening/imminent, ⏩ indicator, manual toggle) and faster sleep (×40 + « Passer à demain matin »); campaign duration re-measured. **T Q L**
 - [ ] « Ce soir » briefing + « Objectifs du soir » HUD list, state-aware, self-ticking; bedtime hint after 22:30 when done or tired. **T Q L**
 
-### Release tasks (done by the design agent when v1.0 lands)
-- [ ] Set `WHATSAPP_GROUP` in `src/content/characters.js` to **« La Gaystapo »** (Lucas's choice: the real group's own name).
-  Only the label changes; the writing around Seb & Nico stays role-based.
-- [ ] Rename the two politicians back to Lucas's preferred names: **Colette Verhaeghe → Martine Aubrac** (ids `colette` → `martine`,
-  flags `colette_*` → `martine_*`) and **Bertrand Lescaut → Arnaud Delandre** (`lescaut` → `delandre`, flags `*lescaut*` → `*delandre*`)
-  across `src/`, the docs and tests. Remove `/Aubrac/` and `/Delandre/` from `tests/unit/names.test.js`. Run the full test suite + sim after the swap.
+### Release tasks (done by the design agent, 2026-10-09)
+- [x] `WHATSAPP_GROUP` in `src/content/characters.js` = **« La Gaystapo »** (Lucas's choice: the real group's own name). Only the
+  label changed; the writing around Seb & Nico stays role-based.
+- [x] The two politicians renamed to Lucas's preferred names: Colette Verhaeghe → **Martine Aubrac** (ids/flags `colette*` →
+  `martine*`), Bertrand Lescaut → **Arnaud Delandre** (`lescaut*` → `delandre*`) across src/, tests, docs and QA files; old ids
+  mapped in `src/sim/saveMigrations.js` RENAMES so existing saves load; `/Aubrac/` and `/Delandre/` removed from the real-names
+  guard. Full unit suite 956 ✅, build ✅.
 
 ### Deviations
 _(none yet)_
@@ -476,10 +477,10 @@ export const UNLOCKS = [{ id: 'db_reading', unlocks: { keys: ['B'], actions: ['n
   card: { title: 'Nouveau : le relevé de décibels', text: '…', hint: 'B / RB' } }];
 // objectives.js (v1.1, §12c.5): « Ce soir » briefing + « Objectifs du soir » HUD list. Engine picks 2–4 per night.
 export const OBJECTIVES = [{
-  id: 'o_tw_colette', text: '…',                 // ≤ 90 chars; illegal ones are options with their risk, never orders
+  id: 'o_tw_martine', text: '…',                 // ≤ 90 chars; illegal ones are options with their risk, never orders
   stance: 'legal',                               // 'legal' | 'grey' | 'illegal' | 'info' (info: done = null, nothing to tick)
-  when: { twist: 'colette_dinner' },             // §14 conditions + twist (tonight's twist), newTool (unlocked tonight), onDuty ('lemaire'|'benali')
-  done: { event: 'photo_taken', table: 'la table de Colette' },  // or { flag: 'x' }; events = TUTORIAL_EVENTS or 'action:<id>'
+  when: { twist: 'martine_dinner' },             // §14 conditions + twist (tonight's twist), newTool (unlocked tonight), onDuty ('lemaire'|'benali')
+  done: { event: 'photo_taken', table: 'la table de Martine' },  // or { flag: 'x' }; events = TUTORIAL_EVENTS or 'action:<id>'
   priority: 10, group: 'photo',                  // highest first, at most one per group
 }];
 // done filters: photo_taken { overLimit, late (after 22:00), table (twist table label), corridor } · db_taken { min } ·
@@ -576,7 +577,7 @@ so it reflects what the player actually did.
 - **Audio** (`src/audio/index.js`, procedural WebAudio, no files): crowd babble (formant-filtered noise voices, syllable-rate modulation, laughs and glass clinks), with the level and panning from the heads at visible tables and distance. Metal chairs dragged on cobbles fire whenever a table's group is hidden or shown again (one scrape per chair, panned). The exhaust hum is a 50 Hz motor + fan noise, louder and muffled in the apartment. A **distant church bell rings 10 strokes when the clock passes 22:00**. **M** = mute (with a small on-screen toast). Audio starts on the first click/key and suspends when the tab is hidden. The standing (Saturday) groups are not in the crowd level yet.
 
 **v0.4 content (content-v0.4)**
-- **Characters**: `CHARACTERS` is an object keyed by id (`speaker in CHARACTERS`). New supporting cast: `biloute` (Jérémie's dachshund), `gaufre` (Seb & Nico's cat), `regis` (Régis Dewaele, n°27, holiday-let landlord, the bloc's recruit), `serveur` (the waiter, first name Théo), `chef` (Commandant Desmet), `journaliste` (Anne-Sophie Lepoutre, La Voix du Nordiste), `avocat` (Maître Vandamme), `clode` (Clode Kode). Seb & Nico are written by their role (the couple across the street, gossip, admins of the WhatsApp group); the group's name is the `WHATSAPP_GROUP` constant (provisionally « Radio Balcon »).
+- **Characters**: `CHARACTERS` is an object keyed by id (`speaker in CHARACTERS`). New supporting cast: `biloute` (Jérémie's dachshund), `gaufre` (Seb & Nico's cat), `regis` (Régis Dewaele, n°27, holiday-let landlord, the bloc's recruit), `serveur` (the waiter, first name Théo), `chef` (Commandant Desmet), `journaliste` (Anne-Sophie Lepoutre, La Voix du Nordiste), `avocat` (Maître Vandamme), `clode` (Clode Kode). Seb & Nico are written by their role (the couple across the street, gossip, admins of the WhatsApp group); the group's name is the `WHATSAPP_GROUP` constant (provisionally « La Gaystapo »).
 - **Flags set by the engine**: the first block of `flags.js` (`night_photo`, `night_db`, `corridor_measured`, `called_police`, `called_as_asso`, `seen_complaisance`, `seen_tipoff`, `serial_caller`, `benali_fined`, `benali_transferred`, `chief_came`, `saw_pee`, `pee_at_door`, `bucket_used`, `bucket_witnessed`, `video_viral`, `klaas_noted_pilou`, `talked_waiter`). Content reads them; content never sets them (except `klaas_noted_pilou`, also set by witnessed content actions).
 - **Condition stats**: `stats` keys are `sleep`, `asso`, `risk`, `job`, `dossier` (0–100); `hidden` keys are `hostility`, `corruption`.
 - **ACTIONS extras**: `cost.time` = afternoon slots (content assumes 3 per afternoon); `cost.minutes` = game minutes for night actions. `witnessed: { exposure: 0–1, by: [witness ids], effects }`: `exposure` is the base chance a present witness notices (the engine scales it with darkness/time/crowd/disguise), `by` lists who can see it (`klaas`, `seb_nico`, `waiter`, `customers`, `biloute`, `dede`, `ghislain`, `police`), and `effects` are applied **only if seen** (on top of `effects`). `sim: '<type>'` marks an action the night sim already implements natively (photo, db, call…): the engine runs its own logic and applies the content `effects` as extras. `once: true` = available once per campaign. `result` = text shown after the action.
@@ -599,7 +600,7 @@ so it reflects what the player actually did.
 - **Intro / tutorial**:
   - Cards: `introCards()` before day 1's morning.
   - Tutorial: `tutorialPrompt(trigger, { ...c.state, seenTutorial })` → `{ id, text }` or `null`. Persist the shown `id`s in the save (`seenTutorial`). The trigger ids the engine must emit (the first time each happens) are `TUTORIAL_TRIGGERS`: morning_start, first_prompt, afternoon_start, first_afternoon_action, night_start, near_door, at_window, first_photo, first_photo_blurry, corridor_needs_measure, legal_view_toggle, bell_22, first_phone, first_police_call, first_tipoff, first_complaisance, first_waiter, first_dossier, near_bucket, first_witness, bed, night_end.
-- **D14**: when the `d14_commission` card is shown, display `commissionScene(c.state)` → `[{ speaker, name, text }]` (speeches by Jérémie, Ghislain, Delphine, Colette and the mayor, chosen from the dossier's strengths and weaknesses) before `choices`. The `scene` field is new on that event: the linter should accept it, and its `when`s use §14 conditions.
+- **D14**: when the `d14_commission` card is shown, display `commissionScene(c.state)` → `[{ speaker, name, text }]` (speeches by Jérémie, Ghislain, Delphine, Martine and the mayor, chosen from the dossier's strengths and weaknesses) before `choices`. The `scene` field is new on that event: the linter should accept it, and its `when`s use §14 conditions.
 - **Phone**:
   - Daily feed: `mediaFeed(c.state, c.state.day, { seen })` → `{ whatsapp, press, social }` of unseen entries. The engine records the ids it showed and applies each entry's `effects` / `setFlags` when it is read.
   - End screen: `mediaEnding(endingId, c.state)` (the newspaper front page, most specific variant) and `mediaEndingFeed(endingId, c.state)` (every ending-only message).
@@ -660,9 +661,9 @@ so it reflects what the player actually did.
 - **Perf**: from ~345k to **97–120k triangles on a weekday, ≤148k on Saturday** (≈210 characters), 115–270 draw calls, measured from 5 viewpoints. Characters are culled when off screen (neither animated nor drawn). Beyond 10 m they get simplified geometry with no small details (eyes, hands, shoes). Base geometry is lighter, and the static decor is merged per material **and per 22 m stretch** so frustum culling works. `?perf=1` = HUD (fps, ms, worst frame, draw calls, triangles, characters drawn/far). No impostors: the distance LOD was enough.
 - **Props**: generic `gadget` (dark box + blinking light) and `art.props.line(a, b)` (or `place('line')`) cover the discreet objects. Also cardboard on the exhaust, uritrottoir, a banner « LE SOMMEIL EST UN DROIT » (**French**, as all in-game text; the English slogan from the brief is not used), petition, police coffee table + waterzooi, chain and padlock (glue drop), stepladder, « OCCUPÉ » sign. Bernadette's tables have **furled parasols** that can be stolen.
 - **FX**: bucket splash (droplets, splashes, **wet cobbles** that dry, customers surprised), stink cloud (+ wavy lines, customers fanning), **blocked exhaust** (the steam stops, smoke comes out of the kitchen), generic smoke, bark puffs. A single small particle system (point shader with per-particle size and opacity).
-- **Characters**: expression bones (eyes, brows, mouth) + small marks (smile/frown arcs, anger mark, sweat drop, tear, side-eye). Items in hand switch with the state (`held`). States: binoculars, carnet, bark, cigarette break, cleaning the awning on a stepladder, glued padlock, greet the police, envelope (readable hand-off), patrol on foot/**bike** (no vehicles on Saturdays), tape measure, clipboard, filming, coffee, laxatives (comic rush to the toilet + queue), chair collapsing, 22:00 round (Jérémie + Biloute on a leash along `anchors.roundPath`). Builders for **every id** in `src/content/characters.js` (colette, lescaut, lemaire/benali/chef, stephane, journaliste, avocat, regis, clode = a small terminal with a face…), with fixed skin tones.
+- **Characters**: expression bones (eyes, brows, mouth) + small marks (smile/frown arcs, anger mark, sweat drop, tear, side-eye). Items in hand switch with the state (`held`). States: binoculars, carnet, bark, cigarette break, cleaning the awning on a stepladder, glued padlock, greet the police, envelope (readable hand-off), patrol on foot/**bike** (no vehicles on Saturdays), tape measure, clipboard, filming, coffee, laxatives (comic rush to the toilet + queue), chair collapsing, 22:00 round (Jérémie + Biloute on a leash along `anchors.roundPath`). Builders for **every id** in `src/content/characters.js` (martine, delandre, lemaire/benali/chef, stephane, journaliste, avocat, regis, clode = a small terminal with a face…), with fixed skin tones.
 - **Portraits**: `art.portrait(id, expression)` returns a PNG dataURL (offscreen WebGL, cached, background colour by group). `src/ui/dom.js` finds it automatically (glob `../art/*.js`).
-- **Day vignettes**: `art.scenes.koddex()` (Pilou typing, two screens, Clode Kode blinking, plants, « SHIP IT » poster), `atelier()` (the carriage workshop: calèche under restoration, association table, Hippolyte standing), `mairie()` (the commission hall: dais Delphine / Lescaut / the chief, the public split between association and bloc). Each one is `{ scene, camera, update, setAspect, dispose }`, rendered by the game's renderer.
+- **Day vignettes**: `art.scenes.koddex()` (Pilou typing, two screens, Clode Kode blinking, plants, « SHIP IT » poster), `atelier()` (the carriage workshop: calèche under restoration, association table, Hippolyte standing), `mairie()` (the commission hall: dais Delphine / Delandre / the chief, the public split between association and bloc). Each one is `{ scene, camera, update, setAspect, dispose }`, rendered by the game's renderer.
 - **Audio**: `audio` is a singleton. `play()`: whatsapp, footsteps, police radio, splash, camera shutter, Koddex keyboard, bark, crash, padlock, paper, stomach rumble, pfff, flush, bell. `loop()`: **lo-fi** (piano, bass, brushed drums, vinyl, 76 bpm, generated live), **hall** (reverb, murmurs, coughs, chairs, papers, PA hum), **typing**. `mode('day')` silences the street.
 - **Gallery** (dev): `/src/art/gallery/`, with every prop, FX, state, portrait, vignette and sound on buttons, and `__gallery.step(n)` for QA in a background tab. It lives in a **subfolder** because `src/ui/dom.js` imports `../art/*.js` eagerly (the gallery broke the game for one push, c8518b6, fixed in 24396dd).
 - **[OPEN] for the build agent**: during `play('serveur', 'smoke')` and `play('ghislain', 'clean')`, `syncActors` must stop repositioning the waiter. `art.cast.officer(id, { bike })` can replace `person(0x1b2847)`. The patrol's path and duration follow the sim if you pass `path`.
@@ -749,7 +750,7 @@ so it reflects what the player actually did.
   - A1: play days 1→3 (morning/afternoon/night/recap). On D14, the commission ends the campaign straight away: no night, no "Jour 15" button.
   - A2: reload mid-afternoon and mid-night. "Continuer" resumes the same day; a night restarts from its beginning.
   - A3: time a real night (~10 min) and a day phase, for the 2h30–4h estimate.
-  - A5: D4 (Colette's dinner, night card), D6/D13 (Saturday crowd), D7 vote, D9, D11, D14 appear on their day.
+  - A5: D4 (Martine's dinner, night card), D6/D13 (Saturday crowd), D7 vote, D9, D11, D14 appear on their day.
   - C3: at the window after 22:00, the "👁 Témoins possibles" line changes when Klaas picks up his binoculars (police in the street, chairs) and when the cat goes in. Try a bucket with the dachshund nearby (21:30–22:30): it barks.
   - C5: the mayor's office reports from the phone (inspector visits are content-driven).
   - C6: `?day=sat`: standing drinkers, people peeing in doorways (incl. Pilou's door), louder.
@@ -875,14 +876,14 @@ so it reflects what the player actually did.
 - Prop ids (use these, or an alias) are listed in `src/art/README.md` § Night twists: `birthday_cake`, `ring_light`, `tv_screen`, `evjf`, `delivery_van`, `busker`, `power_cut`, `heatwave`, `fete_voisins`, `firefighters`, `tour_group`. Unknown ids only print a console warning. New sounds: `cheer`, `megaphone`, `birthday`, plus the `musette` loop (the busker). Screenshots: `qa/art-v1.1/twist-*.jpg`.
 
 **Night twists content (content-twists) — for the build agent and the art agent**
-- `src/content/twists.js` (§14 contract) has 25 twists. Fixed nights: D4 `colette_dinner`, D6 `saturday_van`, D9 ×3, D10 `exhaust_eve`, D11 ×2, D13 `football_match`. The pool has 16, 11 of them without conditions. Tests: `tests/unit/twists.test.js`.
+- `src/content/twists.js` (§14 contract) has 25 twists. Fixed nights: D4 `martine_dinner`, D6 `saturday_van`, D9 ×3, D10 `exhaust_eve`, D11 ×2, D13 `football_match`. The pool has 16, 11 of them without conditions. Tests: `tests/unit/twists.test.js`.
 - **Engine (build agent):**
   - **Fixed-day variants:** several twists share a day (D9: `inspector_surprise_night` when `inspector_surprise`, `inspector_announced_night` when `inspector_announced`, `inspector_quiet_night` fallback; D11: `exhaust_won_night` when `exhaust_meeting_won`, `exhaust_lost_night` fallback). Take the **first one in file order whose `when` matches**; every fixed day has an unconditioned fallback.
   - **Event times:** `sim.events[].at` are minutes since midnight and continue past 24h (`H(24, 30)` = 00:30), like the night sim.
   - **Effects:** `simEffect` only uses `{ noise: +n }` (dB added for a few minutes). `closeDelay` can be negative (the street on its best behaviour).
   - **`night_db`:** `opportunities` uses the native dB reading (key B) under the id `night_db`, as in the §14 unlocks example. Every other opportunity is an `actions.js` id.
-  - **New witness ids:** `colette`, `delphine`, `supporters` (filming), `influencer` (filming), `guide`, `busker` (`at: 'window'`: right under Pilou's window, the bucket's worst enemy), `neighbours`, `firefighters`, `lescaut`, `jeremie_searching`, `tv_crew` (filming).
-  - **Overlap with events.js:** suggest skipping a random event that duplicates tonight's twist: `r_drache` vs `drache_night`, `r_influencer` vs `influencer_night`, `r_fire_brigade` vs `fire_inspection`, `r_bachelor_party` vs `hen_party`. The D4 event `d4_colette_dinner` and the D4 twist are designed to go together.
+  - **New witness ids:** `martine`, `delphine`, `supporters` (filming), `influencer` (filming), `guide`, `busker` (`at: 'window'`: right under Pilou's window, the bucket's worst enemy), `neighbours`, `firefighters`, `delandre`, `jeremie_searching`, `tv_crew` (filming).
+  - **Overlap with events.js:** suggest skipping a random event that duplicates tonight's twist: `r_drache` vs `drache_night`, `r_influencer` vs `influencer_night`, `r_fire_brigade` vs `fire_inspection`, `r_bachelor_party` vs `hen_party`. The D4 event `d4_martine_dinner` and the D4 twist are designed to go together.
   - **Hooks I added (two lines each):** `src/sim/content.js` passes `TWISTS` and `UNLOCKS` through `normalizeContent`. `src/sim/contentLint.js` counts twist conditions and `after.setFlags` as settable, and lints each twist. `tests/unit/typography.test.js` now covers `twists.js`.
 - **Consequences:** each twist sets a `twist_*` flag (declared in `flags.js`). Seven of them surface on the phone, listed in `after.media`: `wa_twist_van`, `wa_twist_regis_party`, `wa_twist_fete_voisins`, `press_twist_match`, `press_twist_fire`, `press_twist_tv`, `so_twist_influencer`. `guide_tour` also sets `knows_trou`.
 - **Props to build (art agent):** white_tablecloth, black_sedan, delivery_van, beer_kegs, hazard_lights, trench_coat, notebook, new_geraniums, ac_unit_running, maintenance_sign, exhaust_off, cardboard_fries_stand, exhaust_full_steam, big_screen, supporter_scarves, flares_smoke, birthday_cake, balloons, ring_light, phone_tripod, megaphone, bride_veil, pink_tshirts, rain, tarpaulin, umbrellas, fans, ice_buckets, open_windows, tour_group_flag, party_lights_27, speakers, accordion, hat_with_coins, candles, streetlights_off, suitcase_by_door, trestle_table, bunting, sugar_tart, fire_truck, tape_measure, mayor_umbrella, lost_dog_poster, leash, tv_camera, boom_mic, street_sweeper, orange_beacon, wet_cobbles. A missing prop should be skipped silently.
@@ -900,7 +901,7 @@ so it reflects what the player actually did.
 
 
 **content-unlocks · twist reactions in media.js (content agent → content-story agent, balance agent)**
-- Appended to `media.js` (one commented block per feed): a WhatsApp reaction for each twist flag that had none (15: `colette_dinner`, `inspector_seen`, `model_street`, `exhaust_silent`, `birthday`, `hen_party`, `drache`, `heatwave`, `guide_tour`, `busker`, `power_cut`, `waiter_holidays`, `lescaut_walk`, `lost_dog`, `street_sweeper`), plus 3 press items (Colette's dinner, the power cut, the street sweeper) and 3 social posts (birthday, hen party, the estaminet during the heatwave). Every twist flag now surfaces on the phone the next day.
+- Appended to `media.js` (one commented block per feed): a WhatsApp reaction for each twist flag that had none (15: `martine_dinner`, `inspector_seen`, `model_street`, `exhaust_silent`, `birthday`, `hen_party`, `drache`, `heatwave`, `guide_tour`, `busker`, `power_cut`, `waiter_holidays`, `delandre_walk`, `lost_dog`, `street_sweeper`), plus 3 press items (Martine's dinner, the power cut, the street sweeper) and 3 social posts (birthday, hen party, the estaminet during the heatwave). Every twist flag now surfaces on the phone the next day.
 - **@content-story agent**: in `twists.js`, `power_cut`'s intro says « au-dessus du Trou », but the nickname is gated behind `knows_trou` (spoiler rule). Suggest « au-dessus de la rue ». Also `wa_twist_van` (232 chars) and `wa_twist_regis_party` (222) are over the 220-char bubble limit.
 - **@balance agent**: `jeremie_hello` / `tatie_hello` can now show (gated on `day` instead of `notFlags: met_*`), as routed in balance pass 3.
 
@@ -1037,7 +1038,7 @@ so it reflects what the player actually did.
   - `sim.js`: `dogActive()` honours `S.dogOff`.
   - `nightActions.js`: Jérémie's round needs `roundTonight` (no round on the lost-dog night).
   - `twists.js` / `contentLint`: `dog` added to `TWIST_SIM_KEYS`.
-- **The playtest bug:** the Fête des voisins table, bunting and tart now leave at 22:00 (`until: H(22, 0)`), as the text says. Colette's table stays until 23:30 (her toast is at 23:05). Twist events that claimed tables « ressortent » or « Dédé range » now fall back to an `else` text when the street is already empty.
+- **The playtest bug:** the Fête des voisins table, bunting and tart now leave at 22:00 (`until: H(22, 0)`), as the text says. Martine's table stays until 23:30 (her toast is at 23:05). Twist events that claimed tables « ressortent » or « Dédé range » now fall back to an `else` text when the street is already empty.
 - **Checker:** `npm run check:coherence` (`scripts/coherence-check.js`) plays 200 campaigns × 7 bots (about 1.2 million lines, ~30 s) with the game's emission points, and writes `qa/coherence-state.md`. **Today: 0 contradictions.** `tests/unit/stateGuard.test.js` runs a strict 8-campaign sample in CI so it stays at 0.
 
 

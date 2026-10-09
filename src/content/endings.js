@@ -45,7 +45,7 @@ const ASSO_FATES = [
   {
     when: { flags: ['tatie_leaked_plan'] },
     text:
-      "Tatie a juré qu’elle n’avait rien dit à Colette. Puis qu’elle n’avait presque rien dit. Puis qu’elle avait dit, mais sous forme de proverbe. Le proverbe était très précis.",
+      "Tatie a juré qu’elle n’avait rien dit à Martine. Puis qu’elle n’avait presque rien dit. Puis qu’elle avait dit, mais sous forme de proverbe. Le proverbe était très précis.",
   },
   {
     when: { flags: ['hilde_tisane'] },
@@ -87,8 +87,8 @@ const INSTITUTIONS = [
     text: "Delphine ne vous a jamais rien promis. Elle vous a seulement dit, une fois, au téléphone : « Les visites surprises sont les seules qui servent. » Vous ne direz jamais qu’elle l’a dit.",
   },
   {
-    when: { flags: ['lescaut_ally'] },
-    text: "Bertrand Lescaut cite désormais « l’exemple de la rue des Bouchers » dans ses discours. Il ne dit jamais exemple de quoi. C’est plus prudent.",
+    when: { flags: ['delandre_ally'] },
+    text: "Arnaud Delandre cite désormais « l’exemple de la rue des Bouchers » dans ses discours. Il ne dit jamais exemple de quoi. C’est plus prudent.",
   },
 ];
 
@@ -169,7 +169,7 @@ const AFTERMATH = [
 const MEM_LEGAL = [
   { when: { flags: ['twist_fire_inspection'] }, text: "Le rapport des pompiers, « 1,40 m pour 3 exigés », a été lu en séance. On dit que c’est cette ligne-là qui a fait basculer la commission. Jérémie dit que c’est le dossier entier. Les deux ont raison." },
   { when: { flags: ['twist_tv_crew'] }, text: "Le reportage « Les pépites du Vieux-Lille » repasse parfois en rediffusion. À chaque fois, Seb poste dans le groupe la photo de la même terrasse, prise trente minutes plus tard. La rediffusion fait moins d’audience que la photo." },
-  { when: { flags: ['twist_lescaut_walk'] }, text: "Le maire raconte encore, en conseil, sa ronde de 23h dans la rue des Bouchers. Il ne raconte pas Dédé courant avec trois chaises dans les bras. Il en garde le souvenir pour lui. Il sourit quand même." },
+  { when: { flags: ['twist_delandre_walk'] }, text: "Le maire raconte encore, en conseil, sa ronde de 23h dans la rue des Bouchers. Il ne raconte pas Dédé courant avec trois chaises dans les bras. Il en garde le souvenir pour lui. Il sourit quand même." },
   { when: { flags: ['twist_street_sweeper'] }, text: "La balayeuse de 23h30 passe toujours. Elle est devenue la mascotte non officielle de l’association. Hippolyte lui a trouvé un nom : « la Commission ». Elle, au moins, statue tous les soirs." },
   { when: { flags: ['twist_guide_tour'] }, text: "Le guide de l’office de tourisme a ajouté une étape à sa balade : « Ici, des riverains ont fait respecter un arrêté. » Les touristes prennent la rue en photo. La rue est très calme sur les photos." },
   { when: { flags: ['twist_power_cut'] }, text: "Dans le dossier, entre deux relevés, il y a une page presque vide : la nuit de la panne. 34 dB. Jérémie l’a classée en annexe, sous le titre « Ce qui est possible »." },
@@ -190,7 +190,7 @@ const MEM_SCANDAL = [
   { when: { flags: ['twist_tv_crew'] }, text: "La chaîne régionale a rediffusé « Les pépites du Vieux-Lille » avec un bandeau : « Reportage tourné avant les révélations ». Dédé, à l’antenne, parle toujours de « respect des voisins ». C’est devenu un classique." },
   { when: { flags: ['twist_influencer'] }, text: "La vidéo de l’influenceuse a resurgi pendant l’affaire : dans le fond d’un plan, on distingue une enveloppe sur une table. Ce n’était peut-être rien. Internet a décidé que c’était tout." },
   { when: { flags: ['twist_regis_party'] }, text: "Pendant l’enquête, quelqu’un a rappelé la soirée étudiante du 27. Régis a déclaré qu’il « n’avait rien à voir avec tout ça ». Personne ne lui avait rien demandé." },
-  { when: { flags: ['twist_lescaut_walk'] }, text: "Le maire avait vu la rue de ses propres yeux, à 23h, quelques jours avant la une. Il l’a dit au micro, très calmement. C’est cette phrase-là que Colette n’a pas commentée." },
+  { when: { flags: ['twist_delandre_walk'] }, text: "Le maire avait vu la rue de ses propres yeux, à 23h, quelques jours avant la une. Il l’a dit au micro, très calmement. C’est cette phrase-là que Martine n’a pas commentée." },
   { when: { flags: ['twist_power_cut'] }, text: "La nuit de la panne, la terrasse avait continué à la bougie, police comprise. La photo floue de cette nuit-là a fait le tour des réseaux pendant l’affaire. Personne n’a su qui l’avait prise. Vous, si." },
   { when: { flags: ['twist_fire_inspection'] }, text: "Le rapport des pompiers, « 1,40 m pour 3 exigés », a été publié en encadré, à côté de la photo de l’enveloppe. Les deux ensemble, ça faisait beaucoup pour une seule terrasse." },
   { when: { flags: ['twist_waiter_holidays'] }, text: "Le serveur est rentré de vacances le jour de la parution. Il a lu le journal dans le train. Il a dit qu’il aurait dû partir plus longtemps." },
@@ -448,14 +448,14 @@ export const ENDINGS = [
       },
       {
         when: { flags: ['commission_done'] },
-        text: "Bertrand Lescaut a regardé le dossier, puis vous, assis entre Dédé et 600 pages, puis le dossier. Décision « reportée à une séance ultérieure ». À la mairie, on appelle ça le report Dubeton.",
+        text: "Arnaud Delandre a regardé le dossier, puis vous, assis entre Dédé et 600 pages, puis le dossier. Décision « reportée à une séance ultérieure ». À la mairie, on appelle ça le report Dubeton.",
       },
       {
         when: { flags: ['press_scandal'] },
         text: "Le « Waterzooi-gate », c’est vous qui l’aviez sorti. Dédé a lu la une à voix haute, table par table, et s’est arrêté à la vôtre : « Toi, mon biloute, je te pardonne. T’avais faim. »",
       },
       {
-        when: { flags: ['lescaut_ally'] },
+        when: { flags: ['delandre_ally'] },
         text: "Le maire cite toujours « l’exemple de la rue des Bouchers ». Il ne cite plus votre nom.",
       },
       {
@@ -592,7 +592,7 @@ export const ENDINGS = [
       },
       {
         when: { flags: ['bombance_wait'] },
-        text: "Tatie Bouchon vous l’avait dit. Colette le lui avait dit. Vous aviez répondu « on verra après la commission ». C’est après la commission. On voit. Le problème suivant a une licence IV.",
+        text: "Tatie Bouchon vous l’avait dit. Martine le lui avait dit. Vous aviez répondu « on verra après la commission ». C’est après la commission. On voit. Le problème suivant a une licence IV.",
       },
       {
         when: { flags: ['bombance_wait', 'met_hippolyte'] },
@@ -622,7 +622,7 @@ export const ENDINGS = [
       {
         when: {},
         text:
-          "« Terrasses et waterzooi : la police municipale mange-t-elle à l’œil ? » La une d’Anne-Sophie Lepoutre a été reprise partout, jusqu’à une radio nationale qui a prononcé « estaminet » avec l’accent parisien. L’enquête interne, ouverte depuis des jours dans l’indifférence, s’est soudain trouvé des moyens. Colette Verhaeghe a déclaré qu’elle « ne connaissait ces gens que de loin », depuis sa table habituelle.",
+          "« Terrasses et waterzooi : la police municipale mange-t-elle à l’œil ? » La une d’Anne-Sophie Lepoutre a été reprise partout, jusqu’à une radio nationale qui a prononcé « estaminet » avec l’accent parisien. L’enquête interne, ouverte depuis des jours dans l’indifférence, s’est soudain trouvé des moyens. Martine Aubrac a déclaré qu’elle « ne connaissait ces gens que de loin », depuis sa table habituelle.",
       },
       {
         when: { flags: ['bribe_photo'] },
@@ -703,8 +703,8 @@ export const ENDINGS = [
         text: "La clim posée sans autorisation a été démontée. Il reste quatre trous dans la brique de 1729, que personne n’a rebouchés.",
       },
       {
-        when: { flags: ['colette_dinner_photo'] },
-        text: "La photo du dîner de Colette Verhaeghe, huit couverts sur une table de six, a été citée à la commission comme « illustration du problème ». Colette a parlé de « malentendu sur le mobilier ».",
+        when: { flags: ['martine_dinner_photo'] },
+        text: "La photo du dîner de Martine Aubrac, huit couverts sur une table de six, a été citée à la commission comme « illustration du problème ». Martine a parlé de « malentendu sur le mobilier ».",
       },
       {
         when: { flags: ['corridor_measured'] },

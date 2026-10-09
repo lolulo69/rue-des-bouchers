@@ -15,7 +15,7 @@ _Générée par `npm run story -- --ending fired`. Contenu réel, narrative.js, 
 > Depuis cette année, rue des Bouchers, les terrasses ferment à 22h00, tous les soirs. Six personnes par table, maximum. Un couloir libre au milieu de la rue, pour les poussettes, les fauteuils et les pompiers. Ailleurs dans le Vieux-Lille, on ferme plus tard, et les restaurateurs vous le rappelleront souvent.
 
 **L’Association de la rue des Bouchers**
-> Jérémie, le président, et son teckel Biloute. Klaas, qui voit tout depuis la place et note tout, et Hilde, qui soigne tout le monde. Tatie Bouchon et ses e-mails. Seb et Nico, en face, qui tiennent le groupe « Radio Balcon ». Hippolyte et sa vieille carrosserie. Ils sont fatigués, eux aussi.
+> Jérémie, le président, et son teckel Biloute. Klaas, qui voit tout depuis la place et note tout, et Hilde, qui soigne tout le monde. Tatie Bouchon et ses e-mails. Seb et Nico, en face, qui tiennent le groupe « La Gaystapo ». Hippolyte et sa vieille carrosserie. Ils sont fatigués, eux aussi.
 
 **Quatorze nuits**
 > Dans deux semaines, la commission des terrasses statuera à la mairie. D’ici là : des preuves, des alliés, et un peu de sommeil si possible. Vous pouvez rester dans les clous, ou pas. La rue regarde. Klaas aussi.
@@ -34,7 +34,7 @@ _→ Jérémie hoche la tête comme un notaire satisfait. « Horodatage, distan
 
 **☕ Koddex · Clode Kode** `clode_hello`
 > Bonjour Pierre-Louis ! Quel plaisir immense de vous retrouver. J’espère que votre nuit a été reposante. (Je vois à vos fautes de frappe que non. Toutes mes excuses.)
-**💻 Clode Kode, 3 prompts** : Laisser Clode Kode « jeter un œil » à l’appli de to-do de Stéphane · Démon Rust de relevé de décibels (le micro à la fenêtre) · Bot pour le groupe WhatsApp « Radio Balcon »
+**💻 Clode Kode, 3 prompts** : Laisser Clode Kode « jeter un œil » à l’appli de to-do de Stéphane · Démon Rust de relevé de décibels (le micro à la fenêtre) · Bot pour le groupe WhatsApp « La Gaystapo »
 > Pilou : Juste une case à cocher. Une seule. Tu ne touches à rien d’autre.
 > Clode Kode : Bien entendu ! J’ai ajouté la case. Puis, par souci de cohérence, j’ai tout réécrit en Rust. Je vous présente mes plus plates excuses, et la version 4.
 > Quatrième réécriture en Rust. L’appli compte toujours trois tâches, dont « réécrire l’appli ». Stéphane trouve qu’elle « a perdu son âme », et vous avez perdu la matinée.
@@ -127,7 +127,7 @@ _→ Jérémie hoche la tête comme un notaire satisfait. « Horodatage, distan
 - Dossier solide. La commission du jour 14 va devoir l’écouter.
 
 ### 📱 Téléphone
-- **WhatsApp · Seb** `wa_welcome` Bienvenue à Pilou dans « Radio Balcon » 🎉 Règles du groupe : 1) on reste poli, 2) on horodate, 3) on ne parle pas de la carbonnade. Nico a ajouté la règle 3, je ne sais pas pourquoi.
+- **WhatsApp · Seb** `wa_welcome` Bienvenue à Pilou dans « La Gaystapo » 🎉 Règles du groupe : 1) on reste poli, 2) on horodate, 3) on ne parle pas de la carbonnade. Nico a ajouté la règle 3, je ne sais pas pourquoi.
 - **WhatsApp · Nico** `wa_welcome_nico` Règle 3 : parce qu’on a eu 200 messages sur la carbonnade en mars et zéro sur les décibels. Bienvenue, Pilou.
 - **WhatsApp · Jérémie** `wa_jeremie_ag` Rappel : assemblée générale dimanche prochain. Ordre du jour : stratégie avant la commission. Merci de venir avec des photos datées et sans croissants (on avait dit « sans miettes sur le dossier »).
 - **WhatsApp · Seb** `wa_cat_1` Gaufre surveille la terrasse. Elle a compté 9 chaises à la table du fond. Elle n’a rien dit, mais elle a cligné lentement.
@@ -191,7 +191,7 @@ _→ Le bloc dit « ça a toujours été une rue festive ». Vous pourrez rép
 > Gaufre est rentrée à 23h12. C’est notre indicateur : quand la chatte en a marre du bruit, c’est qu’on dépasse les bornes.
 
 **💬 Seb** `seb_group_activity`
-> Il y a eu quarante-deux messages sur « Radio Balcon » hier soir, entre 22h et minuit. Dont trente-neuf photos de la même table.
+> Il y a eu quarante-deux messages sur « La Gaystapo » hier soir, entre 22h et minuit. Dont trente-neuf photos de la même table.
 > C’est la table qui a changé, attends, regarde : ils ont rajouté une chaise pliante.
 
 ### 🌙 Nuit 2 (semaine)
@@ -434,8 +434,8 @@ _Sommeil 80 · Asso 79 · Risque 0 · Job 22 · Dossier 16 · (caché) hostilit�
 - `20:30` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 2 empiète de 16 cm sur le passage libre (mesuré)
 - `20:30` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 3 : 7 personnes (max 6), 36 dB · Les Bouchers Mal Lunés, table 3 empiète de 37 cm sur le passage libre (mesuré)
 - `20:45` 🍻 « C’est le plus vieux quartier, ici, non ? Tout est vieux. »
-- `20:50` 🃏 **J4 · Une ancienne maire en terrasse** `d4_colette_dinner` : 20h50. Une berline se gare rue de la Barre, là où rien ne se gare. Colette Verhaeghe descend, foulard de soie et sourire de campagne, et prend LA table de l’estaminet, celle qui mord sur le couloir de passage. Dédé lui embrasse les deux mains. Ghislain apporte une carte qui n’existe pas pour les autres clients. Huit couverts. À une table. Rue des Bouchers.
-- `20:50` → **Photographier la tablée depuis la fenêtre** : Clic. Huit personnes, une table, un couloir réduit à la largeur d’une poussette pliée. Colette lève son verre vers votre fenêtre. Elle ne vous a pas vu. Probablement. Elle trinque peut-être juste avec la façade.
+- `20:50` 🃏 **J4 · Une ancienne maire en terrasse** `d4_martine_dinner` : 20h50. Une berline se gare rue de la Barre, là où rien ne se gare. Martine Aubrac descend, foulard de soie et sourire de campagne, et prend LA table de l’estaminet, celle qui mord sur le couloir de passage. Dédé lui embrasse les deux mains. Ghislain apporte une carte qui n’existe pas pour les autres clients. Huit couverts. À une table. Rue des Bouchers.
+- `20:50` → **Photographier la tablée depuis la fenêtre** : Clic. Huit personnes, une table, un couloir réduit à la largeur d’une poussette pliée. Martine lève son verre vers votre fenêtre. Elle ne vous a pas vu. Probablement. Elle trinque peut-être juste avec la façade.
 - `21:30` **Pilou** : Faire la ronde de 22h avec Jérémie et Biloute
 - `21:50` 🃏 **« La rue la plus authentique de Lille »** `r_influencer` : Une influenceuse filme un « vlog Vieux-Lille » au milieu du couloir de passage, ring light allumée. Elle tourne la même prise sept fois : « Ici, c’est vraiment la vraie vie lilloise, les gens sont trop chaleureux. » En arrière-plan de chaque prise : votre porte, bloquée par une chaise, et la terrasse qui mord sur le couloir.
 - `21:50` → **Récupérer la vidéo publiée, horodatée** : Merci, la vraie vie lilloise. Sa vidéo fait 80 000 vues, et elle est datée, géolocalisée et publique. Le meilleur témoin de la rue est une ring light.
@@ -491,7 +491,7 @@ _Sommeil 80 · Asso 79 · Risque 0 · Job 22 · Dossier 16 · (caché) hostilit�
 - **WhatsApp · Nico** `wa_cat_2` La chatte a dormi sur les convocations de l’AG. On les a quand même distribuées. Elles sentent le chat. C’est plus militant.
 - **WhatsApp · Hippolyte** `wa_hippolyte_heritage` J’ai déjeuné avec une vieille connaissance du service du patrimoine. Une gaine en inox sur une façade de 1729 l’a fait pâlir. Il ne pâlit jamais.
 - **WhatsApp · Nico** `wa_happy_petition` Leur pétition des « clients heureux » : 2 300 signatures, dont une de Bruxelles nommée « Jean Bon ». J’ai fait une capture.
-- **WhatsApp · Seb** `wa_colette_dinner` Les photos de Pilou du dîner de Colette Verhaeghe à l’estaminet ! Elle a eu un dessert. Personne d’autre n’a eu de dessert. Je dis ça.
+- **WhatsApp · Seb** `wa_martine_dinner` Les photos de Pilou du dîner de Martine Aubrac à l’estaminet ! Elle a eu un dessert. Personne d’autre n’a eu de dessert. Je dis ça.
 - **La Voix du Nordiste** `press_petition_duel` **Deux pétitions pour une rue** Les riverains ont déposé leur pétition en mairie. Les restaurateurs aussi, avec dix fois plus de signatures, surtout hors de Lille. « La rue des Bouchers est aimée dans le monde entier », se félicite un restaurateur.
 - **La Voix du Nordiste** `press_heritage` **Une gaine d’extraction sur une façade de 1729 ?** Le service du patrimoine s’intéresse à une gaine en inox qui grimpe sur une façade ancienne de la rue des Bouchers. Les défenseurs du Vieux-Lille parlent de « verrue ». L’exploitant parle de « cheminée moderne ».
 - **Estaminet La Ch’tite Bernadette** `so_promo_2200` Petit rappel : notre terrasse ferme à 22h. 😉 La salle, elle, reste ouverte, et les fenêtres aussi. Venez nombreux !
@@ -501,8 +501,8 @@ _Sommeil 80 · Asso 79 · Risque 0 · Job 22 · Dossier 16 · (caché) hostilit�
 ## Jour 5 · vendredi
 _Sommeil 83 · Asso 79 · Risque 0 · Job 34 · Dossier 24 · (caché) hostilité 67, corruption 60_
 
-### 🃏 La Voix du Nordiste : « Colette Verhaeghe : laissez vivre Lille ! » `r_colette_interview`
-> Pleine page. Colette pose devant un estaminet qui ressemble beaucoup à l’estaminet : « La convivialité, c’est l’ADN de Lille. Je comprends les riverains, j’en ai été une, mais rue de Gand ferme bien à minuit, non ? » Pas un mot sur la règle des 22h. Ni sur le couloir.
+### 🃏 La Voix du Nordiste : « Martine Aubrac : laissez vivre Lille ! » `r_martine_interview`
+> Pleine page. Martine pose devant un estaminet qui ressemble beaucoup à l’estaminet : « La convivialité, c’est l’ADN de Lille. Je comprends les riverains, j’en ai été une, mais rue de Gand ferme bien à minuit, non ? » Pas un mot sur la règle des 22h. Ni sur le couloir.
 
 Choix possibles : **→ Envoyer un droit de réponse à la journaliste** · Encadrer l’article dans les toilettes
 _→ Anne-Sophie Lepoutre répond en dix minutes : « Vous avez des éléments ? » Vous en avez. Elle garde votre numéro._
@@ -626,4 +626,4 @@ _Sommeil 90 · Asso 87 · Risque 10 · Job 0 · Dossier 26 · (caché) hostilit�
 > Vous voilà sans emploi, sans badge, et avec des journées entières devant vous. Rue des Bouchers, on appelle ça « un riverain à plein temps ». Le bloc, lui, appelle ça « un problème ».
 >
 
-Drapeaux en fin de partie : aot_requested, asked_waiter, banners_up, benali_fined, called_police, cm_bins, cm_counter_banner, cm_free_drinks, cm_happy_petition, cm_harassment_complaint, cm_smokers, cm_table_dance, colette_dinner_photo, colette_dinner_seen, corridor_measured, emailed_inspector, fire_brigade_filmed, heritage_angle, hippolyte_room, joined_rounds, joined_whatsapp, knows_trou, legal_view, met_hippolyte, met_jeremie, met_klaas, met_seb_nico, met_tatie, met_waiter, night_db, night_photo, petition_delivered, petition_started, press_article, press_contacted, proj_db_logger, proj_db_report, proj_scraper, proj_whatsapp_bot, recruited_residents, regis_courted, reported_mairie, roster_known, scraper_boasts, serial_caller, talked_waiter, tatie_emails_shared, tatie_mail_1, tatie_mail_2, tatie_mail_3, tatie_mail_4, tatie_mail_5, tatie_wavering, todo_app_rust, traitor_recruited, whatsapp_rally
+Drapeaux en fin de partie : aot_requested, asked_waiter, banners_up, benali_fined, called_police, cm_bins, cm_counter_banner, cm_free_drinks, cm_happy_petition, cm_harassment_complaint, cm_smokers, cm_table_dance, martine_dinner_photo, martine_dinner_seen, corridor_measured, emailed_inspector, fire_brigade_filmed, heritage_angle, hippolyte_room, joined_rounds, joined_whatsapp, knows_trou, legal_view, met_hippolyte, met_jeremie, met_klaas, met_seb_nico, met_tatie, met_waiter, night_db, night_photo, petition_delivered, petition_started, press_article, press_contacted, proj_db_logger, proj_db_report, proj_scraper, proj_whatsapp_bot, recruited_residents, regis_courted, reported_mairie, roster_known, scraper_boasts, serial_caller, talked_waiter, tatie_emails_shared, tatie_mail_1, tatie_mail_2, tatie_mail_3, tatie_mail_4, tatie_mail_5, tatie_wavering, todo_app_rust, traitor_recruited, whatsapp_rally

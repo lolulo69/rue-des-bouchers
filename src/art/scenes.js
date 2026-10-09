@@ -196,7 +196,7 @@ export const scenes = {
     // estrade et table des élus
     k.box(6, 0.3, 1.6, M(0x6b4423), 0, 0.15, -2.2);
     k.box(4.4, 0.08, 0.8, M(0x5a3a24), 0, 1.06, -2.1); k.box(4.4, 0.7, 0.05, M(0x7a2a2a), 0, 0.7, -1.72);
-    const dais = [[CAST.delphine({ pose: 'sit', held: 'clipboard', anim: 'clipboard' }), -1.4], [CAST.lescaut({ pose: 'sit', anim: 'meeting' }), 0], [CAST.chef({ pose: 'sit', anim: 'meeting' }), 1.4]];
+    const dais = [[CAST.delphine({ pose: 'sit', held: 'clipboard', anim: 'clipboard' }), -1.4], [CAST.delandre({ pose: 'sit', anim: 'meeting' }), 0], [CAST.chef({ pose: 'sit', anim: 'meeting' }), 1.4]];
     for (const [p, x] of dais) {
       k.chair(x, -2.6, 0, 0x4a2a1a).position.y = 0.3;
       p.position.set(x, 0.3, -2.6); scene.add(p);
@@ -207,7 +207,7 @@ export const scenes = {
     const pub = [
       [CAST.jeremie({ pose: 'sit', anim: 'meeting' }), -2.2, 0.4], [CAST.tatie('sit'), -1.4, 0.4], [CAST.klaas('sit'), -2.2, 1.5], [CAST.hilde('sit'), -1.4, 1.5],
       [CAST.seb('sit'), -2.2, 2.6], [CAST.nico('sit'), -1.4, 2.6], [CAST.pilou({ pose: 'sit' }), -0.6, 0.4],
-      [CAST.dede({ pose: 'sit', anim: 'meeting' }), 1.2, 0.4], [CAST.ghislain({ pose: 'sit', held: null }), 2.0, 0.4], [CAST.colette({ pose: 'sit' }), 2.0, 1.5],
+      [CAST.dede({ pose: 'sit', anim: 'meeting' }), 1.2, 0.4], [CAST.ghislain({ pose: 'sit', held: null }), 2.0, 0.4], [CAST.martine({ pose: 'sit' }), 2.0, 1.5],
       [humanoid({ pose: 'sit', talk: 0.3 }), 1.2, 1.5], [humanoid({ pose: 'sit', talk: 0.3 }), 1.2, 2.6], [humanoid({ pose: 'sit', talk: 0.3 }), 2.0, 2.6],
     ];
     for (const [p, x, z] of pub) { k.seat(p, x, z, Math.PI); if (!['write', 'meeting'].includes(p.userData.rig.anim)) setState(p, { anim: 'idle' }); p.userData.rig.talk = 0.25; }

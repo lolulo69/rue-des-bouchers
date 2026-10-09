@@ -38,7 +38,7 @@ La campagne complète, ses huit fins, équilibrée et relue. Reste la session de
 ## v0.4 · la campagne
 - Quatorze jours, du lundi au dimanche de la semaine suivante. Chaque jour : Koddex le matin, l'association l'après-midi, la
   rue la nuit.
-- Les rendez-vous fixes : le dîner de Colette Verhaeghe (J4), les samedis sans voitures (J6, J13), l'assemblée générale (J7),
+- Les rendez-vous fixes : le dîner de Martine Aubrac (J4), les samedis sans voitures (J6, J13), l'assemblée générale (J7),
   l'inspectrice (J9), la réunion sur l'extraction (J11), la commission (J14).
 - Les contre-offensives du bloc des restaurants, les e-mails « c'est en cours de résolution » de Tatie Bouchon, 184 dialogues
   contextuels (près de 300 répliques), le fil du téléphone, la sauvegarde dans le navigateur.

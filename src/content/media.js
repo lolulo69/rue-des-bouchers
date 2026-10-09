@@ -326,10 +326,10 @@ export const MEDIA = {
       text: "Deuxième samedi. J’ai rempli un carnet entier. J’en ai racheté trois. Hilde dit que je suis un client fidèle de la papeterie.",
     },
     {
-      id: 'wa_colette_dinner',
-      when: { flags: ['colette_dinner_photo'] },
+      id: 'wa_martine_dinner',
+      when: { flags: ['martine_dinner_photo'] },
       author: 'seb',
-      text: "Les photos de Pilou du dîner de Colette Verhaeghe à l’estaminet ! Elle a eu un dessert. Personne d’autre n’a eu de dessert. Je dis ça.",
+      text: "Les photos de Pilou du dîner de Martine Aubrac à l’estaminet ! Elle a eu un dessert. Personne d’autre n’a eu de dessert. Je dis ça.",
     },
     {
       id: 'wa_ag_legal',
@@ -416,8 +416,8 @@ export const MEDIA = {
       effects: { sleep: -2 },
     },
     {
-      id: 'wa_lescaut',
-      when: { flags: ['lescaut_meeting'] },
+      id: 'wa_delandre',
+      when: { flags: ['delandre_meeting'] },
       author: 'jeremie',
       text: "Le maire nous reçoit. Pas un adjoint. Le maire. J’ai repassé ma chemise deux fois.",
       effects: { asso: +2 },
@@ -448,8 +448,8 @@ export const MEDIA = {
     },
     // ── content-unlocks : réactions aux twists de la nuit (twists.js, after.setFlags) ──
     {
-      id: "wa_twist_colette",
-      when: { flags: ['twist_colette_dinner'] },
+      id: "wa_twist_martine",
+      when: { flags: ['twist_martine_dinner'] },
       author: "seb",
       text: "Attends, attends : COLETTE VERHAEGHE à l’estaminet ce soir. Huit couverts sur une table de six. J’ai la photo, de loin, de travers, mais c’est elle.",
     },
@@ -520,8 +520,8 @@ export const MEDIA = {
       text: "Le remplaçant du serveur rentre les tables à 23h passées. Je ne pensais pas écrire ça un jour : rendez-nous le serveur.",
     },
     {
-      id: "wa_twist_lescaut",
-      when: { flags: ['twist_lescaut_walk'] },
+      id: "wa_twist_delandre",
+      when: { flags: ['twist_delandre_walk'] },
       author: "jeremie",
       text: "Le maire est passé hier à 23h : dix minutes exemplaires. Je lui ai envoyé ce matin les photos des dix minutes d’avant. Avec les heures.",
     },
@@ -633,7 +633,7 @@ export const MEDIA = {
       when: { flags: ['inquiry_open'] },
       author: 'journaliste',
       headline: 'Une enquête interne ouverte',
-      text: "Des riverains ont transmis des documents : une enquête interne vise des agents municipaux. Le maire promet « la transparence totale ». L’ex-maire Colette Verhaeghe n’a « aucun commentaire, sauf que c’est scandaleux ».",
+      text: "Des riverains ont transmis des documents : une enquête interne vise des agents municipaux. Le maire promet « la transparence totale ». L’ex-maire Martine Aubrac n’a « aucun commentaire, sauf que c’est scandaleux ».",
     },
     {
       id: 'press_lemaire',
@@ -783,11 +783,11 @@ export const MEDIA = {
     },
     // ── content-unlocks : réactions aux twists de la nuit (twists.js, after.setFlags) ──
     {
-      id: "press_twist_colette",
-      when: { flags: ['twist_colette_dinner'] },
+      id: "press_twist_martine",
+      when: { flags: ['twist_martine_dinner'] },
       author: "journaliste",
       headline: "L’ancienne maire dîne en terrasse rue des Bouchers",
-      text: "Colette Verhaeghe a été aperçue jeudi soir à la terrasse d’un estaminet de la rue des Bouchers, à une table de huit couverts. Le maximum y est de six. « Je dînais entre amis », a-t-elle précisé. Huit amis.",
+      text: "Martine Aubrac a été aperçue jeudi soir à la terrasse d’un estaminet de la rue des Bouchers, à une table de huit couverts. Le maximum y est de six. « Je dînais entre amis », a-t-elle précisé. Huit amis.",
     },
     {
       id: "press_twist_power",
@@ -907,11 +907,11 @@ export const MEDIA = {
       text: "Suite à un incident avec un fournisseur (rue de Gand, on ne dit pas qui), notre carbonnade a été « surprenante » hier soir. Tout est rentré dans l’ordre. C’est en cours de résolution. 🙏",
     },
     {
-      id: 'so_lescaut_attack',
-      when: { flags: ['lescaut_ally'] },
-      author: 'colette',
+      id: 'so_delandre_attack',
+      when: { flags: ['delandre_ally'] },
+      author: 'martine',
       kind: 'post',
-      text: "De mon temps, on savait que Lille vivait la nuit. Certains préfèrent une ville-dortoir. Je ne citerai personne. (Bertrand.)",
+      text: "De mon temps, on savait que Lille vivait la nuit. Certains préfèrent une ville-dortoir. Je ne citerai personne. (Arnaud.)",
     },
     {
       id: 'so_end_return',

@@ -5,7 +5,7 @@
 // voice : notes de ton pour l'écriture (pas affichées en jeu).
 
 // Nom du groupe WhatsApp de l'association (provisoire : une seule constante, à changer ici si besoin).
-export const WHATSAPP_GROUP = 'Radio Balcon';
+export const WHATSAPP_GROUP = 'La Gaystapo';
 
 export const CHARACTERS = {
   // ── Le joueur ────────────────────────────────────────────────────────────
@@ -51,7 +51,7 @@ export const CHARACTERS = {
     name: 'Tatie Bouchon',
     group: 'asso',
     home: 'Au milieu de la rue, n°19, fenêtre au premier.',
-    bio: "Vieille dame du milieu de la rue, distributrice de sagesse et d’e-mails. Écrit à l’estaminet pour l’odeur depuis des années ; on lui répond toujours que « c’est en cours de résolution ». Prend le thé avec Colette Verhaeghe, l’ancienne maire : une porte ouverte sur la mairie… dans les deux sens.",
+    bio: "Vieille dame du milieu de la rue, distributrice de sagesse et d’e-mails. Écrit à l’estaminet pour l’odeur depuis des années ; on lui répond toujours que « c’est en cours de résolution ». Prend le thé avec Martine Aubrac, l’ancienne maire : une porte ouverte sur la mairie… dans les deux sens.",
     voice: "Proverbes maison, souvent bancals et toujours définitifs : « Si vous voulez quelque chose dans la vie, faut résister et se battre pour. » Girouette : flattée par un verre offert, revigorée par un bon proverbe.",
   },
   seb: {
@@ -147,18 +147,18 @@ export const CHARACTERS = {
     bio: "Inspectrice chargée du dossier de la clim posée sans autorisation. Rigoureuse et lassée des passe-droits. Mariée à Stéphane, le patron de Pilou, ce qui rend tout canal informel aussi utile que compromettant.",
     voice: 'Nette, technique, humour sec. Ne promet rien, note tout. Déteste le mot « arrangement ».',
   },
-  colette: {
-    name: 'Colette Verhaeghe',
+  martine: {
+    name: 'Martine Aubrac',
     group: 'city',
     home: 'Ancienne maire. Toujours une table réservée à l’estaminet et un carnet d’adresses plus épais qu’un PLU.',
     bio: "Ancienne maire, toujours influente, protectrice historique des restaurateurs : « la convivialité, c’est l’ADN de Lille ». Prend le thé avec Tatie Bouchon. Travaille à saper son successeur.",
     voice: 'Grande dame, phrases de discours, « mes chers amis ». Ne dit jamais non, dit « on va regarder ça ».',
   },
-  lescaut: {
-    name: 'Bertrand Lescaut',
+  delandre: {
+    name: 'Arnaud Delandre',
     group: 'city',
     home: "Maire de Lille, à l’hôtel de ville.",
-    bio: "Le maire actuel, successeur de Colette Verhaeghe. A instauré la fermeture à 22h rue des Bouchers. Penche du côté des riverains, mais doit composer avec les réseaux de l’ancienne équipe.",
+    bio: "Le maire actuel, successeur de Martine Aubrac. A instauré la fermeture à 22h rue des Bouchers. Penche du côté des riverains, mais doit composer avec les réseaux de l’ancienne équipe.",
     voice: 'Courtois, prudent, technocrate sincère. « Je vous entends. » Aime les dossiers solides et déteste les surprises dans la presse.',
   },
   journaliste: {

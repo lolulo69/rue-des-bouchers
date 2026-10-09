@@ -615,7 +615,7 @@ export function mount(engine = {}, opts = {}) {
   }
   // Où se passe une action de l'après-midi (scène 3D du résultat) : l'atelier d'Hippolyte ou la mairie
   const ATELIER = /asso_meeting|hippolyte|heritage|recruit|banners|petition_start/;
-  const MAIRIE = /mairie|lescaut|aot|uritrottoir|petition_deliver|inspector|ars|hygiene|inquiry/;
+  const MAIRIE = /mairie|delandre|aot|uritrottoir|petition_deliver|inspector|ars|hygiene|inquiry/;
   const sceneOfAction = (id) => (ATELIER.test(id) ? 'atelier' : MAIRIE.test(id) ? 'mairie' : null);
   // Indice d'effets (sans tout dévoiler) : ce que l'action fait bouger, et le risque d'être vu
   function hintOf(a) {

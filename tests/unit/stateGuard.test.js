@@ -40,13 +40,13 @@ describe('twists : le texte et la rue disent la même chose', () => {
     at(sim, 22 * 60 + 1);
     expect(sim.twist.props).not.toContain('trestle_table');
   });
-  it('dîner de Colette : sa table reste jusqu\'à 23h30, puis rentre', () => {
-    const sim = twistSim('colette_dinner');
-    const colette = () => sim.state.tables.find((t) => t.label.endsWith('la table de Colette'));
+  it('dîner de Martine : sa table reste jusqu\'à 23h30, puis rentre', () => {
+    const sim = twistSim('martine_dinner');
+    const martine = () => sim.state.tables.find((t) => t.label.endsWith('la table de Martine'));
     at(sim, 23 * 60 + 5);
-    expect(colette().out).toBe(true);
+    expect(martine().out).toBe(true);
     at(sim, 23 * 60 + 40);
-    expect(colette().out).toBe(false);
+    expect(martine().out).toBe(false);
   });
   it('drache : la pluie tombe à l\'heure où le texte le dit', () => {
     const sim = twistSim('drache_night');

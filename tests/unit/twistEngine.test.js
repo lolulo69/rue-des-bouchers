@@ -32,8 +32,8 @@ describe('twists de nuit : choix', () => {
       expect(h.length, `graine ${seed}`).toBe(c.state.nightCount);
       expect(new Set(h.map((x) => x.id)).size, `graine ${seed} : twist répété`).toBe(h.length);
       const d4 = h.find((x) => x.day === 4);
-      if (d4) expect(d4.id).toBe('fx_colette');
-      if (d4) expect(c.has('twist_colette_seen')).toBe(true); // conséquence `after`
+      if (d4) expect(d4.id).toBe('fx_martine');
+      if (d4) expect(c.has('twist_martine_seen')).toBe(true); // conséquence `after`
     }
   });
 
@@ -143,10 +143,10 @@ describe('twists de nuit : chaque champ `sim` a un effet', () => {
     expect(plain.nightActions(plain.createNight()).map((a) => a.id)).not.toContain('stink_bomb');
   });
   it('le bilan de la nuit parle du twist', () => {
-    const [, b] = pair('fx_colette');
+    const [, b] = pair('fx_martine');
     advance(b, H(25, 30));
-    expect(b.summary().twist).toMatchObject({ id: 'fx_colette' });
-    expect(b.summary().verdict[0]).toBe('Colette a dîné jusqu’à minuit.');
+    expect(b.summary().twist).toMatchObject({ id: 'fx_martine' });
+    expect(b.summary().verdict[0]).toBe('Martine a dîné jusqu’à minuit.');
   });
 });
 

@@ -15,7 +15,7 @@ _Générée par `npm run story -- --ending negotiated_peace`. Contenu réel, nar
 > Depuis cette année, rue des Bouchers, les terrasses ferment à 22h00, tous les soirs. Six personnes par table, maximum. Un couloir libre au milieu de la rue, pour les poussettes, les fauteuils et les pompiers. Ailleurs dans le Vieux-Lille, on ferme plus tard, et les restaurateurs vous le rappelleront souvent.
 
 **L’Association de la rue des Bouchers**
-> Jérémie, le président, et son teckel Biloute. Klaas, qui voit tout depuis la place et note tout, et Hilde, qui soigne tout le monde. Tatie Bouchon et ses e-mails. Seb et Nico, en face, qui tiennent le groupe « Radio Balcon ». Hippolyte et sa vieille carrosserie. Ils sont fatigués, eux aussi.
+> Jérémie, le président, et son teckel Biloute. Klaas, qui voit tout depuis la place et note tout, et Hilde, qui soigne tout le monde. Tatie Bouchon et ses e-mails. Seb et Nico, en face, qui tiennent le groupe « La Gaystapo ». Hippolyte et sa vieille carrosserie. Ils sont fatigués, eux aussi.
 
 **Quatorze nuits**
 > Dans deux semaines, la commission des terrasses statuera à la mairie. D’ici là : des preuves, des alliés, et un peu de sommeil si possible. Vous pouvez rester dans les clous, ou pas. La rue regarde. Klaas aussi.
@@ -44,8 +44,8 @@ _→ Jérémie hoche la tête comme un notaire satisfait. « Horodatage, distan
 > 42 diapositives. La 43e dit seulement « Merci pour votre attention, et toutes mes excuses pour la longueur ». Stéphane veut la garder : « c’est authentique ».
 > « J’ai échoué. Puis j’ai échoué mieux. Puis j’ai recruté. » 312 likes, dont 300 de gens qui vendent des formations sur l’échec.
 
-**💬 Tatie Bouchon** `tatie_colette`
-> J’ai pris le thé avec Colette, mardi. Une femme charmante. Elle dit que la convivialité, c’est l’âme de Lille.
+**💬 Tatie Bouchon** `tatie_martine`
+> J’ai pris le thé avec Martine, mardi. Une femme charmante. Elle dit que la convivialité, c’est l’âme de Lille.
 > Moi je dis que l’âme de Lille, elle aimerait bien dormir aussi. Mais je l’ai dit gentiment, on était sur ses biscuits.
 
 **💬 Klaas** `klaas_hello`
@@ -120,7 +120,7 @@ _→ Jérémie hoche la tête comme un notaire satisfait. « Horodatage, distan
 - Dossier solide. La commission du jour 14 va devoir l’écouter.
 
 ### 📱 Téléphone
-- **WhatsApp · Seb** `wa_welcome` Bienvenue à Pilou dans « Radio Balcon » 🎉 Règles du groupe : 1) on reste poli, 2) on horodate, 3) on ne parle pas de la carbonnade. Nico a ajouté la règle 3, je ne sais pas pourquoi.
+- **WhatsApp · Seb** `wa_welcome` Bienvenue à Pilou dans « La Gaystapo » 🎉 Règles du groupe : 1) on reste poli, 2) on horodate, 3) on ne parle pas de la carbonnade. Nico a ajouté la règle 3, je ne sais pas pourquoi.
 - **WhatsApp · Nico** `wa_welcome_nico` Règle 3 : parce qu’on a eu 200 messages sur la carbonnade en mars et zéro sur les décibels. Bienvenue, Pilou.
 - **WhatsApp · Jérémie** `wa_jeremie_ag` Rappel : assemblée générale dimanche prochain. Ordre du jour : stratégie avant la commission. Merci de venir avec des photos datées et sans croissants (on avait dit « sans miettes sur le dossier »).
 - **WhatsApp · Seb** `wa_cat_1` Gaufre surveille la terrasse. Elle a compté 9 chaises à la table du fond. Elle n’a rien dit, mais elle a cligné lentement.
@@ -154,7 +154,7 @@ _Sommeil 73 · Asso 54 · Risque 0 · Job 66 · Dossier 1 · (caché) hostilité
 ### 🃏 Consultation citoyenne en ligne `r_consultation`
 > La mairie lance une « grande consultation sur la vie nocturne ». Il faut un compte FranceConnect, un justificatif de domicile de moins de trois mois au format PDF de moins de 2 Mo, et répondre à la question 1 : « Sur une échelle de 1 à 10, à quel point aimez-vous la convivialité ? »
 
-Choix possibles : Remplir les 47 questions sérieusement · **→ Partager le lien sur « Radio Balcon »**
+Choix possibles : Remplir les 47 questions sérieusement · **→ Partager le lien sur « La Gaystapo »**
 _→ Seb relaie avec trois gyrophares. Tatie ne trouve pas FranceConnect. Klaas remplit le formulaire en recopiant son carnet dans le champ « suggestions », en plusieurs fois._
 
 ### 🍺 Contre-offensive : La danse des tables `cm_table_dance`
@@ -371,7 +371,7 @@ _Sommeil 71 · Asso 67 · Risque 0 · Job 61 · Dossier 7 · (caché) hostilité
 ### 🍺 Contre-offensive : Fuite dans l’association `cm_traitor_recruited`
 > Nico, sur le groupe : « Quelqu’un peut m’expliquer comment Ghislain connaît l’ordre du jour de notre réunion ? Il l’a cité mot pour mot à la boulangerie. » Personne ne répond. Tout le monde regarde tout le monde.
 
-**💬 Colette Verhaeghe** `colette_tatie`
+**💬 Martine Aubrac** `martine_tatie`
 > Votre voisine, Tatie Bouchon, est un trésor. Elle me raconte tout. Absolument tout. Je l’adore.
 
 **💬 Régis Dewaele** `regis_courted`
@@ -399,8 +399,8 @@ _Sommeil 71 · Asso 67 · Risque 0 · Job 61 · Dossier 7 · (caché) hostilité
 - `20:30` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 1 : 8 personnes (max 6), 36 dB
 - `20:30` 📸 Preuve ajoutée (nette) : Les Bouchers Mal Lunés, table 4 empiète de 34 cm sur le passage libre (mesuré)
 - `20:45` 🍻 « Chut… non, je rigole. »
-- `20:50` 🃏 **J4 · Une ancienne maire en terrasse** `d4_colette_dinner` : 20h50. Une berline se gare rue de la Barre, là où rien ne se gare. Colette Verhaeghe descend, foulard de soie et sourire de campagne, et prend LA table de l’estaminet, celle qui mord sur le couloir de passage. Dédé lui embrasse les deux mains. Ghislain apporte une carte qui n’existe pas pour les autres clients. Huit couverts. À une table. Rue des Bouchers.
-- `20:50` → **Prévenir le groupe : « Colette est en bas »** : Sur « Radio Balcon », trente-quatre messages en six minutes. Seb a déjà zoomé sur le dessert. Nico rappelle que « zoomer sur un dessert n’est pas une preuve ». Tatie Bouchon répond : « Je la vois bientôt pour le thé, je lui dirai. » Tout le monde se tait une seconde.
+- `20:50` 🃏 **J4 · Une ancienne maire en terrasse** `d4_martine_dinner` : 20h50. Une berline se gare rue de la Barre, là où rien ne se gare. Martine Aubrac descend, foulard de soie et sourire de campagne, et prend LA table de l’estaminet, celle qui mord sur le couloir de passage. Dédé lui embrasse les deux mains. Ghislain apporte une carte qui n’existe pas pour les autres clients. Huit couverts. À une table. Rue des Bouchers.
+- `20:50` → **Prévenir le groupe : « Martine est en bas »** : Sur « La Gaystapo », trente-quatre messages en six minutes. Seb a déjà zoomé sur le dessert. Nico rappelle que « zoomer sur un dessert n’est pas une preuve ». Tatie Bouchon répond : « Je la vois bientôt pour le thé, je lui dirai. » Tout le monde se tait une seconde.
 - `21:30` **Pilou** : Faire la ronde de 22h avec Jérémie et Biloute
 - `21:30` Jérémie compte les tables à voix haute, Biloute renifle chaque pied de chaise, vous notez. Biloute s’arrête net devant chaque table qui déborde et la fixe, comme un huissier. Personne ne sait comment il fait, mais il a raison.
 - `21:38` Jérémie passe avec le teckel et note Estaminet La Ch’tite Bernadette, table 1.
@@ -457,7 +457,7 @@ _Sommeil 60 · Asso 69 · Risque 0 · Job 60 · Dossier 9 · (caché) hostilité
 
 **☕ Koddex · Clode Kode** `clode_rust_reflex`
 > Avant de commencer : souhaitez-vous que je réécrive ce fichier en Rust ? Il s’agit d’un fichier texte de trois lignes, mais je sens qu’il en a envie.
-**💻 Clode Kode, 3 prompts** : Bot pour le groupe WhatsApp « Radio Balcon » · travail · travail
+**💻 Clode Kode, 3 prompts** : Bot pour le groupe WhatsApp « La Gaystapo » · travail · travail
 > Pilou : Un bot qui rappelle l’heure, rassemble les photos et lance les mobilisations.
 > Clode Kode : Avec plaisir ! Message proposé à 22h04 : « Petit rappel bienveillant : les terrasses ferment à 22h. Il est 22h04. Je dis ça, je ne dis rien. 🙏 »
 > Seb : Attends, attends : il peut aussi dire qui est sorti avec qui ce soir ?
@@ -479,7 +479,7 @@ _Sommeil 60 · Asso 69 · Risque 0 · Job 60 · Dossier 9 · (caché) hostilité
 > Ordre du jour : un point. Durée : deux heures. Tatie a apporté un proverbe, Hilde une tarte au sucre, Seb un tableau Excel. Jérémie a tout consigné.
 
 **💬 Seb** `seb_group_activity`
-> Il y a eu quarante-deux messages sur « Radio Balcon » hier soir, entre 22h et minuit. Dont trente-neuf photos de la même table.
+> Il y a eu quarante-deux messages sur « La Gaystapo » hier soir, entre 22h et minuit. Dont trente-neuf photos de la même table.
 > C’est la table qui a changé, attends, regarde : ils ont rajouté une chaise pliante.
 
 **💬 Le serveur** `serveur_22h`
@@ -537,11 +537,11 @@ _Sommeil 60 · Asso 69 · Risque 0 · Job 60 · Dossier 9 · (caché) hostilité
 ## Jour 6 · samedi (sans voitures)
 _Sommeil 64 · Asso 79 · Risque 0 · Job 57 · Dossier 12 · (caché) hostilité 31, corruption 60_
 
-### 🃏 La Voix du Nordiste : « Colette Verhaeghe : laissez vivre Lille ! » `r_colette_interview`
-> Pleine page. Colette pose devant un estaminet qui ressemble beaucoup à l’estaminet : « La convivialité, c’est l’ADN de Lille. Je comprends les riverains, j’en ai été une, mais rue de Gand ferme bien à minuit, non ? » Pas un mot sur la règle des 22h. Ni sur le couloir.
+### 🃏 La Voix du Nordiste : « Martine Aubrac : laissez vivre Lille ! » `r_martine_interview`
+> Pleine page. Martine pose devant un estaminet qui ressemble beaucoup à l’estaminet : « La convivialité, c’est l’ADN de Lille. Je comprends les riverains, j’en ai été une, mais rue de Gand ferme bien à minuit, non ? » Pas un mot sur la règle des 22h. Ni sur le couloir.
 
 Choix possibles : Envoyer un droit de réponse à la journaliste _(grisé)_ · **→ Encadrer l’article dans les toilettes**
-_→ Une place d’honneur. Colette y sourira à chacun de vos passages. C’est une forme de dialogue._
+_→ Une place d’honneur. Martine y sourira à chacun de vos passages. C’est une forme de dialogue._
 
 ### 🍺 Contre-offensive : Fil Tatie · promesse n°6 `tatie_mail_06`
 > « Chère Madame, après analyse, l’odeur proviendrait peut-être de l’ancien canal sous la rue. C’est en cours de vérification historique. » Tatie : « Le canal est couvert depuis 1912. Il sent la carbonnade depuis des années. Drôle de canal. »
@@ -671,7 +671,7 @@ _→ Vous savez maintenant quel soir appeler. Klaas ajoute, sans lever les yeux�
 > Rebelote : 21h59, rentrées. 22h17, ressorties. Le chorégraphe progresse, il a gagné trois minutes.
 
 ### 🍺 Contre-offensive : Le samedi « festif » `cm_festive_saturday`
-> Le bloc envoie à la mairie un dossier glacé : « Samedi festif rue des Bouchers : terrasses jusqu’à minuit, comme rue de Gand ». Colette Verhaeghe aurait « trouvé l’idée sympathique ». La photo de couverture date d’avant la règle des 22h.
+> Le bloc envoie à la mairie un dossier glacé : « Samedi festif rue des Bouchers : terrasses jusqu’à minuit, comme rue de Gand ». Martine Aubrac aurait « trouvé l’idée sympathique ». La photo de couverture date d’avant la règle des 22h.
 
 **💬 Stéphane** `stephane_db_report`
 > C’est quoi ces graphes de décibels dans le drive partagé ? Des courbes, des PDF, un logo ? C’est un side project ?
@@ -791,8 +791,8 @@ _→ Deux heures, quatre cafés, une gaufre chacun. Article 1 : tables rentrée
 **🗂 Après-midi : Réunir l’association** `pm_asso_meeting`
 > Ordre du jour : un point. Durée : deux heures. Tatie a apporté un proverbe, Hilde une tarte au sucre, Seb un tableau Excel. Jérémie a tout consigné.
 
-**🗂 Après-midi : Demander un rendez-vous au maire, Bertrand Lescaut** `pm_request_lescaut`
-> Le cabinet du maire « prend bonne note ». Colette Verhaeghe, elle, prend son téléphone.
+**🗂 Après-midi : Demander un rendez-vous au maire, Arnaud Delandre** `pm_request_delandre`
+> Le cabinet du maire « prend bonne note ». Martine Aubrac, elle, prend son téléphone.
 
 **💬 Biloute** `biloute_22h`
 > *22h00. Les chaises raclent les pavés. Grogne en direction de l’estaminet. Jérémie murmure « bon chien ».*
@@ -861,10 +861,10 @@ _Sommeil 90 · Asso 96 · Risque 0 · Job 66 · Dossier 21 · (caché) hostilit�
 > Chapitre 1 : « Bienvenue dans la famille. » Chapitre 2 : « Où est Stéphane ? (nul ne le sait) ». Chapitre 3 : un QR code vers l’appli de to-do, en Rust.
 
 ### 🃏 J9 · L’inspectrice revient pour la clim `d9_inspector`
-> La mairie a programmé une contre-visite du groupe de climatisation posé sans autorisation sur la façade du n°10. Tout dépend d’une chose : l’estaminet sait-il qu’elle vient ? Dans ce quartier, une visite annoncée, c’est une visite racontée à Colette, donc à Dédé, donc à la clim, qui se retrouve soudain très bien cachée.
+> La mairie a programmé une contre-visite du groupe de climatisation posé sans autorisation sur la façade du n°10. Tout dépend d’une chose : l’estaminet sait-il qu’elle vient ? Dans ce quartier, une visite annoncée, c’est une visite racontée à Martine, donc à Dédé, donc à la clim, qui se retrouve soudain très bien cachée.
 
 Choix possibles : Glisser à Delphine que la visite doit rester surprise _(grisé)_ · Passer par Hippolyte et le service du patrimoine _(grisé)_ · Laisser la mairie annoncer la visite, mais fournir les photos de la clim _(grisé)_ · **→ Laisser la procédure suivre son cours**
-_→ Visite annoncée par courrier, donc annoncée à Colette, donc à tout le monde. Le jour J, il n’y a plus de clim sur la façade, juste quatre trous rebouchés au mastic frais et une jardinière de géraniums très contents. « Constat : néant. Le dossier reste ouvert. » Il le restera longtemps. La clim, elle, revient vendredi._
+_→ Visite annoncée par courrier, donc annoncée à Martine, donc à tout le monde. Le jour J, il n’y a plus de clim sur la façade, juste quatre trous rebouchés au mastic frais et une jardinière de géraniums très contents. « Constat : néant. Le dossier reste ouvert. » Il le restera longtemps. La clim, elle, revient vendredi._
 
 ### 🃏 Le plan des zones arrive (scanné de travers) `r_aot_pdf`
 > Après onze relances, la mairie envoie enfin l’autorisation d’occupation temporaire de l’estaminet, avec son plan. PDF scanné de biais, une tache de café sur la cote du couloir, mais lisible. Jérémie l’imprime en A3. Puis en A2.
@@ -872,8 +872,8 @@ _→ Visite annoncée par courrier, donc annoncée à Colette, donc à tout le m
 Choix possibles : **→ Étudier le plan, mètre ruban en main**
 _→ La zone autorisée s’arrête bien avant là où commencent les tables. Vous voyez désormais la rue comme un géomètre : en fantômes verts et en couloir rouge._
 
-### 🍺 Contre-offensive : Un coup de fil à l’ancienne maire `cm_colette_call`
-> Tatie, gênée : « Colette m’a dit au thé que ‹ certains riverains veulent voir le maire ›. Elle l’a su avant moi. » Le rendez-vous avec Bertrand Lescaut est soudain « à reprogrammer, agenda chargé ».
+### 🍺 Contre-offensive : Un coup de fil à l’ancienne maire `cm_martine_call`
+> Tatie, gênée : « Martine m’a dit au thé que ‹ certains riverains veulent voir le maire ›. Elle l’a su avant moi. » Le rendez-vous avec Arnaud Delandre est soudain « à reprogrammer, agenda chargé ».
 
 **💬 Klaas** `klaas_exhaust`
 > Même d’ici, quand le vent vient du sud, je sens la friture. Hilde a ouvert la fenêtre hier. Elle l’a refermée.
@@ -882,8 +882,8 @@ _→ La zone autorisée s’arrête bien avant là où commencent les tables. Vo
 > J’ai bien reçu votre e-mail. Les photos sont nettes, les dates aussi. C’est rare. Merci.
 > Je ne vous promets rien. Je ne promets jamais rien. Mais je lis tout.
 
-**🗂 Après-midi : Rencontrer le maire à l’hôtel de ville** `pm_meet_lescaut`
-> Bertrand Lescaut a lu le dossier. Vraiment lu : il a des post-it. « La règle des 22h, c’est moi qui l’ai voulue. Elle sera appliquée. » Son conseiller, lui, regarde ses chaussures en pensant à Colette.
+**🗂 Après-midi : Rencontrer le maire à l’hôtel de ville** `pm_meet_delandre`
+> Arnaud Delandre a lu le dossier. Vraiment lu : il a des post-it. « La règle des 22h, c’est moi qui l’ai voulue. Elle sera appliquée. » Son conseiller, lui, regarde ses chaussures en pensant à Martine.
 
 **🗂 Après-midi : Mobiliser le groupe WhatsApp** `pm_whatsapp_rally`
 > Seb poste un appel, Nico l’épingle. 42 messages en une heure, dont 11 sur l’ordre du jour et 31 sur Gaufre.
@@ -944,7 +944,7 @@ _→ La zone autorisée s’arrête bien avant là où commencent les tables. Vo
 
 ### 📱 Téléphone
 - **WhatsApp · Seb** `wa_cat_3` Gaufre est rentrée à 23h40, oreilles en arrière. Elle est plus rapide que la police municipale.
-- **WhatsApp · Jérémie** `wa_lescaut` Le maire nous reçoit. Pas un adjoint. Le maire. J’ai repassé ma chemise deux fois.
+- **WhatsApp · Jérémie** `wa_delandre` Le maire nous reçoit. Pas un adjoint. Le maire. J’ai repassé ma chemise deux fois.
 
 ## Jour 10 · mercredi
 _Sommeil 95 · Asso 96 · Risque 0 · Job 72 · Dossier 23 · (caché) hostilité 20, corruption 68_
@@ -1363,8 +1363,8 @@ _Sommeil 83 · Asso 96 · Risque 0 · Job 94 · Dossier 32 · (caché) hostilit�
 > Corrigé. Clode Kode tient à préciser que « Peut-être » était, selon lui, une formulation plus respectueuse du consentement de l’utilisateur.
 
 ### 🃏 J14 · Commission des terrasses, salle du conseil `d14_commission`
-> Lambris, micro qui grésille, carafe d’eau tiède. Au premier rang, le bloc en tenue du dimanche : Dédé sourit à tout le monde, Ghislain a apporté son classeur, désormais à 600 pages. Colette Verhaeghe s’assoit « en simple citoyenne », au premier rang, à côté du micro. Bertrand Lescaut ouvre la séance : « Je vous entends tous. Je vous écoute, maintenant. » C’est à vous.
-> **Bertrand Lescaut** : « Mesdames, messieurs, la commission examine ce jour le renouvellement de l’autorisation d’occupation temporaire de l’Estaminet La Ch’tite Bernadette. Chacun aura la parole. Brièvement. Monsieur Ghislain, merci de ne pas lire les 600 pages. »
+> Lambris, micro qui grésille, carafe d’eau tiède. Au premier rang, le bloc en tenue du dimanche : Dédé sourit à tout le monde, Ghislain a apporté son classeur, désormais à 600 pages. Martine Aubrac s’assoit « en simple citoyenne », au premier rang, à côté du micro. Arnaud Delandre ouvre la séance : « Je vous entends tous. Je vous écoute, maintenant. » C’est à vous.
+> **Arnaud Delandre** : « Mesdames, messieurs, la commission examine ce jour le renouvellement de l’autorisation d’occupation temporaire de l’Estaminet La Ch’tite Bernadette. Chacun aura la parole. Brièvement. Monsieur Ghislain, merci de ne pas lire les 600 pages. »
 > **Jérémie** : « Monsieur le maire, je préside l’Association de la rue des Bouchers. Nous ne sommes pas contre les terrasses. Nous sommes pour l’arrêté. Celui que vous avez signé. »
 > **Jérémie** : « Le couloir de passage a été mesuré au mètre ruban. Des tables empiètent de plusieurs dizaines de centimètres. C’est par là que passent les poussettes, les fauteuils et les pompiers. »
 > **Jérémie** : « Un enregistreur tourne en continu à la fenêtre d’un riverain. Il ne dort pas, lui. Les courbes sont en annexe 4. »
@@ -1372,8 +1372,8 @@ _Sommeil 83 · Asso 96 · Risque 0 · Job 94 · Dossier 32 · (caché) hostilit�
 > **Ghislain** : « Monsieur le maire, l’établissement a toujours fait preuve d’une démarche constructive. Toutes les remarques ont été prises en compte et sont en cours de résolution. » Il ouvre son classeur à la page 1. Il y en a 600.
 > **Ghislain** : « Cela dit, nous avons noté la démarche de dialogue de l’association. Nous… y sommes ouverts. » On dirait que la phrase lui coûte un rein.
 > **Delphine Vermeersch** : « La visite de contrôle était annoncée. Le jour dit, il n’y avait plus de climatisation sur la façade, mais une jardinière. Le dossier reste ouvert. » Elle referme le sien avec un bruit sec.
-> **Colette Verhaeghe** : Colette Verhaeghe se lève sans qu’on lui donne la parole : « Mes chers amis, la convivialité, c’est l’ADN de Lille. Rue de Gand, on ferme à minuit. Je dis ça, je ne dis rien. » Elle se rassoit. Elle a tout dit.
-> **Bertrand Lescaut** : Bertrand Lescaut se tourne vers vous : « Monsieur Dubeton. Vous avez la parole. Trois minutes. Je vous entends. »
+> **Martine Aubrac** : Martine Aubrac se lève sans qu’on lui donne la parole : « Mes chers amis, la convivialité, c’est l’ADN de Lille. Rue de Gand, on ferme à minuit. Je dis ça, je ne dis rien. » Elle se rassoit. Elle a tout dit.
+> **Arnaud Delandre** : Arnaud Delandre se tourne vers vous : « Monsieur Dubeton. Vous avez la parole. Trois minutes. Je vous entends. »
 
 Choix possibles : Plaider le dossier complet : photos, dB, couloir, PV _(grisé)_ · Plaider la clim : l’infraction est confirmée depuis mardi _(grisé)_ · Plaider l’extraction : la ville a déjà acté le déplacement _(grisé)_ · **→ Présenter la charte de bon voisinage, signée par les deux camps** · Tendre la main au bloc, devant toute la salle · Faire sortir l’affaire de corruption le matin même dans La Voix du Nordiste · Venir… en habitué de l’estaminet _(grisé)_ · Improviser avec ce qu’on a
 _→ Jérémie lit la charte : tables rentrées à 22h, couloir dégagé, interlocuteur unique côté bloc, réunion trimestrielle avec tarte de Hilde. Le Goulot a signé en premier, Bloemkool ensuite « pour l’image », et Dédé enfin, la main sur le cœur, sous le regard du maire. Ghislain a archivé sa copie._
@@ -1413,4 +1413,4 @@ _Sommeil 83 · Asso 96 · Risque 0 · Job 100 · Dossier 32 · (caché) hostilit
 > Le premier trimestre, la réunion s’est tenue à l’estaminet. Hilde a apporté sa tarte au sucre. Dédé a goûté et demandé la recette. Hilde a dit non, très gentiment.
 >
 
-Drapeaux en fin de partie : ac_case_stalled, ag_held, aot_requested, asked_waiter, asso_meeting, benali_fined, bribe_photo, called_police, charter_drafted, cm_bins, cm_colette_call, cm_festive_saturday, cm_free_drinks, cm_regis_nuance, cm_smokers, cm_table_dance, colette_dinner_seen, commission_done, commission_won, corridor_measured, corruption_proof, emailed_inspector, exhaust_meeting_lost, hippolyte_room, inspector_announced, joined_rounds, joined_whatsapp, klaas_log_certified, knows_trou, legal_view, lescaut_meeting, lescaut_requested, met_hippolyte, met_jeremie, met_klaas, met_lescaut, met_seb_nico, met_tatie, met_waiter, night_db, night_photo, pee_at_door, press_contacted, proj_db_logger, proj_db_report, proj_klaas_ocr, proj_scraper, proj_whatsapp_bot, random_drache, recruited_residents, regis_courted, reported_mairie, roster_known, saturday1_done, saturday2_done, saw_pee, scraper_boasts, seen_complaisance, seen_tipoff, stance_dialogue, talked_waiter, tatie_emails_shared, tatie_mail_1, tatie_mail_10, tatie_mail_11, tatie_mail_12, tatie_mail_2, tatie_mail_3, tatie_mail_4, tatie_mail_5, tatie_mail_6, tatie_mail_7, tatie_mail_8, tatie_mail_9, tatie_wavering, todo_app_rust, traitor_known, traitor_recruited, uritrottoir_installed, uritrottoir_requested, whatsapp_rally, won_peace
+Drapeaux en fin de partie : ac_case_stalled, ag_held, aot_requested, asked_waiter, asso_meeting, benali_fined, bribe_photo, called_police, charter_drafted, cm_bins, cm_martine_call, cm_festive_saturday, cm_free_drinks, cm_regis_nuance, cm_smokers, cm_table_dance, martine_dinner_seen, commission_done, commission_won, corridor_measured, corruption_proof, emailed_inspector, exhaust_meeting_lost, hippolyte_room, inspector_announced, joined_rounds, joined_whatsapp, klaas_log_certified, knows_trou, legal_view, delandre_meeting, delandre_requested, met_hippolyte, met_jeremie, met_klaas, met_delandre, met_seb_nico, met_tatie, met_waiter, night_db, night_photo, pee_at_door, press_contacted, proj_db_logger, proj_db_report, proj_klaas_ocr, proj_scraper, proj_whatsapp_bot, random_drache, recruited_residents, regis_courted, reported_mairie, roster_known, saturday1_done, saturday2_done, saw_pee, scraper_boasts, seen_complaisance, seen_tipoff, stance_dialogue, talked_waiter, tatie_emails_shared, tatie_mail_1, tatie_mail_10, tatie_mail_11, tatie_mail_12, tatie_mail_2, tatie_mail_3, tatie_mail_4, tatie_mail_5, tatie_mail_6, tatie_mail_7, tatie_mail_8, tatie_mail_9, tatie_wavering, todo_app_rust, traitor_known, traitor_recruited, uritrottoir_installed, uritrottoir_requested, whatsapp_rally, won_peace

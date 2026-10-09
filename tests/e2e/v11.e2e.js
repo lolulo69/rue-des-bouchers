@@ -157,7 +157,7 @@ test('BUG-010 · nuit à twist (J4) : photographier les tables ne plante pas le 
   await Promise.all([page.waitForURL(/mode=night/), page.click('[data-testid=night-go]')]);
   await page.locator('#hud:visible, #start:visible').first().waitFor({ timeout: 60_000 });
   if (await page.locator('#start').isVisible()) await page.click('#start');
-  // Jusqu'à 22h10, en jouant au clic les événements de nuit (le dîner de Colette met le jeu en pause sur sa carte)
+  // Jusqu'à 22h10, en jouant au clic les événements de nuit (le dîner de Martine met le jeu en pause sur sa carte)
   for (let k = 0; k < 10; k++) {
     const due = await page.evaluate(() => {
       const r = window.__rdb, { sim } = r, c = r.campaign;

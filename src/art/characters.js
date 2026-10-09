@@ -588,9 +588,9 @@ export const CAST = {
   police: (o = {}) => police(o),
   delphine: (o = {}) => humanoid({ skin: 0xf6d2b4, hair: 'bob', hairColor: 0x2d2420, shirt: 0x2f3e5c, skirt: 0x2f3542, height: 1.05, girth: 0.92, glasses: 0x111111, anim: 'clipboard', held: 'clipboard', talk: 0.4, ...o,
     extras: (add, k) => add('box', 'body', [0, k.th * 0.6, 0.18], [0.05, 0.08, 0.01], 0xffffff) }), // badge
-  colette: (o = {}) => humanoid({ skin: 0xf3cdb0, hair: 'bob', hairColor: 0xe8d39a, shirt: 0xb0283a, skirt: 0x2a2a35, height: 0.98, girth: 1.08, talk: 0.8, ...o,
+  martine: (o = {}) => humanoid({ skin: 0xf3cdb0, hair: 'bob', hairColor: 0xe8d39a, shirt: 0xb0283a, skirt: 0x2a2a35, height: 0.98, girth: 1.08, talk: 0.8, ...o,
     extras: (add, k) => { for (let i = 0; i < 9; i++) { const a = -0.9 + i * 0.225; add('ball', 'body', [Math.sin(a) * 0.15, k.th * 0.92 - Math.cos(a) * 0.06, 0.13 + Math.cos(a) * 0.03], 0.022, 0xf8f4ea); } } }), // collier de perles
-  lescaut: (o = {}) => humanoid({ skin: 0xeebf98, hair: 'side', hairColor: 0x4a3f35, shirt: 0x2b3550, pants: 0x2b3550, glasses: 0x333333, height: 1.1, talk: 0.5, ...o,
+  delandre: (o = {}) => humanoid({ skin: 0xeebf98, hair: 'side', hairColor: 0x4a3f35, shirt: 0x2b3550, pants: 0x2b3550, glasses: 0x333333, height: 1.1, talk: 0.5, ...o,
     extras: (add, k) => { add('box', 'body', [0, k.th * 0.6, 0.17], [0.06, k.th * 0.55, 0.02], 0x9a2a3a); add('box', 'body', [0, k.th * 0.7, 0.165], [0.14, k.th * 0.4, 0.015], 0xf2f2f2); } }), // cravate
   journaliste: (o = {}) => humanoid({ skin: 0xfbe0c8, hair: 'ponytail', hairColor: 0xa0522d, shirt: 0xc9b48a, pants: 0x3d4a63, height: 1.0, held: 'notebook', talk: 0.8, ...o,
     extras: (add, k) => add('torus', 'body', [0, k.th * 0.9, 0.02], [0.14, 0.14, 0.25], 0x2a9d8f, [Math.PI / 2, 0, 0]) }), // écharpe
@@ -604,7 +604,7 @@ export const CAST = {
 CAST.waiter = CAST.serveur;
 CAST.dog = CAST.biloute;
 CAST.cat = CAST.gaufre;
-export const CAST_IDS = ['pilou', 'jeremie', 'biloute', 'klaas', 'hilde', 'tatie', 'seb', 'nico', 'gaufre', 'hippolyte', 'regis', 'dede', 'ghislain', 'serveur', 'nouveau', 'lemaire', 'benali', 'chef', 'delphine', 'colette', 'lescaut', 'journaliste', 'avocat', 'stephane', 'clode'];
+export const CAST_IDS = ['pilou', 'jeremie', 'biloute', 'klaas', 'hilde', 'tatie', 'seb', 'nico', 'gaufre', 'hippolyte', 'regis', 'dede', 'ghislain', 'serveur', 'nouveau', 'lemaire', 'benali', 'chef', 'delphine', 'martine', 'delandre', 'journaliste', 'avocat', 'stephane', 'clode'];
 
 // Ancienne API : person(color) = un passant debout. La couleur de l'uniforme de police donne un agent.
 export function person(color) {

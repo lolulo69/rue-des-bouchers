@@ -78,7 +78,7 @@ describe('§13.A1 · calendrier de 14 jours (lundi → dimanche S2), matin → a
   // §13.A5 sur la même campagne
   it('§13.A5 · événements fixes à leur jour et leur phase ; nuits 6 et 13 = samedi sans voitures', () => {
     const fixed = K.EVENTS.filter((e) => e.day !== undefined);
-    for (const id of ['d4_colette_dinner', 'd6_saturday', 'd7_general_meeting', 'd9_inspector', 'd11_exhaust_meeting', 'd13_saturday', 'd14_commission']) {
+    for (const id of ['d4_martine_dinner', 'd6_saturday', 'd7_general_meeting', 'd9_inspector', 'd11_exhaust_meeting', 'd13_saturday', 'd14_commission']) {
       expect(fixed.some((e) => e.id === id), id).toBe(true);
     }
     // Les événements de nuit (D4) se jouent pendant la nuit (campaign.nightEventDue) : on lit le journal de campagne
@@ -175,7 +175,7 @@ describe('§13.D2 · actions d\'après-midi : chacune existe et se joue depuis u
 const SECTION8 = {
   "e-mails « c'est en cours »": 'tatie_mail_1', 'tables 21h59 / 22h20': 'cm_table_dance', 'fumeurs sous la fenêtre': 'cm_smokers',
   'poubelles devant la porte': 'cm_bins', 'tournées offertes (Tatie)': 'cm_free_drinks', 'pétition des clients heureux': 'cm_happy_petition',
-  'plainte pour harcèlement': 'cm_harassment_complaint', 'plainte pour diffamation': 'cm_defamation', 'appel à Colette': 'cm_colette_call',
+  'plainte pour harcèlement': 'cm_harassment_complaint', 'plainte pour diffamation': 'cm_defamation', 'appel à Martine': 'cm_martine_call',
   'samedi « festif »': 'cm_festive_saturday', 'recrutement d\'un riverain': 'traitor_recruited', 'faux post « Bernadette harcelée »': 'cm_fake_post',
 };
 
@@ -274,7 +274,7 @@ function finish(c, pickLabel) {
   return c;
 }
 const ENDING_RUNS = {
-  legal_victory: () => finish(toCommission(31, (c) => satisfy(c, { stats: { dossier: '>=90', risk: '<10' }, flags: ['colette_dinner_photo', 'formal_notice', 'bombance_blocked'], notFlags: ['bombance_bar_project'] })), /dossier complet/),
+  legal_victory: () => finish(toCommission(31, (c) => satisfy(c, { stats: { dossier: '>=90', risk: '<10' }, flags: ['martine_dinner_photo', 'formal_notice', 'bombance_blocked'], notFlags: ['bombance_bar_project'] })), /dossier complet/),
   negotiated_peace: () => finish(toCommission(32, (c) => satisfy(c, { stats: { asso: '>=90' }, hidden: { hostility: '<10' }, flags: ['stance_dialogue', 'charter_drafted', 'bombance_blocked'], notFlags: ['bombance_bar_project'] })), /charte/),
   scandal: () => finish(toCommission(33, (c) => satisfy(c, { flags: ['corruption_proof', 'press_contacted', 'bribe_photo', 'bombance_blocked'], notFlags: ['bombance_bar_project'] })), /Voix du Nordiste/),
   turncoat: () => finish(toCommission(34, (c) => satisfy(c, { flags: ['carbonnade_1', 'carbonnade_2', 'carbonnade_3'] })), /habitué/),
@@ -297,12 +297,12 @@ describe('§13.F1 · les 8 fins sont atteignables par le moteur', () => {
   });
 });
 describe('§13.F2 · l\'épilogue cite ce que le joueur a fait', () => {
-  it('victoire juridique : la photo du dîner de Colette et la mise en demeure apparaissent seulement si le joueur les a', () => {
+  it('victoire juridique : la photo du dîner de Martine et la mise en demeure apparaissent seulement si le joueur les a', () => {
     const legal = byId(K.ENDINGS, 'legal_victory');
     const part = (flag) => legal.epilogue.find((p) => p.when?.flags?.length === 1 && p.when.flags[0] === flag).text;
     const withActs = ENDING_RUNS.legal_victory();
-    const plain = finish(toCommission(31, (c) => satisfy(c, { stats: { dossier: '>=90', risk: '<10' }, flags: ['bombance_blocked'], notFlags: ['bombance_bar_project', 'colette_dinner_photo', 'formal_notice'] })), /dossier complet/);
-    for (const flag of ['colette_dinner_photo', 'formal_notice']) {
+    const plain = finish(toCommission(31, (c) => satisfy(c, { stats: { dossier: '>=90', risk: '<10' }, flags: ['bombance_blocked'], notFlags: ['bombance_bar_project', 'martine_dinner_photo', 'formal_notice'] })), /dossier complet/);
+    for (const flag of ['martine_dinner_photo', 'formal_notice']) {
       expect(withActs.state.epilogue, flag).toContain(part(flag));
       expect(plain.state.epilogue, flag).not.toContain(part(flag));
     }

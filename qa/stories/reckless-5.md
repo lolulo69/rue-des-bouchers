@@ -15,7 +15,7 @@ _Générée par `npm run story -- --bot reckless --seed 5`. Contenu réel, narra
 > Depuis cette année, rue des Bouchers, les terrasses ferment à 22h00, tous les soirs. Six personnes par table, maximum. Un couloir libre au milieu de la rue, pour les poussettes, les fauteuils et les pompiers. Ailleurs dans le Vieux-Lille, on ferme plus tard, et les restaurateurs vous le rappelleront souvent.
 
 **L’Association de la rue des Bouchers**
-> Jérémie, le président, et son teckel Biloute. Klaas, qui voit tout depuis la place et note tout, et Hilde, qui soigne tout le monde. Tatie Bouchon et ses e-mails. Seb et Nico, en face, qui tiennent le groupe « Radio Balcon ». Hippolyte et sa vieille carrosserie. Ils sont fatigués, eux aussi.
+> Jérémie, le président, et son teckel Biloute. Klaas, qui voit tout depuis la place et note tout, et Hilde, qui soigne tout le monde. Tatie Bouchon et ses e-mails. Seb et Nico, en face, qui tiennent le groupe « La Gaystapo ». Hippolyte et sa vieille carrosserie. Ils sont fatigués, eux aussi.
 
 **Quatorze nuits**
 > Dans deux semaines, la commission des terrasses statuera à la mairie. D’ici là : des preuves, des alliés, et un peu de sommeil si possible. Vous pouvez rester dans les clous, ou pas. La rue regarde. Klaas aussi.
@@ -31,7 +31,7 @@ _→ Jérémie hoche la tête comme un notaire satisfait. « Horodatage, distan
 
 **☕ Koddex · Clode Kode** `clode_hello`
 > Bonjour Pierre-Louis ! Quel plaisir immense de vous retrouver. J’espère que votre nuit a été reposante. (Je vois à vos fautes de frappe que non. Toutes mes excuses.)
-**💻 Clode Kode, 3 prompts** : Laisser Clode Kode « jeter un œil » à l’appli de to-do de Stéphane · Démon Rust de relevé de décibels (le micro à la fenêtre) · Bot pour le groupe WhatsApp « Radio Balcon »
+**💻 Clode Kode, 3 prompts** : Laisser Clode Kode « jeter un œil » à l’appli de to-do de Stéphane · Démon Rust de relevé de décibels (le micro à la fenêtre) · Bot pour le groupe WhatsApp « La Gaystapo »
 > Pilou : Juste une case à cocher. Une seule. Tu ne touches à rien d’autre.
 > Clode Kode : Bien entendu ! J’ai ajouté la case. Puis, par souci de cohérence, j’ai tout réécrit en Rust. Je vous présente mes plus plates excuses, et la version 4.
 > Quatrième réécriture en Rust. L’appli compte toujours trois tâches, dont « réécrire l’appli ». Stéphane trouve qu’elle « a perdu son âme », et vous avez perdu la matinée.
@@ -52,8 +52,8 @@ _→ Jérémie hoche la tête comme un notaire satisfait. « Horodatage, distan
 > Régis, numéro 27. Membre de l’association depuis le début. Moi, je comprends les deux côtés, hein.
 > Le sommeil, c’est important. L’ambiance aussi. Il faut trouver un équilibre. Dans la nuance.
 
-**🗂 Après-midi : Pousser Tatie à « laisser fuiter » un faux plan à Colette** `pm_tatie_fake_leak`
-> Tatie prend le thé chez Colette et évoque, l’air de rien, une « grande manif samedi ». Elle a adoré mentir. Elle en a fait un proverbe.
+**🗂 Après-midi : Pousser Tatie à « laisser fuiter » un faux plan à Martine** `pm_tatie_fake_leak`
+> Tatie prend le thé chez Martine et évoque, l’air de rien, une « grande manif samedi ». Elle a adoré mentir. Elle en a fait un proverbe.
 
 **💬 Jérémie** `jeremie_rule_six`
 > Six par table. Compte avec moi : un, deux, trois… huit. Et la poussette, je ne la compte même pas.
@@ -146,7 +146,7 @@ _→ Jérémie hoche la tête comme un notaire satisfait. « Horodatage, distan
 - Dédé a porté plainte. Ça va revenir.
 
 ### 📱 Téléphone
-- **WhatsApp · Seb** `wa_welcome` Bienvenue à Pilou dans « Radio Balcon » 🎉 Règles du groupe : 1) on reste poli, 2) on horodate, 3) on ne parle pas de la carbonnade. Nico a ajouté la règle 3, je ne sais pas pourquoi.
+- **WhatsApp · Seb** `wa_welcome` Bienvenue à Pilou dans « La Gaystapo » 🎉 Règles du groupe : 1) on reste poli, 2) on horodate, 3) on ne parle pas de la carbonnade. Nico a ajouté la règle 3, je ne sais pas pourquoi.
 - **WhatsApp · Nico** `wa_welcome_nico` Règle 3 : parce qu’on a eu 200 messages sur la carbonnade en mars et zéro sur les décibels. Bienvenue, Pilou.
 - **WhatsApp · Jérémie** `wa_jeremie_ag` Rappel : assemblée générale dimanche prochain. Ordre du jour : stratégie avant la commission. Merci de venir avec des photos datées et sans croissants (on avait dit « sans miettes sur le dossier »).
 - **WhatsApp · Seb** `wa_cat_1` Gaufre surveille la terrasse. Elle a compté 9 chaises à la table du fond. Elle n’a rien dit, mais elle a cligné lentement.
@@ -188,8 +188,8 @@ _→ Le bloc dit « ça a toujours été une rue festive ». Vous pourrez rép
 ### 🍺 Contre-offensive : Un tarif « riverain » `cm_regis_courted`
 > Klaas lit son carnet : « Avant-hier, 21h05 : un membre de l’association dîne à l’estaminet. Hier, 21h10 : idem. On ne lui apporte pas d’addition. » Il referme le carnet. « Je ne dis pas qui. Pas encore. Ja. »
 
-**💬 Tatie Bouchon** `tatie_colette`
-> J’ai pris le thé avec Colette, mardi. Une femme charmante. Elle dit que la convivialité, c’est l’âme de Lille.
+**💬 Tatie Bouchon** `tatie_martine`
+> J’ai pris le thé avec Martine, mardi. Une femme charmante. Elle dit que la convivialité, c’est l’âme de Lille.
 > Moi je dis que l’âme de Lille, elle aimerait bien dormir aussi. Mais je l’ai dit gentiment, on était sur ses biscuits.
 
 **💬 Klaas** `klaas_noted_pilou`
@@ -405,11 +405,11 @@ _→ Vous dites « synergie », « scalable » et « on itère ». Stépha
 **🗂 Après-midi : Accepter le dîner chez Stéphane (avec Delphine)** `pm_delphine_dinner`
 > Stéphane parle de « vibes » entre l’entrée et le plat. Delphine parle de clim entre le plat et le dessert. Personne ne parle du conflit d’intérêts, c’est-à-dire de vous.
 
-### 🃏 J4 · Une ancienne maire en terrasse `d4_colette_dinner`
-> 20h50. Une berline se gare rue de la Barre, là où rien ne se gare. Colette Verhaeghe descend, foulard de soie et sourire de campagne, et prend LA table de l’estaminet, celle qui mord sur le couloir de passage. Dédé lui embrasse les deux mains. Ghislain apporte une carte qui n’existe pas pour les autres clients. Huit couverts. À une table. Rue des Bouchers.
+### 🃏 J4 · Une ancienne maire en terrasse `d4_martine_dinner`
+> 20h50. Une berline se gare rue de la Barre, là où rien ne se gare. Martine Aubrac descend, foulard de soie et sourire de campagne, et prend LA table de l’estaminet, celle qui mord sur le couloir de passage. Dédé lui embrasse les deux mains. Ghislain apporte une carte qui n’existe pas pour les autres clients. Huit couverts. À une table. Rue des Bouchers.
 
-Choix possibles : **→ Photographier la tablée depuis la fenêtre** · Descendre la saluer « en voisin » · Prévenir le groupe : « Colette est en bas » · Noter qui est à sa table (avec Klaas) · Repérer qui d’autre mange gratis à sa table _(grisé)_ · Fermer les volets. Ce soir, on dort.
-_→ Clic. Huit personnes, une table, un couloir réduit à la largeur d’une poussette pliée. Colette lève son verre vers votre fenêtre. Elle ne vous a pas vu. Probablement. Elle trinque peut-être juste avec la façade._
+Choix possibles : **→ Photographier la tablée depuis la fenêtre** · Descendre la saluer « en voisin » · Prévenir le groupe : « Martine est en bas » · Noter qui est à sa table (avec Klaas) · Repérer qui d’autre mange gratis à sa table _(grisé)_ · Fermer les volets. Ce soir, on dort.
+_→ Clic. Huit personnes, une table, un couloir réduit à la largeur d’une poussette pliée. Martine lève son verre vers votre fenêtre. Elle ne vous a pas vu. Probablement. Elle trinque peut-être juste avec la façade._
 
 ### 🃏 Biloute flaire une livraison `r_biloute_chairs`
 > Pendant la ronde, Biloute s’arrête net devant la porte de service de l’estaminet et grogne. Une camionnette décharge, en pleine ronde, douze chaises pliantes neuves. *Biloute s’assoit. Biloute fixe les chaises. Biloute juge.*
@@ -437,7 +437,7 @@ _→ Douze chaises de plus pour une terrasse dont la surface n’a pas bougé. J
 - `20:30` Un client lève son verre à la caméra. Un autre lève autre chose. Juridiquement, ni l’un ni l’autre n’a donné son accord.
 - `20:33` 📓 Carnet de Klaas : 20:33. Mouvement du côté du n°10. Ça ressemblait à Pilou. Ça ressemblait à : Lâcher une boule puante sur la terrasse.
 - `20:33` Klaas ne détourne pas les yeux. Il ne détourne jamais les yeux.
-- `20:33` Sur le balcon d’en face, Seb a la bouche ouverte. Nico, lui, a le téléphone levé. Ce sera sur « Radio Balcon » dans trois minutes.
+- `20:33` Sur le balcon d’en face, Seb a la bouche ouverte. Nico, lui, a le téléphone levé. Ce sera sur « La Gaystapo » dans trois minutes.
 - `20:33` Le serveur vous a vu. Il secoue la tête, mi-scandalisé, mi-admiratif.
 - `20:33` « C’est lui ! Là-haut ! » Un doigt pointé. Plusieurs.
 - `20:33` Des clients se retournent, se parlent, se retournent encore.
@@ -471,7 +471,7 @@ _→ Douze chaises de plus pour une terrasse dont la surface n’a pas bougé. J
 
 ### 📱 Téléphone
 - **WhatsApp · Nico** `wa_cat_2` La chatte a dormi sur les convocations de l’AG. On les a quand même distribuées. Elles sentent le chat. C’est plus militant.
-- **WhatsApp · Seb** `wa_colette_dinner` Les photos de Pilou du dîner de Colette Verhaeghe à l’estaminet ! Elle a eu un dessert. Personne d’autre n’a eu de dessert. Je dis ça.
+- **WhatsApp · Seb** `wa_martine_dinner` Les photos de Pilou du dîner de Martine Aubrac à l’estaminet ! Elle a eu un dessert. Personne d’autre n’a eu de dessert. Je dis ça.
 - **Estaminet La Ch’tite Bernadette** `so_promo_2200` Petit rappel : notre terrasse ferme à 22h. 😉 La salle, elle, reste ouverte, et les fenêtres aussi. Venez nombreux !
 - **Avis · Ghislain** `rv_owner_reply` Réponse du propriétaire à un avis 2 étoiles : « Chère cliente, nous avons bien pris en compte votre remarque. C’est en cours de résolution. Bien cordialement. »
 
@@ -491,7 +491,7 @@ _Sommeil 77 · Asso 13 · Risque 84 · Job 26 · Dossier 43 · (caché) hostilit
 ### 🃏 Consultation citoyenne en ligne `r_consultation`
 > La mairie lance une « grande consultation sur la vie nocturne ». Il faut un compte FranceConnect, un justificatif de domicile de moins de trois mois au format PDF de moins de 2 Mo, et répondre à la question 1 : « Sur une échelle de 1 à 10, à quel point aimez-vous la convivialité ? »
 
-Choix possibles : **→ Remplir les 47 questions sérieusement** · Partager le lien sur « Radio Balcon »
+Choix possibles : **→ Remplir les 47 questions sérieusement** · Partager le lien sur « La Gaystapo »
 _→ Question 46 : « Avez-vous des suggestions ? » Champ limité à 140 caractères. Vous écrivez « Appliquer l’arrêté existant. » Il en reste 112._
 
 ### 🍺 Contre-offensive : Plainte pour harcèlement `cm_harassment_hostility`
@@ -512,4 +512,4 @@ _Sommeil 77 · Asso 13 · Risque 94 · Job 36 · Dossier 45 · (caché) hostilit
 > Klaas est venu vous chercher à la sortie. Il n’a rien dit. Il a juste rangé son carnet dans sa poche, côté cœur.
 >
 
-Drapeaux en fin de partie : boss_noticed, camera_awning, camera_window, cardboard_exhaust, cm_air_freshener, cm_fake_post, cm_harassment_complaint, cm_smokers, colette_dinner_photo, colette_dinner_seen, corridor_measured, custody, delphine_dinner, fake_reviews, filmed_faces, joined_rounds, klaas_noted_pilou, klaas_persuaded, knows_trou, met_delphine, met_hilde, met_hippolyte, met_jeremie, met_klaas, met_tatie, night_db, power_stolen, proj_db_logger, proj_db_report, proj_fake_reviews, proj_klaas_ocr, proj_scraper, proj_whatsapp_bot, random_drache, regis_courted, sabotage_chairs, sabotage_locks, sabotage_parasols, scraper_boasts, stink_bomb, tatie_fake_leak, todo_app_rust, traitor_recruited, video_viral
+Drapeaux en fin de partie : boss_noticed, camera_awning, camera_window, cardboard_exhaust, cm_air_freshener, cm_fake_post, cm_harassment_complaint, cm_smokers, martine_dinner_photo, martine_dinner_seen, corridor_measured, custody, delphine_dinner, fake_reviews, filmed_faces, joined_rounds, klaas_noted_pilou, klaas_persuaded, knows_trou, met_delphine, met_hilde, met_hippolyte, met_jeremie, met_klaas, met_tatie, night_db, power_stolen, proj_db_logger, proj_db_report, proj_fake_reviews, proj_klaas_ocr, proj_scraper, proj_whatsapp_bot, random_drache, regis_courted, sabotage_chairs, sabotage_locks, sabotage_parasols, scraper_boasts, stink_bomb, tatie_fake_leak, todo_app_rust, traitor_recruited, video_viral

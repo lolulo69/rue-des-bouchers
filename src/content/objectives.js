@@ -63,8 +63,8 @@ export const OBJECTIVES = [
   // ════════════════════════════════════════════════════════════════════════
   // LE TWIST DU SOIR (twists.js) : son occasion propre
   // ════════════════════════════════════════════════════════════════════════
-  { id: 'o_tw_colette', stance: 'legal', priority: 10, when: { twist: 'colette_dinner' }, done: { event: 'photo_taken', table: 'la table de Colette' },
-    text: 'Colette Verhaeghe dîne à huit sur une table de six. À photographier, horodaté.' },
+  { id: 'o_tw_martine', stance: 'legal', priority: 10, when: { twist: 'martine_dinner' }, done: { event: 'photo_taken', table: 'la table de Martine' },
+    text: 'Martine Aubrac dîne à huit sur une table de six. À photographier, horodaté.' },
   { id: 'o_tw_van', stance: 'legal', priority: 10, when: { twist: 'saturday_van' }, done: { event: 'photo_taken', corridor: true },
     text: 'Une camionnette dans le couloir un samedi piéton : la photo, avec la plaque.' },
   { id: 'o_tw_inspector', stance: 'legal', priority: 10, when: { twist: 'inspector_surprise_night' }, done: { event: 'action:night_mairie' },
@@ -107,7 +107,7 @@ export const OBJECTIVES = [
     text: '22h pile, la fête des voisins range. Photographiez les terrasses qui, elles, restent.' },
   { id: 'o_tw_fire', stance: 'legal', priority: 10, when: { twist: 'fire_inspection' }, done: { event: 'photo_taken', corridor: true },
     text: '22h20 : les pompiers mesurent le couloir. Une photo de la mesure vaut de l’or.' },
-  { id: 'o_tw_lescaut', stance: 'legal', priority: 10, when: { twist: 'lescaut_walk' }, done: { event: 'photo_taken', late: true },
+  { id: 'o_tw_delandre', stance: 'legal', priority: 10, when: { twist: 'delandre_walk' }, done: { event: 'photo_taken', late: true },
     text: 'Le maire passe à 23h. Photographiez la rue à 22h50, avant le grand ménage.' },
   { id: 'o_tw_lost_dog', stance: 'legal', priority: 8, when: { twist: 'lost_dog' }, done: { event: 'moved' },
     text: 'Biloute a fugué. Aidez Jérémie à chercher sous les tables (indice : la table 3).' },

@@ -134,21 +134,21 @@ describe('téléphone et dialogue surfacés par la campagne', () => {
 });
 
 describe('événements de nuit et redites (QA « pass 2 (transcripts) »)', () => {
-  it('le dîner de Colette (J4) n\'est plus une carte avant la nuit : il se joue pendant la nuit, à 20h50', () => {
+  it('le dîner de Martine (J4) n\'est plus une carte avant la nuit : il se joue pendant la nuit, à 20h50', () => {
     const c = fresh(12);
     const preNight = [];
     for (let i = 0; i < 2000 && !(c.state.day === 4 && c.step === 'night'); i++) {
       if (c.step === 'cards') { const card = c.card(); if (c.state.day === 4 && c.state.phase === 'night') preNight.push(card.id); const ok = card.choices.findIndex((x) => x.available); c.resolveCard(Math.max(0, ok)); }
       else advance(c, (x) => x.step === 'cards' || (x.state.day === 4 && x.step === 'night'));
     }
-    expect(preNight).not.toContain('d4_colette_dinner');
-    expect(c.state.nightEvents.map((x) => x.id)).toContain('d4_colette_dinner');
+    expect(preNight).not.toContain('d4_martine_dinner');
+    expect(c.state.nightEvents.map((x) => x.id)).toContain('d4_martine_dinner');
     const sim = c.createNight();
     expect(c.nightEventDue(sim)).toBeNull(); // 20h30 : pas encore
     playNight(sim, POLICIES.passive(), c);
-    const ev = sim.state.journal.find((e) => e.type === 'night-event' && e.id === 'd4_colette_dinner');
+    const ev = sim.state.journal.find((e) => e.type === 'night-event' && e.id === 'd4_martine_dinner');
     expect(ev?.t).toBeGreaterThanOrEqual(20 * 60 + 50);
-    expect(c.state.seen.events).toContain('d4_colette_dinner');
+    expect(c.state.seen.events).toContain('d4_martine_dinner');
   });
 
   it('la drache vide toutes les terrasses en quelques minutes, et rien ne ressort', () => {

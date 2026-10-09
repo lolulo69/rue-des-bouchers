@@ -306,7 +306,7 @@ export const CAMPAIGN = {
   igpn: { openCorruption: -15, transferAfterDays: 3, transferCorruption: -25 },
   tatieLeak: { flag: 'tatie_wavering', minHostility: 40, chance: 0.25 },
   // Bureau ou télétravail (§12b.D) : ~2 jours à la maison par semaine (jamais le J14), tirés à la graine de campagne
-  workdays: { homePerWeek: 2, homeJobPenalty: 1, officeSceneChance: 0.5 }, // Tatie, flattée par le bloc, peut laisser fuiter le vrai plan à Colette
+  workdays: { homePerWeek: 2, homeJobPenalty: 1, officeSceneChance: 0.5 }, // Tatie, flattée par le bloc, peut laisser fuiter le vrai plan à Martine
 };
 
 // Menu de nuit (N, §12c.4) : tout ce que le menu affiche vient d'ici et des données (actions.js, nightActions.js)

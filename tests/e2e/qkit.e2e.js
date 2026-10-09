@@ -127,7 +127,7 @@ test('A3 durée : début de la première nuit de campagne', async ({ page }) => 
 
 test('A5 événements fixes : une carte par jour fixe', async ({ page }) => {
   await newCampaign(page);
-  const FIXED = [[1, 'd1_monday'], [4, 'd4_colette_dinner'], [6, 'd6_saturday'], [7, 'd7_general_meeting'], [9, 'd9_inspector'], [11, 'd11_exhaust_meeting'], [13, 'd13_saturday'], [14, 'd14_commission']];
+  const FIXED = [[1, 'd1_monday'], [4, 'd4_martine_dinner'], [6, 'd6_saturday'], [7, 'd7_general_meeting'], [9, 'd9_inspector'], [11, 'd11_exhaust_meeting'], [13, 'd13_saturday'], [14, 'd14_commission']];
   for (const [day, id] of FIXED) {
     const r = await qk(page, ([d, card]) => window.qk.to(d, 'cards', { card }), [day, id]);
     await settle(page);

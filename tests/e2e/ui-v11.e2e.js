@@ -85,7 +85,7 @@ test('après-midi : carnet sur la rue de jour, résultat à la mairie ; carte «
   });
   await expect(page.locator('[data-testid=notebook]')).toBeVisible();
   await expect(page.locator('#ui-root')).toHaveAttribute('data-scene', 'street');
-  await page.click('[data-testid=action][data-id=pm_request_lescaut]');
+  await page.click('[data-testid=action][data-id=pm_request_delandre]');
   await expect(page.locator('[data-testid=result]')).toBeVisible();
   await expect(page.locator('#ui-root')).toHaveAttribute('data-scene', 'mairie');
   await page.click('[data-testid=result-next]');

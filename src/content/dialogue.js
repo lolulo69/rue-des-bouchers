@@ -460,7 +460,7 @@ export const DIALOGUE = [
   },
 
   // ════════════════════════════════════════════════════════════════════════
-  // TATIE BOUCHON — proverbes bancals, e-mails, girouette, thé avec Colette
+  // TATIE BOUCHON — proverbes bancals, e-mails, girouette, thé avec Martine
   // ════════════════════════════════════════════════════════════════════════
   {
     id: 'tatie_hello',
@@ -518,11 +518,11 @@ export const DIALOGUE = [
     ],
   },
   {
-    id: 'tatie_colette',
+    id: 'tatie_martine',
     speaker: 'tatie',
     when: { flags: ['met_tatie'], chance: 0.4 },
     lines: [
-      "J’ai pris le thé avec Colette, mardi. Une femme charmante. Elle dit que la convivialité, c’est l’âme de Lille.",
+      "J’ai pris le thé avec Martine, mardi. Une femme charmante. Elle dit que la convivialité, c’est l’âme de Lille.",
       "Moi je dis que l’âme de Lille, elle aimerait bien dormir aussi. Mais je l’ai dit gentiment, on était sur ses biscuits.",
     ],
   },
@@ -581,7 +581,7 @@ export const DIALOGUE = [
     speaker: 'tatie',
     when: { flags: ['bloc_fooled', 'met_tatie'] },
     lines: [
-      "J’ai raconté à Colette le plan que vous m’aviez confié. Il paraît qu’en bas, ils ont tout rangé pour rien toute la soirée.",
+      "J’ai raconté à Martine le plan que vous m’aviez confié. Il paraît qu’en bas, ils ont tout rangé pour rien toute la soirée.",
       "« Qui sème le vent récolte des chaises vides. » Je ne me sens pas du tout coupable. Un peu fière, même.",
     ],
     once: true,
@@ -699,11 +699,11 @@ export const DIALOGUE = [
   },
 
   {
-    id: 'seb_colette_ignored',
+    id: 'seb_martine_ignored',
     speaker: 'seb',
-    when: { flags: ['colette_dinner_ignored', 'met_seb_nico'] },
+    when: { flags: ['martine_dinner_ignored', 'met_seb_nico'] },
     lines: [
-      "Colette Verhaeghe a dîné EN BAS DE CHEZ TOI et tu n’as même pas ouvert la fenêtre ?!",
+      "Martine Aubrac a dîné EN BAS DE CHEZ TOI et tu n’as même pas ouvert la fenêtre ?!",
       "J’ai dû tout raconter dans le groupe tout seul. Avec des photos de travers. Tu me dois un feuilleton.",
     ],
     once: true,
@@ -1251,7 +1251,7 @@ export const DIALOGUE = [
   },
 
   // ════════════════════════════════════════════════════════════════════════
-  // INSTITUTIONS — Delphine, Colette, Lescaut, Stéphane
+  // INSTITUTIONS — Delphine, Martine, Delandre, Stéphane
   // ════════════════════════════════════════════════════════════════════════
   {
     id: 'delphine_ac',
@@ -1294,8 +1294,8 @@ export const DIALOGUE = [
     once: true,
   },
   {
-    id: 'colette_conviviality',
-    speaker: 'colette',
+    id: 'martine_conviviality',
+    speaker: 'martine',
     when: { day: [3, 14] },
     lines: [
       "Mes chers amis, la convivialité, c’est l’ADN de Lille. Les terrasses, c’est le cœur qui bat de la ville.",
@@ -1303,9 +1303,9 @@ export const DIALOGUE = [
     ],
   },
   {
-    id: 'colette_dinner',
-    speaker: 'colette',
-    when: { flags: ['colette_dinner_seen'] },
+    id: 'martine_dinner',
+    speaker: 'martine',
+    when: { flags: ['martine_dinner_seen'] },
     lines: [
       "J’étais simplement venue goûter la carbonnade. Une ancienne maire a bien le droit de dîner, non ?",
       "Et de saluer quelques amis. On a encore le droit d’avoir des amis, à Lille.",
@@ -1313,16 +1313,16 @@ export const DIALOGUE = [
     once: true,
   },
   {
-    id: 'colette_tatie',
-    speaker: 'colette',
+    id: 'martine_tatie',
+    speaker: 'martine',
     when: { flags: ['met_tatie'], chance: 0.3 },
     lines: [
       "Votre voisine, Tatie Bouchon, est un trésor. Elle me raconte tout. Absolument tout. Je l’adore.",
     ],
   },
   {
-    id: 'colette_scandal',
-    speaker: 'colette',
+    id: 'martine_scandal',
+    speaker: 'martine',
     when: { flags: ['press_scandal'] },
     lines: [
       "Je découvre cette affaire dans la presse, comme tout le monde. Je n’ai jamais rien su. Je ne connais personne. On va regarder ça.",
@@ -1330,9 +1330,9 @@ export const DIALOGUE = [
     once: true,
   },
   {
-    id: 'lescaut_meeting',
-    speaker: 'lescaut',
-    when: { flags: ['lescaut_meeting'] },
+    id: 'delandre_meeting',
+    speaker: 'delandre',
+    when: { flags: ['delandre_meeting'] },
     lines: [
       "Monsieur Dubeton. Je vous entends. J’ai mis en place les 22h, vous savez. On me l’a beaucoup reproché, dans certains salons.",
       "Apportez-moi du solide. Pas de rancœur, pas de surprises dans la presse. Du solide.",
@@ -1340,26 +1340,26 @@ export const DIALOGUE = [
     once: true,
   },
   {
-    id: 'lescaut_requested',
-    speaker: 'lescaut',
-    when: { flags: ['lescaut_requested'], notFlags: ['lescaut_meeting'] },
+    id: 'delandre_requested',
+    speaker: 'delandre',
+    when: { flags: ['delandre_requested'], notFlags: ['delandre_meeting'] },
     lines: [
       "Le cabinet du maire a bien reçu votre demande. Le maire vous entend. Son agenda, un peu moins.",
     ],
   },
   {
-    id: 'lescaut_petition',
-    speaker: 'lescaut',
-    when: { flags: ['petition_delivered', 'met_lescaut'] },
+    id: 'delandre_petition',
+    speaker: 'delandre',
+    when: { flags: ['petition_delivered', 'met_delandre'] },
     lines: [
       "Votre pétition est sur mon bureau. Elle a plus de signatures que celle des « clients heureux ». Et moins de fautes d’orthographe.",
     ],
     once: true,
   },
   {
-    id: 'lescaut_scandal',
-    speaker: 'lescaut',
-    when: { flags: ['press_scandal', 'met_lescaut'] },
+    id: 'delandre_scandal',
+    speaker: 'delandre',
+    when: { flags: ['press_scandal', 'met_delandre'] },
     lines: [
       "Je déteste les surprises dans la presse. Celle-là, je dois l’avouer, je la déteste un peu moins.",
     ],
@@ -1919,11 +1919,11 @@ export const DIALOGUE = [
     once: true,
   },
   {
-    id: 'tw_lescaut_tatie',
+    id: 'tw_delandre_tatie',
     speaker: 'tatie',
-    when: { flags: ['twist_lescaut_walk', 'met_tatie'] },
+    when: { flags: ['twist_delandre_walk', 'met_tatie'] },
     lines: [
-      "Le maire est passé l’autre soir, à pied ! Je l’ai vu de ma fenêtre. Il a regardé les bonnes tables. Colette, elle, ne venait qu’en berline. Je dis ça, je ne dis rien.",
+      "Le maire est passé l’autre soir, à pied ! Je l’ai vu de ma fenêtre. Il a regardé les bonnes tables. Martine, elle, ne venait qu’en berline. Je dis ça, je ne dis rien.",
     ],
     once: true,
   },

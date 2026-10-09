@@ -39,37 +39,37 @@ export const EVENTS = [
     ],
   },
 
-  // ── J4 · jeudi : Colette Verhaeghe dîne à l'estaminet ──────────────────────
+  // ── J4 · jeudi : Martine Aubrac dîne à l'estaminet ──────────────────────
   {
-    id: 'd4_colette_dinner',
+    id: 'd4_martine_dinner',
     at: 20 * 60 + 50, // joué pendant la nuit, à cette heure (campaign.nightEventDue)
     day: 4,
     phase: 'night',
-    speaker: 'colette',
+    speaker: 'martine',
     title: "J4 · Une ancienne maire en terrasse",
     text:
-      "20h50. Une berline se gare rue de la Barre, là où rien ne se gare. Colette Verhaeghe descend, foulard de soie et sourire de campagne, et prend LA table de l’estaminet, celle qui mord sur le couloir de passage. Dédé lui embrasse les deux mains. Ghislain apporte une carte qui n’existe pas pour les autres clients. Huit couverts. À une table. Rue des Bouchers.",
+      "20h50. Une berline se gare rue de la Barre, là où rien ne se gare. Martine Aubrac descend, foulard de soie et sourire de campagne, et prend LA table de l’estaminet, celle qui mord sur le couloir de passage. Dédé lui embrasse les deux mains. Ghislain apporte une carte qui n’existe pas pour les autres clients. Huit couverts. À une table. Rue des Bouchers.",
     choices: [
       {
         label: 'Photographier la tablée depuis la fenêtre',
         effects: {
           dossier: +6,
           hostility: +5,
-          setFlags: ['colette_dinner_seen', 'colette_dinner_photo'],
-          evidence: { kind: 'photo', quality: 0.8, legal: true, label: "J4 · Colette Verhaeghe à 8 sur une table de 6, en débord sur le couloir" },
+          setFlags: ['martine_dinner_seen', 'martine_dinner_photo'],
+          evidence: { kind: 'photo', quality: 0.8, legal: true, label: "J4 · Martine Aubrac à 8 sur une table de 6, en débord sur le couloir" },
         },
         result:
-          "Clic. Huit personnes, une table, un couloir réduit à la largeur d’une poussette pliée. Colette lève son verre vers votre fenêtre. Elle ne vous a pas vu. Probablement. Elle trinque peut-être juste avec la façade.",
+          "Clic. Huit personnes, une table, un couloir réduit à la largeur d’une poussette pliée. Martine lève son verre vers votre fenêtre. Elle ne vous a pas vu. Probablement. Elle trinque peut-être juste avec la façade.",
       },
       {
         label: 'Descendre la saluer « en voisin »',
-        effects: { hostility: +10, asso: +3, sleep: -5, setFlags: ['colette_dinner_seen'] },
+        effects: { hostility: +10, asso: +3, sleep: -5, setFlags: ['martine_dinner_seen'] },
         result:
           "« Ah, un riverain ! Mes chers amis, voilà la vraie vie de quartier ! » Elle vous serre la main, vous présente comme « un passionné », et vous ressortez avec une carte de visite et l’impression d’avoir été inauguré. Dédé, lui, a retenu votre visage.",
       },
       {
-        label: 'Prévenir le groupe : « Colette est en bas »',
-        effects: { asso: +6, setFlags: ['colette_dinner_seen', 'whatsapp_rally'] },
+        label: 'Prévenir le groupe : « Martine est en bas »',
+        effects: { asso: +6, setFlags: ['martine_dinner_seen', 'whatsapp_rally'] },
         result: `Sur « ${WHATSAPP_GROUP} », trente-quatre messages en six minutes. Seb a déjà zoomé sur le dessert. Nico rappelle que « zoomer sur un dessert n’est pas une preuve ». Tatie Bouchon répond : « Je la vois bientôt pour le thé, je lui dirai. » Tout le monde se tait une seconde.`,
       },
       {
@@ -77,7 +77,7 @@ export const EVENTS = [
         requires: { flags: ['met_klaas'] },
         effects: {
           dossier: +4,
-          setFlags: ['colette_dinner_seen'],
+          setFlags: ['martine_dinner_seen'],
           evidence: { kind: 'carnet', quality: 0.7, legal: true, label: 'Carnet de Klaas, J4 : « 20h52, ex-maire, 8 couverts, table 1, couloir à 1m10 »' },
         },
         result:
@@ -89,17 +89,17 @@ export const EVENTS = [
         effects: {
           dossier: +5,
           corruption: -3,
-          setFlags: ['colette_dinner_seen', 'colette_dinner_photo'],
-          evidence: { kind: 'photo', quality: 0.65, legal: true, label: "J4 · Le brigadier Lemaire, en civil, au dîner de Colette" },
+          setFlags: ['martine_dinner_seen', 'martine_dinner_photo'],
+          evidence: { kind: 'photo', quality: 0.65, legal: true, label: "J4 · Le brigadier Lemaire, en civil, au dîner de Martine" },
         },
         result:
           "En bout de table, en civil mais avec la même moustache : le brigadier Lemaire. Il ne paie pas son waterzooi. Personne ne paie rien, d’ailleurs. Ce soir, l’addition, c’est la rue.",
       },
       {
         label: 'Fermer les volets. Ce soir, on dort.',
-        effects: { sleep: +8, setFlags: ['colette_dinner_ignored'] },
+        effects: { sleep: +8, setFlags: ['martine_dinner_ignored'] },
         result:
-          "Vous fermez. On entend quand même le discours de Colette sur « la convivialité, ADN de Lille », mais en mono. C’est déjà ça.",
+          "Vous fermez. On entend quand même le discours de Martine sur « la convivialité, ADN de Lille », mais en mono. C’est déjà ça.",
       },
     ],
   },
@@ -188,7 +188,7 @@ export const EVENTS = [
     speaker: 'delphine',
     title: "J9 · L’inspectrice revient pour la clim",
     text:
-      "La mairie a programmé une contre-visite du groupe de climatisation posé sans autorisation sur la façade du n°10. Tout dépend d’une chose : l’estaminet sait-il qu’elle vient ? Dans ce quartier, une visite annoncée, c’est une visite racontée à Colette, donc à Dédé, donc à la clim, qui se retrouve soudain très bien cachée.",
+      "La mairie a programmé une contre-visite du groupe de climatisation posé sans autorisation sur la façade du n°10. Tout dépend d’une chose : l’estaminet sait-il qu’elle vient ? Dans ce quartier, une visite annoncée, c’est une visite racontée à Martine, donc à Dédé, donc à la clim, qui se retrouve soudain très bien cachée.",
     choices: [
       {
         label: 'Glisser à Delphine que la visite doit rester surprise',
@@ -215,7 +215,7 @@ export const EVENTS = [
         label: 'Laisser la procédure suivre son cours',
         effects: { setFlags: ['inspector_announced', 'ac_case_stalled'], corruption: +3 },
         result:
-          "Visite annoncée par courrier, donc annoncée à Colette, donc à tout le monde. Le jour J, il n’y a plus de clim sur la façade, juste quatre trous rebouchés au mastic frais et une jardinière de géraniums très contents. « Constat : néant. Le dossier reste ouvert. » Il le restera longtemps. La clim, elle, revient vendredi.",
+          "Visite annoncée par courrier, donc annoncée à Martine, donc à tout le monde. Le jour J, il n’y a plus de clim sur la façade, juste quatre trous rebouchés au mastic frais et une jardinière de géraniums très contents. « Constat : néant. Le dossier reste ouvert. » Il le restera longtemps. La clim, elle, revient vendredi.",
       },
     ],
   },
@@ -299,16 +299,16 @@ export const EVENTS = [
     id: 'd14_commission',
     day: 14,
     phase: 'afternoon',
-    speaker: 'lescaut',
+    speaker: 'delandre',
     title: 'J14 · Commission des terrasses, salle du conseil',
     text:
-      "Lambris, micro qui grésille, carafe d’eau tiède. Au premier rang, le bloc en tenue du dimanche : Dédé sourit à tout le monde, Ghislain a apporté son classeur, désormais à 600 pages. Colette Verhaeghe s’assoit « en simple citoyenne », au premier rang, à côté du micro. Bertrand Lescaut ouvre la séance : « Je vous entends tous. Je vous écoute, maintenant. » C’est à vous.",
+      "Lambris, micro qui grésille, carafe d’eau tiède. Au premier rang, le bloc en tenue du dimanche : Dédé sourit à tout le monde, Ghislain a apporté son classeur, désormais à 600 pages. Martine Aubrac s’assoit « en simple citoyenne », au premier rang, à côté du micro. Arnaud Delandre ouvre la séance : « Je vous entends tous. Je vous écoute, maintenant. » C’est à vous.",
     // Scène de la commission : le moteur affiche, dans l'ordre, chaque réplique dont `when` correspond
     // (même principe que les épilogues), puis les choix. Forces et faiblesses du dossier → discours.
     scene: [
       // ── Ouverture ──────────────────────────────────────────────────────
       {
-        speaker: 'lescaut',
+        speaker: 'delandre',
         when: {},
         text: "« Mesdames, messieurs, la commission examine ce jour le renouvellement de l’autorisation d’occupation temporaire de l’Estaminet La Ch’tite Bernadette. Chacun aura la parole. Brièvement. Monsieur Ghislain, merci de ne pas lire les 600 pages. »",
       },
@@ -341,7 +341,7 @@ export const EVENTS = [
       },
       {
         speaker: 'jeremie',
-        when: { flags: ['colette_dinner_photo'] },
+        when: { flags: ['martine_dinner_photo'] },
         text: "« Pièce 12 : un dîner de huit personnes à une table de six, le jeudi de la première semaine. » Il ne regarde pas le premier rang. Tout le monde regarde le premier rang.",
       },
       {
@@ -434,23 +434,23 @@ export const EVENTS = [
         text: "Delphine Vermeersch n’est pas là. Un collègue lit sa note d’une voix monocorde : « L’inspectrice s’est déportée de ce dossier pour des raisons de déontologie. » Ghislain sourit pour la première fois de l’année.",
       },
 
-      // ── Colette Verhaeghe, « simple citoyenne » ────────────────────────
+      // ── Martine Aubrac, « simple citoyenne » ────────────────────────
       {
-        speaker: 'colette',
+        speaker: 'martine',
         when: { notFlags: ['press_scandal'] },
-        text: "Colette Verhaeghe se lève sans qu’on lui donne la parole : « Mes chers amis, la convivialité, c’est l’ADN de Lille. Rue de Gand, on ferme à minuit. Je dis ça, je ne dis rien. » Elle se rassoit. Elle a tout dit.",
+        text: "Martine Aubrac se lève sans qu’on lui donne la parole : « Mes chers amis, la convivialité, c’est l’ADN de Lille. Rue de Gand, on ferme à minuit. Je dis ça, je ne dis rien. » Elle se rassoit. Elle a tout dit.",
       },
 
       // ── Le maire, avant la parole de Pilou ─────────────────────────────
       {
-        speaker: 'lescaut',
-        when: { flags: ['lescaut_ally'] },
-        text: "Bertrand Lescaut vous fait un signe de tête discret. « J’ai lu votre dossier, monsieur Dubeton. Tout votre dossier. Je vous écoute. »",
+        speaker: 'delandre',
+        when: { flags: ['delandre_ally'] },
+        text: "Arnaud Delandre vous fait un signe de tête discret. « J’ai lu votre dossier, monsieur Dubeton. Tout votre dossier. Je vous écoute. »",
       },
       {
-        speaker: 'lescaut',
-        when: { notFlags: ['lescaut_ally'] },
-        text: "Bertrand Lescaut se tourne vers vous : « Monsieur Dubeton. Vous avez la parole. Trois minutes. Je vous entends. »",
+        speaker: 'delandre',
+        when: { notFlags: ['delandre_ally'] },
+        text: "Arnaud Delandre se tourne vers vous : « Monsieur Dubeton. Vous avez la parole. Trois minutes. Je vous entends. »",
       },
     ],
     choices: [
@@ -494,7 +494,7 @@ export const EVENTS = [
         requires: { flags: ['corruption_proof', 'press_contacted'] },
         effects: { hostility: +25, corruption: -40, setFlags: ['commission_done', 'won_scandal', 'commission_won', 'press_scandal'] },
         result:
-          "La une du journal : « Terrasses et waterzooi : la police municipale mange-t-elle à l’œil ? » La salle bruisse. Colette se découvre un rendez-vous urgent. Le Commandant Desmet annonce, sans qu’on lui demande, que « l’affaire est prise très au sérieux ». La commission devient un point presse. Le bloc a perdu, et ne l’oubliera pas.",
+          "La une du journal : « Terrasses et waterzooi : la police municipale mange-t-elle à l’œil ? » La salle bruisse. Martine se découvre un rendez-vous urgent. Le Commandant Desmet annonce, sans qu’on lui demande, que « l’affaire est prise très au sérieux ». La commission devient un point presse. Le bloc a perdu, et ne l’oubliera pas.",
       },
       {
         label: 'Venir… en habitué de l’estaminet',
@@ -507,7 +507,7 @@ export const EVENTS = [
         label: 'Improviser avec ce qu’on a',
         effects: { setFlags: ['commission_done', 'commission_lost'] },
         result:
-          "Vous parlez du sommeil, de la gaine, du droit à la nuit. C’est sincère. Ghislain répond avec 600 pages, Colette avec « l’ADN de Lille ». « La commission prend acte des efforts de l’établissement. » L’AOT est renouvelée. Avec, en prime, une extension d’une table.",
+          "Vous parlez du sommeil, de la gaine, du droit à la nuit. C’est sincère. Ghislain répond avec 600 pages, Martine avec « l’ADN de Lille ». « La commission prend acte des efforts de l’établissement. » L’AOT est renouvelée. Avec, en prime, une extension d’une table.",
       },
     ],
   },
@@ -775,7 +775,7 @@ export const EVENTS = [
     once: true,
     title: 'Une affiche sur la vitrine de La Bombance',
     text:
-      "Sur la vitrine blanchie du n°4, l’affiche « À LOUER » a été remplacée par « BIENTÔT ». Bientôt quoi ? Tatie Bouchon a sa petite idée : « Colette m’a dit qu’un garçon très bien voulait y faire un bar à cocktails. Avec DJ. Elle trouvait ça ‹ dynamique ›. »",
+      "Sur la vitrine blanchie du n°4, l’affiche « À LOUER » a été remplacée par « BIENTÔT ». Bientôt quoi ? Tatie Bouchon a sa petite idée : « Martine m’a dit qu’un garçon très bien voulait y faire un bar à cocktails. Avec DJ. Elle trouvait ça ‹ dynamique ›. »",
     choices: [
       {
         label: 'Prévenir Hippolyte',
@@ -791,13 +791,13 @@ export const EVENTS = [
   },
 
   {
-    id: 'r_colette_interview',
-    speaker: 'colette',
+    id: 'r_martine_interview',
+    speaker: 'martine',
     when: { day: [5, 12], phase: 'morning', notFlags: ['press_article'], chance: 0.2 },
     once: true,
-    title: "La Voix du Nordiste : « Colette Verhaeghe : laissez vivre Lille ! »",
+    title: "La Voix du Nordiste : « Martine Aubrac : laissez vivre Lille ! »",
     text:
-      "Pleine page. Colette pose devant un estaminet qui ressemble beaucoup à l’estaminet : « La convivialité, c’est l’ADN de Lille. Je comprends les riverains, j’en ai été une, mais rue de Gand ferme bien à minuit, non ? » Pas un mot sur la règle des 22h. Ni sur le couloir.",
+      "Pleine page. Martine pose devant un estaminet qui ressemble beaucoup à l’estaminet : « La convivialité, c’est l’ADN de Lille. Je comprends les riverains, j’en ai été une, mais rue de Gand ferme bien à minuit, non ? » Pas un mot sur la règle des 22h. Ni sur le couloir.",
     choices: [
       {
         label: "Envoyer un droit de réponse à la journaliste",
@@ -808,7 +808,7 @@ export const EVENTS = [
       {
         label: "Encadrer l’article dans les toilettes",
         effects: { sleep: +2 },
-        result: "Une place d’honneur. Colette y sourira à chacun de vos passages. C’est une forme de dialogue.",
+        result: "Une place d’honneur. Martine y sourira à chacun de vos passages. C’est une forme de dialogue.",
       },
     ],
   },
@@ -951,7 +951,7 @@ export const EVENTS = [
     once: true,
     title: 'Permis déposé au n°4',
     text:
-      "Un panneau blanc est apparu sur la façade de La Bombance : « Déclaration préalable de travaux · Changement de destination · Bar de nuit ». Tatie, ravie d’avoir eu raison : « Je vous l’avais dit. C’est Colette qui me l’a dit. Je ne devrais pas vous le dire. »",
+      "Un panneau blanc est apparu sur la façade de La Bombance : « Déclaration préalable de travaux · Changement de destination · Bar de nuit ». Tatie, ravie d’avoir eu raison : « Je vous l’avais dit. C’est Martine qui me l’a dit. Je ne devrais pas vous le dire. »",
     choices: [
       {
         label: "Lancer Hippolyte sur l’angle patrimoine du n°4",

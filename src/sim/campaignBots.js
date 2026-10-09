@@ -163,7 +163,7 @@ function recklessNight() {
   };
 }
 
-const MIXED = { dossier: 5, asso: 1.5, sleep: 0.5, risk: -3, hostility: -0.2, job: 0.3, legalEvidence: 8, illegalEvidence: 2, flags: flagWeights({ stance_legal: 20, tatie_fake_leak: 5, bloc_fooled: 5, lawyer_hired: 8, formal_notice: 8, lescaut_requested: 6, lescaut_meeting: 8 }), caution: 2 };
+const MIXED = { dossier: 5, asso: 1.5, sleep: 0.5, risk: -3, hostility: -0.2, job: 0.3, legalEvidence: 8, illegalEvidence: 2, flags: flagWeights({ stance_legal: 20, tatie_fake_leak: 5, bloc_fooled: 5, lawyer_hired: 8, formal_notice: 8, delandre_requested: 6, delandre_meeting: 8 }), caution: 2 };
 const MIXED_TIRED = { ...MIXED, sleep: 3 };
 const STEALTHY = { dossier: 1, risk: -2, hostility: 0.3, illegalEvidence: 3, anyFlag: 2, flags: flagWeights({ stance_direct: 15, disguise_hood: 20, disguise_vest: 20, waiter_bribed: 15, waiter_informant: 15, proj_wifi_cracker: 15, wifi_cracked: 15, kitchen_sabotaged: 25, laxative_done: 15, backroom_sneak: 30, camera_awning: 8, press_scandal: 20, sabotage_chairs: 12, sabotage_parasols: 12, sabotage_locks: 12, power_stolen: 12, stink_bomb: 8 }), caution: 2 };
 const STEALTHY_CAMERA = { ...STEALTHY, flags: { ...STEALTHY.flags, camera_awning: 14 } };
@@ -190,7 +190,7 @@ export const CAMPAIGN_BOTS = {
   }),
   legal: () => make({
     name: 'légal prudent', legality: ['legal'],
-    weights: { dossier: 3, asso: 1.5, sleep: 0.5, risk: -5, hostility: -0.2, job: 0.3, legalEvidence: 6, flags: flagWeights({ stance_legal: 20, lawyer_hired: 8, formal_notice: 8, lescaut_requested: 6, lescaut_meeting: 8, lescaut_ally: 8, inquiry_open: 10, lemaire_transferred: 10 }) },
+    weights: { dossier: 3, asso: 1.5, sleep: 0.5, risk: -5, hostility: -0.2, job: 0.3, legalEvidence: 6, flags: flagWeights({ stance_legal: 20, lawyer_hired: 8, formal_notice: 8, delandre_requested: 6, delandre_meeting: 8, delandre_ally: 8, inquiry_open: 10, lemaire_transferred: 10 }) },
     nightPolicy: legalNight({ asso: true }), nightContent: () => true,
   }),
   reckless: () => make({

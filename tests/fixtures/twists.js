@@ -2,7 +2,7 @@
 // pas le contenu du jeu (src/content/twists.js et unlocks.js, écrits par les auteurs).
 const H = (h, m = 0) => h * 60 + m;
 export const TWISTS = [
-  { id: 'fx_colette', day: 4, title: 'Colette dîne à l’estaminet', intro: 'Ce soir, l’ancienne maire dîne en terrasse.', sim: { closeDelay: 25 }, props: ['colette_table'], lines: { recap: ['Colette a dîné jusqu’à minuit.'] }, after: { setFlags: ['twist_colette_seen'] } },
+  { id: 'fx_martine', day: 4, title: 'Martine dîne à l’estaminet', intro: 'Ce soir, l’ancienne maire dîne en terrasse.', sim: { closeDelay: 25 }, props: ['martine_table'], lines: { recap: ['Martine a dîné jusqu’à minuit.'] }, after: { setFlags: ['twist_martine_seen'] } },
   { id: 'fx_birthday', pool: true, title: 'Anniversaire à la table 4', intro: 'Onze personnes à la table 4.', sim: { tables: [{ rest: 'bernadette', count: 11, label: 'table 4' }], events: [{ at: H(23, 40), text: 'Joyeux anniversaire ! (à tue-tête)', simEffect: { noise: 8 } }] }, props: ['candles'] },
   { id: 'fx_influencer', pool: true, title: 'Une influenceuse et son ring light', intro: 'Elle filme tout.', sim: { witnesses: [{ id: 'influencer', at: 'street', filming: true, p: 1 }] }, props: ['ring_light'], after: { media: ['wa_influencer'] } },
   { id: 'fx_match', pool: true, title: 'Match sur écran géant', intro: 'Un écran dehors.', sim: { noise: 1.3, events: [{ at: H(21, 40), text: 'BUT !', simEffect: { noise: 12, minutes: 3 } }] } },

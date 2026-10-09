@@ -42,7 +42,7 @@ Line numbers re-checked on `main` at e46d826.
 | src/ui/rules.js | 39, 51 | `jusqu'au`, `n'est` | `jusqu’au`, `n’est` | UI · **applied** (copy-apply) |
 | index.html | 35 | La **hotte du resto** souffle sous sa fenêtre. | La **gaine d’extraction** souffle sous sa fenêtre. (« gaine » everywhere else in the game) | build · **applied** (copy-apply) |
 | index.html | 34 | `l'<b>Estaminet La Ch'tite Bernadette</b>` | `l’<b>Estaminet La Ch’tite Bernadette</b>` | build · **applied** (copy-apply) |
-| index.html | 52 | 💬 Groupe WhatsApp de l'asso | 💬 Groupe WhatsApp « Radio Balcon » (read `WHATSAPP_GROUP` at runtime, so the v1.0 rename reaches this button) | build · **applied** (copy-apply) |
+| index.html | 52 | 💬 Groupe WhatsApp de l'asso | 💬 Groupe WhatsApp « La Gaystapo » (read `WHATSAPP_GROUP` at runtime, so the v1.0 rename reaches this button) | build · **applied** (copy-apply) |
 | index.html | 50–51 | Police municipale (en mon nom) / Police, « pour l'Association… » | fine, apart from the apostrophe | build · **applied** (copy-apply) |
 
 ## Applied (copy-apply)

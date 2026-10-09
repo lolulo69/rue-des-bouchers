@@ -326,7 +326,7 @@ export function makeAmbience(ctx, { out, sfxOut, noise, makeReverbBus, music, pl
       let s = 0; e.ticks.push((dt) => { s += dt / 70; e.pos.z = z1 + (z0 - z1) * s; if (s >= 1) e.stop(); });
       twistE.push(e);
     },
-    lescaut_walk: () => duck(3),
+    delandre_walk: () => duck(3),
   };
 
   return {

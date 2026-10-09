@@ -11,7 +11,7 @@ export const FLAGS = {
   met_klaas: '', stance_legal: '', stance_direct: '', stance_dialogue: '', petition_started: '', press_contacted: '',
   won_legal: '', won_peace: '', commission_won: '', commission_lost: '', commission_done: '', carbonnade_1: '', carbonnade_2: '', carbonnade_3: '',
   bombance_bar_project: '', cm_bins: '', cm_harassment_complaint: '', proj_db_logger: '', proj_fake_reviews: '', stink_bomb: '',
-  disguise_hood: '', martine_seen: '', random_drache: '', twist_colette_seen: '', lescaut_meeting: '',
+  disguise_hood: '', martine_seen: '', random_drache: '', twist_martine_seen: '', delandre_meeting: '',
 };
 
 export const CHARACTERS = { pilou: { name: 'Pilou' }, klaas: { name: 'Klaas' }, jeremie: { name: 'Jérémie' }, dede: { name: 'Dédé' } };
@@ -22,7 +22,7 @@ export const DIALOGUE = [
 ];
 
 export const EVENTS = [
-  { id: 'martine_dinner', day: 4, phase: 'night', title: 'Le dîner de Colette', text: 'Colette Verhaeghe dîne à l\'estaminet.', choices: [
+  { id: 'martine_dinner', day: 4, phase: 'night', title: 'Le dîner de Martine', text: 'Martine Aubrac dîne à l\'estaminet.', choices: [
     { label: 'Regarder', effects: { setFlags: ['martine_seen'] }, result: 'Elle commande la carbonnade.' },
   ] },
   { id: 'ag', day: 7, phase: 'afternoon', title: 'Assemblée générale', text: 'Quelle stratégie ?', choices: [

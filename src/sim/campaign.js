@@ -638,12 +638,12 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
   };
   c.endAfternoon = () => {
     if (S.step !== 'actions') throw new Error(`fin d’après-midi hors de l’après-midi (${S.step})`);
-    // Tatie hésite (flattée par le bloc) : elle peut laisser fuiter le vrai plan à Colette
+    // Tatie hésite (flattée par le bloc) : elle peut laisser fuiter le vrai plan à Martine
     const L = C.tatieLeak;
     if (L && c.has(L.flag) && !c.has('tatie_leaked_plan') && S.hidden.hostility >= L.minHostility && rng.chance(L.chance)) {
       setFlag('tatie_leaked_plan');
       c.note('engine-flag', { flag: 'tatie_leaked_plan' });
-      S.cards.push({ type: 'info', id: 'tatie_leak', title: 'Fuite', text: 'Tatie Bouchon a pris le thé avec Colette Verhaeghe. Le bloc connaît vos plans.' });
+      S.cards.push({ type: 'info', id: 'tatie_leak', title: 'Fuite', text: 'Tatie Bouchon a pris le thé avec Martine Aubrac. Le bloc connaît vos plans.' });
     }
     beginPhase('night');
   };

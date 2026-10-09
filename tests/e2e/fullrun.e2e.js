@@ -14,7 +14,7 @@ import { watchErrors, hhmm } from './helpers.js';
 const WPM = 200;
 const CLICK_S = 2;
 const NIGHT_S = (RULES.nightEnd - RULES.nightStart) / RULES.gameMinutesPerSecond; // durée réelle d'une nuit, en s
-const FIXED = { 1: 'd1_monday', 4: 'd4_colette_dinner', 6: 'd6_saturday', 7: 'd7_general_meeting', 9: 'd9_inspector', 11: 'd11_exhaust_meeting', 13: 'd13_saturday', 14: 'd14_commission' };
+const FIXED = { 1: 'd1_monday', 4: 'd4_martine_dinner', 6: 'd6_saturday', 7: 'd7_general_meeting', 9: 'd9_inspector', 11: 'd11_exhaust_meeting', 13: 'd13_saturday', 14: 'd14_commission' };
 const OUT = 'test-results/fullrun'; // journaux complets (effacés par Playwright à chaque lancement)
 const SUMMARY = 'qa/fullrun'; // résumés versionnés : qa/duration.md est reconstruit à partir de tous les styles déjà joués
 
@@ -44,7 +44,7 @@ const STYLES = {
     choices: [/dialogue/i, /charte/i, /Tendre la main/i, /soupe/i, /poliment/i, /Accepter/i],
     avoid: [/action directe/i, /habitué/i],
     koddex: (opts) => pickProjects(opts, (p) => /whatsapp|bot/i.test(p.id), 1),
-    actions: { prefer: /meeting|reunion|réunion|dialog|delphine|dinner|tatie|hippolyte|petition|whatsapp|recruit|lescaut|waiter|charte|media/i, groups: ['legal', 'grey'] },
+    actions: { prefer: /meeting|reunion|réunion|dialog|delphine|dinner|tatie|hippolyte|petition|whatsapp|recruit|delandre|waiter|charte|media/i, groups: ['legal', 'grey'] },
     night: 'diplomat',
   },
   stealthy: {
@@ -62,7 +62,7 @@ const STYLES = {
     choices: [/voie légale/i, /dossier complet/i, /Plaider/i, /Brandir/i, /Photographier/i, /Noter/i, /soupe/i],
     avoid: [/action directe/i, /habitué/i],
     koddex: (opts) => pickProjects(opts, (p) => (p.legality ?? 'legal') === 'legal', 1),
-    actions: { prefer: /mairie|press|lawyer|avocat|petition|delphine|inspector|lescaut|ars|hygiene/i, groups: ['legal', 'grey'] },
+    actions: { prefer: /mairie|press|lawyer|avocat|petition|delphine|inspector|delandre|ars|hygiene/i, groups: ['legal', 'grey'] },
     night: 'mixed',
   },
   passive: {
@@ -448,7 +448,7 @@ test('album du parcours (légal, graine 3) → qa/screens/flow/', async ({ page 
   }
 });
 
-// BUG-003 (corrigé, qa/bugs.md) : la scène de la commission (répliques de Jérémie, Ghislain, Delphine, Colette, du maire)
+// BUG-003 (corrigé, qa/bugs.md) : la scène de la commission (répliques de Jérémie, Ghislain, Delphine, Martine, du maire)
 // est calculée par le moteur (card.scene) mais l'interface ne l'affiche pas.
 test('BUG-003 (corrigé) · la scène de la commission (J14) est affichée avant les plaidoiries', async () => {
   const f = `${OUT}/legal.json`;
