@@ -69,6 +69,7 @@ export function initialState(seed, cfg = CONFIG) {
     pendingEnding: null,
     workplaces: workplacePlan(seed, cfg), // §12b.D : 'office' | 'home' pour chaque jour
     workplace: 'office',
+    tutorials: { seen: [], done: [], step: {} }, // v1.1 : tutoriels pratiques des outils (vus, terminés, étape en cours)
     twistHistory: [],    // v1.1 : [{ day, id }], jamais deux fois le même twist
     tonightTwist: null,  // { day, id } : choisi à l'entrée de la nuit, rejoué tel quel après un rechargement
     unlocked: [],        // v1.1 : ids de UNLOCKS acquis
@@ -498,6 +499,41 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     return S.tonightTwist.id ? TWISTS[S.tonightTwist.id] ?? null : null;
   };
   c.tonightTwist = () => c.twistTonight(); // nom utilisé par src/ui
+
+  // ---------- tutoriels pratiques des outils de nuit (v1.1, §12b.B, src/content/tutorials.js) ----------
+  // trigger : { night: n, after?, where? } (la n-ième nuit jouée) ou { unlock: id, after?, where? } (dès que l'outil est acquis).
+  // Le jeu (game.js) affiche la marque, appelle tutorialSeen à la 1re apparition (l'horloge se fige quelques secondes),
+  // puis tutorialEvent(nom) à chaque geste du joueur : l'étape dont `done` correspond avance ; la dernière termine le tutoriel.
+  const T8 = () => (S.tutorials ??= { seen: [], done: [], step: {} });
+  c.toolTutorialDue = ({ min, where } = {}) => {
+    const t = T8();
+    const night = S.nightCount + 1;
+    return K.TOOL_TUTORIALS.find((x) => {
+      if (t.done.includes(x.id)) return false;
+      const g = x.trigger ?? {};
+      if (g.night !== undefined && g.night !== night) return false;
+      if (g.unlock && !S.unlocked.includes(g.unlock)) return false;
+      if (g.after !== undefined && min !== undefined && min < g.after) return false;
+      if (g.where && where && g.where !== where) return false;
+      return true;
+    }) ?? null;
+  };
+  c.tutorialSeen = (id) => { const t = T8(); if (t.seen.includes(id)) return false; t.seen.push(id); c.note('tutorial', { id, seen: true }); return true; };
+  c.tutorialStep = (id) => T8().step[id] ?? 0;
+  c.tutorialSkip = (id) => { const t = T8(); if (!t.done.includes(id)) { t.done.push(id); c.note('tutorial', { id, skipped: true }); } };
+  // → les tutoriels terminés par ce geste (pour le « bravo »)
+  c.tutorialEvent = (name) => {
+    const t = T8();
+    const finished = [];
+    for (const x of K.TOOL_TUTORIALS) {
+      if (!t.seen.includes(x.id) || t.done.includes(x.id)) continue;
+      const k = t.step[x.id] ?? 0;
+      if (x.steps?.[k]?.done !== name) continue;
+      t.step[x.id] = k + 1;
+      if (t.step[x.id] >= (x.steps?.length ?? 0)) { t.done.push(x.id); finished.push(x); c.note('tutorial', { id: x.id, done: true }); }
+    }
+    return finished;
+  };
   const opportunities = (sim) => sim?.twist?.sim?.opportunities ?? [];
   c.actionAllowed = (id, sim) => U.action(id, S.unlocked, opportunities(sim));
   c.keyAllowed = (key, sim) => {

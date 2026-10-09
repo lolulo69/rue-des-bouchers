@@ -55,3 +55,7 @@ kbd { background: #ffffff1a; border: 1px solid #ffffff33; border-radius: 4px; pa
 #fatal { background: #0d0d12f2; z-index: 100; }
 #fatal p { max-width: 560px; line-height: 1.5; }
 .twist-intro { max-width: 520px; line-height: 1.45; background: #ffffff10; border-radius: 10px; padding: 10px 14px; }
+#coach { position: absolute; left: 50%; bottom: 120px; transform: translateX(-50%); max-width: min(560px, 92vw); background: #0d0d12e6; border: 1px solid #4cc9f0; border-radius: 10px; padding: 10px 14px; display: flex; gap: 12px; align-items: center; pointer-events: auto; line-height: 1.45; }
+#coach p { margin: 0; }
+#coach kbd { white-space: nowrap; }
+#coach button { background: transparent; color: #f2ede4; border: 1px solid #ffffff44; border-radius: 6px; padding: 4px 10px; cursor: pointer; }

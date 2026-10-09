@@ -7,6 +7,7 @@ import { RULES, SKY, STREET, NOISE, EVIDENCE, INTERACT, ZONES, POLICE } from './
 import { createSim, makeConfig, fmt, createCampaign, contentFromGlob, checkSave } from './sim/index.js';
 import * as narrative from './sim/narrative.js';
 import { audio } from './audio/index.js';
+import { padGlyph } from './input/index.js';
 import { createRng } from './sim/rng.js';
 import { WHATSAPP_GROUP } from './content/characters.js';
 import { bindNight } from './input/night.js'; // manette (agent UI, src/input)
@@ -152,6 +153,41 @@ function tuto(trigger) {
   const t = campaign.tutorial(trigger);
   if (t) log(`💡 ${t.text}`, 'tuto');
 }
+// ---------- Tutoriels pratiques des outils (v1.1, §12b.B) ----------
+// La marque s'affiche quand l'outil arrive (nuit 1 ou déblocage), au bon endroit ; l'horloge de nuit se fige
+// ~3 s à sa première apparition ; chaque geste du joueur (tutoEvent) fait avancer l'étape ; « Passer » ou Retour arrière.
+let coach = null;
+let coachPauseUntil = 0;
+const escapeHtml = (s) => String(s ?? '').replace(/[&<>]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[ch]));
+const placeWhere = () => (player.loc === 'street' ? 'street' : nearWindow() ? 'window' : 'apt');
+function renderCoach() {
+  if (!coach) { $('coach').classList.add('hidden'); return; }
+  const s = coach.steps?.[campaign.tutorialStep(coach.id)];
+  if (!s) { coach = null; $('coach').classList.add('hidden'); return; }
+  const pad = s.pad ? (padGlyph?.(s.pad) ?? s.pad) : '';
+  $('coach-text').innerHTML = escapeHtml(s.text).replace('{key}', `<kbd>${escapeHtml(s.key ?? '')}</kbd>`).replace('{pad}', `<kbd>${escapeHtml(pad)}</kbd>`);
+  $('coach').classList.remove('hidden');
+}
+function updateCoach() {
+  if (!campaign || !started || S.ended) return;
+  if (!coach) {
+    const due = campaign.toolTutorialDue({ min: S.min, where: placeWhere() });
+    if (!due) return;
+    coach = due;
+    if (campaign.tutorialSeen(due.id)) coachPauseUntil = now + 3; // première apparition : l'horloge se fige un instant
+  }
+  renderCoach();
+}
+function tutoEvent(name) {
+  if (!campaign) return;
+  for (const t of campaign.tutorialEvent(name)) {
+    if (t.congrats) log(`✔ ${t.congrats}`, 'good');
+    if (coach?.id === t.id) coach = null;
+  }
+  if (coach) renderCoach(); else $('coach').classList.add('hidden');
+}
+$('coach-skip').addEventListener('click', () => { if (coach) { campaign.tutorialSkip(coach.id); coach = null; renderCoach(); } });
+
 // Cloche de 22h (21:55, 22:00, 22:05) et bribes de terrasse quand Pilou est près des tables
 const bell = { before: false, strike: false, after: false, outAt22: null };
 let nextBark = 20;
@@ -208,6 +244,10 @@ function updateHud() {
     wit = named.length ? `👁 Témoins possibles : ${named.join(', ')}` : '👁 Personne ne regarde.';
   }
   $('witness').textContent = wit;
+  // Évènements de tutoriel liés à l'affichage (fenêtre, indice du seau, ligne des témoins lue ≥ 3 s)
+  if (nearWindow()) { tutoEvent('at_window'); if (!S.sleeping) tutoEvent('bucket_noticed'); }
+  if (wit) { witnessShownSince ??= now; if (now - witnessShownSince >= 3) tutoEvent('witnesses_read'); } else witnessShownSince = null;
+  updateCoach();
 }
 
 // ---------- Photo ----------
@@ -231,6 +271,8 @@ function photo() {
   const hit = raycaster.intersectObjects(hits, false)[0];
   const target = hit?.object.userData.target;
   const r = sim.act({ type: 'photo', target, distance: hit?.distance, fromWindow: player.loc === 'apt', noiseDb });
+  tutoEvent('photo_taken');
+  if (r.found?.some((f) => f.kind === 'corridor')) tutoEvent('corridor_measured');
   if (r.ok) { tuto('first_photo'); if (r.found.some((f) => f.quality < 0.6)) tuto('first_photo_blurry'); }
   else if (target?.kind === 'table' && sim.encroachment(sim.table(target.id)) > 0) tuto('corridor_needs_measure');
 }
@@ -241,7 +283,7 @@ const nearWindow = () => player.loc === 'apt' && player.pos.x > apt.x1 - 1.6 && 
 function interaction() {
   if (player.loc === 'street') {
     if (flat(player.pos, ANCHORS.streetDoor) < INTERACT.door) return { label: 'Monter chez Pilou', act: () => teleport('apt') };
-    if (sim.waiterOnDuty() && flat(player.pos, sim.waiterPos()) < INTERACT.waiter) return { label: 'Demander au serveur de rentrer les tables', act: () => { tuto('first_waiter'); sim.act({ type: 'waiter' }); } };
+    if (sim.waiterOnDuty() && flat(player.pos, sim.waiterPos()) < INTERACT.waiter) return { label: 'Demander au serveur de rentrer les tables', act: () => { tuto('first_waiter'); sim.act({ type: 'waiter' }); tutoEvent('waiter_asked'); } };
   } else {
     if (flat(player.pos, world.aptDoor) < INTERACT.aptDoor) return { label: 'Descendre dans la rue', act: () => teleport('street') };
     if (flat(player.pos, world.bed) < INTERACT.bed) return { label: S.sleeping ? 'Se relever' : 'Essayer de dormir (accélère la nuit)', act: toggleSleep };
@@ -250,7 +292,7 @@ function interaction() {
 }
 function teleport(where) {
   player.loc = where;
-  if (where === 'apt') player.pos.set(world.aptDoor.x + 0.5, apt.floor, world.aptDoor.z);
+  if (where === 'apt') { player.pos.set(world.aptDoor.x + 0.5, apt.floor, world.aptDoor.z); tutoEvent('entered_building'); }
   else player.pos.set(ANCHORS.streetDoor.x + 0.6, 0, ANCHORS.streetDoor.z);
   player.yaw = -Math.PI / 2;
   player.pitch = 0;
@@ -258,15 +300,16 @@ function teleport(where) {
 function toggleSleep() {
   sim.act({ type: 'sleep', on: !S.sleeping });
   player.pitch = S.sleeping ? 0.9 : 0;
-  if (S.sleeping) log('Pilou se couche. Le temps file…');
+  if (S.sleeping) { log('Pilou se couche. Le temps file…'); tutoEvent('bed_tried'); }
 }
 
 // ---------- Overlays ----------
 function openOverlay(name) {
   overlay = name;
   $(name).classList.remove('hidden');
-  if (name === 'dossier') renderDossier();
-  if (name === 'nightmenu') renderNightMenu();
+  if (name === 'dossier') { renderDossier(); tutoEvent('dossier_opened'); }
+  if (name === 'nightmenu') { renderNightMenu(); tutoEvent('night_menu_opened'); }
+  if (name === 'phone') tutoEvent('phone_opened');
   if (name === 'phone') {
     tuto('first_phone');
     // Boutons du téléphone selon les outils débloqués (v1.1, unlocks.js)
@@ -306,7 +349,7 @@ for (const b of document.querySelectorAll('#phone button')) {
   b.addEventListener('click', () => {
     const c = b.dataset.call;
     closeOverlay();
-    if (c === 'police' || c === 'police-asso') { tuto('first_police_call'); cue('radio'); }
+    if (c === 'police' || c === 'police-asso') { tuto('first_police_call'); cue('radio'); tutoEvent('police_called'); }
     if (c === 'police') sim.act({ type: 'police' });
     else if (c === 'police-asso') sim.act({ type: 'police', asso: true });
     else if (c === 'asso') { if (sim.act({ type: 'asso' })?.ok) cue('whatsapp'); }
@@ -431,14 +474,15 @@ addEventListener('keydown', (e) => {
   if (e.code === 'KeyE') interaction()?.act();
   else if (e.code === 'KeyL') {
     if (campaign && !campaign.keyAllowed('L', sim)) log('La vue des zones légales viendra avec le plan de l’AOT (pas encore).');
-    else { director.toggleLegalView(); tuto('legal_view_toggle'); }
+    else { director.toggleLegalView(); tuto('legal_view_toggle'); tutoEvent('legal_view_toggled'); }
   }
   else if (S.sleeping) return;
   else if (e.code === 'KeyP') photo();
   else if (e.code === 'KeyB') {
     if (campaign && !campaign.nativeAllowed('db', {}, sim)) log('Pas encore de sonomètre (il arrive bientôt).');
-    else sim.act({ type: 'db', noiseDb, fromWindow: player.loc === 'apt' });
+    else { sim.act({ type: 'db', noiseDb, fromWindow: player.loc === 'apt' }); tutoEvent('db_taken'); }
   }
+  else if (e.code === 'Backspace' && coach) { campaign.tutorialSkip(coach.id); coach = null; renderCoach(); }
   else if (e.code === 'KeyF') {
     if (!nearWindow()) log('Le seau, c’est depuis la fenêtre.');
     else sim.act({ type: 'bucket' });
@@ -460,6 +504,9 @@ function move(dt) {
   if (mv.lengthSq() === 0) return;
   const speed = keys.has('ShiftLeft') || keys.has('ShiftRight') ? 5.5 : 3.2;
   player.pos.addScaledVector(mv.normalize(), speed * dt);
+  walked += speed * dt;
+  if (walked > 3) tutoEvent('moved');
+  if (speed > 4) tutoEvent('ran');
   const p = player.pos;
   if (player.loc === 'street') {
     p.x = clamp(p.x, -W + 0.35, W - 0.35);
@@ -537,7 +584,7 @@ function renderNightMenu() {
   for (const a of acts) {
     const b = document.createElement('button');
     b.textContent = `${a.label}${a.legality === 'illegal' ? ' (illégal)' : a.legality === 'grey' ? ' (limite)' : ''}`;
-    b.addEventListener('click', () => { closeOverlay(); campaign.doNightAction(sim, a.id); drainSim(); });
+    b.addEventListener('click', () => { closeOverlay(); campaign.doNightAction(sim, a.id); tutoEvent(`action:${a.id}`); drainSim(); });
     list.append(b);
   }
 }
@@ -568,6 +615,8 @@ function showEnd() {
 
 // ---------- Boucle ----------
 let hudTimer = 0;
+let walked = 0;
+let witnessShownSince = null;
 let lastPolicePhase = null;
 const camPos = new THREE.Vector3();
 function update(dt) {
@@ -579,7 +628,7 @@ function update(dt) {
   const phase = S.police?.phase ?? null;
   if (phase === 'walking' && lastPolicePhase !== 'walking') cue('radio', { pos: { x: ANCHORS.policeSpawn.x, y: 1.5, z: ANCHORS.policeSpawn.z } });
   lastPolicePhase = phase;
-  sim.tick(dt * RULES.gameMinutesPerSecond * (S.sleeping ? RULES.sleepTimeMultiplier : 1));
+  if (now >= coachPauseUntil) sim.tick(dt * RULES.gameMinutesPerSecond * (S.sleeping ? RULES.sleepTimeMultiplier : 1));
   camPos.set(player.pos.x, player.pos.y + 1.65, player.pos.z);
   noiseDb = sim.noiseAt(camPos, player.loc === 'apt');
 }

@@ -54,6 +54,7 @@ const MIGRATIONS = {
   3: (s) => {
     s.workplaces ??= null;
     s.workplace ??= 'office';
+    s.tutorials ??= { seen: [], done: [], step: {} };
     s.version = 4;
     return s;
   },

@@ -46,3 +46,47 @@ test('Échap pendant la nuit : le menu de pause / réglages de l\'interface s\'o
   const t = await page.evaluate(() => { const before = window.__rdb.sim.state.min; window.__rdb.step(10); return window.__rdb.sim.state.min - before; });
   expect(t).toBeGreaterThan(0);
 });
+
+test('tutoriel pratique, nuit 1 : la marque apparaît, l\'horloge se fige un instant, marcher fait avancer l\'étape', async ({ page }) => {
+  test.setTimeout(240_000);
+  await page.goto('/?nolock=1&seed=12');
+  await page.evaluate(() => localStorage.clear());
+  await page.reload();
+  await page.click('#campaign');
+  await page.click('[data-testid=title-new]');
+  if (await page.locator('[data-testid=intro-skip]').count()) await page.click('[data-testid=intro-skip]');
+  await page.evaluate(() => {
+    const c = window.__rdb.ui.campaign;
+    for (let i = 0; i < 200 && c.step !== 'night'; i++) {
+      if (c.step === 'cards') c.resolveCard(c.card().choices.find((x) => x.available)?.i ?? 0);
+      else if (c.step === 'koddex') c.koddex(['work', 'work', 'work']);
+      else if (c.step === 'actions') c.endAfternoon();
+    }
+    localStorage.setItem(window.__rdb.saveKey, JSON.stringify(c.save()));
+  });
+  await page.goto('/?nolock=1&mode=night&seed=12');
+  await page.locator('#hud').waitFor({ state: 'visible' });
+  const r = await page.evaluate(() => {
+    const { sim, step } = window.__rdb;
+    step(6); // la marque s'affiche au rafraîchissement du HUD
+    const t0 = sim.state.min;
+    step(30); // 1 s : horloge figée
+    const paused = sim.state.min - t0;
+    return { coach: !document.getElementById('coach').classList.contains('hidden'), text: document.getElementById('coach-text').textContent, paused };
+  });
+  expect(r.coach, 'marque de tutoriel visible').toBe(true);
+  expect(r.paused).toBe(0);
+  // Marcher : l'étape « marcher » est validée (le texte change ou la marque se termine)
+  const after = await page.evaluate(() => {
+    const { player, step } = window.__rdb;
+    for (let i = 0; i < 30; i++) { player.pos.z += 0.2; window.__rdb.key('KeyW'); }
+    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyW' }));
+    step(40);
+    window.dispatchEvent(new KeyboardEvent('keyup', { code: 'KeyW' }));
+    step(6);
+    return { text: document.getElementById('coach-text').textContent, step: window.__rdb.campaign.tutorialStep('tuto_move') };
+  });
+  expect(after.step).toBeGreaterThanOrEqual(1);
+  await page.click('#coach-skip');
+  expect(await page.evaluate(() => window.__rdb.campaign.state.tutorials.done.length)).toBeGreaterThan(0);
+});
