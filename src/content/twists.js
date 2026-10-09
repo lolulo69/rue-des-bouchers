@@ -308,7 +308,7 @@ export const TWISTS = [
   {
     id: 'guide_tour',
     title: 'La visite guidée nocturne',
-    pool: true,
+    day: 1, // fixed: night 1 is the tutorial night, a gentle twist that introduces the street's history
     intro: "L’office de tourisme lance sa « balade nocturne du Vieux-Lille ». Point d’orgue à 22h15 : la rue des Bouchers, « autrefois surnommée le Trou ». Le guide a un micro-cravate et une voix qui porte.",
     sim: {
       witnesses: [{ id: 'guide', at: 'street', filming: false }],
@@ -343,6 +343,30 @@ export const TWISTS = [
     },
     props: ['party_lights_27', 'speakers'],
     after: { setFlags: ['twist_regis_party'], media: ['wa_twist_regis_party'] },
+  },
+  {
+    id: 'carbonnade_contest',
+    title: 'Le concours de la meilleure carbonnade',
+    pool: true,
+    intro: "Ce soir, l’estaminet accueille la finale du « concours de la meilleure carbonnade du Vieux-Lille ». Jury de trois, dont un ancien adjoint. Les tables ont été « exceptionnellement » rapprochées.",
+    sim: {
+      crowd: 1.2,
+      noise: 1.1,
+      closeDelay: 20,
+      tables: [{ rest: 'bernadette', count: 9, label: 'la table du jury' }],
+      events: [
+        { at: H(21, 30), text: "Le jury goûte. Silence religieux sur la terrasse. Pour la première fois de la soirée, on entend la gaine.", simEffect: { noise: -6 } },
+        { at: H(22, 10), text: "Dédé remporte le premier prix. Applaudissements, chope levée, « encore dix minutes, c’est exceptionnel ». Il est 22h10.", simEffect: { noise: 6 } },
+      ],
+      opportunities: ['night_photo'],
+    },
+    lines: {
+      barks: ['« Plus de bière dans la sauce, c’est ça le secret ! »', '« Le jury, il est payé en carbonnade ? »'],
+      klaas: ['Neuf personnes à la table du jury. Le règlement en autorise six. Le jury ne lit pas les règlements.'],
+      recap: ['Dédé a gagné le concours. La terrasse, elle, a gagné vingt minutes après 22h.'],
+    },
+    props: ['trophy', 'jury_table'],
+    after: { setFlags: ['twist_carbonnade_contest'], media: [] },
   },
   {
     id: 'busker',

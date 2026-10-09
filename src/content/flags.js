@@ -238,4 +238,6 @@ export const FLAGS = {
   twist_lost_dog: 'Rebondissement : Biloute a disparu',
   twist_tv_crew: 'Rebondissement : le reportage télé',
   twist_street_sweeper: 'Rebondissement : la balayeuse de 23h30',
+  // v1.1 · design agent
+  twist_carbonnade_contest: 'Nuit du concours de carbonnade (rebondissement)',
 };
