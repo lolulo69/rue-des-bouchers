@@ -229,7 +229,7 @@ export const ASSO = {
   shareGainPerPiece: 3,
   shareDecay: 0.7,               // rendements décroissants : chaque pièce partagée le même soir vaut ×0.7 de la précédente
   nightGainCap: 4,               // gain d'Asso max par nuit (QA balance #1)
-  diminishFrom: 50,              // campagne : au-dessus, chaque gain d'Asso vaut ×(100 − asso) / (100 − diminishFrom)
+  diminishFrom: 55,              // campagne : au-dessus, chaque gain d'Asso vaut ×(100 − asso) / (100 − diminishFrom)
   spamPenalty: 3,
 };
 
@@ -282,11 +282,11 @@ export const CAMPAIGN = {
   // Projets perso de Koddex (koddex.js) qui changent la mécanique
   dbLogger: { every: 30, quality: 0.7, valueScale: 0.5 }, // proj_db_logger : relevé auto à la fenêtre, toutes les 30 min après 22h
   whatsappBot: { actions: ['pm_whatsapp_rally', 'pm_petition_start', 'pm_banners', 'pm_recruit'], timeDiscount: 1, assoBonus: 2 }, // proj_whatsapp_bot
-  nightEvidenceScale: 0.068,     // pièce légale de la nuit → points de dossier de campagne (les mêmes infractions reviennent chaque nuit : balance 2026-10-08)
+  nightEvidenceScale: 0.067,     // pièce légale de la nuit → points de dossier de campagne (les mêmes infractions reviennent chaque nuit : balance 2026-10-08)
   contentEvidenceValue: 3,       // effet { evidence } du contenu : valeur × qualité
   contentDossierScale: 0.3,       // gains de Dossier écrits par le contenu (`dossier: +N`) × ce facteur
   contentAssoScale: 0.5,         // gains d'Asso écrits par le contenu (`asso: +N`) × ce facteur
-  assoDecayPerDay: 5,            // l'Asso redescend chaque matin vers son niveau de départ si on ne la nourrit pas
+  assoDecayPerDay: 4,            // l'Asso redescend chaque matin vers son niveau de départ si on ne la nourrit pas
   dossierTarget: 100,            // ~8–10 bonnes nuits (QA balance #2)
   maxCountermovesPerDay: 2,
   maxDialoguesPerPhase: 2,

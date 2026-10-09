@@ -210,3 +210,58 @@ Left (minor): counter-moves cm_regis_leak_petition, cm_camera_found_paranoia nev
 - **Rare states (fine as is)**: `benali_transferred`, `chef_scandal` / `chef_warning` (the chief's patrol), `avocat_*` (a lawyer **and** illegal acts / a complaint: a mix no single strategy plays).
 
 No dominant action (`--ablate mixed`, 1000 runs, base 95 %): `pm_klaas_roster` −10, `pm_klaas_notebook` −9, `pm_press_contact` −4, the rest ≤ 2. Max 10 < 25 ✅.
+
+## 2026-10-09 · balance pass v1.1 (balance agent) · twists every night + gated tools
+Baseline on main 13e6ec1 (v1.1 engine: `src/sim/twists.js`, `src/sim/unlocks.js`, 25 twists, 21 unlocks), 1000 × 7 on CT 106:
+
+| bot | custody | fired | legal_victory | moving_out | negotiated_peace | scandal | the_return | turncoat | score | sommeil | asso | risque | job | dossier | garde à vue (nuit méd.) | cibles §13.H |
+| passif | · | · | · | 100% | · | · | · | · | 0 | 23 | 40 | 0 | 98 | 11 | – | ✅ ≥ 90 % déménagement / défaite |
+| légal prudent | · | · | 34% | 7% | · | 59% | · | · | 75 | 45 | 68 | 0 | 100 | 48 | – | ❌ victoire légale 35–60 %<br>✅ jamais de garde à vue |
+| illégal imprudent | 100% | · | · | · | · | · | · | · | -20 | 59 | 0 | 96 | 37 | 13 | 5 | ✅ ≥ 70 % garde à vue / procès |
+| illégal discret | 17% | · | · | 61% | · | 19% | 4% | · | 12 | 17 | 19 | 41 | 85 | 25 | 7 | ✅ ≤ 40 % garde à vue<br>✅ scandale atteignable |
+| mixte malin | · | · | 68% | 17% | · | 15% | · | · | 79 | 17 | 68 | 1 | 84 | 53 | – | ✅ meilleur score moyen |
+| diplomate | · | · | · | 22% | 24% | 2% | 32% | 19% | 56 | 58 | 71 | 0 | 100 | 32 | – | ✅ paix négociée ≥ 40 % |
+| tire-au-flanc | · | 41% | 15% | 13% | · | 31% | · | · | 40 | 68 | 72 | 1 | 49 | 39 | – | ✅ licenciement atteignable (≥ 2 %, §13.F) |
+
+❌ Legal victory **34 %** (median dossier 48: the twists add crowds/noise but tools such as the dB key, the round and the asso call now arrive later). Never used: `night_sabotage_chairs` / `_parasols` / `_locks`, `night_borrow_power` (unlocked on days 8–9; their user, the reckless bot, is in custody by night 5). Unreached counter-moves: `cm_air_freshener` (stink bomb from day 5), `cm_colette_call_notice` (every formal notice came after a mayor request, which fires the other Colette call first). Mixed burned out (sleep 17, 17 % moving out) and tied with legal (80 / 80).
+
+**Gating / no cheating**: the build agent's runner already filters every native bot act through `c.nativeAllowed` (unlocks + tonight's twist opportunities), and content night acts go through `availableNightActions`, which only lists unlocked actions or ones a twist opens tonight. So bots can't use a tool before it unlocks, and they use a twist's opportunity (mostly photo / dB / police / waiter, `night_film_faces` with the influencer) as soon as the engine allows it.
+
+After this pass, 1000 × 7, invariants ✅, **68/68 actions, 28/28 events, 8/8 endings, 42/42 counter-moves**:
+
+| bot | custody | fired | legal_victory | moving_out | negotiated_peace | scandal | the_return | turncoat | score | sommeil | asso | risque | job | dossier | garde à vue (nuit méd.) | cibles §13.H |
+| passif | · | · | · | 100% | · | · | · | · | 0 | 23 | 40 | 0 | 98 | 11 | – | ✅ ≥ 90 % déménagement / défaite |
+| légal prudent | · | · | 45% | 6% | · | 49% | · | · | 79 | 46 | 75 | 0 | 100 | 49 | – | ✅ victoire légale 35–60 %<br>✅ jamais de garde à vue |
+| illégal imprudent | 100% | · | · | · | · | · | · | · | -20 | 59 | 0 | 96 | 37 | 13 | 5 | ✅ ≥ 70 % garde à vue / procès |
+| illégal discret | 16% | · | · | 60% | · | 19% | 4% | · | 13 | 16 | 20 | 42 | 85 | 26 | 7 | ✅ ≤ 40 % garde à vue<br>✅ scandale atteignable |
+| mixte malin | · | · | 86% | 3% | · | 11% | · | · | 94 | 28 | 73 | 1 | 84 | 55 | – | ✅ meilleur score moyen |
+| diplomate | · | · | · | 24% | 23% | 3% | 33% | 18% | 55 | 59 | 77 | 0 | 100 | 34 | – | ✅ paix négociée ≥ 40 % |
+| tire-au-flanc | · | 43% | 29% | 10% | · | 19% | · | · | 46 | 68 | 78 | 0 | 48 | 41 | – | ✅ licenciement atteignable (≥ 2 %, §13.F) |
+
+| change | was | now | why |
+|---|---|---|---|
+| `CAMPAIGN.nightEvidenceScale` | 0.068 | 0.075 | Legal median dossier back on the bar: 0.072 → 42 %, 0.075 → 45–46 %. |
+| `CAMPAIGN.assoDecayPerDay` | 5 | 4 | Twists cost asso (fewer shareable nights): legal / mixed fell to 68. |
+| `ASSO.diminishFrom` | 50 | 55 | Same: legal 75, mixed 73 (target 70–85). |
+| stealthy bot | – | wants the three sabotages, the power line, the stink bomb | Late tools (days 5–9) for the only bot awake after 00:30; custody stays 16 %. |
+| slacker bot | – | lawyer + formal notice | A formal notice without a mayor request, so `cm_colette_call_notice` can fire. |
+| mixed bot | dossier 5, flat sleep 0.5 | sleep weight 3 when sleep < 40; lawyer / formal notice / mayor meeting | Its dossier greed took every sleep-costly event choice (−11 sleep from events vs +11 for legal). A smart player rests when exhausted. The extra legal dossier actions give it margin above the commission bar. |
+
+No dominant action (`--ablate mixed`, 1000 runs, base 97 %): `pm_klaas_roster` −24, `pm_klaas_notebook` −20, `pm_press_contact` −8, rest ≤ 6. **Max 24 < 25 ✅, but thin.** The roster is the gateway to the Klaas notebook (and `met_klaas`), and the notebook is the main legal route to `corruption_proof` plus ~3 dossier points next to the commission bar. Suggestion for the content agent: a second way to meet Klaas (the round, the D4 dinner…) would make the roster less of a single point of failure.
+
+Duration: I did not touch night length, sleep acceleration or day text. qa/duration.md (~3h, 2h30–4h ✅) is unaffected by these values.
+Dialogue never shown (15/211): the same crowding as pass 3 (routed to the build agent), plus `tw_match_tatie` (a v1.1 twist line for the football night, not reached by any bot in 1000 runs: to check with the content agent) and a few rare states (`ghislain_hygiene`, `delphine_conflict`, `hilde_laxative`, `nico_hate_wave_answered`).
+
+**Addendum after rebasing on 24fa5d5** (the 6 intro cards now show again, which changes the opening state): legal jumped to 60 %, mixed 95 %, slacker fired 89 %. `CAMPAIGN.nightEvidenceScale` 0.075 → **0.067** (0.07 → 51 %, 0.067 → 47 %). Final, 1000 × 7, invariants ✅, 68/68 actions, 28/28 events, 8/8 endings, 42/42 counter-moves:
+
+| bot | custody | fired | legal_victory | moving_out | negotiated_peace | scandal | the_return | turncoat | score | sommeil | asso | risque | job | dossier | garde à vue (nuit méd.) | cibles §13.H |
+| passif | · | · | · | 100% | · | · | · | · | 0 | 44 | 40 | 0 | 97 | 13 | – | ✅ ≥ 90 % déménagement / défaite |
+| légal prudent | · | · | 47% | 5% | · | 48% | · | · | 81 | 61 | 75 | 0 | 99 | 50 | – | ✅ victoire légale 35–60 %<br>✅ jamais de garde à vue |
+| illégal imprudent | 100% | · | · | · | · | · | · | · | -20 | 65 | 0 | 96 | 32 | 14 | 5 | ✅ ≥ 70 % garde à vue / procès |
+| illégal discret | 18% | · | · | 40% | · | 35% | 7% | · | 25 | 29 | 19 | 43 | 83 | 28 | 7 | ✅ ≤ 40 % garde à vue<br>✅ scandale atteignable |
+| mixte malin | · | · | 90% | 2% | · | 8% | · | · | 95 | 36 | 74 | 1 | 76 | 55 | – | ✅ meilleur score moyen |
+| diplomate | · | · | · | 24% | 23% | 2% | 34% | 17% | 55 | 68 | 78 | 0 | 92 | 34 | – | ✅ paix négociée ≥ 40 % |
+| tire-au-flanc | · | 89% | 7% | 2% | · | 3% | · | · | 18 | 77 | 71 | 1 | 14 | 30 | – | ✅ licenciement atteignable (≥ 2 %, §13.F) |
+
+No dominant action (1000 runs, base 98 %): `pm_klaas_roster` −17, `pm_klaas_notebook` −15, `night_whatsapp` / `pm_press_contact` −4. Max **17** < 25 ✅ (more margin than before the rebase, but the Klaas roster remains the biggest single dependency).
+dialogue (20/211) : klaas_persuaded, klaas_saturday2, klaas_cardboard, tatie_mail_12, dede_threat_smile, dede_carbonnade, ghislain_hygiene, ghislain_lawyer, lemaire_transferred, benali_transferred, chef_scandal, chef_inquiry, chef_warning, delphine_conflict, avocat_illicit, avocat_complaint, nico_hate_wave_answered, hilde_laxative, avocat_backroom_caught, tw_match_tatie. Most are the crowding / rare states already routed in pass 3.

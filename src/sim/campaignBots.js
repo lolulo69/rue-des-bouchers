@@ -163,7 +163,9 @@ function recklessNight() {
   };
 }
 
-const STEALTHY = { dossier: 1, risk: -2, hostility: 0.3, illegalEvidence: 3, anyFlag: 2, flags: flagWeights({ stance_direct: 15, disguise_hood: 20, disguise_vest: 20, waiter_bribed: 15, waiter_informant: 15, proj_wifi_cracker: 15, wifi_cracked: 15, kitchen_sabotaged: 25, laxative_done: 15, backroom_sneak: 30, camera_awning: 8, press_scandal: 20 }), caution: 2 };
+const MIXED = { dossier: 5, asso: 1.5, sleep: 0.5, risk: -3, hostility: -0.2, job: 0.3, legalEvidence: 8, illegalEvidence: 2, flags: flagWeights({ stance_legal: 20, tatie_fake_leak: 5, bloc_fooled: 5, lawyer_hired: 8, formal_notice: 8, lescaut_requested: 6, lescaut_meeting: 8 }), caution: 2 };
+const MIXED_TIRED = { ...MIXED, sleep: 3 };
+const STEALTHY = { dossier: 1, risk: -2, hostility: 0.3, illegalEvidence: 3, anyFlag: 2, flags: flagWeights({ stance_direct: 15, disguise_hood: 20, disguise_vest: 20, waiter_bribed: 15, waiter_informant: 15, proj_wifi_cracker: 15, wifi_cracked: 15, kitchen_sabotaged: 25, laxative_done: 15, backroom_sneak: 30, camera_awning: 8, press_scandal: 20, sabotage_chairs: 12, sabotage_parasols: 12, sabotage_locks: 12, power_stolen: 12, stink_bomb: 8 }), caution: 2 };
 const STEALTHY_CAMERA = { ...STEALTHY, flags: { ...STEALTHY.flags, camera_awning: 14 } };
 const DIPLOMAT = { asso: 3, hostility: -1.5, dossier: 1, sleep: 0.5, risk: -5, flags: flagWeights({ stance_dialogue: 30, won_peace: 80, bombance_blocked: -5 }) }; // pas de recours contre un nouveau voisin
 const DIPLOMAT_TURNCOAT = { ...DIPLOMAT, asso: 0, flags: flagWeights({ carbonnade_1: 40, carbonnade_2: 40, carbonnade_3: 40, won_scandal: 0, commission_won: 0 }) };
@@ -206,7 +208,7 @@ export const CAMPAIGN_BOTS = {
   }),
   mixed: () => make({
     name: 'mixte malin', legality: ['legal', 'grey', 'illegal'], sideProjects: 1, maxRisk: 40,
-    weights: { dossier: 5, asso: 1.5, sleep: 0.5, risk: -3, hostility: -0.2, job: 0.3, legalEvidence: 8, illegalEvidence: 2, flags: flagWeights({ stance_legal: 20, tatie_fake_leak: 5, bloc_fooled: 5 }), caution: 2 },
+    weights: (c) => (c.state.stats.sleep < 40 ? MIXED_TIRED : MIXED), // fatigué : le sommeil passe avant la preuve
     naps: (c) => (c.state.stats.sleep < 35 && c.state.stats.job > 45 ? 1 : 0),
     nightPolicy: legalNight({ asso: true }), nightContent: (sim, a, camp, x) => a.legality === 'legal' || (camp.state.stats.risk < 30 && unseen(sim, a, camp)),
     continueFired: true,
@@ -221,7 +223,7 @@ export const CAMPAIGN_BOTS = {
   // Tire-au-flanc : tout Koddex part en side projects, le boulot attend. Ne prend pas le rebond « au chômage ».
   slacker: () => make({
     name: 'tire-au-flanc', legality: ['legal'], sideProjects: 3, jobFloor: -Infinity, naps: () => 1, lazyWork: true,
-    weights: { dossier: 3, asso: 1.5, sleep: 0.5, risk: -5, legalEvidence: 6, flags: flagWeights({ stance_legal: 20 }) },
+    weights: { dossier: 3, asso: 1.5, sleep: 0.5, risk: -5, legalEvidence: 6, flags: flagWeights({ stance_legal: 20, lawyer_hired: 8, formal_notice: 8 }) },
     nightPolicy: legalNight({ bedAt: 23.5 * 60 }), nightContent: () => true,
   }),
 };
