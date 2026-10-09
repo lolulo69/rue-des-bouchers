@@ -4,7 +4,7 @@
 //
 // Points d'appel : voir GAME_DESIGN.md, Build notes « narrative-wiring ».
 import { evalCondition, compare } from './conditions.js';
-import { KLAAS_NOTEBOOK, POLICE_LINES, WITNESS_LINES, BARKS, BELL, WAITER_LINES, RECAP_HEADLINES, NIGHT_END } from '../content/night.js';
+import { KLAAS_NOTEBOOK, POLICE_LINES, WITNESS_LINES, BARKS, BELL, WAITER_LINES, RECAP_HEADLINES, NIGHT_END, STREET_LINES } from '../content/night.js';
 import { INTRO_CARDS, TUTORIAL } from '../content/intro.js';
 import { MEDIA } from '../content/media.js';
 import { DIALOGUE } from '../content/dialogue.js';
@@ -154,6 +154,18 @@ export function pickNightLine(kind, sim, rng = sim?.rng, extra = {}) {
   // pacing.js : pas la même ligne deux fois dans la nuit, ni d'une nuit à la suivante
   const line = sim?.pacing ? sim.pacing.choose(pool, rng ?? undefined) : pick(pool, rng);
   return line === null ? null : fill(line, { ...ctx, ...extra.ctx });
+}
+
+// ── Lignes de la rue écrites par la sim (pacing-2) ─────────────────────────
+// kind : 'pee_door' | 'round_note' | 'round_action' | 'db:recorded' | 'db:early' | 'db:low' | 'db:again'
+// Choisie par sim.pacing (pas deux fois dans la nuit ni la suivante) ; null si la liste n'existe pas.
+export function streetLine(kind, sim, ctx = {}, rng) {
+  const [head, sub] = kind.split(':');
+  const pool = sub ? STREET_LINES[head]?.[sub] : STREET_LINES[head];
+  if (!pool?.length) return null;
+  const line = sim?.pacing ? sim.pacing.choose(pool, rng ?? undefined) : pick(pool, rng);
+  const cap = (v) => (typeof v === 'string' ? v.charAt(0).toUpperCase() + v.slice(1) : v);
+  return fill(line, { ...ctx, ...Object.fromEntries(Object.entries(ctx).map(([k, v]) => [k.charAt(0).toUpperCase() + k.slice(1), cap(v)])) });
 }
 
 // ── Police ─────────────────────────────────────────────────────────────────

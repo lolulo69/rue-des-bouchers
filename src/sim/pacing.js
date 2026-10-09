@@ -7,7 +7,9 @@
 // Mémoire d'une nuit à l'autre : sim.pacing.memory() → carry.pacing de la nuit suivante (campaign.js).
 import { createRng } from './rng.js';
 import { weatherNow } from './weather.js';
-import { CLATTER, AMBIENT } from '../content/night.js';
+import { CLATTER, AMBIENT, PHONE_PINGS } from '../content/night.js';
+import { WHATSAPP_GROUP } from '../content/characters.js';
+import { streetLine } from './narrative.js';
 
 const DEFAULTS = { enabled: true, quietMin: 10, quietMax: 13, clatterWindow: 2 };
 const NUM = ['zéro', 'une', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf', 'dix', 'onze', 'douze'];
@@ -29,7 +31,8 @@ export function attachPacing(sim, { carry = {} } = {}) {
 
   // Ce que le joueur VOIT compte comme « il se passe quelque chose » : une ligne du journal de nuit
   const log = sim.log;
-  sim.log = (text, cls) => { if (text) { lastMoment = S.min; seen.add(text); } return log(text, cls); };
+  let ambientRun = 0; // micro-moments d'affilée sans autre ligne (jamais 3 de suite : anti-spam)
+  sim.log = (text, cls) => { if (text) { lastMoment = S.min; seen.add(text); ambientRun = cls === 'ambient' ? ambientRun + 1 : 0; } return log(text, cls); };
 
   // Choisit un gabarit pas encore dit cette nuit ni la précédente ; liste épuisée : celui qui a servi il y a le plus longtemps
   const choose = (list, r = rng) => {
@@ -96,6 +99,15 @@ export function attachPacing(sim, { carry = {} } = {}) {
     if (a.effects?.klaas) sim.klaasAlert?.();
   }
 
+  function phonePing() {
+    const texts = PHONE_PINGS.map((p) => p.text.replace('{group}', WHATSAPP_GROUP));
+    const fresh = texts.filter((t) => !seen.has(t) && !prev.has(t));
+    const pool = fresh.length ? fresh : texts.filter((t) => !seen.has(t));
+    if (!pool.length) return;
+    sim.log(rng.pick(pool), 'phone');
+    sim.note('phone-ping', {});
+  }
+
   // Appelé après chaque pas de simulation (on enveloppe sim.tick, comme campaign.js › autoDbLogger)
   const tick = sim.tick;
   sim.tick = (dMin) => {
@@ -103,7 +115,8 @@ export function attachPacing(sim, { carry = {} } = {}) {
     if (pending.length && (S.ended || S.min - pending[0].at >= P.clatterWindow)) flushClatter();
     if (S.ended || S.sleeping) { lastMoment = S.min; return; }
     if (S.min - lastMoment >= nextGap) {
-      ambient();
+      // anti-spam : après deux micro-moments d'affilée, un message du groupe plutôt qu'une 3e ambiance
+      if (ambientRun >= 2) phonePing(); else ambient();
       lastMoment = S.min;
       nextGap = rng.range(P.quietMin, P.quietMax);
     }
@@ -111,6 +124,8 @@ export function attachPacing(sim, { carry = {} } = {}) {
 
   const api = {
     choose,
+    // Une ligne de la rue (narrative.streetLine) : sim.pacing?.line('pee_door') ?? texte de repli
+    line: (kind, ctx = {}) => streetLine(kind, sim, ctx),
     // sim.js › clearTable : une table rentrée par son resto (regroupée avec les voisines)
     clatter(restId, { terrace = false } = {}) { pending.push({ restId, terrace, at: S.min }); },
     // À reporter dans carry.pacing de la nuit suivante

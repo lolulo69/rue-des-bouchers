@@ -42,6 +42,7 @@ export const ACTIONS = [
     cost: { minutes: 20 },
     requires: { stats: { asso: '>=30' } },
     effects: { setFlags: ['joined_rounds'], asso: +3, dossier: +1, sleep: -3 },
+    resultLines: 'round_action', // 8 variantes : night.js › STREET_LINES.round_action (result = repli)
     result: "Jérémie compte les tables à voix haute, Biloute renifle chaque pied de chaise, vous notez. Biloute s’arrête net devant chaque table qui déborde et la fixe, comme un huissier. Personne ne sait comment il fait, mais il a raison.",
   },
   {

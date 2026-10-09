@@ -291,7 +291,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
       const p = { id: `pipi-${++S.peeCount}`, doorway, start: S.min, end: S.min + pee.duration };
       S.pees.push(p);
       sim.note('pee', { peeId: p.id, pos: { x: doorway.x, z: doorway.z } });
-      if (doorway.pilou) sim.log('Quelqu’un urine contre votre porte d’entrée. Classique du samedi.', 'bad');
+      if (doorway.pilou) sim.log(sim.pacing?.line('pee_door') ?? 'Quelqu’un urine contre votre porte d’entrée. Classique du samedi.', 'bad');
       S.nextPeeAt = S.min + rng.range(...pee.interval);
     }
   }
@@ -444,11 +444,15 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
   // Relevé en dB : une pièce par demi-heure si c'est du tapage nocturne (après 22:00, au-dessus du seuil)
   function dbReading({ noiseDb, fromWindow = true } = {}) {
     const db = Math.round(noiseDb ?? sim.noiseAt(fromWindow ? ANCHORS.pilouWindow : sim.restCenter(sim.rest('bernadette')), false));
-    if (S.min < SLEEP.drainAfter || db < EVIDENCE.dbThreshold) { sim.log(`📟 ${db} dB. ${S.min < SLEEP.drainAfter ? 'Avant 22h, ça ne compte pas.' : 'Pénible, mais pas assez pour un dossier.'}`); return { ok: false, db }; }
-    if (S.lastDbAt !== undefined && S.min - S.lastDbAt < EVIDENCE.dbEvery) { sim.log(`📟 ${db} dB. Déjà un relevé il y a moins de ${EVIDENCE.dbEvery} min.`); return { ok: false, db }; }
+    if (S.min < SLEEP.drainAfter || db < EVIDENCE.dbThreshold) {
+      const early = S.min < SLEEP.drainAfter;
+      sim.log(sim.pacing?.line(early ? 'db:early' : 'db:low', { db }) ?? `📟 ${db} dB. ${early ? 'Avant 22h, ça ne compte pas.' : 'Pénible, mais pas assez pour un dossier.'}`);
+      return { ok: false, db };
+    }
+    if (S.lastDbAt !== undefined && S.min - S.lastDbAt < EVIDENCE.dbEvery) { sim.log(sim.pacing?.line('db:again', { db, every: EVIDENCE.dbEvery }) ?? `📟 ${db} dB. Déjà un relevé il y a moins de ${EVIDENCE.dbEvery} min.`); return { ok: false, db }; }
     S.lastDbAt = S.min;
     const ev = sim.addEvidence({ type: 'db', kind: 'db', restId: null, quality: 0.8, value: sim.pieceValue(null, 'db', EVIDENCE.dbValue), db, text: `Relevé sonore à ${fmt(S.min)} : ${db} dB${fromWindow ? ' à la fenêtre de Pilou' : ' dans la rue'}` });
-    sim.log(`📟 ${db} dB relevés et horodatés.`, 'good');
+    sim.log(sim.pacing?.line('db:recorded', { db }) ?? `📟 ${db} dB relevés et horodatés.`, 'good');
     return { ok: true, db, found: [ev] };
   }
 
@@ -504,7 +508,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
       if (!kinds.length) continue;
       S.dogSpotted[t.restId] = true;
       sim.addEvidence({ type: 'round', kind: kinds[0], restId: t.restId, tableId: t.id, quality: 0.8, value: sim.pieceValue(t.restId, kinds[0], EVIDENCE.roundValue), pos: { x: t.x, z: t.z }, count: t.count, encroach: sim.encroachment(t), text: `Ronde de Jérémie : ${t.label} (${kinds.join(', ')}). Le teckel grogne.` });
-      sim.log(`Jérémie passe avec le teckel et note ${t.label}.`, 'good');
+      sim.log(sim.pacing?.line('round_note', { table: t.label }) ?? `Jérémie passe avec le teckel et note ${t.label}.`, 'good');
     }
   }
 

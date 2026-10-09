@@ -232,13 +232,15 @@ export function performNightAction(sim, c, id, player) {
   sim.note('night-action', {
     id, legality: a.legality, at: spec.at, pos, minutes, seen: seen.map((w) => w.kind), filmed: seen.some((w) => w.filmed), ...simResult,
   });
-  if (a.result) sim.log(a.result, a.legality === 'legal' ? 'good' : 'bad');
+  // resultLines : variantes du résultat (night.js › STREET_LINES, via pacing : pas deux fois dans la nuit ni la suivante)
+  const resultText = (a.resultLines && sim.pacing?.line(a.resultLines)) || a.result;
+  if (resultText) sim.log(resultText, a.legality === 'legal' ? 'good' : 'bad');
 
   // Le temps de l'acte passe (minute par minute : police, tables et sommeil continuent de tourner)
   for (let m = 0; m < minutes && !S.ended; m++) sim.tick(1);
 
   return {
-    ok: true, result: a.result ?? null, minutes, startedAt, art, sim: simResult,
+    ok: true, result: resultText ?? null, minutes, startedAt, art, sim: simResult,
     seen: seen.map((w) => ({ id: w.id, kind: w.kind, name: w.name, ally: !!w.ally, filmed: !!w.filmed })),
   };
 }
