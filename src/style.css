@@ -7,6 +7,8 @@ canvas#game { display: block; width: 100vw; height: 100vh; }
 #clock { position: absolute; top: 16px; right: 20px; font: 700 40px/1 ui-monospace, monospace; text-shadow: 0 2px 8px #000; }
 #clock.late { color: #ff6b5b; }
 #day { position: absolute; top: 60px; right: 20px; opacity: .7; }
+#fast { position: absolute; top: 84px; right: 20px; color: #e9c46a; font-weight: 700; text-shadow: 0 2px 6px #000; }
+#fast.manual::after { content: ' (V)'; opacity: .7; font-weight: 400; }
 .bars { position: absolute; top: 16px; left: 16px; display: grid; gap: 6px; width: 240px; }
 .bar { display: grid; grid-template-columns: 64px 1fr 52px; align-items: center; gap: 8px; font-size: 13px; text-shadow: 0 1px 3px #000; }
 .bar i { height: 8px; background: #ffffff22; border-radius: 4px; overflow: hidden; }

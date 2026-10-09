@@ -7,7 +7,7 @@ import '../ui/ui.css';
 import { inputMode, onInputMode, padGlyph, startPad } from './index.js';
 
 // touche du jeu → bouton de la manette
-const KEY_TO_PAD = { E: 'A', P: 'X', F: 'RT', N: 'Y', T: 'LB', B: 'RB', L: 'LT', Tab: 'RS', C: 'VIEW', 'Échap': 'START' };
+const KEY_TO_PAD = { E: 'A', P: 'X', F: 'RT', N: 'Y', T: 'LB', B: 'RB', L: 'LT', Tab: 'RS', C: 'VIEW', 'Échap': 'START', V: 'B' };
 export const keyHint = (key) => {
   if (inputMode().mode !== 'pad' || !KEY_TO_PAD[key]) return key;
   const g = padGlyph(KEY_TO_PAD[key]);
@@ -26,7 +26,7 @@ function padKeysNode() {
   div.innerHTML = [
     `<div><kbd>Stick gauche</kbd> se déplacer · <kbd>${g('LS')}</kbd> courir · <kbd>Stick droit</kbd> regarder</div>`,
     `<div><kbd>${g('A')}</kbd> portes, serveur, lit · <kbd>${g('X')}</kbd> photo (preuve) · <kbd>${g('LB')}</kbd> téléphone · <kbd>${g('RB')}</kbd> relevé dB</div>`,
-    `<div><kbd>${g('RT')}</kbd> maintenu : seau d’eau (depuis la fenêtre, illégal) · <kbd>${g('Y')}</kbd> actions de nuit · <kbd>${g('RS')}</kbd> dossier · <kbd>${g('LT')}</kbd> zones légales · <kbd>${g('START')}</kbd> pause</div>`,
+    `<div><kbd>${g('RT')}</kbd> maintenu : seau d’eau (depuis la fenêtre, illégal) · <kbd>${g('Y')}</kbd> actions de nuit · <kbd>${g('RS')}</kbd> dossier · <kbd>${g('LT')}</kbd> zones légales · <kbd>${g('B')}</kbd> accélérer · <kbd>${g('START')}</kbd> pause</div>`,
   ].join('');
   return div;
 }

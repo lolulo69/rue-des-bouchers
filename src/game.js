@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { buildWorld } from './world.js';
 import { createDirector } from './scene/director.js';
 import { RULES, SKY, STREET, NOISE, EVIDENCE, INTERACT, ZONES, POLICE, NIGHT_MENU } from './config.js';
-import { createSim, makeConfig, fmt, createCampaign, contentFromGlob, checkSave, nightMenu, LOCATIONS } from './sim/index.js';
+import { createSim, makeConfig, fmt, createCampaign, contentFromGlob, checkSave, nightMenu, LOCATIONS, nightClock } from './sim/index.js';
 import * as narrative from './sim/narrative.js';
 import { audio } from './audio/index.js';
 import { padGlyph, moveFocus } from './input/index.js';
@@ -160,6 +160,10 @@ function tuto(trigger) {
 // ~3 s à sa première apparition ; chaque geste du joueur (tutoEvent) fait avancer l'étape ; « Passer » ou Retour arrière.
 let coach = null;
 let coachPauseUntil = 0;
+// Horloge adaptative (§12c.5, src/sim/nightClock.js) : vitesse visée, vitesse lissée, « accélérer » à la main (V / Ⓑ)
+let fastManual = false;
+let clockScale = 1;
+let clockInfo = { scale: 1, fast: false, reason: 'normal' };
 const escapeHtml = (s) => String(s ?? '').replace(/[&<>]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[ch]));
 const placeWhere = () => (player.loc === 'street' ? 'street' : nearWindow() ? 'window' : 'apt');
 function renderCoach() {
@@ -220,6 +224,10 @@ let noiseDb = NOISE.ambientDb;
 function updateHud() {
   $('clock').textContent = fmt(S.min);
   $('clock').classList.toggle('late', S.min >= CLOSE);
+  const fast = $('fast');
+  fast.classList.toggle('hidden', clockScale < 1.05 || S.sleeping);
+  fast.classList.toggle('manual', fastManual);
+  fast.textContent = `⏩ ×${Math.round(clockScale)}`;
   bar('bar-noise', ((noiseDb - NOISE.hudMinDb) / (NOISE.hudMaxDb - NOISE.hudMinDb)) * 100);
   $('val-noise').textContent = `${Math.round(noiseDb)} dB`;
   bar('bar-sleep', S.sleep);
@@ -497,6 +505,7 @@ addEventListener('keydown', (e) => {
   if (overlay || e.repeat) return keys.add(e.code);
   keys.add(e.code);
   if (e.code === 'KeyE') interaction()?.act();
+  else if (e.code === 'KeyV') { fastManual = !fastManual; log(fastManual ? '⏩ Accélérer\u00a0: la nuit file dès que rien ne se passe.' : 'Vitesse normale (après 22h30, la nuit accélère d’elle-même quand rien ne se passe).'); }
   else if (e.code === 'KeyL') {
     if (campaign && !campaign.keyAllowed('L', sim)) log('La vue des zones légales viendra avec le plan de l’AOT (pas encore).');
     else { director.toggleLegalView(); tuto('legal_view_toggle'); tutoEvent('legal_view_toggled'); }
@@ -702,7 +711,11 @@ function update(dt) {
   const phase = S.police?.phase ?? null;
   if (phase === 'walking' && lastPolicePhase !== 'walking') cue('radio', { pos: { x: ANCHORS.policeSpawn.x, y: 1.5, z: ANCHORS.policeSpawn.z } });
   lastPolicePhase = phase;
-  if (now >= coachPauseUntil) sim.tick(dt * RULES.gameMinutesPerSecond * (S.sleeping ? RULES.sleepTimeMultiplier : 1));
+  clockInfo = nightClock(sim, campaign, { manual: fastManual });
+  // On ralentit d'un coup en se relevant ; sinon la vitesse glisse vers sa cible (easeSeconds)
+  if (!S.sleeping && clockScale > RULES.clock.fastScale) clockScale = clockInfo.scale;
+  else clockScale += (clockInfo.scale - clockScale) * (1 - Math.exp(-dt / RULES.clock.easeSeconds));
+  if (now >= coachPauseUntil) sim.tick(dt * RULES.gameMinutesPerSecond * clockScale);
   camPos.set(player.pos.x, player.pos.y + 1.65, player.pos.z);
   noiseDb = sim.noiseAt(camPos, player.loc === 'apt');
 }
@@ -744,6 +757,7 @@ window.__rdb = {
   get campaign() { return dayUI?.campaign ?? campaign; },
   get ui() { return dayUI; },
   get renderCount() { return renderCount; },
+  get clock() { return { scale: clockScale, manual: fastManual, ...clockInfo }; },
   goNight: () => goNight(dayUI.campaign),
   saveKey: SAVE_KEY,
   step(n = 1, dt = 1 / 30) { for (let i = 0; i < n; i++) tick(dt); return S.min; },

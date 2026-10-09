@@ -97,7 +97,7 @@ export function bindNight({ player, getOverlay = () => null } = {}) {
     dispatch: (code, type) => sendKey(code, code === 'Tab' ? 'Tab' : code.replace(/^Key/, '').toLowerCase(), type),
     openMenu: openPauseMenu,
     onHold: holdIndicator(),
-    onBack: skipActiveCoach,
+    onBack: () => skipActiveCoach() || sendKey('KeyV', 'v'), // Ⓑ : passer la marque affichée, sinon accélérer (§12c.5)
     settings: currentSettings,
   });
   let menuOpen = () => !!document.querySelector('#ui-menu .ui-menu-box');

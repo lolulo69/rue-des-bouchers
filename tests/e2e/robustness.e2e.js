@@ -200,3 +200,34 @@ test('menu de nuit (N, §12c.4) : « Ici, maintenant », « Ailleurs ce soir » 
   expect(f1.inMenu).toBe(true);
   expect(f0).toBeTruthy();
 });
+
+test('horloge adaptative (§12c.5) : ⏩ après 22h30 quand rien ne se passe, retour à ×1 quand la police arrive, V accélère', async ({ page }) => {
+  await page.goto('/?nolock=1&seed=4');
+  await page.click('#start');
+  const r = await page.evaluate(() => {
+    const { sim, step, key } = window.__rdb;
+    const early = (step(60), window.__rdb.clock);
+    key('KeyV'); step(90);
+    const manual = window.__rdb.clock;
+    key('KeyV');
+    while (sim.state.min < 23 * 60 + 10) sim.tick(1);
+    sim.state.journal = [];
+    step(120);
+    const late = { ...window.__rdb.clock, shown: !document.getElementById('fast').classList.contains('hidden'), text: document.getElementById('fast').textContent };
+    const t0 = sim.state.min; step(30); const fastMinutes = sim.state.min - t0;
+    sim.act({ type: 'police' });
+    step(120);
+    const police = window.__rdb.clock;
+    return { early, manual, late, fastMinutes, police };
+  });
+  expect(r.early).toMatchObject({ fast: false, reason: 'normal' });
+  expect(r.early.scale).toBeCloseTo(1, 2);
+  expect(r.manual).toMatchObject({ fast: true, manual: true, reason: 'manual' });
+  expect(r.late.reason).toBe('late');
+  expect(r.late.scale).toBeGreaterThan(2.5);
+  expect(r.late.shown).toBe(true);
+  expect(r.late.text).toMatch(/⏩ ×3/);
+  expect(r.fastMinutes).toBeGreaterThan(1.3); // 1 s réelle ≈ 1,5 min de jeu à ×3 (0,5 à ×1)
+  expect(r.police.reason).toBe('busy:police');
+  expect(r.police.scale).toBeLessThan(1.2);
+});
