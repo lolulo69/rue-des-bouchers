@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { TALK } from '../../src/content/talk.js';
 import { CHARACTERS } from '../../src/content/characters.js';
 import { FLAGS } from '../../src/content/flags.js';
+import { ACTIONS } from '../../src/content/actions.js';
 
 const WHO = ['jeremie', 'tatie', 'seb_nico', 'waiter', 'dede', 'ghislain', 'customers', 'patrol', 'klaas'];
 const condFlags = (w = {}) => [...(w.flags ?? []), ...(w.notFlags ?? [])];
@@ -27,6 +28,7 @@ describe('talk.js (§12e.3 : parler aux gens, la nuit)', () => {
           expect(ch.label.length, `${t.id} : ${ch.label}`).toBeLessThanOrEqual(70);
           if (ch.reply) expect(ch.reply.length, t.id).toBeLessThanOrEqual(220);
           if (ch.sim) expect(ch.sim, t.id).toBe('waiter');
+          if (ch.action) expect(ACTIONS.some((x) => x.id === ch.action), `${t.id} → ${ch.action}`).toBe(true);
         }
       }
     }

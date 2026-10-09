@@ -11,6 +11,8 @@
 //   exchanges: 2 ou 3 au plus, joués dans l'ordre ; un choix avec `end: true` clôt la conversation
 //   choices  : 2 ou 3 ; `reply` = la réponse (même locuteur que `say`) ; `effects` = effets §14 ; `requires` = conditions §14
 //              `sim: 'waiter'` = le moteur joue la demande au serveur (sim.act({ type: 'waiter' })), comme la touche E l'a toujours fait
+//              `action: '<id d'ACTIONS>'` = le moteur joue cette action de nuit (coût, témoins, effets), comme depuis le menu N
+//   when.onBreak: true = le serveur est à sa pause cigarette (sim.waiterOnBreak())
 // Voix : celles de characters.js. Pilou parle par les libellés des choix (pas de réplique écrite pour lui).
 
 const H = (h, m = 0) => h * 60 + m;
@@ -155,6 +157,24 @@ export const TALK = [
         choices: [
           { label: 'Pilou. Enchanté, Théo.', reply: 'Pilou. Bon. Si un jour je peux faire un truc, sans me faire virer, je te dis.', requires: { flags: ['talked_waiter'] }, effects: { setFlags: ['met_waiter'] } },
           { label: 'Bonne fin de service.', reply: 'Merci. Encore deux heures. Ou trois.', end: true },
+        ] },
+    ],
+  },
+  {
+    id: 'talk_waiter_smoke',
+    who: 'waiter',
+    when: { onBreak: true, flags: ['asked_waiter'], notFlags: ['waiter_bribed', 'waiter_fired'] },
+    exchanges: [
+      { speaker: 'serveur', say: 'Six minutes de pause, montre en main. Si Dédé me cherche, je suis aux toilettes. Vous fumez ?',
+        choices: [
+          { label: 'Non. Mais j’ai des questions.', reply: 'Tout le monde a des questions. Personne ne paie le parking du serveur.' },
+          { label: 'Glisser un billet, discrètement.', reply: 'Il empoche le billet sans le regarder. « Je m’appelle Théo. Et je vous ai jamais vu. »', action: 'night_bribe_waiter', end: true },
+          { label: 'Bonne pause.', reply: 'Merci. Elle est déjà finie.', end: true },
+        ] },
+      { speaker: 'serveur', say: 'Les questions, c’est après la fermeture. Ou contre un café. Un vrai, pas celui du patron.',
+        choices: [
+          { label: 'Glisser un billet, discrètement.', reply: 'Il empoche le billet sans le regarder. « Je m’appelle Théo. Je finis à minuit et demie. »', action: 'night_bribe_waiter', end: true },
+          { label: 'Une autre fois.', reply: 'Une autre fois. Je suis toujours là, malheureusement.', end: true },
         ] },
     ],
   },
