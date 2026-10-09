@@ -526,7 +526,7 @@ export const NIGHT_END = {
 // ════════════════════════════════════════════════════════════════════════════
 export const CLATTER = {
   names: {
-    bernadette: 'l’estaminet', malunes: 'les Mal Lunés', goulot: 'Le Goulot', bloemkool: 'Bloemkool',
+    bernadette: 'l’estaminet', malunes: 'le grill des Mal Lunés', goulot: 'Le Goulot', bloemkool: 'Bloemkool',
     endroit: 'L’Endroit', truffe: 'Truffe et Ficelle', mug: 'Mug',
   },
   one: [

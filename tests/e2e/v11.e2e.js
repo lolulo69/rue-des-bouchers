@@ -31,13 +31,13 @@ const playUntil = (page, stopSrc, { maxDay = 14 } = {}) => page.evaluate(({ stop
     if (stop(c)) break;
     if (c.step === 'cards') {
       const k = c.card();
-      if (k.type === 'unlock') at(c.state.day).unlocks.push(k.id);
+      if (k.type === 'unlock' || k.unlock) at(c.state.day).unlocks.push(k.unlock ?? k.id);
       c.resolveCard(k.choices.find((x) => x.available)?.i ?? 0);
     } else if (c.step === 'koddex') { at(c.state.day).workplace = workplace(); c.koddex(['work', 'work', 'work']); }
     else if (c.step === 'actions') c.endAfternoon();
     else if (c.step === 'night') {
       at(c.state.day).night = true;
-      at(c.state.day).twist = c.tonightTwist?.()?.id ?? null;
+      at(c.state.day).twist = (c.twistTonight ?? c.tonightTwist)?.()?.id ?? null;
       const sim = c.createNight();
       for (let k = 0; !sim.state.ended && k < 2000; k++) {
         for (let ev = c.nightEventDue?.(sim); ev; ev = c.nightEventDue(sim)) c.resolveNightEvent(sim, ev.choices.find((x) => x.available)?.i ?? 0);
@@ -55,9 +55,9 @@ test.describe('v1.1 · twists de nuit', () => {
   test('la carte de nuit annonce le twist du soir (titre + intro) avant « Descendre dans la rue »', async ({ page }) => {
     const errors = watchErrors(page);
     await newCampaign(page);
-    test.skip(!(await page.evaluate(() => typeof window.__rdb.ui.campaign.tonightTwist === 'function')), 'twists pas encore sur main : c.tonightTwist() absent');
+    test.skip(!(await page.evaluate(() => { const c = window.__rdb.ui.campaign; return typeof (c.twistTonight ?? c.tonightTwist) === 'function'; })), 'twists pas encore sur main');
     expect((await playUntil(page, (c) => c.step === 'night')).step).toBe('night');
-    const tw = await page.evaluate(() => window.__rdb.ui.campaign.tonightTwist());
+    const tw = await page.evaluate(() => { const c = window.__rdb.ui.campaign; return (c.twistTonight ?? c.tonightTwist)(); });
     expect(tw, 'chaque nuit a son twist (§13.J)').not.toBeNull();
     const card = page.locator('[data-testid=night]');
     await expect(card).toBeVisible();
@@ -71,7 +71,7 @@ test.describe('v1.1 · twists de nuit', () => {
   test('14 nuits : un twist chaque nuit, jamais deux fois le même dans une campagne', async ({ page }) => {
     test.setTimeout(240_000);
     await newCampaign(page, 3); // la graine 3 va jusqu'au J14 en jeu passif (101 déménage au J11 depuis l'équilibrage v1.1)
-    test.skip(!(await page.evaluate(() => typeof window.__rdb.ui.campaign.tonightTwist === 'function')), 'twists pas encore sur main : c.tonightTwist() absent');
+    test.skip(!(await page.evaluate(() => { const c = window.__rdb.ui.campaign; return typeof (c.twistTonight ?? c.tonightTwist) === 'function'; })), 'twists pas encore sur main');
     const r = await playUntil(page, () => false);
     const ids = Object.values(r.days).filter((d) => d.night).map((d) => d.twist);
     expect(ids.length, 'des nuits jouées').toBeGreaterThanOrEqual(13);
@@ -84,8 +84,8 @@ test.describe('v1.1 · outils débloqués au fil des jours', () => {
   test('une carte « Nouveau » s’affiche (titre, texte, touche), et s’acquitte d’un clic', async ({ page }) => {
     const errors = watchErrors(page);
     await newCampaign(page);
-    const r = await playUntil(page, (c) => c.step === 'cards' && c.card()?.type === 'unlock', { maxDay: 4 });
-    const card = await page.evaluate(() => { const c = window.__rdb.ui.campaign; return c.step === 'cards' && c.card()?.type === 'unlock' ? c.card() : null; });
+    const r = await playUntil(page, (c) => c.step === 'cards' && (c.card()?.type === 'unlock' || !!c.card()?.unlock), { maxDay: 4 });
+    const card = await page.evaluate(() => { const c = window.__rdb.ui.campaign; const k = c.step === 'cards' ? c.card() : null; return k && (k.type === 'unlock' || k.unlock) ? { id: k.id, data: k.data && typeof k.data === 'object' && k.data.title ? k.data : { title: k.title, text: k.text, hint: k.hint } } : null; });
     test.skip(!card, `cartes « Nouveau » pas encore dans la file (aucune sur les jours 1–4 ; étape ${r.step}, jour ${r.day})`);
     const el = page.locator('[data-testid=card][data-type=unlock]');
     await expect(el).toBeVisible();

@@ -5,19 +5,6 @@ When a bug is fixed, remove the `fixme` (the test then guards against regression
 
 ## Open
 
-### BUG-008 · v1.1: the night card never shows the twist (UI calls `c.tonightTwist()`, the engine has `c.twistTonight()`)
-- **Files**: `src/ui/index.js:587` feature-detects `typeof c.tonightTwist === 'function'`; the engine (`src/sim/campaign.js:444`, f9d341c) exposes `c.twistTonight()` (the build note b78a1c6 said `tonightTwist`).
-- **Expected**: the « Descendre dans la rue » night card shows tonight's twist (title + intro).
-- **Actual**: the detection fails silently, the night card has no twist. (The engine also queues the intro as an `info` card `twist:<id>` at the start of the night phase, so the text does appear once, as a separate card; once the UI reads the twist, decide whether to keep both.)
-- **Owner guess**: UI agent with the build agent (one name to align). Test: `tests/e2e/v11.e2e.js` (updated locally to the engine's name; pushed once main is green).
-
-### BUG-009 · v1.1: « Nouveau » unlock cards render as a generic « Nouvel outil » (no text, no key hint)
-- **Files**: the engine queues unlock cards as `{ type: 'info', id: 'unlock:<id>', unlock: '<id>', title, text, hint }` (`src/sim/campaign.js` › `beginPhase`); `src/ui/index.js:338` calls `unlockCard(card, card.unlock ?? card.data ?? card)`, so `u` is the **string** id and `u.title` / `u.text` / `u.hint` are undefined.
-- **Expected**: « ✨ Nouveau » + the card's title, its two lines and « Touche : B » (or the pad glyph).
-- **Actual**: « Nouvel outil », no text, no hint, for all 21 unlocks.
-- **Owner guess**: UI agent: `unlockCard(card, typeof card.unlock === 'object' ? card.unlock : card.data?.title ? card.data : card)`. One line.
-
-
 ### BUG-007 · The D14 commission's verdict text is skipped: the screen jumps straight to the ending
 - **Test**: `tests/e2e/fullrun.e2e.js` › « BUG-004 (corrigé) · le résultat de la dernière carte d’une phase est affiché » (fails after a full run whose commission choice has a `result`: `lostResults: [{ day: 14, id: 'd14_commission', step: 'ended' }]`).
 - **Files**: `src/ui/index.js` › `shown()`: `c.step === 'ended'` takes priority over `view.cardResult` (my BUG-004 fix, b0677ae), so `choose()`'s result card is never drawn when that choice ends the campaign.
@@ -36,6 +23,8 @@ When a bug is fixed, remove the `fixme` (the test then guards against regression
 - **Duration (§13.A)**: see `qa/duration.md`. Both full campaigns land at ~3h05 (target 2h30–4h); the custody run stops at day 5 (1h16), as expected for an early ending.
 
 ## Fixed
+- **BUG-008** · the night card never showed the twist (UI called `c.tonightTwist()`, the engine had `c.twistTonight()`). Fixed by the build agent in 13e6ec1 (the engine answers `c.tonightTwist()`). Test: `v11.e2e.js` › « la carte de nuit annonce le twist du soir ».
+- **BUG-009** · « Nouveau » cards lost their title/text/hint (the UI read them from the unlock id string). Fixed in 13e6ec1 / fe57180 (object payload, UI falls back to the card). Test: `v11.e2e.js` › « une carte « Nouveau » s’affiche ».
 - **BUG-005** · Tab was swallowed in the day UI (the 3D game's global `keydown` cancels Tab for the night dossier). Fixed in `src/ui/index.js` (UI agent, ui-v0.9): while the day UI is on screen, a capture listener stops Tab before the game's handler without cancelling it; Enter/Space (or a click) now also skip the Koddex typewriter. Test un-fixme'd: `edge.e2e.js` › « BUG-005 ».
 - **BUG-006** · the production build bundled `ui.html`'s `standalone.js` into the game's `ui` chunk, mounting a second, engine-less day UI (campaigns ran without the 3D night). Fixed by the build agent in c70745b. Guard test: `edge.e2e.js` › « BUG-006 (corrigé) » (one `.ui-layer`, no `window.__rdbUi`, the campaign belongs to the game's UI).
 - **BUG-002** · the Koddex end-of-morning was never shown. Fixed in 69aaa7e (UI agent): `shown()` keeps the Koddex screen until « Quitter Koddex ». Test un-fixme'd in `tests/e2e/campaign-flow.e2e.js`.
