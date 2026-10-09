@@ -78,7 +78,9 @@ export function mount(engine = {}, opts = {}) {
   };
   const statsSnap = () => ({ ...c.state.stats });
   const deltas = (before) => Object.fromEntries(Object.keys(STAT_LABELS).map((k) => [k, Math.round(c.state.stats[k] - before[k])]));
-  const fresh = () => c.state.day === 1 && c.state.phase === 'morning' && !c.state.seen.events.length && !c.state.seen.dialogue.length;
+  // Partie neuve (intro à montrer) : jour 1, matin, aucun événement joué ni prompt donné. Pas de test sur les dialogues :
+  // le moteur v1.1 en marque un comme vu dès le départ (call_background), et l'intro disparaissait.
+  const fresh = () => c.state.day === 1 && c.state.phase === 'morning' && !c.state.seen.events.length && !c.state.koddexDone && !c.state.seen.actions.length;
 
   // ── campagne (page autonome) ────────────────────────────────────────
   function loadSave() {

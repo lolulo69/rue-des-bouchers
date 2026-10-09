@@ -61,7 +61,9 @@ test('jours 1 à 3 joués dans l’interface : Koddex, après-midi, nuit, bilan,
 
   await expect(page.locator('[data-testid=card]')).toBeVisible();
   // U3 : portrait rendu par art.portrait (image), pas les initiales
-  await expect(page.locator('[data-testid=card] .ui-portrait img').first()).toBeVisible();
+  // (la 1re carte peut être une carte « Nouveau » sans personnage : le portrait n'est exigé que s'il y en a un)
+  const face = page.locator('[data-testid=card] .ui-portrait');
+  if (await face.count()) await expect(face.first().locator('img')).toBeVisible();
   await page.waitForTimeout(400);
   await page.screenshot({ path: 'test-results/ui-card.png', fullPage: true });
   const seen = new Set();
