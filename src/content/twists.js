@@ -30,7 +30,7 @@ export const TWISTS = [
         { at: H(23, 5), text: "Martine lève son verre : « À la convivialité, mes chers amis ! » Toute la terrasse trinque. Les fenêtres aussi, à leur façon.", simEffect: { noise: 6 }, state: { estaminetOut: '>0' }, else: 'Martine lève son verre à l’intérieur, derrière la vitrine : « À la convivialité ! » La rue, dehors, n’entend qu’un tintement.' },
       ],
       opportunities: ['night_photo'],
-      windows: [{ at: H(23, 5), minutes: 2, turns: ['customers', 'waiter', 'dede'], text: "L’ancienne maire lève son verre : toute la terrasse trinque, tournée vers elle." }],
+      windows: [{ at: H(23, 5), minutes: 2, turns: ['customers', 'waiter', 'dede'], state: { estaminetOut: '>0' }, text: "L’ancienne maire lève son verre : toute la terrasse trinque, tournée vers elle." }],
     },
     lines: {
       barks: ["« Madame la maire ! Enfin, l’ancienne, mais quand même ! »", "« On peut faire une photo avec vous ? »", "« Elle a eu un dessert. Personne d’autre n’a eu de dessert. »"],

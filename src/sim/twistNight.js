@@ -87,6 +87,8 @@ export function updateTwist(sim) {
   for (const w of S.twistWindows ?? []) {
     if (w.done || S.min < w.at) continue;
     w.done = true;
+    // Garde d'état (§13.L), comme les moments : pas de « toute la terrasse trinque » devant une terrasse vide
+    if (w.state && !holds(w.state, sim)) continue;
     divertAttention(sim, { source: 'window', id: `${S.twist?.id}:${w.i}`, turns: w.turns ?? [], minutes: w.minutes ?? 2, text: w.text ?? null });
     if (w.text) sim.log(`👀 ${w.text}`, 'good');
   }
