@@ -240,4 +240,8 @@ export const FLAGS = {
   twist_street_sweeper: 'Rebondissement : la balayeuse de 23h30',
   // v1.1 · design agent
   twist_carbonnade_contest: 'Nuit du concours de carbonnade (rebondissement)',
+
+  // ── content-stealth (§12d) ──────────────────────────────────────────────
+  disguise_hood: 'Pilou porte la capuche du portemanteau (moins reconnaissable)',
+  disguise_vest: 'Pilou porte le gilet jaune « comme un livreur » (encore moins reconnaissable)',
 };

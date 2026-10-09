@@ -68,6 +68,14 @@ export const NIGHT_ACTION_SPECS = {
   night_eat_carbonnade_1: { at: 'estaminet', window: [H(20, 30), H(22, 30)], needs: 'kitchenOpen', art: { anim: ['pilou', 'eat'] } },
   night_eat_carbonnade_2: { at: 'estaminet', window: [H(20, 30), H(22, 30)], needs: 'kitchenOpen', art: { anim: ['pilou', 'eat'] } },
   night_eat_carbonnade_3: { at: 'estaminet', window: [H(20, 30), H(22, 30)], needs: 'kitchenOpen', art: { anim: ['pilou', 'eat'] } },
+  // §12d : diversions (sans fiche = dans la rue, toute la nuit) et déguisements (au portemanteau du couloir)
+  night_firecracker: { at: 'street', window: [H(21), H(26)], repeat: true },
+  night_call_landline: { at: 'street', window: [H(20, 30), H(24)], needs: 'waiterOnDuty', repeat: true },
+  night_fake_alert: { at: 'street', window: [H(20, 30), H(24, 30)], repeat: true },
+  night_wrong_pizza: { at: 'street', window: [H(20, 30), H(24)], needs: 'terraceOut', repeat: true },
+  night_biloute_bark: { at: 'street', window: [H(21, 30), H(23)], needs: 'roundTonight', repeat: true, art: { fx: 'barkPuff' } },
+  night_disguise: { at: 'apartment', window: [H(20, 30), H(26, 30)] },
+  night_disguise_vest: { at: 'apartment', window: [H(20, 30), H(26, 30)] },
 };
 
 // Conditions de scène (état de la nuit) + raison affichée quand elle manque

@@ -510,6 +510,12 @@ export const OBJECTIVES = [{
 }];
 // done filters: photo_taken { overLimit, late (after 22:00), table (twist table label), corridor } · db_taken { min } ·
 // police_called { patrol, asso }.
+// Stealth (v1.1, §12d). An ACTION may carry a diversion; a TWIST's sim block may carry natural windows.
+//   diversion: { turns: ['klaas'|'seb_nico'|'waiter'|'dede'|'ghislain'|'customers'|'patrol'], minutes: N, cooldown: M, traceRisk: 0..1 }
+//     those witnesses look away or leave for N game minutes; replayable after M minutes; traceRisk = chance the diversion is traced
+//     back to Pilou, which applies the action's `witnessed.effects`.
+//   sim.windows: [{ at: H(h, m), minutes: N, turns: [...], text: '…' }]  natural moments when attention is elsewhere (HUD « Fenêtre propice »).
+//   Disguise: actions night_disguise (hood → disguise_hood) and night_disguise_vest (hi-vis vest → disguise_vest), DISGUISE config.
 ```
 Rules: all text is in French; **no real restaurant names**; every `speaker` exists in `characters.js`; every flag is declared;
 every action, event and ending is reachable (the linter + the campaign simulator check this). An epilogue is built from the parts whose `when` matches,

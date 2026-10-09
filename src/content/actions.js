@@ -341,6 +341,92 @@ export const ACTIONS = [
   },
 
   // ════════════════════════════════════════════════════════════════════════
+  // NUIT — DIVERSIONS ET DÉGUISEMENTS (§12d, contrat §14 « diversion »)
+  // diversion : { turns: [témoins qui regardent ailleurs ou s'en vont], minutes, cooldown (minutes de jeu avant de pouvoir
+  //               recommencer), traceRisk (0–1 : chance qu'on remonte jusqu'à Pilou → `witnessed.effects`) }
+  // ════════════════════════════════════════════════════════════════════════
+  {
+    id: 'night_firecracker',
+    label: 'Un pétard au bout de la rue, côté place',
+    phase: 'night',
+    legality: 'illegal',
+    cost: { minutes: 6 },
+    requires: { day: [3, 14] },
+    diversion: { turns: ['klaas', 'seb_nico', 'waiter', 'dede', 'customers'], minutes: 2, cooldown: 60, traceRisk: 0.25 },
+    effects: { hostility: +2 },
+    witnessed: { exposure: 0.25, by: ['customers', 'klaas'], effects: { risk: +12, hostility: +5 } },
+    result: "PAN. Toute la rue se retourne vers la place. Trois clients filment un lampadaire, Klaas braque ses jumelles sur un pigeon. Deux minutes où personne ne regarde le n°10.",
+  },
+  {
+    id: 'night_call_landline',
+    label: "Appeler le fixe de l’estaminet pour une réservation compliquée",
+    phase: 'night',
+    legality: 'grey',
+    cost: { minutes: 3 },
+    requires: { day: [2, 14] },
+    diversion: { turns: ['waiter', 'dede', 'ghislain'], minutes: 3, cooldown: 45, traceRisk: 0.15 },
+    effects: {},
+    witnessed: { exposure: 0.15, by: ['ghislain'], effects: { hostility: +10, risk: +3 } },
+    result: "« Une table pour douze, samedi, au nom de M. Bouchon, avec un gâteau sans gluten mais avec des bougies. » Dédé, le serveur et Ghislain rentrent chercher le grand cahier. Trois minutes de débat.",
+  },
+  {
+    id: 'night_fake_alert',
+    label: 'Lancer une fausse alerte sur le groupe WhatsApp',
+    phase: 'night',
+    legality: 'grey',
+    cost: { minutes: 2 },
+    requires: { flags: ['met_seb_nico'] },
+    diversion: { turns: ['seb_nico'], minutes: 4, cooldown: 90, traceRisk: 0.3 },
+    effects: { asso: -2 },
+    witnessed: { exposure: 0.3, by: ['seb_nico'], effects: { asso: -6 } },
+    result: "« URGENT : qui a laissé une poussette dans l’escalier du 13 ? » Seb et Nico rentrent mener l’enquête. Le balcon est vide. La chatte, elle, vous regarde.",
+  },
+  {
+    id: 'night_biloute_bark',
+    label: 'Demander à Jérémie de faire aboyer Biloute au coin de la rue',
+    phase: 'night',
+    legality: 'grey',
+    cost: { minutes: 4 },
+    requires: { flags: ['joined_rounds'] },
+    diversion: { turns: ['customers', 'waiter', 'klaas'], minutes: 2, cooldown: 60, traceRisk: 0.1 },
+    effects: {},
+    witnessed: { exposure: 0.1, by: ['klaas'], effects: { asso: -3 } },
+    result: "Jérémie fronce les sourcils, puis sort une croquette. *Biloute aboie au coin de la rue de la Barre comme s’il avait vu un chat de deux mètres.* Toutes les têtes tournent. Jérémie : « Je n’ai rien vu. »",
+  },
+  {
+    id: 'night_wrong_pizza',
+    label: 'Commander des pizzas livrées à la mauvaise porte',
+    phase: 'night',
+    legality: 'grey',
+    cost: { minutes: 5 },
+    requires: { day: [2, 14] },
+    diversion: { turns: ['customers', 'waiter', 'dede'], minutes: 4, cooldown: 120, traceRisk: 0.2 },
+    effects: {},
+    witnessed: { exposure: 0.2, by: ['dede', 'customers'], effects: { hostility: +8, risk: +4 } },
+    result: "Un livreur perdu sonne au 14 avec quatre pizzas « pour M. Dédé ». Attroupement, débat, une table entière se lève pour aider à lire l’adresse. Personne ne regarde ailleurs. Enfin si : ailleurs.",
+  },
+  {
+    id: 'night_disguise',
+    label: 'Mettre la capuche du portemanteau',
+    phase: 'night',
+    legality: 'legal',
+    cost: { minutes: 1 },
+    requires: { notFlags: ['disguise_hood'] },
+    effects: { setFlags: ['disguise_hood'] },
+    result: "Le sweat à capuche du portemanteau, dans le couloir. Dans la rue, de loin, vous êtes « un jeune ». Klaas, lui, reconnaîtrait votre démarche entre mille. Mais il est loin.",
+  },
+  {
+    id: 'night_disguise_vest',
+    label: 'Enfiler le gilet jaune « comme un livreur »',
+    phase: 'night',
+    legality: 'legal',
+    cost: { minutes: 1 },
+    requires: { day: [3, 14], notFlags: ['disguise_vest'] },
+    effects: { setFlags: ['disguise_vest'] },
+    result: "Le gilet jaune du vélo électrique. Un livreur de plus dans la rue : personne ne regarde jamais les livreurs. C’est leur superpouvoir. Ce soir, c’est le vôtre.",
+  },
+
+  // ════════════════════════════════════════════════════════════════════════
   // APRÈS-MIDI — LÉGAL : institutions
   // ════════════════════════════════════════════════════════════════════════
   {
