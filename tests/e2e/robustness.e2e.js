@@ -233,26 +233,38 @@ test('horloge adaptative (§12c.5) : ⏩ après 22h30 quand rien ne se passe, re
 });
 
 test('dormir (§12c.5) : voile « Pilou dort… », ×40, puis « Passer à demain matin » joue la fin de la nuit minute par minute', async ({ page }) => {
-  test.setTimeout(120_000);
+  // Robuste sous SwiftShader en CI (QA, red-main 2026-10-09) : les premières images compilent toute la scène ; dans un seul
+  // page.evaluate synchrone avec 90 images rendues, ça dépassait 120 s sur un runner chargé (« Target page … closed »).
+  // Le jeu, lui, ne gèle pas : « Passer à demain matin » finit la nuit en ~11 images de quelques ms.
+  test.setTimeout(240_000);
   await page.goto('/?nolock=1&seed=2');
   await page.click('#start');
-  const r = await page.evaluate(() => {
-    const { world, player, step, sim, key } = window.__rdb;
+  await page.locator('#hud').waitFor({ state: 'visible' });
+  await page.evaluate(() => window.__rdb.step(1)); // image d'échauffement (shaders, textures), à part
+  await page.evaluate(() => {
+    const { world, player, step } = window.__rdb;
     player.loc = 'apt';
     player.pos.set(world.bed.x, world.apt.floor, world.bed.z + 0.6);
     step(3);
+  });
+  const r = await page.evaluate(() => {
+    const { step, key } = window.__rdb;
     key('KeyE');
-    step(90); // 3 s réelles
+    step(9, 1 / 3); // 3 s de jeu en 9 images (l'horloge glisse vers ×40 sur easeSeconds)
     const veil = !document.getElementById('sleepveil').classList.contains('hidden');
     const scale = window.__rdb.clock.scale;
     const status = document.getElementById('sleep-status').textContent;
     return { veil, scale, status };
   });
   await page.screenshot({ path: 'test-results/sleep-veil.png' });
+  await page.evaluate(() => window.dispatchEvent(new KeyboardEvent('keydown', { code: 'Enter', bubbles: true })));
+  // 30 min de nuit par image : quelques évaluations courtes plutôt qu'une longue
+  for (let k = 0; k < 10 && !(await page.evaluate(() => window.__rdb.sim.state.ended)); k++) {
+    await page.evaluate(() => { const { sim, step } = window.__rdb; for (let i = 0; i < 4 && !sim.state.ended; i++) step(1); });
+  }
   Object.assign(r, await page.evaluate(() => {
     const { sim, step } = window.__rdb;
-    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'Enter', bubbles: true }));
-    for (let i = 0; i < 40 && !sim.state.ended; i++) step(1);
+    step(1);
     return { end: sim.state.min, ended: sim.state.ended, endShown: !document.getElementById('end').classList.contains('hidden') };
   }));
   expect(r.veil).toBe(true);
