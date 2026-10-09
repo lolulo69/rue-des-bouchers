@@ -43,6 +43,7 @@ export const EVENTS = [
   {
     id: 'd4_martine_dinner',
     at: 20 * 60 + 50, // joué pendant la nuit, à cette heure (campaign.nightEventDue)
+    stage: { cue: 'event:d4_martine_dinner' }, // §12e.6 : joué à l'écran à cette heure
     day: 4,
     phase: 'night',
     speaker: 'martine',
@@ -519,6 +520,7 @@ export const EVENTS = [
   {
     id: 'r_drache',
     at: 21 * 60 + 15, // joué pendant la nuit, à cette heure (campaign.nightEventDue)
+    stage: { cue: 'event:r_drache' }, // §12e.6 : joué à l'écran à cette heure
     simEffect: 'rain', // les terrasses rentrent pour de bon (campaign.js NIGHT_EVENT_EFFECTS)
     when: { phase: 'night', notFlags: ['random_drache'], chance: 0.12 },
     once: true,
@@ -546,6 +548,7 @@ export const EVENTS = [
   {
     id: 'r_suitcases',
     at: 25 * 60 + 7, // joué pendant la nuit, à cette heure (campaign.nightEventDue)
+    stage: { cue: 'event:r_suitcases' }, // §12e.6 : joué à l'écran à cette heure
     when: { phase: 'night', day: [3, 13], chance: 0.15 },
     once: true,
     title: '1h07 : roulettes sur pavés',
@@ -590,6 +593,7 @@ export const EVENTS = [
   {
     id: 'r_waiter_smoke',
     at: 24 * 60 + 20, // joué pendant la nuit, à cette heure (campaign.nightEventDue)
+    stage: { cue: 'event:r_waiter_smoke' }, // §12e.6 : joué à l'écran à cette heure
     speaker: 'serveur',
     when: { phase: 'night', day: [2, 13], flags: ['talked_waiter'], notFlags: ['met_waiter'], chance: 0.3 },
     once: true,
@@ -614,6 +618,7 @@ export const EVENTS = [
   {
     id: 'r_bachelor_party',
     at: 23 * 60 + 40, // joué pendant la nuit, à cette heure (campaign.nightEventDue)
+    stage: { cue: 'event:r_bachelor_party' }, // §12e.6 : joué à l'écran à cette heure
     when: { phase: 'night', day: [5, 13], chance: 0.12 },
     once: true,
     title: 'Enterrement de vie de garçon, quatorze participants',
@@ -661,6 +666,7 @@ export const EVENTS = [
   {
     id: 'r_biloute_chairs',
     at: 21 * 60 + 40, // joué pendant la nuit, à cette heure (campaign.nightEventDue)
+    stage: { cue: 'event:r_biloute_chairs' }, // §12e.6 : joué à l'écran à cette heure
     speaker: 'biloute',
     when: { phase: 'night', day: [2, 12], flags: ['joined_rounds'], chance: 0.25 },
     once: true,
@@ -722,6 +728,7 @@ export const EVENTS = [
   {
     id: 'r_fire_brigade',
     at: 22 * 60 + 35, // joué pendant la nuit, à cette heure (campaign.nightEventDue)
+    stage: { cue: 'event:r_fire_brigade' }, // §12e.6 : joué à l'écran à cette heure
     when: { phase: 'night', day: [3, 13], chance: 0.1 },
     once: true,
     title: 'Les pompiers ne passent pas',
@@ -854,6 +861,7 @@ export const EVENTS = [
   {
     id: 'r_influencer',
     at: 21 * 60 + 30, // joué pendant la nuit, à cette heure (campaign.nightEventDue)
+    stage: { cue: 'event:r_influencer' }, // §12e.6 : joué à l'écran à cette heure
     when: { phase: 'night', day: [3, 13], chance: 0.12 },
     once: true,
     title: '« La rue la plus authentique de Lille »',

@@ -11,6 +11,8 @@
 // Règle d'écriture : satire des institutions, du bloc et de Pilou ; jamais des riverains. Fiction (§0).
 
 const H = (h, m = 0) => h * 60 + m;
+// §12e.6 : chaque moment (sim.events puis sim.windows, numérotés à la suite) porte stage: { cue: 'twist:<id>:<n>' } ;
+// les lignes `barks` se jouent avec le repère 'bark', les lignes `klaas` avec 'klaas_writes' (src/scene/stageCues.js).
 
 export const TWISTS = [
   // ════════════════════════════════════════════════════════════════════════
@@ -26,11 +28,11 @@ export const TWISTS = [
       closeDelay: 25,
       witnesses: [{ id: 'martine', at: 'terrace', filming: false }],
       events: [
-        { at: H(20, 50), text: "Une berline se gare rue de la Barre, là où rien ne se gare. Martine descend, foulard au vent." },
-        { at: H(23, 5), text: "Martine lève son verre : « À la convivialité, mes chers amis ! » Toute la terrasse trinque. Les fenêtres aussi, à leur façon.", simEffect: { noise: 6 }, state: { estaminetOut: '>0' }, else: 'Martine lève son verre à l’intérieur, derrière la vitrine : « À la convivialité ! » La rue, dehors, n’entend qu’un tintement.' },
+        { stage: { cue: 'twist:martine_dinner:0' }, at: H(20, 50), text: "Une berline se gare rue de la Barre, là où rien ne se gare. Martine descend, foulard au vent." },
+        { stage: { cue: 'twist:martine_dinner:1' }, at: H(23, 5), text: "Martine lève son verre : « À la convivialité, mes chers amis ! » Toute la terrasse trinque. Les fenêtres aussi, à leur façon.", simEffect: { noise: 6 }, state: { estaminetOut: '>0' }, else: 'Martine lève son verre à l’intérieur, derrière la vitrine : « À la convivialité ! » La rue, dehors, n’entend qu’un tintement.' },
       ],
       opportunities: ['night_photo'],
-      windows: [{ at: H(23, 5), minutes: 5, turns: ['customers', 'waiter', 'dede'], state: { estaminetOut: '>0' }, text: "L’ancienne maire lève son verre : toute la terrasse trinque, tournée vers elle." }],
+      windows: [{ stage: { cue: 'twist:martine_dinner:2' }, at: H(23, 5), minutes: 5, turns: ['customers', 'waiter', 'dede'], state: { estaminetOut: '>0' }, text: "L’ancienne maire lève son verre : toute la terrasse trinque, tournée vers elle." }],
     },
     lines: {
       barks: ["« Madame la maire ! Enfin, l’ancienne, mais quand même ! »", "« On peut faire une photo avec vous ? »", "« Elle a eu un dessert. Personne d’autre n’a eu de dessert. »"],
@@ -50,8 +52,8 @@ export const TWISTS = [
       noise: 1.1,
       corridorBlocked: true,
       events: [
-        { at: H(21, 10), text: "Le chauffeur décharge douze fûts, puis disparaît « boire un café ». Les warnings clignotent sur les pavés." },
-        { at: H(23, 0), text: "La camionnette repart en marche arrière, klaxon compris, au milieu de la foule. Trois verres en moins.", simEffect: { noise: 8 } },
+        { stage: { cue: 'twist:saturday_van:0' }, at: H(21, 10), text: "Le chauffeur décharge douze fûts, puis disparaît « boire un café ». Les warnings clignotent sur les pavés." },
+        { stage: { cue: 'twist:saturday_van:1' }, at: H(23, 0), text: "La camionnette repart en marche arrière, klaxon compris, au milieu de la foule. Trois verres en moins.", simEffect: { noise: 8 } },
       ],
       opportunities: ['night_photo', 'night_police'],
     },
@@ -72,7 +74,7 @@ export const TWISTS = [
     sim: {
       witnesses: [{ id: 'delphine', at: 'street', filming: false }],
       closeDelay: 10,
-      events: [{ at: H(22, 10), text: "Delphine note quelque chose, sans lever les yeux. L’estaminet n’a pas reconnu l’imperméable." }],
+      events: [{ stage: { cue: 'twist:inspector_surprise_night:0' }, at: H(22, 10), text: "Delphine note quelque chose, sans lever les yeux. L’estaminet n’a pas reconnu l’imperméable." }],
       opportunities: ['night_photo', 'night_mairie'],
     },
     lines: {
@@ -93,7 +95,7 @@ export const TWISTS = [
       crowd: 0.85,
       noise: 0.85,
       closeDelay: -20,
-      events: [{ at: H(23, 30), text: "La rumeur court que « la dame de la mairie est rentrée chez elle ». Deux tables ressortent, timidement.", simEffect: { noise: 5 }, state: { tablesOut: '>0' }, else: 'La rumeur court que « la dame de la mairie est rentrée chez elle ». Trop tard : tout est déjà rangé. Dédé soupire.' }],
+      events: [{ stage: { cue: 'twist:inspector_announced_night:0' }, at: H(23, 30), text: "La rumeur court que « la dame de la mairie est rentrée chez elle ». Deux tables ressortent, timidement.", simEffect: { noise: 5 }, state: { tablesOut: '>0' }, else: 'La rumeur court que « la dame de la mairie est rentrée chez elle ». Trop tard : tout est déjà rangé. Dédé soupire.' }],
       opportunities: ['night_db'],
     },
     lines: {
@@ -111,7 +113,7 @@ export const TWISTS = [
     intro: "La contre-visite de la clim s’est jouée cet après-midi. Ce soir, Dédé arrose les géraniums du store en sifflotant. Il siffle faux, mais il siffle. C’est rarement bon signe.",
     sim: {
       closeDelay: 15,
-      events: [{ at: H(22, 30), text: "Dédé allume la clim, à fond, pour « vérifier qu’elle marche toujours ». Elle marche.", simEffect: { noise: 4 } }],
+      events: [{ stage: { cue: 'twist:inspector_quiet_night:0' }, at: H(22, 30), text: "Dédé allume la clim, à fond, pour « vérifier qu’elle marche toujours ». Elle marche.", simEffect: { noise: 4 } }],
       opportunities: ['night_photo'],
     },
     lines: {
@@ -129,7 +131,7 @@ export const TWISTS = [
     sim: {
       exhaustOff: true,
       noise: 0.95,
-      events: [{ at: H(21, 30), text: "Un client commande une carbonnade. Le serveur répond « ce soir, c’est salade ». Le client ne comprend pas. Vous, si." }],
+      events: [{ stage: { cue: 'twist:exhaust_eve:0' }, at: H(21, 30), text: "Un client commande une carbonnade. Le serveur répond « ce soir, c’est salade ». Le client ne comprend pas. Vous, si." }],
       opportunities: ['night_db', 'night_photo'],
     },
     lines: {
@@ -150,7 +152,7 @@ export const TWISTS = [
       noise: 1.1,
       crowd: 1.15,
       closeDelay: 15,
-      events: [{ at: H(22, 15), text: "Dédé sort sur la terrasse avec une baraque à frites en carton : « Adieu, ma belle. » Applaudissements.", simEffect: { noise: 6 } }],
+      events: [{ stage: { cue: 'twist:exhaust_won_night:0' }, at: H(22, 15), text: "Dédé sort sur la terrasse avec une baraque à frites en carton : « Adieu, ma belle. » Applaudissements.", simEffect: { noise: 6 } }],
       opportunities: ['night_db'],
     },
     lines: {
@@ -168,7 +170,7 @@ export const TWISTS = [
     sim: {
       noise: 1.1,
       closeDelay: 10,
-      events: [{ at: H(23, 20), text: "Ghislain sort fumer sous votre fenêtre et lève les yeux vers la gaine, puis vers vous. Il hoche la tête, satisfait." }],
+      events: [{ stage: { cue: 'twist:exhaust_lost_night:0' }, at: H(23, 20), text: "Ghislain sort fumer sous votre fenêtre et lève les yeux vers la gaine, puis vers vous. Il hoche la tête, satisfait." }],
       opportunities: ['night_db'],
     },
     lines: {
@@ -189,12 +191,12 @@ export const TWISTS = [
       closeDelay: 30,
       witnesses: [{ id: 'supporters', at: 'street', filming: true }],
       events: [
-        { at: H(21, 12), text: 'BUT ! Cent cinquante personnes hurlent en même temps. Le carnet de Klaas tremble.', simEffect: { noise: 12 } },
-        { at: H(21, 47), text: "Penalty raté. Un silence absolu, puis cent cinquante soupirs. C’est presque pire.", simEffect: { noise: 4 } },
-        { at: H(22, 50), text: 'Coup de sifflet final, victoire. La rue chante. Toute la rue. Pendant quarante minutes.', simEffect: { noise: 10 } },
+        { stage: { cue: 'twist:football_match:0' }, at: H(21, 12), text: 'BUT ! Cent cinquante personnes hurlent en même temps. Le carnet de Klaas tremble.', simEffect: { noise: 12 } },
+        { stage: { cue: 'twist:football_match:1' }, at: H(21, 47), text: "Penalty raté. Un silence absolu, puis cent cinquante soupirs. C’est presque pire.", simEffect: { noise: 4 } },
+        { stage: { cue: 'twist:football_match:2' }, at: H(22, 50), text: 'Coup de sifflet final, victoire. La rue chante. Toute la rue. Pendant quarante minutes.', simEffect: { noise: 10 } },
       ],
       opportunities: ['night_db', 'night_photo'],
-      windows: [{ at: H(21, 12), minutes: 5, turns: ['customers', 'waiter', 'dede', 'seb_nico'], text: "BUT ! Toute la rue regarde l’écran. Personne ne regarde le reste de la rue." }, { at: H(22, 50), minutes: 5, turns: ['customers', 'waiter', 'dede'], text: "Coup de sifflet final : la rue chante, les bras levés, les yeux au ciel." }],
+      windows: [{ stage: { cue: 'twist:football_match:3' }, at: H(21, 12), minutes: 5, turns: ['customers', 'waiter', 'dede', 'seb_nico'], text: "BUT ! Toute la rue regarde l’écran. Personne ne regarde le reste de la rue." }, { stage: { cue: 'twist:football_match:4' }, at: H(22, 50), minutes: 5, turns: ['customers', 'waiter', 'dede'], text: "Coup de sifflet final : la rue chante, les bras levés, les yeux au ciel." }],
     },
     lines: {
       barks: ['« ALLEZ LILLE ! »', '« Arbitre, va dormir rue de Gand ! »', '« On reste pour la troisième mi-temps ! »'],
@@ -216,9 +218,9 @@ export const TWISTS = [
     sim: {
       tables: [{ rest: 'bernadette', count: 11, label: 'table 4' }],
       closeDelay: 20,
-      events: [{ at: H(23, 40), text: "Les lumières de la terrasse s’éteignent. « Joyeux anniversaire » à onze voix, puis à quarante : toute la rue s’y met. Jojo pleure.", simEffect: { noise: 9 } }],
+      events: [{ stage: { cue: 'twist:birthday_t4:0' }, at: H(23, 40), text: "Les lumières de la terrasse s’éteignent. « Joyeux anniversaire » à onze voix, puis à quarante : toute la rue s’y met. Jojo pleure.", simEffect: { noise: 9 } }],
       opportunities: ['night_photo'],
-      windows: [{ at: H(23, 40), minutes: 5, turns: ['customers', 'waiter', 'dede'], text: "Lumières éteintes, gâteau, chant : tous les yeux sur les bougies de Jojo." }],
+      windows: [{ stage: { cue: 'twist:birthday_t4:1' }, at: H(23, 40), minutes: 5, turns: ['customers', 'waiter', 'dede'], text: "Lumières éteintes, gâteau, chant : tous les yeux sur les bougies de Jojo." }],
     },
     lines: {
       barks: ['« Chut, il arrive ! » « Qui ? » « Jojo ! »', '« On est onze, mais Jojo compte double, c’est son anniversaire. »', '« Encore une bougie et on appelle les pompiers. »'],
@@ -235,9 +237,9 @@ export const TWISTS = [
     intro: "Une influenceuse tourne « la vraie nuit lilloise » au milieu du couloir de passage, ring light allumée. Tout ce qui se passe ce soir peut finir sur Internet. Tout. Y compris ce qui se passe à votre fenêtre.",
     sim: {
       witnesses: [{ id: 'influencer', at: 'street', filming: true }],
-      events: [{ at: H(21, 30), text: "« Coucou les loulous ! Ce soir je vous emmène dans la rue la plus authentique de Lille ! » Prise une. Prise deux. Prise trois." }],
+      events: [{ stage: { cue: 'twist:influencer_night:0' }, at: H(21, 30), text: "« Coucou les loulous ! Ce soir je vous emmène dans la rue la plus authentique de Lille ! » Prise une. Prise deux. Prise trois." }],
       opportunities: ['night_photo', 'night_film_faces'],
-      windows: [{ at: H(21, 30), minutes: 5, turns: ['customers'], text: "Prise trois de la ring light : les clients prennent la pose, face à elle." }],
+      windows: [{ stage: { cue: 'twist:influencer_night:1' }, at: H(21, 30), minutes: 5, turns: ['customers'], text: "Prise trois de la ring light : les clients prennent la pose, face à elle." }],
     },
     lines: {
       barks: ['« On passe dans sa vidéo ! Souris ! »', '« C’est qui ? » « Une influenceuse. » « Elle influence quoi ? »'],
@@ -257,11 +259,11 @@ export const TWISTS = [
       noise: 1.15,
       closeDelay: 15,
       events: [
-        { at: H(22, 30), text: "Au mégaphone : « MARION, ON T’AIME ! » Le mégaphone a une option sirène. Elle l’a trouvée.", simEffect: { noise: 12 } },
-        { at: H(23, 15), text: "Gage : Marion doit faire signer un serment à un inconnu. L’inconnu, c’est Biloute." },
+        { stage: { cue: 'twist:hen_party:0' }, at: H(22, 30), text: "Au mégaphone : « MARION, ON T’AIME ! » Le mégaphone a une option sirène. Elle l’a trouvée.", simEffect: { noise: 12 } },
+        { stage: { cue: 'twist:hen_party:1' }, at: H(23, 15), text: "Gage : Marion doit faire signer un serment à un inconnu. L’inconnu, c’est Biloute." },
       ],
       opportunities: ['night_db', 'night_ask_waiter'],
-      windows: [{ at: H(22, 30), minutes: 5, turns: ['customers', 'waiter', 'dede'], text: "Le numéro au mégaphone : sirène, chorégraphie, toute la rue regarde Marion." }],
+      windows: [{ stage: { cue: 'twist:hen_party:2' }, at: H(22, 30), minutes: 5, turns: ['customers', 'waiter', 'dede'], text: "Le numéro au mégaphone : sirène, chorégraphie, toute la rue regarde Marion." }],
     },
     lines: {
       barks: ['« MARION ! MARION ! »', '« On lui a dit de pas boire de genièvre, elle a bu du genièvre. »'],
@@ -279,9 +281,9 @@ export const TWISTS = [
     sim: {
       rain: true,
       crowd: 0.65,
-      events: [{ at: H(21, 15), text: 'La drache tombe, droite, épaisse. Les tables du milieu se vident ; celles sous le store se serrent, à quatorze sur trois tables.' , simEffect: { rain: true }}],
+      events: [{ stage: { cue: 'twist:drache_night:0' }, at: H(21, 15), text: 'La drache tombe, droite, épaisse. Les tables du milieu se vident ; celles sous le store se serrent, à quatorze sur trois tables.' , simEffect: { rain: true }}],
       opportunities: ['night_photo'],
-      windows: [{ at: H(21, 15), minutes: 5, turns: ['customers', 'waiter'], text: "La drache tombe : tout le monde court se serrer sous le store." }],
+      windows: [{ stage: { cue: 'twist:drache_night:1' }, at: H(21, 15), minutes: 5, turns: ['customers', 'waiter'], text: "La drache tombe : tout le monde court se serrer sous le store." }],
     },
     lines: {
       barks: ['« On reste ! On est sous le store ! »', '« J’ai les pieds dans une flaque, mais c’est une bonne flaque. »'],
@@ -300,7 +302,7 @@ export const TWISTS = [
       noise: 1.3,
       crowd: 1.2,
       closeDelay: 25,
-      events: [{ at: H(24, 30), text: 'Il fait encore vingt-sept degrés. Un client dort sur sa chaise. Un autre commande un sorbet. Un troisième chante.' }],
+      events: [{ stage: { cue: 'twist:heatwave:0' }, at: H(24, 30), text: 'Il fait encore vingt-sept degrés. Un client dort sur sa chaise. Un autre commande un sorbet. Un troisième chante.' }],
       opportunities: ['night_db'],
     },
     lines: {
@@ -318,9 +320,9 @@ export const TWISTS = [
     intro: "L’office de tourisme lance sa « balade nocturne du Vieux-Lille ». Point d’orgue à 22h15 : la rue des Bouchers, « autrefois surnommée le Trou ». Le guide a un micro-cravate et une voix qui porte.",
     sim: {
       witnesses: [{ id: 'guide', at: 'street', filming: false }],
-      events: [{ at: H(22, 15), text: "« Mesdames et messieurs, voici le Trou. Un canal coulait ici jusqu’en 1920. » Trente touristes regardent les pavés, puis les terrasses, puis votre fenêtre." }],
+      events: [{ stage: { cue: 'twist:guide_tour:0' }, at: H(22, 15), text: "« Mesdames et messieurs, voici le Trou. Un canal coulait ici jusqu’en 1920. » Trente touristes regardent les pavés, puis les terrasses, puis votre fenêtre." }],
       opportunities: ['night_photo'],
-      windows: [{ at: H(22, 15), minutes: 5, turns: ['customers', 'waiter'], text: "Le guide raconte le canal : trente touristes et la terrasse regardent les pavés." }],
+      windows: [{ stage: { cue: 'twist:guide_tour:1' }, at: H(22, 15), minutes: 5, turns: ['customers', 'waiter'], text: "Le guide raconte le canal : trente touristes et la terrasse regardent les pavés." }],
     },
     lines: {
       barks: ['« C’est ici, le Trou ? Ça a bien changé. » « Pas tant que ça. »', '« On peut s’asseoir ? » « Vous êtes trente. »'],
@@ -338,11 +340,11 @@ export const TWISTS = [
     sim: {
       noise: 1.15,
       events: [
-        { at: H(24, 10), text: 'Au 27, la basse traverse trois murs et deux siècles. Les fenêtres vibrent jusqu’à la place.', simEffect: { noise: 8 } },
-        { at: H(25, 0), text: 'Dix-neuf étudiants descendent dans la rue « prendre l’air ». Avec les enceintes.', simEffect: { noise: 6 } },
+        { stage: { cue: 'twist:regis_party:0' }, at: H(24, 10), text: 'Au 27, la basse traverse trois murs et deux siècles. Les fenêtres vibrent jusqu’à la place.', simEffect: { noise: 8 } },
+        { stage: { cue: 'twist:regis_party:1' }, at: H(25, 0), text: 'Dix-neuf étudiants descendent dans la rue « prendre l’air ». Avec les enceintes.', simEffect: { noise: 6 } },
       ],
       opportunities: ['night_db', 'night_police'],
-      windows: [{ at: H(24, 10), minutes: 8, turns: ['customers'], text: "Les étudiants du 27 descendent avec leurs enceintes : toute la rue regarde le 27." }],
+      windows: [{ stage: { cue: 'twist:regis_party:2' }, at: H(24, 10), minutes: 8, turns: ['customers'], text: "Les étudiants du 27 descendent avec leurs enceintes : toute la rue regarde le 27." }],
     },
     lines: {
       barks: ['« C’est où, la soirée ? » « Au 27, l’appart avec l’ambiance ! »', '« Le proprio a dit qu’on pouvait. »'],
@@ -363,11 +365,11 @@ export const TWISTS = [
       closeDelay: 20,
       tables: [{ rest: 'bernadette', count: 9, label: 'la table du jury' }],
       events: [
-        { at: H(21, 30), text: "Le jury goûte. Silence religieux sur la terrasse. Pour la première fois de la soirée, on entend la gaine.", simEffect: { noise: -6 } },
-        { at: H(22, 10), text: "Dédé remporte le premier prix. Applaudissements, chope levée, « encore dix minutes, c’est exceptionnel ». Il est 22h10.", simEffect: { noise: 6 } },
+        { stage: { cue: 'twist:carbonnade_contest:0' }, at: H(21, 30), text: "Le jury goûte. Silence religieux sur la terrasse. Pour la première fois de la soirée, on entend la gaine.", simEffect: { noise: -6 } },
+        { stage: { cue: 'twist:carbonnade_contest:1' }, at: H(22, 10), text: "Dédé remporte le premier prix. Applaudissements, chope levée, « encore dix minutes, c’est exceptionnel ». Il est 22h10.", simEffect: { noise: 6 } },
       ],
       opportunities: ['night_photo'],
-      windows: [{ at: H(22, 10), minutes: 5, turns: ['customers', 'waiter', 'dede'], text: "Proclamation du jury : toutes les têtes se tournent vers la table des gourmets." }],
+      windows: [{ stage: { cue: 'twist:carbonnade_contest:2' }, at: H(22, 10), minutes: 5, turns: ['customers', 'waiter', 'dede'], text: "Proclamation du jury : toutes les têtes se tournent vers la table des gourmets." }],
     },
     lines: {
       barks: ['« Plus de bière dans la sauce, c’est ça le secret ! »', '« Le jury, il est payé en carbonnade ? »'],
@@ -386,11 +388,11 @@ export const TWISTS = [
       noise: 1.1,
       witnesses: [{ id: 'busker', at: 'window', filming: false }],
       events: [
-        { at: H(21, 0), text: 'Première chanson : « Le P’tit Quinquin ». La terrasse chante le refrain.' },
-        { at: H(23, 0), text: "Vingt-troisième fois « Le P’tit Quinquin ». Dédé lui offre une bière pour qu’il change. Il change : il passe à la deuxième.", simEffect: { noise: 3 } },
+        { stage: { cue: 'twist:busker:0' }, at: H(21, 0), text: 'Première chanson : « Le P’tit Quinquin ». La terrasse chante le refrain.' },
+        { stage: { cue: 'twist:busker:1' }, at: H(23, 0), text: "Vingt-troisième fois « Le P’tit Quinquin ». Dédé lui offre une bière pour qu’il change. Il change : il passe à la deuxième.", simEffect: { noise: 3 } },
       ],
       opportunities: ['night_db'],
-      windows: [{ at: H(23, 0), minutes: 5, turns: ['customers', 'waiter'], text: "Grand final de l’accordéoniste : la terrasse chante, les yeux fermés." }],
+      windows: [{ stage: { cue: 'twist:busker:2' }, at: H(23, 0), minutes: 5, turns: ['customers', 'waiter'], text: "Grand final de l’accordéoniste : la terrasse chante, les yeux fermés." }],
     },
     lines: {
       barks: ['« Dors, min p’tit quinquin… »', '« Une autre ! » « Il en connaît que trois. »'],
@@ -409,11 +411,11 @@ export const TWISTS = [
       darkness: 0.8,
       exhaustOff: true,
       events: [
-        { at: H(22, 40), text: 'Noir total. La gaine s’arrête dans un dernier soupir. Le silence est tellement épais qu’on entend la clim… ne pas tourner.' },
-        { at: H(23, 25), text: 'Le courant revient. La gaine redémarre comme un tracteur. Une table applaudit, une autre râle.', simEffect: { noise: 4 } },
+        { stage: { cue: 'twist:power_cut:0' }, at: H(22, 40), text: 'Noir total. La gaine s’arrête dans un dernier soupir. Le silence est tellement épais qu’on entend la clim… ne pas tourner.' },
+        { stage: { cue: 'twist:power_cut:1' }, at: H(23, 25), text: 'Le courant revient. La gaine redémarre comme un tracteur. Une table applaudit, une autre râle.', simEffect: { noise: 4 } },
       ],
       opportunities: ['night_db'],
-      windows: [{ at: H(22, 40), minutes: 8, turns: ['customers', 'waiter', 'klaas', 'seb_nico'], text: "Noir total. On ne voit plus que les bougies. Et encore." }],
+      windows: [{ stage: { cue: 'twist:power_cut:2' }, at: H(22, 40), minutes: 8, turns: ['customers', 'waiter', 'klaas', 'seb_nico'], text: "Noir total. On ne voit plus que les bougies. Et encore." }],
     },
     lines: {
       barks: ['« C’est romantique, en fait. »', '« Quelqu’un a une lampe ? » « J’ai mon téléphone. » « Il a plus de batterie. »'],
@@ -431,7 +433,7 @@ export const TWISTS = [
     intro: "Demain, le serveur part en vacances : dix jours, ses premiers depuis deux ans. Ce soir, il sert en chantant, rentre les tables à l’heure « parce qu’il a un train », et dit au revoir à tout le monde. Même à vous.",
     sim: {
       closeDelay: -10,
-      events: [{ at: H(24, 30), text: "Le serveur pose son tablier sur une chaise, lève les yeux vers votre fenêtre et fait un petit signe. Puis il part en courant vers la gare." }],
+      events: [{ stage: { cue: 'twist:waiter_last_night:0' }, at: H(24, 30), text: "Le serveur pose son tablier sur une chaise, lève les yeux vers votre fenêtre et fait un petit signe. Puis il part en courant vers la gare." }],
       opportunities: ['night_ask_waiter'],
     },
     lines: {
@@ -452,11 +454,11 @@ export const TWISTS = [
       crowd: 1.05,
       witnesses: [{ id: 'neighbours', at: 'street', filming: false }],
       events: [
-        { at: H(20, 45), text: 'Hilde coupe la tarte au sucre. Jérémie fait un discours de trois minutes. Biloute vole une part.' },
-        { at: H(22, 0), text: "À 22h00 pile, l’association range sa table. Ostensiblement. Avec des raclements de chaises très pédagogiques." },
+        { stage: { cue: 'twist:fete_voisins:0' }, at: H(20, 45), text: 'Hilde coupe la tarte au sucre. Jérémie fait un discours de trois minutes. Biloute vole une part.' },
+        { stage: { cue: 'twist:fete_voisins:1' }, at: H(22, 0), text: "À 22h00 pile, l’association range sa table. Ostensiblement. Avec des raclements de chaises très pédagogiques." },
       ],
       opportunities: ['night_photo'],
-      windows: [{ at: H(22, 0), minutes: 5, turns: ['seb_nico', 'klaas'], text: "22h : l’association range sa fête. Seb, Nico et Klaas sont aux tréteaux." }],
+      windows: [{ stage: { cue: 'twist:fete_voisins:2' }, at: H(22, 0), minutes: 5, turns: ['seb_nico', 'klaas'], text: "22h : l’association range sa fête. Seb, Nico et Klaas sont aux tréteaux." }],
     },
     lines: {
       barks: ['« C’est quoi, cette fête, là-bas ? » « Les voisins. » « Ils ont des voisins ? »', '« Ils rangent à 22h. C’est de la provocation. »'],
@@ -475,9 +477,9 @@ export const TWISTS = [
     intro: "Ce soir, une équipe de pompiers fait un « exercice de passage » dans les rues piétonnes du Vieux-Lille. Avec un mètre ruban. Ils passeront rue des Bouchers vers 22h20. Les terrasses ne sont pas au courant.",
     sim: {
       witnesses: [{ id: 'firefighters', at: 'street', filming: false }],
-      events: [{ at: H(22, 20), text: "Le camion s’engage, s’arrête, recule. Un pompier mesure le couloir : « 1,40 m. Il en faut 2. » Dédé découvre ce que veut dire « procès-verbal »." }],
+      events: [{ stage: { cue: 'twist:fire_inspection:0' }, at: H(22, 20), text: "Le camion s’engage, s’arrête, recule. Un pompier mesure le couloir : « 1,40 m. Il en faut 2. » Dédé découvre ce que veut dire « procès-verbal »." }],
       opportunities: ['night_photo', 'night_police'],
-      windows: [{ at: H(22, 20), minutes: 5, turns: ['customers', 'waiter', 'dede'], text: "Les pompiers mesurent le couloir : tout le monde regarde le mètre ruban." }],
+      windows: [{ stage: { cue: 'twist:fire_inspection:1' }, at: H(22, 20), minutes: 5, turns: ['customers', 'waiter', 'dede'], text: "Les pompiers mesurent le couloir : tout le monde regarde le mètre ruban." }],
     },
     lines: {
       barks: ['« C’est un exercice ? » « Pour eux, oui. Pour la terrasse, non. »', '« Ils sont mignons, les pompiers. » « Ils mesurent ta chaise. »'],
@@ -496,9 +498,9 @@ export const TWISTS = [
     sim: {
       witnesses: [{ id: 'delandre', at: 'street', filming: false }],
       closeDelay: -15,
-      events: [{ at: H(23, 0), text: "Le maire remonte la rue. Dédé range trois tables en courant, les bras pleins de chaises. Le maire le regarde faire. « Je vous en prie, ne vous dérangez pas pour moi. »", state: { tablesOut: '>0' }, else: 'Le maire remonte une rue déjà rangée, chaises empilées, couloir libre. Il a l’air presque déçu.' }],
+      events: [{ stage: { cue: 'twist:delandre_walk:0' }, at: H(23, 0), text: "Le maire remonte la rue. Dédé range trois tables en courant, les bras pleins de chaises. Le maire le regarde faire. « Je vous en prie, ne vous dérangez pas pour moi. »", state: { tablesOut: '>0' }, else: 'Le maire remonte une rue déjà rangée, chaises empilées, couloir libre. Il a l’air presque déçu.' }],
       opportunities: ['night_photo', 'night_db'],
-      windows: [{ at: H(23, 0), minutes: 5, turns: ['dede', 'waiter', 'ghislain'], text: "Le maire remonte la rue : le bloc range en courant, sans regarder ailleurs." }],
+      windows: [{ stage: { cue: 'twist:delandre_walk:1' }, at: H(23, 0), minutes: 5, turns: ['dede', 'waiter', 'ghislain'], text: "Le maire remonte la rue : le bloc range en courant, sans regarder ailleurs." }],
     },
     lines: {
       barks: ['« C’est le maire ? » « L’actuel ou l’ancienne ? » « L’actuel. Range ton verre. »'],
@@ -518,11 +520,11 @@ export const TWISTS = [
       dog: false, // pas de ronde ce soir (twistNight.js : sim.dogActive() reste faux)
       witnesses: [{ id: 'jeremie_searching', at: 'street', filming: false }],
       events: [
-        { at: H(21, 30), text: 'Jérémie, au milieu du couloir : « BILOUTE ! » Trois clients répondent « oui ? ».' },
-        { at: H(22, 50), text: "Biloute est retrouvé sous la table 3 de l’estaminet, une frite dans la gueule, entouré de clients ravis. Dédé : « Il a bon goût, ton chien. »" },
+        { stage: { cue: 'twist:lost_dog:0' }, at: H(21, 30), text: 'Jérémie, au milieu du couloir : « BILOUTE ! » Trois clients répondent « oui ? ».' },
+        { stage: { cue: 'twist:lost_dog:1' }, at: H(22, 50), text: "Biloute est retrouvé sous la table 3 de l’estaminet, une frite dans la gueule, entouré de clients ravis. Dédé : « Il a bon goût, ton chien. »" },
       ],
       opportunities: ['night_photo'],
-      windows: [{ at: H(21, 30), minutes: 8, turns: ['customers', 'waiter', 'dede'], text: "Toute la terrasse cherche Biloute sous les tables, à quatre pattes." }],
+      windows: [{ stage: { cue: 'twist:lost_dog:2' }, at: H(21, 30), minutes: 8, turns: ['customers', 'waiter', 'dede'], text: "Toute la terrasse cherche Biloute sous les tables, à quatre pattes." }],
     },
     lines: {
       barks: ['« Un teckel ? Il était là ! Non, c’était un sac. »', '« On l’appelle comment ? » « Biloute. » « Comme nous tous, quoi. »'],
@@ -541,11 +543,11 @@ export const TWISTS = [
       witnesses: [{ id: 'tv_crew', at: 'terrace', filming: true }],
       closeDelay: 20,
       events: [
-        { at: H(21, 0), text: "Dédé, au micro : « Ici, on respecte nos voisins. C’est notre ADN. » Il fait un clin d’œil à votre fenêtre, à l’antenne." },
-        { at: H(22, 30), text: 'Fin du tournage. En trois minutes, deux tables ressortent et le couloir disparaît.', simEffect: { noise: 6 }, state: { tablesOut: '>0' }, else: 'Fin du tournage. La terrasse, déjà rangée, ne ressort pas : Dédé a raté le coche, et il le sait.' },
+        { stage: { cue: 'twist:tv_crew:0' }, at: H(21, 0), text: "Dédé, au micro : « Ici, on respecte nos voisins. C’est notre ADN. » Il fait un clin d’œil à votre fenêtre, à l’antenne." },
+        { stage: { cue: 'twist:tv_crew:1' }, at: H(22, 30), text: 'Fin du tournage. En trois minutes, deux tables ressortent et le couloir disparaît.', simEffect: { noise: 6 }, state: { tablesOut: '>0' }, else: 'Fin du tournage. La terrasse, déjà rangée, ne ressort pas : Dédé a raté le coche, et il le sait.' },
       ],
       opportunities: ['night_photo', 'night_db'],
-      windows: [{ at: H(21, 0), minutes: 8, turns: ['dede', 'waiter', 'ghislain', 'customers'], text: "Dédé au micro, la caméra tourne : l’estaminet ne regarde que l’objectif." }],
+      windows: [{ stage: { cue: 'twist:tv_crew:2' }, at: H(21, 0), minutes: 8, turns: ['dede', 'waiter', 'ghislain', 'customers'], text: "Dédé au micro, la caméra tourne : l’estaminet ne regarde que l’objectif." }],
     },
     lines: {
       barks: ['« On passe à la télé ! Fais semblant d’être sobre ! »', '« Coupez ! Ça tourne encore ? Non ? Alors on ressort ! »'],
@@ -562,9 +564,9 @@ export const TWISTS = [
     intro: "La ville a changé ses horaires de nettoyage : la balayeuse-laveuse passe désormais rue des Bouchers à 23h30, gyrophare orange et jets d’eau. Les terrasses l’ont appris par un papier scotché sur un lampadaire. Personne ne lit les lampadaires.",
     sim: {
       closeDelay: -20,
-      events: [{ at: H(23, 30), text: 'La balayeuse entre dans la rue, jets à fond. Les clients sautent sur leurs chaises, les chaises sautent sur les pavés. En deux minutes, plus une table dehors.', simEffect: { noise: 10 } }],
+      events: [{ stage: { cue: 'twist:street_sweeper:0' }, at: H(23, 30), text: 'La balayeuse entre dans la rue, jets à fond. Les clients sautent sur leurs chaises, les chaises sautent sur les pavés. En deux minutes, plus une table dehors.', simEffect: { noise: 10 } }],
       opportunities: ['night_photo'],
-      windows: [{ at: H(23, 30), minutes: 5, turns: ['customers', 'waiter', 'dede'], text: "La balayeuse arrose : on sauve ses chaussures, pas sa vigilance." }],
+      windows: [{ stage: { cue: 'twist:street_sweeper:1' }, at: H(23, 30), minutes: 5, turns: ['customers', 'waiter', 'dede'], text: "La balayeuse arrose : on sauve ses chaussures, pas sa vigilance." }],
     },
     lines: {
       barks: ['« C’est quoi ce bruit ? » « La mairie. » « À cette heure-ci ? »', '« Mes chaussures ! »'],
