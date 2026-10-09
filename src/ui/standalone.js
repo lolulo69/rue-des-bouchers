@@ -9,3 +9,5 @@ if (q.has('fast')) globalThis.__rdbUiSpeed = 0;
 if (!q.has('artday')) globalThis.__rdbNoArtDay = true;
 const seed = q.has('seed') ? Number(q.get('seed')) : undefined;
 window.__rdbUi = mount({}, { seed });
+// Tests : la boîte de conversation de nuit (talk.js), chargée à la demande
+window.__rdbTalk = () => import('./talk.js');

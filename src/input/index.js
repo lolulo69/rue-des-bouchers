@@ -84,6 +84,9 @@ export function moveFocus(container, dir) {
 
 // Contexte d'interface actif (ou null : la nuit 3D a la main)
 function uiContext() {
+  // une boîte modale de l'interface (conversation de nuit…) : navigation comme un menu
+  const modal = document.querySelector('[data-pad-context]');
+  if (modal) return { el: modal, kind: 'menu' };
   const menu = document.querySelector('#ui-menu .ui-menu-box');
   if (menu) return { el: menu, kind: 'menu' };
   const ov = night?.overlayEl?.();

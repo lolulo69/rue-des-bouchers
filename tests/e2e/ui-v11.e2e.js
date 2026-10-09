@@ -187,3 +187,31 @@ test('un seul écran titre : le menu est sur le titre 3D, pas de second titre', 
   await page.click('#campaign');
   await expect(page.locator('#title [data-testid=title-continue]')).toContainText('jour 1');
 });
+
+// §12e.3 : la boîte de conversation (portrait, réplique, 2–3 choix, réponse, suite ou fin), au clavier
+test('conversation de nuit : réplique, choix au clavier, réponse, échange suivant, Au revoir', async ({ page }) => {
+  await page.goto('/ui.html?fresh=1');
+  await page.evaluate(async () => {
+    const m = await window.__rdbTalk();
+    const steps = [
+      { speaker: 'jeremie', say: 'Je fais la ronde de 22h avec Biloute.', choices: [{ i: 0, label: 'Je peux venir ?' }, { i: 1, label: 'Bonne promenade.' }] },
+      { speaker: 'jeremie', say: 'Règle numéro un : on ne s’énerve pas.', choices: [{ i: 0, label: 'Et la police ?' }, { i: 1, label: 'Compris.', available: false }] },
+    ];
+    let n = 0;
+    window.__closed = false;
+    m.showTalk({ step: steps[0], onChoose: async (i) => ({ reply: `réponse ${n}-${i}`, next: steps[++n] ?? null }), onClose: () => { window.__closed = true; } });
+  });
+  const talk = page.locator('[data-testid=talk]');
+  await expect(talk).toContainText('Je fais la ronde');
+  await expect(talk.locator('.ui-portrait').first()).toBeVisible();
+  await expect(page.locator('[data-testid=talk-choice]').first()).toBeFocused();
+  await page.keyboard.press('Digit1');
+  await expect(talk).toContainText('réponse 0-0');
+  await expect(talk).toContainText('Règle numéro un');
+  await expect(page.locator('[data-testid=talk-choice][data-i="1"]')).toBeDisabled();
+  await page.keyboard.press('Enter');
+  await expect(talk).toContainText('réponse 1-0');
+  await page.click('[data-testid=talk-close]');
+  await expect(talk).toHaveCount(0);
+  expect(await page.evaluate(() => window.__closed)).toBe(true);
+});

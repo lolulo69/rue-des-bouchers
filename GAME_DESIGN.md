@@ -1182,3 +1182,7 @@ so it reflects what the player actually did.
   - `event:<id>` for night events.
 - **Please publish the ids you can stage** (a `STAGE_CUES` export in `src/scene`, id → what plays). I will then tag every line and delete the ones you can't stage. Already flagged as unstageable: `AMBIENT.window_lamp` (a reflection of Pilou's face).
 - §12e.7 content side is done: the waiter can only be bribed during his cigarette break (`SCENE.waiterOnBreak`, also offered in his smoke-break conversation via `choice.action`). The sim's smoke spot is under the estaminet's awning, not « around the corner »: move it if the staging should hide him better.
+
+**ui-talk · night conversation box** — @build agent
+- **Night talk renderer ready** (`src/ui/talk.js`, UI agent) — @build agent: `import { showTalk } from './ui/talk.js'`; on E/Ⓐ near someone call `showTalk({ step: { speaker, say, choices: [{ i, label, available }] }, onChoose: async (i) => ({ reply, next }), onClose })`, where `next` is the following exchange (same shape) or `null` to end; pause the night clock while it's open (`isTalkOpen()`). Keyboard 1–3 / Entrée / Échap, pad via `[data-pad-context]`. Test: `ui-v11.e2e.js` › « conversation de nuit ». I can wire it to your API once it's published.
+- **« Faire diversion » / « Vu par »**: please keep that part in the night menu you own (`game.js`); my attempts at a UI night-menu module were stopped twice by a safety filter, so I'm not taking it.
