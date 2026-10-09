@@ -4,6 +4,7 @@
 import { createRng } from './rng.js';
 import { fmt } from './time.js';
 import { holds } from './stateGuard.js';
+import { divertAttention } from './witness.js';
 
 // Accessoires d'un twist : 'id' ou { id, from, until } (minutes de jeu) ; le metteur en scène lit sim.twist.props à chaque image
 const propSpecs = (twist) => (twist?.props ?? []).map((p) => (typeof p === 'string' ? { id: p } : p));
@@ -24,6 +25,8 @@ export function setupTwist(sim, twist) {
   S.darkness = Math.max(0, Math.min(1, T.darkness ?? 0));
   S.corridorBlocked = !!T.corridorBlocked;  // camionnette dans le couloir de passage
   S.twistEvents = (T.events ?? []).map((e, i) => ({ ...e, i, done: false }));
+  // Fenêtres naturelles (§12d) : le but du match, le gâteau de la table 4… l'attention est ailleurs quelques minutes
+  S.twistWindows = (T.windows ?? []).map((w, i) => ({ ...w, i, done: false }));
   // Accessoires datés (ex. la table de la fête des voisins rentre à 22h00, comme le dit le texte)
   S.twistProps = propSpecs(twist);
   if (sim.twist) sim.twist.props = activeProps(S.twistProps, S.min);
@@ -81,6 +84,12 @@ export function updateTwist(sim) {
     if (ids.join() !== sim.twist.props.join()) sim.twist.props = ids;
   }
   if (!sim.twist && !S.noiseBoosts.length) return;
+  for (const w of S.twistWindows ?? []) {
+    if (w.done || S.min < w.at) continue;
+    w.done = true;
+    divertAttention(sim, { source: 'window', id: `${S.twist?.id}:${w.i}`, turns: w.turns ?? [], minutes: w.minutes ?? 2, text: w.text ?? null });
+    if (w.text) sim.log(`👀 ${w.text}`, 'good');
+  }
   if (S.twistRainAt !== undefined && S.min >= S.twistRainAt) startRain(sim);
   for (const e of S.twistEvents) {
     if (e.done || S.min < e.at) continue;

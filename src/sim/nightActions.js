@@ -7,6 +7,8 @@
 //
 // Règle d'écriture : un acte illégal n'est qu'un libellé, une conséquence et un crochet visuel. Aucun mode d'emploi.
 
+import { attentionFactor, divertAttention } from './witness.js';
+
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const H = (h, m = 0) => h * 60 + m; // 1h30 du matin = H(25, 30)
 const END = Infinity; // jusqu'à la fin de la nuit (RULES.nightEnd, 02h30 depuis §12d.4)
@@ -104,6 +106,9 @@ export const SIM_EFFECTS = {
   },
 };
 
+// Noms pour le journal (« le serveur, Dédé regardent ailleurs »)
+export const TURN_NAMES = { klaas: 'Klaas', seb_nico: 'Seb & Nico', waiter: 'le serveur', dede: 'Dédé', ghislain: 'Ghislain', customers: 'les clients', patrol: 'la patrouille' };
+
 // Témoins du contenu (`witnessed.by`) → témoins de la sim (witness.js kind). Dédé, Ghislain et la police ne sont pas
 // modélisés par la sim : ils sont tirés ici (EXTRA_WITNESSES).
 export const SIM_KIND = { klaas: 'klaas', seb_nico: 'seb_nico', waiter: 'waiter', customers: 'customers', biloute: 'jeremie', jeremie: 'jeremie' };
@@ -130,6 +135,9 @@ function blocked(sim, a, spec, player) {
     if (S.min > spec.window[1]) return 'Trop tard pour ça ce soir.';
   }
   if (S.min + minutes > sim.cfg.RULES.nightEnd) return 'Pas le temps avant la fin de la nuit.';
+  // Diversion (§12d) : pas deux fois de suite, il faut laisser retomber l'attention
+  const ready = S.diversionReadyAt?.[a.id];
+  if (a.diversion && ready !== undefined && S.min < ready) return `Trop tôt pour recommencer\u00a0: encore ${Math.ceil(ready - S.min)}\u00a0min.`;
   if (spec.needs && !SCENE[spec.needs].test(sim)) return SCENE[spec.needs].reason;
   if (player) {
     const loc = LOCATIONS[spec.at];
@@ -177,7 +185,7 @@ function rollAll(sim, a, pos) {
     if (!w.present(sim)) continue;
     const at = id === 'police' ? { x: sim.cfg.ANCHORS.waiter.x, z: sim.restCenter(sim.rest(sim.state.police.restId)).z } : sim.restCenter(bern(sim));
     if (dist2(at, pos) > w.range) continue;
-    if (!sim.rng.chance(Math.min(1, exposure * dark * sim.disguise))) continue;
+    if (!sim.rng.chance(Math.min(1, exposure * dark * sim.disguise * attentionFactor(sim, id)))) continue;
     const hit = { id, kind: id, name: w.name, pos: at, weight: w.weight, ally: false, filmed: false };
     seen.push(hit);
     sim.state.witnessMemories.push({ time: sim.state.min, who: id, kind: id, ally: false, name: w.name, act: a.label, filmed: false });
@@ -246,11 +254,36 @@ export function performNightAction(sim, c, id, player) {
   const resultText = (a.resultLines && sim.pacing?.line(a.resultLines)) || a.result;
   if (resultText) sim.log(resultText, a.legality === 'legal' ? 'good' : 'bad');
 
+  // Déguisement mis en pleine nuit (night_disguise…) : la nuit en tient compte tout de suite
+  const worn = (a.effects?.setFlags ?? []).filter((f) => f in sim.cfg.DISGUISE);
+  if (worn.length) {
+    worn.forEach((f) => sim.flags.add(f));
+    sim.disguise = Math.min(1, ...Object.entries(sim.cfg.DISGUISE).filter(([f]) => sim.flags.has(f)).map(([, m]) => m));
+  }
+
   // Le temps de l'acte passe (minute par minute : police, tables et sommeil continuent de tourner)
   for (let m = 0; m < minutes && !S.ended; m++) sim.tick(1);
 
+  // Diversion (§12d) : une fois l'acte préparé, les témoins visés regardent ailleurs (ou s'en vont) pendant `minutes`.
+  // traceRisk : on remonte jusqu'à Pilou (le déguisement aide) → les conséquences de `witnessed.effects`.
+  let traced = false;
+  if (a.diversion && !S.ended) {
+    const d = a.diversion;
+    divertAttention(sim, { source: 'diversion', id, turns: d.turns ?? [], minutes: d.minutes ?? 2, text: a.label });
+    (S.diversionReadyAt ??= {})[id] = S.min + (d.cooldown ?? 0);
+    sim.log(`👀 Fenêtre propice\u00a0: ${d.minutes ?? 2}\u00a0min où ${(d.turns ?? []).map((t) => TURN_NAMES[t] ?? t).join(', ')} regarde${(d.turns ?? []).length > 1 ? 'nt' : ''} ailleurs.`, 'good');
+    if (d.traceRisk && sim.rng.chance(Math.min(1, d.traceRisk * sim.disguise))) {
+      traced = true;
+      const we = a.witnessed?.effects ?? {};
+      sim.punish([{ id: 'trace', kind: 'trace', name: 'on remonte jusqu’à vous', weight: 1, ally: false, filmed: false }], id, we.risk ?? 0, -(we.asso ?? 0));
+      applyEffects(sim, c, { ...we, risk: undefined, asso: undefined }, 'witnessed', id);
+      c.note('witness', { act: id, by: ['trace'], night: true });
+      sim.note('traced', { id });
+    }
+  }
+
   return {
-    ok: true, result: resultText ?? null, minutes, startedAt, art, sim: simResult,
+    ok: true, result: resultText ?? null, minutes, startedAt, art, sim: simResult, traced,
     seen: seen.map((w) => ({ id: w.id, kind: w.kind, name: w.name, ally: !!w.ally, filmed: !!w.filmed })),
   };
 }

@@ -6,6 +6,7 @@
 // (où aller, ce qu'il faut d'abord : nightActions.js availableNightActions).
 import { availableNightActions, LOCATIONS, NIGHT_ACTION_SPECS, EXTRA_WITNESSES, SIM_KIND } from './nightActions.js';
 import { NIGHT_MENU } from '../config.js';
+import { attentionFactor } from './witness.js';
 
 const dist2 = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
 const shortName = (w) => (w.kind === 'customers' ? 'des clients' : String(w.name).split(' (')[0]);
@@ -26,7 +27,7 @@ export function witnessRisk(sim, a, pos, M = NIGHT_MENU) {
     const w = EXTRA_WITNESSES[id];
     if (!w.present(sim)) continue;
     const at = id === 'police' ? { x: sim.cfg.ANCHORS.waiter.x, z: sim.restCenter(sim.rest(sim.state.police.restId)).z } : sim.restCenter(sim.rest('bernadette'));
-    if (dist2(at, pos) <= w.range) seers.push({ name: w.name, p: Math.min(1, exposure * sim.disguise) });
+    if (dist2(at, pos) <= w.range) seers.push({ name: w.name, p: Math.min(1, exposure * sim.disguise * attentionFactor(sim, id)) });
   }
   const p = 1 - seers.reduce((q, s) => q * (1 - s.p), 1);
   const level = p >= M.risk.high ? 'high' : p >= M.risk.medium ? 'medium' : 'low';

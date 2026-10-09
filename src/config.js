@@ -223,6 +223,7 @@ export const WITNESS = {
   saturdayCover: 0.7,
   jeremie: { name: 'Jérémie et son teckel', p: 0.8, weight: 0.3, ally: true },            // la foule du samedi couvre : chaque client remarque moins
   riskCap: 1.6,                  // plafond de la somme des poids
+  attention: { away: 0.08 },     // §12d : un témoin détourné (diversion, fenêtre du twist) ne voit plus qu'avec cette part de sa probabilité
 };
 
 export const BUCKET = {

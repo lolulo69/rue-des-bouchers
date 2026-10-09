@@ -5,6 +5,8 @@
 // La nuit est la même à toutes les vitesses : seul le pas de temps réel change (sim.tick reste l'unique chemin).
 
 // Ce qui « se passe » : entrées du journal récentes qui méritent qu'on ralentisse
+import { activeAttention } from './witness.js';
+
 const LIVELY = new Set(['witness', 'evidence', 'night-action', 'night-event', 'twist-event', 'police-arrive', 'tipoff', 'bribe', 'table-return', 'pee', 'scandal']);
 
 // Pourquoi il ne faut pas accélérer maintenant (null = rien en vue)
@@ -12,6 +14,7 @@ export function busyReason(sim, c, R = sim.cfg.RULES.clock) {
   const S = sim.state;
   const P = S.police;
   if (P && (P.phase === 'pending' || P.phase === 'walking' || P.phase === 'onsite')) return 'police';
+  if (activeAttention(sim).length) return 'window'; // §12d : fenêtre propice (diversion, moment du twist) → ×1
   const soon = (at) => at >= S.min - 1 && at <= S.min + R.lookahead;
   if ((S.twistEvents ?? []).some((e) => !e.done && soon(e.at))) return 'twist';
   if (S.twistRainAt !== undefined && soon(S.twistRainAt)) return 'twist';

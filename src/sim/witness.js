@@ -19,6 +19,28 @@ export function klaasDetection(sim, d) {
   return k.p * Math.min(1, Math.max(0, (far - d) / (far - near)));
 }
 
+// ── Attention (§12d) ──────────────────────────────────────────────────
+// Chaque témoin regarde la rue (son point d'attention par défaut). Une diversion (action `diversion`) ou une fenêtre
+// naturelle d'un twist (`sim.windows`) détourne certains témoins pendant quelques minutes : ils regardent ailleurs
+// (le pétard côté place) ou s'en vont (le téléphone de l'estaminet). Leur probabilité de voir Pilou tombe alors à
+// WITNESS.attention.away (un coup d'œil reste possible). S.attention = [{ source, id, turns, from, until, text }].
+// turns : 'klaas' | 'seb_nico' | 'waiter' | 'dede' | 'ghislain' | 'customers' | 'patrol' (= le kind 'police').
+const TURN_OF = { police: 'patrol' };
+export const activeAttention = (sim) => (sim.state.attention ?? []).filter((a) => sim.state.min >= a.from && sim.state.min < a.until);
+export function attentionFactor(sim, kind) {
+  const t = TURN_OF[kind] ?? kind;
+  return activeAttention(sim).some((a) => a.turns.includes(t)) ? (sim.cfg.WITNESS.attention?.away ?? 0.08) : 1;
+}
+// Ouvre une fenêtre d'attention détournée (diversion ou moment du twist), pour `minutes` minutes de jeu à partir de maintenant
+export function divertAttention(sim, { source, id, turns, minutes, text = null }) {
+  const S = sim.state;
+  const a = { source, id, turns: [...turns], from: S.min, until: S.min + minutes, text };
+  (S.attention ??= []).push(a);
+  sim.note('attention', { source, id, turns: a.turns, until: a.until });
+  sim.events.push({ type: 'attention', ...a });
+  return a;
+}
+
 // Qui pourrait voir un acte commis en `pos` en ce moment (ligne de vue + portée selon l'obscurité) ?
 export function potentialWitnesses(sim, pos) {
   const { WITNESS, STREET, ANCHORS } = sim.cfg;
@@ -34,14 +56,16 @@ export function potentialWitnesses(sim, pos) {
   const add = (id, kind, def, at, extra = {}) => {
     if (dist3(at, pos) > range || !lineOfSight(at, pos, W)) return;
     // Obscurité : les gens de la rue ; déguisement : tous ceux qui ne sont pas des alliés (ils ne reconnaissent pas Pilou)
-    const p = def.p * (kind === 'waiter' || kind === 'customers' || kind === 'jeremie' || kind === 'twist' ? dark : 1) * (def.ally ? 1 : sim.disguise) * twistDark;
-    out.push({ id, kind, name: def.name, pos: at, p, baseP: def.p, weight: def.weight, ally: def.ally, ...extra });
+    const focus = attentionFactor(sim, kind); // §12d : détourné par une diversion ou une fenêtre du twist
+    const p = def.p * (kind === 'waiter' || kind === 'customers' || kind === 'jeremie' || kind === 'twist' ? dark : 1) * (def.ally ? 1 : sim.disguise) * twistDark * focus;
+    out.push({ id, kind, name: def.name, pos: at, p, baseP: def.p, weight: def.weight, ally: def.ally, distracted: focus < 1, ...extra });
   };
   // Klaas : pas de portée générique, mais une détection qui baisse avec la distance (jumelles la nuit)
   if (sim.klaasAwake() && lineOfSight(ANCHORS.klaasWindow, pos, W)) {
     const p = klaasDetection(sim, dist3(ANCHORS.klaasWindow, pos));
     const name = sim.klaasWatching() ? `${WITNESS.klaas.name.split(' (')[0]} (jumelles)` : WITNESS.klaas.name;
-    if (p > 0) out.push({ id: 'klaas', kind: 'klaas', name, pos: ANCHORS.klaasWindow, p: p * twistDark, baseP: WITNESS.klaas.p, weight: WITNESS.klaas.weight, ally: true });
+    const focus = attentionFactor(sim, 'klaas');
+    if (p > 0) out.push({ id: 'klaas', kind: 'klaas', name, pos: ANCHORS.klaasWindow, p: p * twistDark * focus, baseP: WITNESS.klaas.p, weight: WITNESS.klaas.weight, ally: true, distracted: focus < 1 });
   }
   if (sim.catPresent()) add('seb_nico', 'seb_nico', WITNESS.seb_nico, ANCHORS.balcony);
   if (sim.dogActive()) add('jeremie', 'jeremie', WITNESS.jeremie, { ...sim.dogPos(), y: 1.6 });
