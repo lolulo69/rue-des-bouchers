@@ -266,15 +266,15 @@ export const ACTIONS = [
   },
   {
     id: 'night_bribe_waiter',
-    label: 'Glisser un billet au serveur pour qu’il parle',
+    label: 'Glisser un billet au serveur, à sa pause cigarette',
     phase: 'night',
     legality: 'illegal',
     once: true,
     cost: { minutes: 5 },
     requires: { flags: ['asked_waiter'], notFlags: ['waiter_bribed', 'waiter_fired'] },
     effects: { setFlags: ['waiter_bribed', 'met_waiter'] },
-    witnessed: { exposure: 0.4, by: ['dede', 'ghislain', 'customers'], effects: { risk: +10, hostility: +15, setFlags: ['waiter_fired'], clearFlags: ['waiter_informant'] } },
-    result: "Il empoche le billet sans le regarder. « Je m’appelle Théo. Je finis à minuit et demie. Et je vous ai jamais vu. »",
+    witnessed: { exposure: 0.2, by: ['dede', 'ghislain', 'customers'], effects: { risk: +10, hostility: +15, setFlags: ['waiter_fired'], clearFlags: ['waiter_informant'] } },
+    result: "À l’écart, pendant sa pause cigarette, il empoche le billet sans le regarder. « Je m’appelle Théo. Je finis à minuit et demie. Et je vous ai jamais vu. »",
   },
   {
     id: 'night_backroom_photo',

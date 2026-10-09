@@ -65,7 +65,7 @@ export const NIGHT_ACTION_SPECS = {
   night_sabotage_chairs: { at: 'terrace', window: [H(23, 30), END], art: { terrace: 'collapse' } },
   night_sabotage_parasols: { at: 'terrace', window: [H(23, 30), END], art: { terrace: 'parasols' } },
   night_sabotage_locks: { at: 'terrace', window: [H(24), END] },
-  night_bribe_waiter: { at: 'terrace', window: [H(20, 30), H(25)], needs: 'waiterOnDuty', art: { anim: ['serveur', 'give'] } },
+  night_bribe_waiter: { at: 'terrace', window: [H(21, 12), H(24, 38)], needs: 'waiterOnBreak', art: { anim: ['serveur', 'give'] } }, // §12e.7 : à sa pause, hors de vue
   night_backroom_photo: { at: 'estaminet', window: [H(20, 30), H(24, 30)], needs: 'policeOnsite', art: { anim: ['dede', 'give'] } },
   night_bribe_photo_window: { at: 'window', window: [H(20, 30), H(24, 30)], needs: 'policeOnsite' }, // pas d'enveloppe sans patrouille
   night_eat_carbonnade_1: { at: 'estaminet', window: [H(20, 30), H(22, 30)], needs: 'kitchenOpen', art: { anim: ['pilou', 'eat'] } },
@@ -92,6 +92,7 @@ export const SCENE = {
   exhaustOn: { test: (sim) => sim.state.min < sim.cfg.NOISE.exhaustOffMinute, reason: 'La gaine est arrêtée.' },
   kitchenOpen: { test: (sim) => sim.state.min < H(23), reason: 'La cuisine est fermée.' },
   waiterOnDuty: { test: (sim) => sim.waiterOnDuty(), reason: 'Le serveur est parti.' },
+  waiterOnBreak: { test: (sim) => sim.waiterOnBreak(), reason: 'Le serveur est en service : attendez sa pause cigarette.' },
   policeOnsite: { test: (sim) => sim.state.police?.phase === 'onsite', reason: 'Aucune patrouille sur place.' },
   roundTonight: { test: (sim) => !sim.state.dogOff, reason: 'Pas de ronde ce soir : Biloute a disparu.' }, // twist lost_dog (dog: false)
 };
