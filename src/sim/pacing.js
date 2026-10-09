@@ -10,6 +10,7 @@ import { weatherNow } from './weather.js';
 import { CLATTER, AMBIENT, PHONE_PINGS } from '../content/night.js';
 import { WHATSAPP_GROUP } from '../content/characters.js';
 import { streetLine } from './narrative.js';
+import { usable, textOf, holds } from './stateGuard.js';
 
 const DEFAULTS = { enabled: true, quietMin: 10, quietMax: 13, clatterWindow: 2 };
 const NUM = ['zéro', 'une', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf', 'dix', 'onze', 'douze'];
@@ -35,11 +36,13 @@ export function attachPacing(sim, { carry = {} } = {}) {
   sim.log = (text, cls) => { if (text) { lastMoment = S.min; seen.add(text); ambientRun = cls === 'ambient' ? ambientRun + 1 : 0; } return log(text, cls); };
 
   // Choisit un gabarit pas encore dit cette nuit ni la précédente ; liste épuisée : celui qui a servi il y a le plus longtemps
+  // Garde d'état (§13.L, stateGuard.js) : seules les lignes qui collent à la situation ; la mémoire porte sur le TEXTE
   const choose = (list, r = rng) => {
-    if (!list?.length) return null;
-    const fresh = list.filter((l) => !seen.has(l) && !prev.has(l));
-    const notTonight = fresh.length ? fresh : list.filter((l) => !seen.has(l));
-    const line = notTonight.length ? r.pick(notTonight) : [...list].sort((a, b) => (lastUse.get(a) ?? -1) - (lastUse.get(b) ?? -1))[0];
+    const ok = usable(list ?? [], sim).map(textOf);
+    if (!ok.length) return null;
+    const fresh = ok.filter((l) => !seen.has(l) && !prev.has(l));
+    const notTonight = fresh.length ? fresh : ok.filter((l) => !seen.has(l));
+    const line = notTonight.length ? r.pick(notTonight) : [...ok].sort((a, b) => (lastUse.get(a) ?? -1) - (lastUse.get(b) ?? -1))[0];
     seen.add(line);
     lastUse.set(line, S.min);
     return line;
@@ -68,7 +71,8 @@ export function attachPacing(sim, { carry = {} } = {}) {
       if (weatherNow(S) && rng.chance(0.5)) key = 'rain';
       else if (sim.day?.key === 'sat' && rng.chance(0.35)) key = 'saturday';
     }
-    const line = choose(CLATTER[key]);
+    const line = choose(CLATTER[key]) ?? choose(CLATTER.one);
+    if (!line) return;
     sim.log(fill(line, { who, Who: cap(who), n: NUM[n] ?? String(n) }));
   }
 
@@ -81,6 +85,7 @@ export function attachPacing(sim, { carry = {} } = {}) {
       if (w.to !== undefined && S.min >= w.to) return false;
       if (w.sat !== undefined && w.sat !== sat) return false;
       if (w.rain !== undefined && w.rain !== rain) return false;
+      if (a.state && !holds(a.state, sim)) return false; // garde d'état (§13.L)
       return !seen.has(a.text);
     };
     const pool = AMBIENT.filter(ok);

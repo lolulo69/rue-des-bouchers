@@ -203,8 +203,8 @@ function ambientLines(dt) {
     nextBark = 20 + narrRng.next() * 20;
     const near = S.tables.some((t) => t.out && Math.hypot(t.x - player.pos.x, t.z - player.pos.z) < (player.loc === 'apt' ? 10 : 6));
     // Le twist de la nuit a ses propres bribes : une sur deux
-    const twistBarks = sim.twist?.lines?.barks;
-    if (near) log(twistBarks?.length && narrRng.chance(0.5) ? twistBarks[narrRng.int(0, twistBarks.length - 1)] : narrative.pickNightLine('bark', sim, narrRng), 'bark');
+    // (gardées par l'état de la rue, §13.L : narrative.twistLine)
+    if (near) log((narrRng.chance(0.5) && narrative.twistLine('barks', sim, narrRng)) || narrative.pickNightLine('bark', sim, narrRng), 'bark');
   }
   if (S.tipoffs.length) tuto('first_tipoff');
   if (S.policeLog.some((p) => p.outcome === 'complaisance')) tuto('first_complaisance');

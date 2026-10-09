@@ -3,6 +3,11 @@
 // Un RNG à part (dérivé de la graine) : une nuit sans twist reste identique à avant la v1.1.
 import { createRng } from './rng.js';
 import { fmt } from './time.js';
+import { holds } from './stateGuard.js';
+
+// Accessoires d'un twist : 'id' ou { id, from, until } (minutes de jeu) ; le metteur en scène lit sim.twist.props à chaque image
+const propSpecs = (twist) => (twist?.props ?? []).map((p) => (typeof p === 'string' ? { id: p } : p));
+const activeProps = (specs, min) => specs.filter((p) => min >= (p.from ?? 0) && min < (p.until ?? Infinity)).map((p) => p.id);
 
 // `noise` multiplie l'amplitude des sources extérieures : en dB, +20·log10(noise) (×1.15 → +1,2 dB, ×1.3 → +2,3 dB).
 // Les pics des moments (`events[].simEffect.noise`, en dB) durent 5 minutes par défaut (un but, une chanson).
@@ -19,6 +24,11 @@ export function setupTwist(sim, twist) {
   S.darkness = Math.max(0, Math.min(1, T.darkness ?? 0));
   S.corridorBlocked = !!T.corridorBlocked;  // camionnette dans le couloir de passage
   S.twistEvents = (T.events ?? []).map((e, i) => ({ ...e, i, done: false }));
+  // Accessoires datés (ex. la table de la fête des voisins rentre à 22h00, comme le dit le texte)
+  S.twistProps = propSpecs(twist);
+  if (sim.twist) sim.twist.props = activeProps(S.twistProps, S.min);
+  // Pas de ronde ce soir (Biloute a fugué) : le teckel ne fait pas le tour
+  if (T.dog === false) S.dogOff = true;
   if (!twist) return;
   const rng = createRng((sim.seed ^ 0x7157a) >>> 0);
   // Foule : plus (ou moins) de monde à chaque table et dans les groupes debout
@@ -39,13 +49,13 @@ export function setupTwist(sim, twist) {
     S.tables.push({
       id: `${r.id}-x${extra}`, restId: r.id, label: `${r.name}, ${label}`, twist: true,
       x: r.side * (STREET.halfWidth - ZONES.wallGap - ZONES.tableFootprint), z: r.z1 + 1.1 * extra,
-      count: spec.count ?? 6, out: true,
-      clearAt: rng.chance(r.compliance) ? close + rng.range(0, RULES.lateGraceMinutes) : rng.range(...r.lateClear),
+      count: spec.count ?? 6, out: true, until: spec.until ?? null,
+      clearAt: spec.until ?? (rng.chance(r.compliance) ? close + rng.range(0, RULES.lateGraceMinutes) : rng.range(...r.lateClear)),
       clearedAt: null, clearedBy: null, pendingBy: null, hiddenUntil: null, evidence: new Set(),
     });
   }
   // Les restos rangent plus tard ce soir-là
-  if (T.closeDelay) for (const t of S.tables) t.clearAt += T.closeDelay;
+  if (T.closeDelay) for (const t of S.tables) if (!t.until) t.clearAt += T.closeDelay; // une table « jusqu'à 22h » reste à l'heure dite
   // La drache (twist) : elle tombe entre 21:00 et 22:00 ; sous le store de Bernadette, on reste
   if (T.rain) S.twistRainAt = rng.range(21 * 60, 22 * 60);
 }
@@ -55,6 +65,7 @@ export function startRain(sim, { spareAwning = true } = {}) {
   const S = sim.state;
   if (S.twistRained) return;
   S.twistRained = true;
+  S.twistRainedAt = S.min;
   const out = S.tables.filter((t) => t.out && !(spareAwning && t.restId === 'bernadette'));
   out.forEach((t, k) => { t.clearAt = Math.min(t.clearAt, S.min + 0.5 + (4 * k) / Math.max(1, out.length)); t.pendingBy = 'rain'; });
   for (const g of S.standing) if (g.leaveAt > S.min) g.leaveAt = S.min + 2;
@@ -64,6 +75,10 @@ export function startRain(sim, { spareAwning = true } = {}) {
 
 export function updateTwist(sim) {
   const S = sim.state;
+  if (S.twistProps?.length && sim.twist) {
+    const ids = activeProps(S.twistProps, S.min);
+    if (ids.join() !== sim.twist.props.join()) sim.twist.props = ids;
+  }
   if (!sim.twist && !S.noiseBoosts.length) return;
   if (S.twistRainAt !== undefined && S.min >= S.twistRainAt) startRain(sim);
   for (const e of S.twistEvents) {
@@ -72,7 +87,9 @@ export function updateTwist(sim) {
     sim.note('twist-event', { twistId: S.twist?.id, i: e.i });
     // Pour le metteur en scène (art.twists.trigger) : l'accessoire et le moment (ex. { prop: 'tv_screen', moment: 'goal' })
     sim.events.push({ type: 'twist-moment', twistId: S.twist?.id, i: e.i, prop: e.prop ?? null, moment: e.moment ?? `moment${e.i}`, at: e.at, text: e.text ?? null });
-    if (e.text) sim.log(e.text);
+    // Garde d'état (§13.L) : le texte ne s'affiche que s'il colle à la rue à cet instant (sinon `else`, ou rien)
+    const text = !e.state || holds(e.state, sim) ? e.text : e.else ?? null;
+    if (text) sim.log(text);
     const fx = e.simEffect ?? {};
     if (fx.noise) S.noiseBoosts.push({ db: fx.noise, until: S.min + (fx.minutes ?? EVENT_NOISE_MINUTES) });
     if (fx.rain) startRain(sim, { spareAwning: fx.rain !== 'all' });

@@ -122,7 +122,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
     patrolOnDuty: () => patrolOnDuty(sim),
     restCenter: (r) => ({ x: r.side * 2, y: 1, z: (r.z0 + r.z1) / 2 }),
     // Ronde de Jérémie et du teckel : une traversée de la rue entre DOG.start et DOG.end
-    dogActive: () => S.min >= DOG.start && S.min < DOG.end,
+    dogActive: () => !S.dogOff && S.min >= DOG.start && S.min < DOG.end, // twist « Biloute a disparu » : pas de ronde
     dogPos: () => ({ x: DOG.x, y: 0.4, z: DOG.z0 + (DOG.z1 - DOG.z0) * clamp((S.min - DOG.start) / (DOG.end - DOG.start), 0, 1) }),
     activeBribe: () => S.bribes.find((b) => S.min >= b.from && S.min < b.until),
     // Valeur d'une pièce : pleine pour la 1re de ce resto et de ce type cette nuit, ×repeatFactor ensuite

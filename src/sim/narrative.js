@@ -4,6 +4,7 @@
 //
 // Points d'appel : voir GAME_DESIGN.md, Build notes « narrative-wiring ».
 import { evalCondition, compare } from './conditions.js';
+import { usable, textOf } from './stateGuard.js';
 import { KLAAS_NOTEBOOK, POLICE_LINES, WITNESS_LINES, BARKS, BELL, WAITER_LINES, RECAP_HEADLINES, NIGHT_END, STREET_LINES } from '../content/night.js';
 import { INTRO_CARDS, TUTORIAL } from '../content/intro.js';
 import { MEDIA } from '../content/media.js';
@@ -37,6 +38,12 @@ export function fill(template, ctx = {}, { fallback = '…', missing } = {}) {
 
 // Tirage déterministe : rng (sim.rng / campagne) ou, sans rng, la première ligne.
 const pick = (list, rng) => (!list?.length ? null : rng ? rng.pick(list) : list[0]);
+// Choix gardé (§13.L) : seules les lignes dont la garde `state` tient maintenant (stateGuard.js) ; pacing.js évite les redites.
+// Les réserves mélangent chaînes et objets { text, state } ; renvoie toujours le texte (ou null).
+function choose(pool, sim, rng) {
+  if (sim?.pacing) return sim.pacing.choose(pool ?? [], rng ?? undefined);
+  return textOf(pick(usable(pool, sim), rng));
+}
 
 // État de campagne ({ day, phase, flags: [] | Set, stats, hidden }) → contexte de conditions §14
 export function toCtx(state = {}) {
@@ -151,9 +158,16 @@ export function pickNightLine(kind, sim, rng = sim?.rng, extra = {}) {
   } else {
     pool = nightPool(kind);
   }
-  // pacing.js : pas la même ligne deux fois dans la nuit, ni d'une nuit à la suivante
-  const line = sim?.pacing ? sim.pacing.choose(pool, rng ?? undefined) : pick(pool, rng);
-  return line === null ? null : fill(line, { ...ctx, ...extra.ctx });
+  // Garde d'état + pacing.js (pas la même ligne deux fois dans la nuit, ni d'une nuit à la suivante)
+  let line = choose(pool, sim, rng);
+  if (line == null && kind === 'bark') line = choose(BARKS.weekday, sim, rng); // bribes du samedi ou de police toutes exclues
+  return line == null ? null : fill(line, { ...ctx, ...extra.ctx });
+}
+
+// Une bribe du rebondissement de la nuit (twists.js lines.barks / lines.klaas), gardée comme les autres ; null si aucune ne tient.
+export function twistLine(kind, sim, rng = sim?.rng) {
+  const line = choose(sim?.twist?.lines?.[kind], sim, rng);
+  return line == null ? null : line;
 }
 
 // ── Lignes de la rue écrites par la sim (pacing-2) ─────────────────────────
@@ -163,7 +177,8 @@ export function streetLine(kind, sim, ctx = {}, rng) {
   const [head, sub] = kind.split(':');
   const pool = sub ? STREET_LINES[head]?.[sub] : STREET_LINES[head];
   if (!pool?.length) return null;
-  const line = sim?.pacing ? sim.pacing.choose(pool, rng ?? undefined) : pick(pool, rng);
+  const line = choose(pool, sim, rng);
+  if (line == null) return null;
   const cap = (v) => (typeof v === 'string' ? v.charAt(0).toUpperCase() + v.slice(1) : v);
   return fill(line, { ...ctx, ...Object.fromEntries(Object.entries(ctx).map(([k, v]) => [k.charAt(0).toUpperCase() + k.slice(1), cap(v)])) });
 }
@@ -180,8 +195,8 @@ export function policePool(outcome, patrol, { asso = false } = {}) {
 // sim (facultatif) : avec pacing.js, la ligne ne revient ni dans la nuit ni la suivante
 export function policeLine(outcome, patrol, ctx = {}, rng, sim = null) {
   const pool = policePool(outcome, patrol, ctx);
-  const line = sim?.pacing ? sim.pacing.choose(pool, rng ?? undefined) : pick(pool, rng);
-  return line === null ? null : fill(line, ctx);
+  const line = choose(pool, sim, rng);
+  return line == null ? null : fill(line, ctx);
 }
 
 // ── Klaas ──────────────────────────────────────────────────────────────────
@@ -195,13 +210,13 @@ export const KLAAS_PRECISE_AT = 0.6;
 // ctx   : le nightCtx correspondant (table / tipoff / police / pee / clatter / pilou)
 // Renvoie { text, precise } ou null si Klaas ne peut pas voir.
 export function klaasEntry(event, detection, rng) {
-  if (event.about === 'bedtime') return { text: pick(KLAAS_NOTEBOOK.bedtime, rng), precise: true };
+  if (event.about === 'bedtime') return { text: textOf(pick(KLAAS_NOTEBOOK.bedtime, rng)), precise: true };
   if (!(detection > 0)) return null;
   const about = event.about === 'bucket' ? 'pilou' : event.about;
   const pools = KLAAS_NOTEBOOK[about];
   if (!pools) return null;
   const precise = detection >= KLAAS_PRECISE_AT;
-  const line = pick(precise ? pools.precise : pools.vague, rng);
+  const line = textOf(pick(precise ? pools.precise : pools.vague, rng));
   const ctx = event.about === 'bucket' ? { act: 'seau d’eau', ...event } : event;
   return { text: fill(line, ctx), precise };
 }
