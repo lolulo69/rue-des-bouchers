@@ -84,3 +84,32 @@ describe('pacing.js : variété des lignes', () => {
     expect(CLATTER_LINES.length).toBeGreaterThanOrEqual(10);
   });
 });
+
+describe('pacing.js : anti-spam', () => {
+  it('jamais 3 micro-moments d’affilée ; un message du groupe prend le relais', () => {
+    let pings = 0;
+    for (const seed of [1, 2, 3, 4]) {
+      const sim = night({ seed });
+      let run = 0;
+      while (!sim.state.ended) {
+        sim.tick(1);
+        for (const e of sim.drainEvents()) {
+          if (e.type !== 'log') continue;
+          run = e.cls === 'ambient' ? run + 1 : 0;
+          expect(run, `nuit ${seed}, ${e.text}`).toBeLessThan(3);
+          if (e.cls === 'phone') pings++;
+        }
+      }
+    }
+    expect(pings).toBeGreaterThan(0);
+  });
+
+  it('pas plus d’une ligne visible toutes les 10 s réelles en moyenne sur une nuit sans joueur', () => {
+    const sim = night({ seed: 9 });
+    let lines = 0;
+    const start = sim.state.min;
+    while (!sim.state.ended) { sim.tick(1); lines += sim.drainEvents().filter((e) => e.type === 'log').length; }
+    const realMinutes = ((sim.state.min - start) * 2) / 60;
+    expect(lines / realMinutes).toBeLessThanOrEqual(6);
+  });
+});

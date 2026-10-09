@@ -27,6 +27,7 @@ const LABEL = String(arg('label', 'mesure'));
 const QUIET_S = 30; // un silence plus long que ça compte comme temps mort (en entier)
 const TARGET_DEAD_S = 90;
 const TARGET_SIM = 0.7;
+const TARGET_LPM = 6; // ~1 ligne visible toutes les 10 s réelles, en moyenne sur la nuit
 
 const cfg = makeConfig();
 const REAL_S_PER_GAME_MIN = 1 / cfg.RULES.gameMinutesPerSecond; // 1 min de jeu = 2 s réelles
@@ -58,7 +59,7 @@ function playNightAudited(sim, policy, c, choose) {
   const moments = []; // { min, key, text }
   let nextContent = -Infinity;
   const take = () => {
-    for (const e of sim.events) if (e.type === 'log' && e.text) moments.push({ min: e.min ?? sim.state.min, key: `log:${template(e.text)}`, text: e.text });
+    for (const e of sim.events) if (e.type === 'log' && e.text) moments.push({ min: e.min ?? sim.state.min, key: `log:${template(e.text)}`, text: e.text, visible: true, ambient: e.cls === 'ambient' });
     sim.events.length = 0;
   };
   while (!sim.state.ended) {
@@ -70,7 +71,7 @@ function playNightAudited(sim, policy, c, choose) {
       }
     }
     for (let ev = c?.nightEventDue?.(sim); ev; ev = c.nightEventDue(sim)) {
-      moments.push({ min: sim.state.min, key: `event:${ev.id}`, text: ev.data?.title ?? ev.id });
+      moments.push({ min: sim.state.min, key: `event:${ev.id}`, text: ev.data?.title ?? ev.id, visible: true });
       const ok = ev.choices.filter((x) => x.available);
       c.resolveNightEvent(sim, ok.length ? choose(ev, ok) : 0);
     }
@@ -89,7 +90,15 @@ function nightStats(moments, start, end) {
     const gapS = (times[i] - times[i - 1]) * REAL_S_PER_GAME_MIN;
     if (gapS > QUIET_S) dead += gapS;
   }
-  return { dead, situations: new Set(moments.map((m) => m.key)) };
+  // Débit du journal (anti-spam) : lignes visibles par minute réelle, pic sur une minute réelle glissante, ambiances d'affilée
+  const vis = moments.filter((m) => m.visible).sort((a, b) => a.min - b.min);
+  const realMin = ((end - start) * REAL_S_PER_GAME_MIN) / 60;
+  const win = 60 / REAL_S_PER_GAME_MIN; // une minute réelle, en minutes de jeu
+  let peak = 0;
+  for (let i = 0, j = 0; i < vis.length; i++) { while (vis[i].min - vis[j].min >= win) j++; peak = Math.max(peak, i - j + 1); }
+  let run = 0, triples = 0;
+  for (const m of vis) { run = m.ambient ? run + 1 : 0; if (run === 3) triples++; }
+  return { dead, situations: new Set(moments.map((m) => m.key)), lpm: realMin ? vis.length / realMin : 0, peak, triples };
 }
 
 function auditCampaign(seed, botName) {
@@ -138,17 +147,17 @@ const rows = [];
 const topLines = new Map();
 for (const botName of BOTS) {
   if (!CAMPAIGN_BOTS[botName]) { console.error(`bot inconnu : ${botName}`); process.exit(2); }
-  let nN = 0, deadSum = 0, sitSum = 0, simSum = 0, simN = 0, simMax = 0, over = 0, pairs = 0, overDead = 0;
+  let nN = 0, deadSum = 0, sitSum = 0, simSum = 0, simN = 0, simMax = 0, over = 0, pairs = 0, overDead = 0, lpmSum = 0, peakMax = 0, triples = 0;
   const twists = new Set();
   for (let r = 0; r < RUNS; r++) {
     const a = auditCampaign(1000 + r, botName);
-    for (const n of a.nights) { nN++; deadSum += n.dead; sitSum += n.situations.size; if (n.dead > TARGET_DEAD_S) overDead++; if (n.twist) twists.add(n.twist); }
+    for (const n of a.nights) { nN++; deadSum += n.dead; sitSum += n.situations.size; if (n.dead > TARGET_DEAD_S) overDead++; if (n.twist) twists.add(n.twist); lpmSum += n.lpm; peakMax = Math.max(peakMax, n.peak); triples += n.triples; }
     for (const s of a.sims) { simSum += s; simN++; simMax = Math.max(simMax, s); pairs++; if (s > TARGET_SIM) over++; }
     for (const [t, k] of a.lines) if (k > 1) topLines.set(t, (topLines.get(t) ?? 0) + k);
   }
   rows.push({
     bot: botName, nights: nN, dead: deadSum / nN, overDead: overDead / nN, situations: sitSum / nN,
-    sim: simN ? simSum / simN : 0, simMax, over, pairs, twists: twists.size,
+    sim: simN ? simSum / simN : 0, simMax, over, pairs, twists: twists.size, lpm: lpmSum / nN, peak: peakMax, triples,
   });
 }
 const worst = [...topLines].sort((a, b) => b[1] - a[1]).slice(0, 12);
@@ -158,12 +167,14 @@ let sha = 'inconnu';
 try { sha = execSync('git rev-parse --short HEAD', { cwd: ROOT }).toString().trim(); } catch { /* hors git */ }
 const ok = (b, t) => (b ? `✅ ${t}` : `❌ ${t}`);
 const table = [
-  '| Bot | Nuits | Temps mort moyen / nuit | Nuits > 90 s | Situations distinctes / nuit | Similarité moyenne (nuits consécutives) | Similarité max | Paires > 0,7 | Twists distincts |',
-  '|---|---|---|---|---|---|---|---|---|',
-  ...rows.map((r) => `| ${r.bot} | ${r.nights} | ${fmtS(r.dead)} | ${pct(r.overDead)} | ${r.situations.toFixed(1)} | ${r.sim.toFixed(2)} | ${r.simMax.toFixed(2)} | ${r.over}/${r.pairs} | ${r.twists} |`),
+  '| Bot | Nuits | Temps mort moyen / nuit | Nuits > 90 s | Situations distinctes / nuit | Similarité moyenne (nuits consécutives) | Similarité max | Paires > 0,7 | Twists distincts | Lignes / min réelle | Pic sur 1 min | 3 ambiances d’affilée |',
+  '|---|---|---|---|---|---|---|---|---|---|---|---|',
+  ...rows.map((r) => `| ${r.bot} | ${r.nights} | ${fmtS(r.dead)} | ${pct(r.overDead)} | ${r.situations.toFixed(1)} | ${r.sim.toFixed(2)} | ${r.simMax.toFixed(2)} | ${r.over}/${r.pairs} | ${r.twists} | ${r.lpm.toFixed(1)} | ${r.peak} | ${r.triples} |`),
 ].join('\n');
 const allDead = rows.reduce((s, r) => s + r.dead * r.nights, 0) / rows.reduce((s, r) => s + r.nights, 0);
 const allOver = rows.reduce((s, r) => s + r.over, 0);
+const allLpm = rows.reduce((s, r) => s + r.lpm * r.nights, 0) / rows.reduce((s, r) => s + r.nights, 0);
+const allTriples = rows.reduce((s, r) => s + r.triples, 0);
 const section = `## ${LABEL} · ${new Date().toISOString().slice(0, 10)} · main @ ${sha}
 
 ${RUNS} campagnes par bot (graines 1000…${999 + RUNS}).
@@ -172,6 +183,7 @@ ${table}
 
 - Cible v1.1 temps mort : ${ok(allDead < TARGET_DEAD_S, `${fmtS(allDead)} en moyenne (cible < ${TARGET_DEAD_S} s)`)}
 - Cible v1.1 similarité : ${ok(allOver === 0, `${allOver} paire(s) de nuits consécutives au-dessus de ${TARGET_SIM} (cible : 0)`)}
+- Anti-spam : ${ok(allLpm <= TARGET_LPM && allTriples === 0, `${allLpm.toFixed(1)} lignes par minute réelle en moyenne (cible ≤ ${TARGET_LPM}, soit ~1 ligne / 10 s) ; ${allTriples} fois 3 ambiances d’affilée (cible : 0)`)}
 
 Lignes les plus répétées (lignes vues au moins 2 fois dans une même campagne ; total de leurs occurrences sur ce passage) :
 ${worst.map(([t, k]) => `- ${k} × « ${t.length > 140 ? `${t.slice(0, 140)}…` : t} »`).join('\n')}

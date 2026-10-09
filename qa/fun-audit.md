@@ -8,6 +8,38 @@ est la somme des silences de plus de 30 s réelles entre deux moments (1 min de 
 Une *situation* = le gabarit d'une ligne (sans heures ni nombres) ou un type d'événement ; la **similarité** de deux nuits consécutives
 est l'indice de Jaccard de leurs ensembles de situations. Les bots sont ceux du simulateur (`src/sim/campaignBots.js`).
 
+## pacing-2 (lignes de la rue, anti-spam) · 2026-10-09 · main @ 2ffc2af
+
+20 campagnes par bot (graines 1000…1019).
+
+| Bot | Nuits | Temps mort moyen / nuit | Nuits > 90 s | Situations distinctes / nuit | Similarité moyenne (nuits consécutives) | Similarité max | Paires > 0,7 | Twists distincts | Lignes / min réelle | Pic sur 1 min | 3 ambiances d’affilée |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| passive | 259 | 0 s | 0 % | 37.9 | 0.16 | 0.28 | 0/239 | 22 | 3.3 | 8 | 0 |
+| legal | 260 | 0 s | 0 % | 47.6 | 0.22 | 0.37 | 0/240 | 22 | 5.8 | 30 | 0 |
+| reckless | 92 | 0 s | 0 % | 44.1 | 0.14 | 0.23 | 0/72 | 14 | 3.5 | 17 | 0 |
+| stealthy | 241 | 79 s | 46 % | 39.4 | 0.16 | 0.28 | 0/221 | 21 | 3.1 | 14 | 0 |
+| mixed | 260 | 0 s | 0 % | 47.5 | 0.22 | 0.36 | 0/240 | 23 | 5.8 | 30 | 0 |
+| diplomat | 260 | 0 s | 0 % | 40.6 | 0.22 | 0.39 | 0/240 | 22 | 4.7 | 32 | 0 |
+| slacker | 105 | 0 s | 0 % | 43.5 | 0.20 | 0.28 | 0/85 | 16 | 5.0 | 28 | 0 |
+
+- Cible v1.1 temps mort : ✅ 13 s en moyenne (cible < 90 s)
+- Cible v1.1 similarité : ✅ 0 paire(s) de nuits consécutives au-dessus de 0.7 (cible : 0)
+- Anti-spam : ✅ 4.5 lignes par minute réelle en moyenne (cible ≤ 6, soit ~1 ligne / 10 s) ; 0 fois 3 ambiances d’affilée (cible : 0)
+
+Lignes les plus répétées (lignes vues au moins 2 fois dans une même campagne ; total de leurs occurrences sur ce passage) :
+- 260 × « Les Mal Lunés rentre enfin sa terrasse. Vous notez l’heure, par principe. »
+- 260 × « Plus une chaise dehors chez les Mal Lunés. Il aura fallu le temps. »
+- 250 × « WhatsApp : 3 pièce(s) partagée(s). Seb : « 😱 On imprime tout pour la commission ! » »
+- 242 × « Le standard soupire avant de décrocher. Vous l’avez entendu soupirer. Personne ne viendra. »
+- 241 × « Raclement de chaises sur les pavés : les Mal Lunés rentre sa terrasse… enfin. »
+- 238 × « Police : « Ah, c’est encore vous… On note, monsieur. » Personne ne viendra. »
+- 228 × « Des talons sur les pavés : clac, clac, clac, puis un juron, puis plus de clac. »
+- 228 × « Un homme cherche ses clés à la lumière de son téléphone, entre deux pavés. Il les trouve dans sa poche. »
+- 228 × « Police : « Monsieur, encore vous ? On a d’autres priorités. » Personne ne viendra. »
+- 227 × « Au bout de la rue, la lampe de Klaas s’allume. Il a entendu quelque chose. »
+- 226 × « Un touriste demande « la Grand-Place ? » à toute la terrasse. Six doigts pointent dans six directions. »
+- 221 × « « À la nôtre ! » Une table entière se lève pour trinquer. Les verres tintent jusqu’à votre fenêtre. »
+
 ## v1.1 + pacing (variantes, raclements regroupés, vie de la rue) · 2026-10-08 · main @ 250f53a
 
 20 campagnes par bot (graines 1000…1019).
