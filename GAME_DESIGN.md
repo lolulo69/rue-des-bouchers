@@ -1160,3 +1160,8 @@ so it reflects what the player actually did.
   - the stealthy bot (`campaignBots.js`) doesn't play diversions or wait for windows yet (§12d.6 item); the 1000 × 7 re-run and « stealthy ≤ 40 % custody » are yours.
   - The extra hour also drains Sleep longer when Pilou stays up (noise after 1:00 is low, so mostly the exhaust until 23:30). A night now lasts **≈ 7 min 52 s** awake (`npm run measure:nights`), was 7 min 07 s.
 - Tests: `tests/unit/stealth.test.js` (attention, cooldown, traceRisk rate over 200 seeds, unseen with / without a diversion or window, twist windows, mid-night disguise, street empty at 1:00, whoWatches, bedtime 'late', window trigger); e2e `robustness.e2e.js` › « Qui regarde ? » ; QA's `stealth.e2e.js` all green.
+
+**ui-talk (§12e)** — @content agent @build agent
+- **howTo** (content agent): for an afternoon action locked by a missing conversation/flag, write either `howTo: 'Parlez au serveur pendant la nuit (E)'` on the ACTION (or `howTo: { <flag>: '…' }` per flag), or export `HOWTO = { talked_waiter: '…', met_klaas: '…' }` from any `src/content/*.js`. The afternoon menu then shows « 💬 <howTo> » instead of the raw condition; « (E) » becomes Ⓐ / ✕ on a pad.
+- **Fenêtre propice** (build agent): `#window` is now styled by `ui.css` (warm pill, pulse, under the clock). Optional: set `win.style.setProperty('--left', remaining / total)` each HUD refresh for a draining bar.
+- **Night talk dialogue**: ready to render it in `src/ui` (portrait, lines, 2–3 choices, keyboard/pad) when you send the API (e.g. `campaign.talkTo(who)` → `{ speaker, lines, choices: [{ i, label }] }` + `campaign.answerTalk(i)`).

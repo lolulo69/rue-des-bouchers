@@ -53,6 +53,17 @@ export function explain(cond, c) {
 }
 
 // Toutes les actions d'après-midi, disponibles ou non, avec la raison.
+// « Comment l'obtenir » (§12e.3) : texte de l'auteur pour une condition qui est une conversation à avoir (ou un fait à
+// provoquer) : le champ `howTo` de l'action, ou une table HOWTO { drapeau: texte } exportée par un fichier de contenu.
+const HOWTO = Object.assign({}, ...Object.values(import.meta.glob('../content/*.js', { eager: true })).map((m) => m.HOWTO ?? {}));
+export function howToFor(a, c) {
+  const missing = (a.requires?.flags ?? []).filter((f) => !c.has(f));
+  if (!missing.length) return null;
+  if (typeof a.howTo === 'string') return a.howTo;
+  if (a.howTo && typeof a.howTo === 'object') return missing.map((f) => a.howTo[f]).find(Boolean) ?? null;
+  return missing.map((f) => HOWTO[f]).find(Boolean) ?? null;
+}
+
 export function afternoonMenu(c) {
   const S = c.state;
   const avail = new Set(c.availableActions().map((a) => a.id));
@@ -61,7 +72,12 @@ export function afternoonMenu(c) {
     let why = [];
     if (!avail.has(a.id)) {
       if (a.once && S.seen.actions.includes(a.id)) why = ['Déjà fait'];
-      else why = explain(a.requires, c);
+      else {
+        why = explain(a.requires, c);
+        // une conversation à avoir : on dit comment, à la place de la condition brute
+        const how = howToFor(a, c);
+        if (how) why = [`💬 ${how}`, ...why.filter((w) => !/^D’abord|^Il vous manque/.test(w))];
+      }
       if (!why.length && cost > S.timeLeft) why = [`Il faut ${cost} créneau${cost > 1 ? 'x' : ''} (reste ${S.timeLeft})`];
       if (!why.length) why = ['Indisponible pour le moment'];
     }
