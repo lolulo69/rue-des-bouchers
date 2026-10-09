@@ -320,12 +320,13 @@ async function runCampaign(page, key, style, album = null) {
     if (await page.locator('#fatal').isVisible()) throw new Error(`écran d’erreur fatale au jour ${s?.day} (${s?.step}) : ${(await page.locator('#fatal').innerText()).slice(0, 1500)}`);
     s = await state(page);
     if (!s) { await page.waitForTimeout(200); continue; }
-    if (s.step === 'ended') break;
+    // Le résultat d'une carte passe avant tout, même la fin (BUG-007 : le verdict du J14 s'affiche avant l'écran de fin)
     if (s.result) {
-      if (album) await album.snap(page, 'result');
+      if (album) await album.snap(page, s.step === 'ended' ? 'commission-verdict' : 'result', { mobile: s.step === 'ended' });
       await clickTestId(page, clock, '[data-testid=result-next]');
       continue;
     }
+    if (s.step === 'ended') break;
     if (s.step === 'cards') {
       if (album) await album.snap(page, s.card.id === 'd14_commission' ? 'commission' : `card-${s.card.type}`, { mobile: s.card.type === 'event' });
       await playCard(page, clock, style, log, s);
