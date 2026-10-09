@@ -514,6 +514,7 @@ export function buildWorld(scene, opts = {}) {
     aptCollide: flat.collide,
     homeScreen: flat.homeScreen,
     homeSeat: flat.homeSeat,
+    sofa: flat.sofa, // { position, seat, doze: { position, yaw, head }, box } — la sieste / nuit sur le canapé
     aptRooms: flat.rooms,
     emissiveMaterials,
     windowSpots: kit.windows,

@@ -78,6 +78,13 @@ export function buildApartment(city, scene, { F, bz, W }) {
   const sofa = M(0x7a8f7a);
   box(2.2, 0.42, 0.85, sofa, -5.6, F + 0.21, zb - 0.45); box(2.2, 0.45, 0.2, sofa, -5.6, F + 0.65, zb - 0.1);
   box(0.85, 0.42, 1.3, sofa, -6.5, F + 0.21, zb - 1.5); box(0.2, 0.45, 1.3, sofa, -6.85, F + 0.65, zb - 1.5);
+  // world.sofa : où Pilou s'écroule les soirs où il ne rejoint pas son lit (facteur qualité du sommeil)
+  const sofaSpot = {
+    position: new THREE.Vector3(-5.6, F, zb - 0.45), // centre de l'assise longue, au sol
+    seat: new THREE.Vector3(-5.6, F + 0.42, zb - 0.5), // assis, face au séjour (-z)
+    doze: { position: new THREE.Vector3(-5.5, F + 0.45, zb - 0.5), yaw: Math.PI / 2, head: new THREE.Vector3(-4.75, F + 0.55, zb - 0.5) }, // allongé le long du dossier, tête côté accoudoir est
+    box: { x0: -6.95, x1: -4.5, z0: zb - 2.15, z1: zb },
+  };
   for (const dx of [-0.5, 0.2]) box(0.45, 0.35, 0.12, M(0xe9c46a), -5.6 + dx, F + 0.62, zb - 0.28);
   box(2.2, 0.01, 1.6, M(0xc4614f), -5.4, F + 0.01, bz + 0.6);
   // LE bureau de Pilou, contre la façade, juste à côté de la fenêtre : deux écrans
@@ -181,5 +188,5 @@ export function buildApartment(city, scene, { F, bz, W }) {
     }
     return p;
   }
-  return { apt, bed, aptDoor, homeScreen, homeSeat, collide, light, rooms: { living: [xs, -7.0], corridor: [-7.0, xb], bedroom: [-9.5, -12.5], daughter: [-12.5, xb], bathroom: [-7.0, -9.5] } };
+  return { apt, bed, aptDoor, homeScreen, homeSeat, sofa: sofaSpot, collide, light, rooms: { living: [xs, -7.0], corridor: [-7.0, xb], bedroom: [-9.5, -12.5], daughter: [-12.5, xb], bathroom: [-7.0, -9.5] } };
 }

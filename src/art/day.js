@@ -148,18 +148,16 @@ async function streetScene() {
 async function homeScene(opts = {}) {
   const base = await streetScene(opts); // la rue de jour vit dehors (livraisons, terrasses qu'on installe…)
   const { world } = dayStreet;
-  const seat = world.homeSeat, screen = world.homeScreen;
+  const screen = world.homeScreen;
   const camera = new THREE.PerspectiveCamera(60, 16 / 9, 0.03, 160);
-  const eye = new THREE.Vector3(seat.x - 0.05, seat.y + 1.16, seat.z - 0.05);
-  const look = screen.position.clone().setY(screen.position.y - 0.04);
+  // caméra fixe, à 0,70 m de l’écran : à 1280×720 le terminal fait ~490×265 px (seuil UI 420×240), et le rectangle ne bouge pas
+  const eye = new THREE.Vector3(screen.position.x - 0.7, screen.position.y + 0.06, screen.position.z);
+  const look = screen.position.clone().setY(screen.position.y - 0.01);
+  camera.position.copy(eye); camera.lookAt(look);
   return {
     scene: base.scene, camera, screen,
     update(dt, t) {
       base.update(dt, t); // anime la rue (et sa caméra, qu'on n'utilise pas)
-      // de temps en temps, le regard file vers la fenêtre (distractions de la rue)
-      const glance = Math.max(0, Math.sin(t * 0.21) - 0.75) * 4;
-      camera.position.set(eye.x + Math.sin(t * 0.3) * 0.01, eye.y + Math.sin(t * 1.1) * 0.005, eye.z);
-      camera.lookAt(look.x, look.y + glance * 0.1, look.z - glance * 1.4);
     },
     dispose: base.dispose,
   };
