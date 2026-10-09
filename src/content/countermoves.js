@@ -185,7 +185,7 @@ export const COUNTERMOVES = [
     id: 'cm_free_drinks',
     title: 'Tournée générale (pour certains)',
     speaker: 'dede',
-    when: { day: [3, 12], phase: 'afternoon', stats: { asso: '>=30' }, notFlags: ['cm_free_drinks'] },
+    when: { day: [3, 12], phase: 'afternoon', stats: { asso: '>=30' }, notFlags: ['cm_free_drinks'], chance: 0.5 }, // Tatie ne flanche pas à chaque partie
     text: "Dédé offre « un petit genièvre aux voisins sympas ». Tatie Bouchon a accepté le sien, puis un deuxième, « par politesse ». Ce soir, elle trouve que « le monsieur jovial n’est pas si méchant, hein ».",
     effects: { asso: -6, setFlags: ['cm_free_drinks', 'tatie_wavering'] },
     once: true,

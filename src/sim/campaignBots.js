@@ -32,7 +32,7 @@ const flagWeights = (prefix) => ({
   carbonnade_1: -20, carbonnade_2: -30, carbonnade_3: -60, commission_lost: -20, ...prefix,
 });
 
-function make({ name, weights: w, legality, diversions = null, sideProjects = 1, jobFloor = 35, naps = () => 0, lazyWork = false, nightPolicy, nightContent, maxRisk = 100, continueFired = false, alsoLegal = [] }) {
+function make({ name, weights: w, legality, diversions = null, illegalFrom = 0, preferAllies = false, sideProjects = 1, jobFloor = 35, naps = () => 0, lazyWork = false, nightPolicy, nightContent, maxRisk = 100, continueFired = false, alsoLegal = [] }) {
   const W = (c) => (typeof w === 'function' ? w(c) : w);
   const allowed = (a, c) => (legality.includes(a.legality ?? 'legal') || alsoLegal.includes(a.id)) && (a.legality === 'legal' || c.state.stats.risk < maxRisk);
   return {
@@ -88,22 +88,27 @@ function make({ name, weights: w, legality, diversions = null, sideProjects = 1,
           if (!nightContent || s.state.sleeping) return [];
           const ACT = Object.fromEntries(camp.content.ACTIONS.map((a) => [a.id, a]));
           const avail = availableNightActions(s, camp).filter((x) => x.available).map((x) => [ACT[x.id], x]);
-          const wanted = avail.filter(([a]) => !a.diversion && allowed(a, camp) && nightScore(a, camp, s) > 0);
+          const early = s.state.min < illegalFrom; // pas d'acte gris / illégal avant l'heure choisie par le bot
+          const wanted = avail.filter(([a]) => !a.diversion && allowed(a, camp) && !(early && a.legality !== 'legal') && nightScore(a, camp, s) > 0);
           const now = wanted.filter(([a, x]) => nightContent(s, a, camp, x)).map(([a]) => a.id);
           if (now.length || !diversions) return now;
           // Ce qui vaudrait le coup si personne ne voyait (après une diversion)
-          const worth = avail.filter(([a]) => !a.diversion && a.legality !== 'legal' && allowed(a, camp) && nightScore(a, camp, s, true) > 0);
+          const worth = early ? [] : avail.filter(([a]) => !a.diversion && a.legality !== 'legal' && allowed(a, camp) && nightScore(a, camp, s, true) > 0);
           // §12d : un acte voulu mais vu ? la diversion la plus ciblée qui détourne ces témoins-là (puis la moins traçable), puis l'acte
           const divs = avail.filter(([d]) => d.diversion && diversions(d, camp)).map(([d]) => d)
             .sort((x, y) => x.diversion.turns.length - y.diversion.turns.length || (x.diversion.traceRisk ?? 0) - (y.diversion.traceRisk ?? 0));
-          // deux diversions ciblées valent parfois mieux qu'une large (le téléphone + la fausse alerte, plutôt que le pétard)
-          const pairs = divs.flatMap((x, i) => divs.slice(i + 1).map((y) => [x, y]))
-            .sort((p, q) => new Set([...p[0].diversion.turns, ...p[1].diversion.turns]).size - new Set([...q[0].diversion.turns, ...q[1].diversion.turns]).size);
+          // Une à trois diversions ciblées (le téléphone + un ami, plutôt que le pétard) : le moins de gens détournés possible,
+          // puis la trace la plus faible (les amis ne balancent pas). La première doit encore agir quand la dernière est prête.
+          const combos = [
+            ...divs.map((x) => [x]),
+            ...divs.flatMap((x, i) => divs.slice(i + 1).map((y) => [x, y])),
+            ...divs.flatMap((x, i) => divs.slice(i + 1).flatMap((y, j) => divs.slice(i + j + 2).map((z) => [x, y, z]))),
+          ].map((c) => ({ c, turns: [...new Set(c.flatMap((d) => d.diversion.turns))], trace: c.reduce((t, d) => t + (d.diversion.traceRisk ?? 0), 0), allies: c.filter((d) => d.id.startsWith('night_ally_')).length }))
+            .filter(({ c }) => c.slice(1).reduce((m, d) => m + (d.cost?.minutes ?? 0), 0) < (c[0].diversion.minutes ?? 0))
+            .sort((p, q) => p.turns.length - q.turns.length || (preferAllies ? q.allies - p.allies : 0) || p.trace - q.trace);
           for (const [a] of worth) {
-            const d = divs.find((dv) => unseen(s, a, camp, dv.diversion.turns));
-            const pair = pairs.find(([x, y]) => (x.diversion.minutes ?? 0) > (y.cost?.minutes ?? 0) && unseen(s, a, camp, [...x.diversion.turns, ...y.diversion.turns]));
-            if (pair && (!d || new Set([...pair[0].diversion.turns, ...pair[1].diversion.turns]).size < d.diversion.turns.length)) return [pair[0].id, pair[1].id, a.id];
-            if (d) return [d.id, a.id];
+            const best = combos.find(({ turns }) => unseen(s, a, camp, turns));
+            if (best) return [...best.c.map((d) => d.id), a.id];
           }
           return [];
         },
@@ -180,7 +185,7 @@ function recklessNight() {
   };
 }
 
-const MIXED = { dossier: 5, asso: 1.5, sleep: 0.5, risk: -3, hostility: -0.2, job: 0.3, legalEvidence: 8, illegalEvidence: 2, flags: flagWeights({ stance_legal: 20, tatie_fake_leak: 5, bloc_fooled: 5, lawyer_hired: 8, formal_notice: 8, delandre_requested: 6, delandre_meeting: 8 }), caution: 2 };
+const MIXED = { dossier: 5, asso: 1.5, sleep: 0.5, risk: -3, hostility: -0.2, job: 0.3, legalEvidence: 8, illegalEvidence: 2, flags: flagWeights({ stance_legal: 20, tatie_fake_leak: 5, bloc_fooled: 5, filmed_faces: 10, lawyer_hired: 8, formal_notice: 8, delandre_requested: 6, delandre_meeting: 8 }), caution: 2 };
 const MIXED_TIRED = { ...MIXED, sleep: 3 };
 const STEALTHY = { dossier: 1, risk: -2, hostility: 0.3, illegalEvidence: 3, anyFlag: 2, flags: flagWeights({ stance_direct: 15, disguise_hood: 20, disguise_vest: 20, waiter_bribed: 15, waiter_informant: 15, proj_wifi_cracker: 15, wifi_cracked: 15, kitchen_sabotaged: 25, laxative_done: 15, backroom_sneak: 30, camera_awning: 8, press_scandal: 20, sabotage_chairs: 12, sabotage_parasols: 12, sabotage_locks: 12, power_stolen: 12, stink_bomb: 8 }), caution: 2 };
 const STEALTHY_CAMERA = { ...STEALTHY, flags: { ...STEALTHY.flags, camera_awning: 14 } };
@@ -222,8 +227,8 @@ export const CAMPAIGN_BOTS = {
   }),
   stealthy: () => make({
     name: 'illégal discret', legality: ['illegal', 'grey'], sideProjects: 2, maxRisk: 40,
-    // La caméra sous le store : en fin de campagne (J9+) et casier vierge (Risque < 10), pour qu'elle filme la commission
-    weights: (c) => (c.state.day >= 9 && c.state.stats.risk < 10 ? STEALTHY_CAMERA : STEALTHY),
+    // La caméra sous le store : en fin de campagne (J9+) et casier léger (Risque < 20), pour qu'elle filme la commission
+    weights: (c) => (c.state.day >= 9 && c.state.stats.risk < 20 ? STEALTHY_CAMERA : STEALTHY),
     nightPolicy: stealthyNight(), nightContent: (sim, a, camp) => a.legality === 'legal' || unseen(sim, a, camp),
     diversions: (d, c) => c.state.stats.risk < 20,
     alsoLegal: ['pm_press_contact', 'pm_press_scandal', 'pm_waiter_testimony', 'night_ronde_jeremie'], // marchepieds légaux du plan illégal (la presse pour le scandale, le serveur retourné)
@@ -232,8 +237,11 @@ export const CAMPAIGN_BOTS = {
     name: 'mixte malin', legality: ['legal', 'grey', 'illegal'], sideProjects: 1, maxRisk: 40,
     weights: (c) => (c.state.stats.sleep < 40 ? MIXED_TIRED : MIXED), // fatigué : le sommeil passe avant la preuve
     naps: (c) => (c.state.stats.sleep < 35 && c.state.stats.job > 45 ? 1 : 0),
-    nightPolicy: legalNight({ asso: true }), nightContent: (sim, a, camp, x) => a.legality === 'legal' || (camp.state.stats.risk < 30 && unseen(sim, a, camp)),
-    diversions: (d, c) => d.legality === 'grey' && c.state.stats.risk < 20, // parfois : une diversion grise, casier presque vierge
+    // les actes gris / illégaux seulement avec l'Asso derrière soi (≥ 50) : c'est là que les amis peuvent aider (diversions alliées)
+    nightPolicy: legalNight({ asso: true }), nightContent: (sim, a, camp, x) => a.legality === 'legal' || (camp.state.stats.risk < 30 && camp.state.stats.asso >= 50 && unseen(sim, a, camp)),
+    diversions: (d, c) => d.legality === 'grey' && c.state.stats.risk < 20 && c.state.stats.asso >= 50,
+    illegalFrom: 21.5 * 60, // patient : à partir de 21h30, quand Jérémie et Biloute peuvent aider
+    preferAllies: true, // l'Asso derrière soi : on demande d'abord aux amis (Seb & Nico, Tatie, Jérémie) // parfois : une diversion grise, casier presque vierge
     continueFired: true,
   }),
   diplomat: () => make({

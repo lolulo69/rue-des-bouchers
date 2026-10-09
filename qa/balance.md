@@ -328,3 +328,36 @@ Stealthy custody **19 %** (≤ 40 ✅). The other bots are unchanged.
 Duration: no change to night length or clock values (the ×0.5 window clock is the build agent's).
 
 No dominant action (`--ablate mixed`, 500 runs, base 97 %): `pm_klaas_roster` −17, `pm_klaas_notebook` −14, `pm_press_contact` −7. Max 17 < 25 ✅ (41 actions incl. diversions).
+
+## 2026-10-09 · balance-stealth, addendum · the three ally diversions (coverage 80/80)
+Design agent's check at 2c55c77: `night_ally_seb_nico`, `night_ally_tatie` and `night_ally_jeremie` were never used by a bot (77/80).
+
+**Requirements checked (none impossible):**
+- Seb & Nico: `met_seb_nico` + Asso ≥ 50.
+- Jérémie: `joined_rounds` + Asso ≥ 40, 21:30–23:00 on a night with the round.
+- Tatie: `met_tatie` + Asso ≥ 40 + **not `tatie_wavering`**. That flag was set in almost every run (`cm_free_drinks` fires as soon as Asso ≥ 30 on days 3–12) and only cleared by the rare `r_tatie_proverb` (morning, Asso < 35, chance 0.25). → `cm_free_drinks` gets `chance: 0.5` (counter-move `when`): Dédé doesn't win Tatie over in every campaign.
+- Stealthy can't use the allies: §13.H wants its Asso low (~25).
+
+**Mixed bot:**
+- It does its grey / illegal acts only with the Asso behind it (≥ 50) and from 21:30 (when Jérémie and Biloute can help). Before, it planted the window camera at 20:30 on day 4 with Asso ~8, when no ally can help.
+- Among equally narrow diversion combinations it prefers asking friends (`preferAllies`). Strictly by cost, Tatie is dominated by the owner's delivery call (same person turned, trace 0.15 < 0.2, no Asso cost).
+- It wants to film the tables' faces for the press (`filmed_faces` 10).
+
+**All bots:** chains of up to three narrow diversions (fewest people turned, then lowest total trace risk; the first must still be running when the last is ready).
+**Stealthy:** plants the awning camera from day 9 while Risk < 20 (was < 10). Its Risk rose with the diversion play, so the camera, and the counter-move where the waiter finds it, had become too rare.
+
+Mixed per campaign: landline 1.1, window camera 1.0, film faces 1.0, **ally Jérémie 1.0, ally Seb & Nico 1.0, ally Tatie 0.2**, pizza 0.9.
+1000 × 7 (CT 106), invariants ✅, **80/80 actions, 28/28 events, 8/8 endings, 42/42 counter-moves**:
+
+| bot | custody | fired | legal_victory | moving_out | negotiated_peace | scandal | the_return | turncoat | score | sommeil | asso | risque | job | dossier | garde à vue (nuit méd.) | cibles §13.H |
+| passif | · | · | · | 100% | · | · | · | · | 0 | 48 | 40 | 0 | 97 | 12 | – | ✅ ≥ 90 % déménagement / défaite |
+| légal prudent | · | · | 51% | 3% | · | 46% | · | · | 83 | 57 | 74 | 0 | 99 | 50 | – | ✅ victoire légale 35–60 %<br>✅ jamais de garde à vue |
+| illégal imprudent | 100% | · | · | · | · | · | · | · | -20 | 65 | 0 | 96 | 31 | 14 | 5 | ✅ ≥ 70 % garde à vue / procès |
+| illégal discret | 18% | · | · | 39% | · | 36% | 7% | · | 26 | 20 | 25 | 58 | 80 | 30 | 8 | ✅ ≤ 40 % garde à vue<br>✅ scandale atteignable |
+| mixte malin | · | · | 89% | 4% | · | 7% | · | · | 94 | 30 | 65 | 5 | 75 | 55 | – | ✅ meilleur score moyen |
+| diplomate | · | · | · | 21% | 26% | 4% | 35% | 14% | 60 | 67 | 79 | 0 | 92 | 34 | – | ✅ paix négociée ≥ 40 % |
+| tire-au-flanc | · | 90% | 5% | 1% | · | 4% | · | · | 17 | 76 | 70 | 1 | 13 | 30 | – | ✅ licenciement atteignable (≥ 2 %, §13.F) |
+
+@content agents: `night_ally_tatie` is dominated by `night_owner_delivery_call` for a cost-minimising player. If she should be more than flavour, give her a small edge (trace 0, or a second witness she plausibly keeps busy).
+
+No dominant action (`--ablate mixed`, 500 runs, base 95 %): `pm_klaas_notebook` −14, `pm_tatie_emails` −11, `pm_klaas_roster` −9. Max 14 < 25 ✅ (47 actions).
