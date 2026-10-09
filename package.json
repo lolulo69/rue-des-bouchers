@@ -17,7 +17,8 @@
     "test:fullrun": "QA_FULLRUN=1 playwright test fullrun --workers=1",
     "qa:album": "QA_ALBUM=1 playwright test fullrun -g album --workers=1",
     "audit:fun": "node scripts/fun-audit.js",
-    "check:coherence": "node scripts/coherence-check.js"
+    "check:coherence": "node scripts/coherence-check.js",
+    "measure:nights": "node scripts/night-duration.js"
   },
   "keywords": [],
   "author": "Lucas Lefort",
