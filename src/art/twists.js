@@ -110,7 +110,7 @@ export function createTwists(scene, world, { onFrame, anim }) {
       g.add(mesh(B(0.5, 0.05, 0.05), M(0x2a2a2a), 0, -0.55, -0.25));
       g.add(mesh(B(1.7, 1.0, 0.08), M(0x111111), 0, 0, -0.05));
       g.add(mesh(new THREE.PlaneGeometry(1.6, 0.9), new THREE.MeshBasicMaterial({ map: tex }), 0, 0, 0));
-      const state = { home: 0, away: 0, flash: 0, acc: 0 };
+      const state = { home: 0, away: 0, flash: 0, acc: 0, msg: 'BUT !', col: 'rgba(255,210,63,0.9)' };
       const players = Array.from({ length: 12 }, (_, i) => ({ x: Math.random(), y: Math.random(), side: i % 2 }));
       const draw = (tt) => {
         const c = cv.getContext('2d');
@@ -121,7 +121,7 @@ export function createTwists(scene, world, { onFrame, anim }) {
         c.fillStyle = '#fff'; c.beginPath(); c.arc(128 + Math.sin(tt * 1.3) * 80, 77 + Math.cos(tt * 1.7) * 40, 2.5, 0, 7); c.fill();
         c.fillStyle = 'rgba(0,0,0,0.65)'; c.fillRect(0, 0, 256, 16);
         c.fillStyle = '#fff'; c.font = 'bold 12px Arial'; c.textAlign = 'center'; c.fillText(`LILLE ${state.home} – ${state.away} LENS`, 128, 12);
-        if (state.flash > 0) { c.fillStyle = 'rgba(255,210,63,0.9)'; c.font = '900 48px Arial'; c.fillText('BUT !', 128, 92); }
+        if (state.flash > 0) { c.fillStyle = state.col; c.font = `900 ${state.msg.length > 6 ? 34 : 48}px Arial`; c.fillText(state.msg, 128, 92); }
         tex.needsUpdate = true;
       };
       draw(0);
@@ -132,7 +132,10 @@ export function createTwists(scene, world, { onFrame, anim }) {
           if (state.flash > 0 && (state.flash -= dt) <= 0) for (const q of fans()) if (q.userData.rig.anim === 'cheer') setState(q, { anim: 'idle' });
         },
         trigger(m, o = {}) {
+          if (m === 'miss') { state.msg = 'RATÉ…'; state.col = 'rgba(200,220,255,0.9)'; state.flash = 6; return; }
+          if (m === 'final') { state.msg = 'VICTOIRE !'; state.col = 'rgba(255,210,63,0.95)'; state.flash = 40; for (const q of fans()) setState(q, { anim: 'cheer' }); return; }
           if (m !== 'goal') return;
+          state.msg = 'BUT !'; state.col = 'rgba(255,210,63,0.9)';
           if (o.away) state.away++; else state.home++;
           state.flash = 5;
           for (const q of fans()) setState(q, { anim: 'cheer' });
@@ -173,8 +176,8 @@ export function createTwists(scene, world, { onFrame, anim }) {
     busker: () => {
       const p = humanoid({ hair: 'bald', hairColor: 0x6b5b4b, mustache: 0x6b5b4b, shirt: 0x2b4d7a, pants: 0x3a3a3a, held: 'accordion', anim: 'accordion', talk: 0, expr: 'happy',
         extras: (add, k) => add('cyl', 'head', [0, 1.75 * k.r, 0], [1.9 * k.r, 0.35 * k.r, 1.9 * k.r], 0x2a2a2a) });
-      p.position.set(-W + 1.1, 0, bz - 1.4); p.rotation.y = Math.PI / 2 + 0.3;
-      const hat = new THREE.Group(); hat.position.set(-W + 1.6, 0, bz - 0.8);
+      p.position.set(-W + 2.7, 0, bz + 2.6); p.rotation.y = -Math.PI / 2 - 0.5; // au bord du couloir, entre la porte du n°10 et la terrasse, tourné vers la fenêtre
+      const hat = new THREE.Group(); hat.position.set(-W + 2.2, 0, bz + 3.2);
       hat.add(mesh(C(0.16, 0.12, 0.09, 12), M(0x2a2a2a), 0, 0.045, 0), mesh(C(0.22, 0.22, 0.015, 14), M(0x2a2a2a), 0, 0.005, 0));
       for (let i = 0; i < 6; i++) hat.add(mesh(C(0.02, 0.02, 0.004, 8), M(0xe8c45a, { metalness: 0.8, roughness: 0.3 }), (Math.random() - 0.5) * 0.15, 0.06, (Math.random() - 0.5) * 0.15));
       return handle('busker', [p, hat]);

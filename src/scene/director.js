@@ -9,6 +9,10 @@
 import * as THREE from 'three';
 import { CAST, customer, setState, bike as makeBike } from '../art/characters.js';
 import { FILM_MINUTES, PATROL_CAST } from './schedule.js';
+import { createStage, AMBIENT_STAGE } from './stage.js';
+import { createTwistLive } from './twistLive.js';
+import { STAGE_CUES } from './stageCues.js';
+import { AMBIENT } from '../content/night.js';
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
@@ -25,6 +29,22 @@ export function createDirector({ scene, world, art, audio }) {
   const props = new Map(); // clé → handle de art.props (accessoires pilotés par l'état)
   const state = { journalAt: 0, police: null, coffee: null, bribeDone: new Set(), films: [], waiterBreak: false, cleaning: false, exhaust: false };
   const home = new Map(Object.entries(cast).map(([id, p]) => [id, { pos: p.position.clone(), rot: p.rotation.y }]));
+  // ---------- mise en scène des lignes de nuit (§12e.6) ----------
+  const stage = createStage({ scene, world, art, audio });
+  world.stage = stage; // QA : __rdb.world.stage.play('scooter'), __rdb.world.playCue({ cue: 'npc:couple_argue' })
+  const twistLive = createTwistLive({ world, art, audio, stage }); // les twists en vrai, à leurs heures (§12e.2)
+  world.twistLive = twistLive; // QA
+  const ambientById = new Map((AMBIENT ?? []).map((a) => [a.id, a]));
+  // Joue un repère de ligne : 'cue' | { cue, at?, dur? } (src/scene/stageCues.js) ; twist:/event:/witness: → plus bas
+  world.playCue = (s) => playCue(s);
+  function playCue(s) {
+    const c = typeof s === 'string' ? { cue: s } : s;
+    if (!c?.cue) return null;
+    const def = STAGE_CUES[c.cue];
+    if (!def) return null; // motifs (twist:…, event:…, witness:…) : joués par leurs systèmes
+    if (def.status === 'stub') { console.debug?.(`stage : repère « ${c.cue} » pas encore mis en scène`); return null; }
+    return stage.play({ id: def.stage, ...(def.opts ?? {}), ...(c.at ? { at: c.at } : {}), ...(c.dur ? { dur: c.dur } : {}) });
+  }
 
   // ---------- acteurs créés à la demande ----------
   const standing = []; // { g, view }
@@ -101,8 +121,9 @@ export function createDirector({ scene, world, art, audio }) {
 
   // ---------- événements de la simulation ----------
   function onEvent(e) {
+    if (e.stage) playCue(e.stage); // une ligne (ou un événement) qui porte son repère de scène
     if (e.type === 'splash') art.fx.splash();
-    else if (e.type === 'twist-moment') { art.twists?.trigger(e.prop ?? null, e.moment, e); audio?.twistMoment?.(e); } // ex. { prop: 'tv_screen', moment: 'goal' }
+    // (les moments des twists se jouent à leur heure dans twistLive, d'après les données du twist)
     else if (e.type === 'art') {
       const pos = toV(e.pos);
       if (e.fx && e.fx !== 'exhaustBlocked') art.fx[e.fx]?.(pos ?? undefined); // la hotte bouchée suit l'état (update)
@@ -117,6 +138,12 @@ export function createDirector({ scene, world, art, audio }) {
     const J = sim.state.journal ?? [];
     for (; state.journalAt < J.length; state.journalAt++) {
       const j = J[state.journalAt];
+      // une ligne d'ambiance : son repère (content/night.js › AMBIENT[].stage), sinon celui de la bibliothèque
+      if (j.type === 'ambient' && j.id) {
+        const cue = ambientById.get(j.id)?.stage;
+        if (cue) playCue(cue);
+        else if (AMBIENT_STAGE[j.id]) stage.play(AMBIENT_STAGE[j.id]);
+      }
       // un acte filmé : les clients autour lèvent leur téléphone quelques minutes
       if (j.type === 'night-action' && j.filmed && j.pos) {
         const near = world.tables.filter((v) => Math.hypot(v.group.position.x - j.pos.x, v.group.position.z - j.pos.z) < 9);
@@ -232,14 +259,27 @@ export function createDirector({ scene, world, art, audio }) {
     const waiter = world.waiter;
     waiter.visible = sim.waiterOnDuty();
     const onBreak = waiter.visible && !!sim.waiterOnBreak?.(); // horaires : src/sim/schedule.js (les témoins les connaissent)
-    if (onBreak !== state.waiterBreak) {
-      state.waiterBreak = onBreak;
-      if (onBreak) art.anim.play('serveur', 'smoke', { move: false });
+    // Il marche jusqu'à son coin (rue de la Barre, hors de vue de la terrasse) en passant par l'angle, et revient pareil
+    const wp = sim.waiterPos(), H = sim.cfg.STREET.length / 2;
+    const wv = (state.waiterAt ??= V(wp.x, 0, wp.z)), target = V(wp.x, 0, wp.z);
+    const corner = V(Math.sign(wp.x || -1) * (W - 0.8), 0, -H + 0.6);
+    if (onBreak && wv.distanceTo(target) > 0.3) state.waiterAway = true;
+    let walking = false;
+    if (state.waiterAway && wv.distanceTo(target) < 40) {
+      const round = (target.z < -H) !== (wv.z < -H) && wv.distanceTo(corner) > 0.3; // on passe l'angle d'abord
+      const goal = round ? corner : target, step = goal.clone().sub(wv), L = step.length();
+      if (L > 0.05) { wv.addScaledVector(step, Math.min(1, (1.5 * dt) / L)); waiter.rotation.y = Math.atan2(step.x, step.z); walking = true; }
+      if (!onBreak && wv.distanceTo(target) < 0.3) state.waiterAway = false;
+    } else { wv.copy(target); state.waiterAway = false; }
+    waiter.position.copy(wv);
+    const smoking = onBreak && !walking;
+    if (smoking !== state.waiterBreak) {
+      state.waiterBreak = smoking;
+      if (smoking) art.anim.play('serveur', 'smoke', { move: false });
       else art.anim.stop('serveur', { place: false });
     }
-    const wp = sim.waiterPos();
-    waiter.position.set(wp.x, 0, wp.z);
-    waiter.rotation.y = onBreak ? (wp.x < 0 ? Math.PI / 2 : -Math.PI / 2) : Math.cos(min * sim.cfg.ANCHORS.waiter.speed) > 0 ? 0 : Math.PI;
+    if (smoking) waiter.rotation.y = 0; // adossé au mur de la rue de la Barre, face à la rue
+    else if (!walking) waiter.rotation.y = Math.cos(min * sim.cfg.ANCHORS.waiter.speed) > 0 ? 0 : Math.PI;
 
     // Ghislain frotte le store sur son escabeau en début de soirée
     const cleaning = !!sim.ghislainCleaning?.();
@@ -308,7 +348,8 @@ export function createDirector({ scene, world, art, audio }) {
 
     // La hotte : vapeur jusqu'à l'arrêt de la cuisine ; carton = fumée qui ressort par la cuisine
     const { NOISE } = sim.cfg;
-    world.steam.intensity = min < NOISE.exhaustOffMinute ? 1 : Math.max(0, world.steam.intensity - dt * 0.3);
+    const twNow = sim.twist ?? S.twist ?? null, fullSteam = (twNow?.props ?? []).some((p) => (p?.id ?? p) === 'exhaust_full_steam');
+    world.steam.intensity = S.exhaustOff ? Math.max(0, world.steam.intensity - dt * 0.5) : min < NOISE.exhaustOffMinute ? (fullSteam ? 1.5 : 1) : Math.max(0, world.steam.intensity - dt * 0.3);
     world.steam.update(dt);
     const blocked = !!S.exhaustBlocked && min < NOISE.exhaustOffMinute;
     if (blocked !== state.exhaust) { state.exhaust = blocked; art.fx.exhaustBlocked(blocked); }
@@ -323,7 +364,7 @@ export function createDirector({ scene, world, art, audio }) {
 
     // Twist de la nuit (§12b.A) : les accessoires listés par le contenu (sim.twist.props)
     const tw = sim.twist ?? S.twist ?? null;
-    art.twists?.sync(tw?.props ?? []);
+    twistLive.update(tw, min);
     // L'audio de la nuit : sons du twist, hotte (arrêtée / à fond / bouchée par le carton), coupure de courant
     const full = tw?.props?.includes('exhaust_full_steam') ? 1.3 : 1;
     audio?.street?.({ twist: tw?.id ?? null, exhaust: S.exhaustOff ? 0 : world.steam.intensity * full * (blocked ? 0.6 : 1), darkness: S.darkness ?? 0 });
@@ -338,12 +379,14 @@ export function createDirector({ scene, world, art, audio }) {
       state.films.splice(i, 1);
     }
     world.gameMinutes = min; // horloge du jeu pour l'audio (cloche de 22h)
+    stage.update(dt); // en dernier : une scène peut emprunter un acteur que la sim vient de placer
   }
 
   return {
     update,
     onEvent,
     hitTargets: () => [...pees.filter((v) => v.p.visible).map((v) => v.hit), ...officers.filter((o) => o.p?.visible).map((o) => o.hit)],
+    stage, playCue, // QA : director.stage.play('scooter'), director.playCue({ cue: 'npc:couple_argue' })
     toggleLegalView: () => { if (ghost) ghost.visible = !ghost.visible; return ghost?.visible ?? false; },
     get legalView() { return ghost?.visible ?? false; },
     props,
