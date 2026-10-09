@@ -164,3 +164,17 @@ export const OBJECTIVES = [
   { id: 'o_gen_dossier', stance: 'legal', priority: 2, when: { day: [5, 12], stats: { dossier: '<20' } }, done: { event: 'dossier_opened' },
     text: 'Le dossier est maigre pour la commission. Ouvrez-le (Tab) : qu’est-ce qui manque ?' },
 ];
+
+// ════════════════════════════════════════════════════════════════════════════
+// CONSEIL « AU LIT » (§12c.5, bloc de l'agent build) : après 22h30, quand l'essentiel est fait (why: 'done') ou dès que
+// le Sommeil est bas (why: 'tired'). Le moteur (src/sim/objectives.js bedtimeHint) en montre un au plus toutes les
+// ~20 minutes de jeu, en dernière ligne des « Objectifs du soir » ; le jeu ajoute la touche (E / Ⓐ) et la direction du lit.
+// ════════════════════════════════════════════════════════════════════════════
+export const BEDTIME = [
+  { id: 'bed_done_dossier', why: 'done', text: 'Dossier à jour : au lit. La rue continuera sans vous.' },
+  { id: 'bed_done_enough', why: 'done', text: 'Vous avez fait votre part ce soir. La chambre côté cour vous attend.' },
+  { id: 'bed_done_klaas', why: 'done', text: 'Klaas veille encore à sa fenêtre : vous pouvez dormir, lui note tout.' },
+  { id: 'bed_tired_fall', why: 'tired', text: 'Vous tombez de sommeil : allez vous allonger, même mal, même tard.' },
+  { id: 'bed_tired_eyes', why: 'tired', text: 'Les yeux qui piquent, la nuque qui lâche. Le lit, maintenant ?' },
+  { id: 'bed_tired_tomorrow', why: 'tired', text: 'Demain, Koddex vous attend à 9h. Une heure de sommeil vaut une photo.' },
+];

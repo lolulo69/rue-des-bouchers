@@ -15,6 +15,10 @@ export const RULES = {
   // va se passer (patrouille en route ou sur place, moment de twist / événement de nuit dans les lookahead minutes,
   // témoin / preuve / action dans les calmMinutes dernières minutes). « Accélérer » (manuel) : ×fastScale dès 20h30.
   clock: { fastAfter: 22 * 60 + 30, fastScale: 3, lookahead: 10, calmMinutes: 5, easeSeconds: 1.2 },
+  // Conseil « au lit » (§12c.5, objectives.js bedtimeHint) : après `after`, quand tout est fait ou Sommeil ≤ tiredSleep ;
+  // visible `show` minutes de jeu, au plus une fois toutes les `every` minutes
+  bedtime: { after: 22 * 60 + 30, tiredSleep: 25, show: 8, every: 20 },
+  objectives: { max: 4, maxInfo: 1 },
 };
 
 // Variantes de soirée (?day=sat). Le lundi est la soirée de référence.

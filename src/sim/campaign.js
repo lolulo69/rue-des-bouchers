@@ -18,6 +18,8 @@ import { normalizeContent } from './content.js';
 import { pickTwist, nightTwist } from './twists.js';
 import { createUnlocks } from './unlocks.js';
 import { performNightAction } from './nightActions.js';
+import { pickObjectives, matchDone, journalEvents, bedtimeHint } from './objectives.js';
+import { evalCondition } from './conditions.js';
 import { fmt } from './time.js';
 
 import { SAVE_VERSION, migrateSave, sanitizeSave } from './saveMigrations.js';
@@ -106,6 +108,8 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
   const shown = (id) => { S.lastShown[id] = S.day; };
   // Événements de nuit : joués pendant la nuit 3D à leur heure (`at`), plus en cartes avant 20h30 (c.nightEventDue)
   S.nightEvents ??= [];
+  // Objectifs du soir (§12c.5) : { day, ids, done } de la nuit en cours (ou de la dernière, pour le bilan)
+  S.objectives ??= null;
   // Ensemble des drapeaux, mis en cache (les conditions sont évaluées très souvent) ; invalidé à chaque modification
   let flagSet = null;
   const flags = () => (flagSet ??= new Set(S.flags));
@@ -500,6 +504,57 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
   };
   c.tonightTwist = () => c.twistTonight(); // nom utilisé par src/ui
 
+  // ---------- objectifs du soir (§12c.5, src/sim/objectives.js, src/content/objectives.js) ----------
+  // c.tonightObjectives() → [{ id, text, stance, info, done }] : choisis à l'entrée de la nuit (2 à 4), cochés au fil de la nuit
+  // par c.objectivesTick(sim) (journal + drapeaux) et c.objectiveEvent(nom, charge) (événements du jeu 3D, tutoEvent).
+  const POLICE_CFG = cfg.POLICE;
+  const onDutyTonight = () => {
+    const shift = POLICE_CFG.roster[c.weekday()] ?? POLICE_CFG.roster.mon;
+    return [...new Set(shift.map((id) => (id === 'lemaire' && S.police.lemaireTransferred ? 'benali'
+      : id === 'benali' && S.police.benaliTransferred ? (S.police.lemaireTransferred ? 'chief' : 'lemaire') : id)))];
+  };
+  const OBJ = byId(K.OBJECTIVES ?? []);
+  const objDone = (id) => S.objectives.done.includes(id);
+  const tickObjective = (o) => {
+    if (objDone(o.id)) return false;
+    S.objectives.done.push(o.id);
+    c.note('objective', { id: o.id });
+    return true;
+  };
+  const objList = () => (S.objectives?.ids ?? []).map((id) => OBJ[id]).filter(Boolean);
+  c.tonightObjectives = () => {
+    if (S.phase === 'night' && S.objectives?.day !== S.day && !c.ended) {
+      const orng = createRng((S.seed ^ Math.imul(S.day, 0x9e3779b1)) >>> 0); // à part : n'use pas le hasard de la campagne
+      const ctx = {
+        check: (cond) => evalCondition(cond, c.ctx(), orng),
+        twist: c.twistTonight()?.id ?? null,
+        newTools: S.journal.filter((e) => e.type === 'unlock' && e.day === S.day).map((e) => e.id),
+        onDuty: onDutyTonight(),
+      };
+      S.objectives = { day: S.day, ids: pickObjectives(K.OBJECTIVES ?? [], ctx, cfg.RULES.objectives ?? {}).map((o) => o.id), done: [] };
+    }
+    return objList().map((o) => ({ id: o.id, text: o.text, stance: o.stance, info: !o.done, done: objDone(o.id) }));
+  };
+  // Un événement du jeu (tutoEvent) : → objectifs cochés à l'instant [{ id, text }]
+  c.objectiveEvent = (name, payload = {}) => {
+    if (!S.objectives || S.objectives.day !== S.day) return [];
+    const ev = { ...payload, name };
+    return objList().filter((o) => o.done && !o.done.flag && matchDone(o.done, ev) && tickObjective(o)).map((o) => ({ id: o.id, text: o.text }));
+  };
+  // La nuit (journal depuis le dernier passage) et les drapeaux : → objectifs cochés à l'instant
+  c.objectivesTick = (sim) => {
+    if (!S.objectives || S.objectives.day !== S.day) return [];
+    const { events, cursor } = journalEvents(sim, sim.objectivesCursor ?? 0);
+    sim.objectivesCursor = cursor;
+    const out = events.flatMap((ev) => c.objectiveEvent(ev.name, ev));
+    for (const o of objList()) if (o.done?.flag && c.has(o.done.flag) && tickObjective(o)) out.push({ id: o.id, text: o.text });
+    return out;
+  };
+  // Conseil « au lit » (§12c.5) : { id, why, text } ou null ; busy = nightClock.busyReason (rien d'imminent)
+  c.bedtimeHint = (sim, { busy = null } = {}) => bedtimeHint(sim, {
+    objectives: c.tonightObjectives(), busy, hints: K.BEDTIME ?? [], mem: (sim.bedtimeMemory ??= {}),
+  });
+
   // ---------- tutoriels pratiques des outils de nuit (v1.1, §12b.B, src/content/tutorials.js) ----------
   // trigger : { night: n, after?, where? } (la n-ième nuit jouée) ou { unlock: id, after?, where? } (dès que l'outil est acquis).
   // Le jeu (game.js) affiche la marque, appelle tutorialSeen à la 1re apparition (l'horloge se fige quelques secondes),
@@ -620,6 +675,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     sim.contentActions = [];
     if (c.has('proj_db_logger')) autoDbLogger(sim);
     c.note('night-start', { reversal });
+    c.tonightObjectives(); // §12c.5 : choisis au plus tard à l'entrée de la nuit
     return sim;
   };
   // Démon Rust de relevé (proj_db_logger) : à chaque pas de la nuit, un relevé horodaté à la fenêtre de Pilou
@@ -684,6 +740,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
   c.finishNight = (sim) => {
     if (S.step !== 'night') throw new Error(`fin de nuit hors de la nuit (${S.step})`);
     const N = sim.state;
+    c.objectivesTick(sim); // §12c.5 : ce qui s'est fait cette nuit, même sans le jeu 3D (bots, nuit passée)
     S.nightEvents = [];
     S.nightCount++;
     S.pacingMemory = sim.pacing?.memory() ?? S.pacingMemory ?? null;

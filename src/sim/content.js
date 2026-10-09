@@ -1,6 +1,6 @@
 // Chargement du contenu narratif (src/content/*.js, §14). Le moteur ne fait que normaliser :
 // accepte un objet { FLAGS, CHARACTERS, DIALOGUE, EVENTS, ACTIONS, COUNTERMOVES, KODDEX, ENDINGS } ou une liste de modules.
-const KEYS = ['FLAGS', 'CHARACTERS', 'DIALOGUE', 'EVENTS', 'ACTIONS', 'COUNTERMOVES', 'KODDEX', 'ENDINGS', 'MEDIA', 'INTRO_CARDS', 'TUTORIAL', 'PROMPTS_PER_MORNING', 'WHATSAPP_GROUP', 'PLACES', 'TWISTS', 'UNLOCKS', 'WORKDAYS', 'TOOL_TUTORIALS', 'TUTORIAL_EVENTS'];
+const KEYS = ['FLAGS', 'CHARACTERS', 'DIALOGUE', 'EVENTS', 'ACTIONS', 'COUNTERMOVES', 'KODDEX', 'ENDINGS', 'MEDIA', 'INTRO_CARDS', 'TUTORIAL', 'PROMPTS_PER_MORNING', 'WHATSAPP_GROUP', 'PLACES', 'TWISTS', 'UNLOCKS', 'WORKDAYS', 'TOOL_TUTORIALS', 'TUTORIAL_EVENTS', 'OBJECTIVES', 'BEDTIME'];
 // night.js : textes de la nuit (aboiements, cloche, carnet de Klaas…), regroupés sous NIGHT
 const NIGHT_KEYS = ['BARKS', 'BELL', 'KLAAS_NOTEBOOK', 'NIGHT_END', 'POLICE_LINES', 'RECAP_HEADLINES', 'WAITER_LINES', 'WITNESS_LINES'];
 
@@ -30,6 +30,8 @@ export function normalizeContent(modules) {
     UNLOCKS: merged.UNLOCKS ?? [],   // v1.1 : outils progressifs (src/content/unlocks.js)
     TOOL_TUTORIALS: merged.TOOL_TUTORIALS ?? [], // v1.1 : tutoriels pratiques des outils de nuit (tutorials.js)
     TUTORIAL_EVENTS: merged.TUTORIAL_EVENTS ?? {},
+    OBJECTIVES: merged.OBJECTIVES ?? [], // §12c.5 : objectifs du soir (objectives.js)
+    BEDTIME: merged.BEDTIME ?? [],       // §12c.5 : conseil « au lit »
     WORKDAYS: { commute: [], office: [], home: { distractions: [], calls: [] }, koddex: { office: [], home: [] }, ...(merged.WORKDAYS ?? {}) },
     WHATSAPP_GROUP: merged.WHATSAPP_GROUP,
     PLACES: merged.PLACES,
