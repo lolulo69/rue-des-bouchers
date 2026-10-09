@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
-  test:
+  unit:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -25,21 +25,50 @@ jobs:
         run: npm test
       - name: Bundle size (< 3 MB, §13.I)
         run: npm run check:bundle
-      - name: Campaign simulator smoke (6 bots, invariants)
+      - name: Campaign simulator smoke (bots, invariants)
         run: npm run sim -- --runs 20
+
+  e2e:
+    # The e2e suite outgrew one 30-minute job: 4 parallel shards
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
-      - name: E2E smoke (build + vite preview + headless Chromium)
-        run: npm run test:e2e
-        env:
-          CI: true
-      - name: Perf (frame time Saturday street, load < 5 s; 60 fps is a warning on SwiftShader)
-        run: npm run test:perf
+      - name: E2E (build + vite preview + headless Chromium), shard ${{ matrix.shard }}/4
+        run: npx playwright test --shard=${{ matrix.shard }}/4
         env:
           CI: true
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: e2e-screenshots
+          name: e2e-screenshots-${{ matrix.shard }}
           path: test-results/
           if-no-files-found: ignore
+
+  perf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Perf (frame time Saturday street, load < 5 s; 60 fps is a warning on SwiftShader)
+        run: npm run test:perf
+        env:
+          CI: true
