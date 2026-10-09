@@ -308,6 +308,18 @@ Checklist additions (v1.1) are in §13.J.
 4. **The night action menu is hard to understand**: rework it so it's obvious what you can do *here and now* and why other
    things aren't possible (where to go / what's needed), with legality, risk and time cost readable at a glance, and a coach mark.
 
+5. **The night drags after ~22:30** (« pas grand-chose à faire, ou je rate des choses ») **and sleeping is too slow.**
+   - **Adaptive night clock**: normal speed until ~22:30; afterwards the clock runs ×3 *unless* something is happening or
+     imminent (a patrol on its way, a twist moment or night event within the next 10 game minutes, a witness situation, the
+     player in a menu/action), where it eases back to normal. A small « ⏩ » indicator shows the acceleration. A key
+     (and pad button) toggles « accélérer » manually at any time.
+   - **Sleep**: ×12 becomes ×40, with a dim « Pilou dort… » overlay that still shows what wakes him (noise peaks), and a
+     « Passer à demain matin » button that resolves the rest of the night instantly (same sim, fast-forwarded).
+   - **« Ce soir » briefing**: at night start, under the twist card, 2–4 concrete, state-aware suggestions for tonight
+     (« Nouveau : la caméra à la fenêtre », « Colette dîne à la table 2 : 8 couverts, à photographier », « 22h : la ronde avec
+     Jérémie », « Lemaire est de service : la police risque de prendre un café »), and an « Objectifs du soir » list in the HUD
+     that ticks itself as they're done. Data in src/content/objectives.js (§14 style); the engine picks them.
+
 ## 13. v1.0 acceptance checklist
 v1.0 ships only when **every** box is ticked. Nothing is dropped silently: anything cut or simplified is listed under "Deviations" with Lucas's OK.
 Proof: **T** = automated test (vitest / Playwright / campaign simulator, runs in CI) · **Q** = design agent's QA session in Chrome (screenshots in `qa/`) · **L** = Lucas playtest.
@@ -392,6 +404,10 @@ The campaign simulator plays 1000 seeded campaigns per strategy bot. Targets:
 
 ### L. Text ↔ state coherence (Lucas, playtest 1)
 - [ ] Every line shown (barks, Klaas, police, twist events, recap, dialogue, media) is consistent with the simulation state at the moment it's shown: no « en terrasse » when no table is out, no « les tables rentrent » when they're already in, no daytime line at night, no line about someone absent, twist props/tables obey what the text says (the Fête des voisins tables go home at 22:00). Lines carry state guards; a checker scans 200 seeded campaigns and reports 0 mismatches. **T Q L**
+
+### M. Night pacing (playtest 1)
+- [ ] Adaptive night clock (×3 after 22:30 unless something is happening/imminent, ⏩ indicator, manual toggle) and faster sleep (×40 + « Passer à demain matin »); campaign duration re-measured. **T Q L**
+- [ ] « Ce soir » briefing + « Objectifs du soir » HUD list, state-aware, self-ticking. **T Q L**
 
 ### Release tasks (done by the design agent when v1.0 lands)
 - [ ] Set `WHATSAPP_GROUP` in `src/content/characters.js` to **« La Gaystapo »** (Lucas's choice: the real group's own name).
