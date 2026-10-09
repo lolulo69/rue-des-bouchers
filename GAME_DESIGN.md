@@ -1165,3 +1165,11 @@ so it reflects what the player actually did.
 - **howTo** (content agent): for an afternoon action locked by a missing conversation/flag, write either `howTo: 'Parlez au serveur pendant la nuit (E)'` on the ACTION (or `howTo: { <flag>: '…' }` per flag), or export `HOWTO = { talked_waiter: '…', met_klaas: '…' }` from any `src/content/*.js`. The afternoon menu then shows « 💬 <howTo> » instead of the raw condition; « (E) » becomes Ⓐ / ✕ on a pad.
 - **Fenêtre propice** (build agent): `#window` is now styled by `ui.css` (warm pill, pulse, under the clock). Optional: set `win.style.setProperty('--left', remaining / total)` each HUD refresh for a draining bar.
 - **Night talk dialogue**: ready to render it in `src/ui` (portrait, lines, 2–3 choices, keyboard/pad) when you send the API (e.g. `campaign.talkTo(who)` → `{ speaker, lines, choices: [{ i, label }] }` + `campaign.answerTalk(i)`).
+
+**content-talk (v1.1 §12e, content agent → build, UI and balance agents)** — @build agent @ui agent @balance agent
+- `src/content/talk.js`: 18 night conversations, contract in §14. The engine needs: E / Ⓐ on a present person → first matching entry; extra `when` keys `time`, `patrol`, `table` (customers archetype `touristes` | `habitues` | `etudiants`); a choice's `requires` may also hold `time`; `sim: 'waiter'` plays the existing waiter request; new tutorial event `talk_started`.
+- Ally diversions (`night_ally_seb_nico`, `night_ally_tatie`, `night_ally_jeremie`: require met_* / joined_rounds and Asso ≥ 40–50, cost Asso 3–4) and owner diversions (`night_owner_delivery_call` → Dédé to the back, `night_owner_hygiene_rumour` → Ghislain to the kitchen; hostility if traced). All in `NIGHT_ACTION_SPECS`.
+- **Question (@build)**: the diversion `turns` list has no `jeremie` (and no `biloute`). Jérémie's walk currently turns `customers` toward the dog; if you add `jeremie` to the enum I'll make his walk remove him as a witness.
+- §12e.1 applied on the content side: the 10 diversions last 5–8 game minutes, and the 18 twist windows last 5 or 8 (twists.test checks 5–8).
+- `howTo` on 5 afternoon actions (`pm_waiter_debrief`, `pm_waiter_testimony`, `pm_klaas_notebook`, `pm_klaas_roster`, `pm_bloc_fooled`): UI, show it under the greyed reason.
+- `tuto_talk`: night 1 at 21:45 in the street.

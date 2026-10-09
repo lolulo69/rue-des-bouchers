@@ -42,7 +42,7 @@ describe('twists.js', () => {
     // §12d : fenêtres naturelles { at, minutes, turns, text }, dans la nuit, témoins connus du contrat
     for (const w of t.sim.windows ?? []) {
       expect(w.at >= 20 * 60 + 30 && w.at <= 26 * 60 + 30, `${id} : fenêtre à ${w.at}`).toBe(true);
-      expect(w.minutes > 0 && w.minutes <= 5, `${id} : durée de fenêtre`).toBe(true);
+      expect(w.minutes >= 5 && w.minutes <= 8, `${id} : durée de fenêtre (§12e.1 : 5–8 min)`).toBe(true);
       for (const x of w.turns) expect(['klaas', 'seb_nico', 'waiter', 'dede', 'ghislain', 'customers', 'patrol'], `${id} : ${x}`).toContain(x);
       expect(w.text.length > 0 && w.text.length <= 100, `${id} : texte de fenêtre`).toBe(true);
     }

@@ -77,6 +77,11 @@ export const NIGHT_ACTION_SPECS = {
   night_fake_alert: { at: 'street', window: [H(20, 30), H(24, 30)], repeat: true },
   night_wrong_pizza: { at: 'street', window: [H(20, 30), H(24)], needs: 'terraceOut', repeat: true },
   night_biloute_bark: { at: 'street', window: [H(21, 30), H(23)], needs: 'roundTonight', repeat: true, art: { fx: 'barkPuff' } },
+  night_ally_seb_nico: { at: 'street', window: [H(20, 30), H(24, 30)], repeat: true },
+  night_ally_tatie: { at: 'street', window: [H(20, 30), H(24)], repeat: true },
+  night_ally_jeremie: { at: 'street', window: [H(21, 30), H(23)], needs: 'roundTonight', repeat: true },
+  night_owner_delivery_call: { at: 'street', window: [H(20, 30), H(24)], repeat: true },
+  night_owner_hygiene_rumour: { at: 'street', window: [H(20, 30), H(23)], needs: 'kitchenOpen', repeat: true },
   night_disguise: { at: 'apartment', window: [H(20, 30), H(26, 30)] },
   night_disguise_vest: { at: 'apartment', window: [H(20, 30), H(26, 30)] },
 };

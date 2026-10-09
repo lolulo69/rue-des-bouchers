@@ -49,6 +49,15 @@ export const TOOL_TUTORIALS = [
     congrats: 'Le meilleur point de vue de la rue. Et le plus bruyant.',
   },
   {
+    id: 'tuto_talk',
+    tool: 'talk',
+    trigger: { night: 1, after: 21 * 60 + 45, where: 'street' },
+    steps: [
+      { text: 'Approchez quelqu’un et appuyez sur {key} / {pad} pour parler : Jérémie et son teckel, le serveur, une table.', key: 'E', pad: 'A', done: 'talk_started' },
+    ],
+    congrats: 'Vous parlez aux gens. Dans cette rue, c’est souvent comme ça que tout commence.',
+  },
+  {
     id: 'tuto_waiter',
     tool: 'waiter',
     trigger: { night: 1, after: 22 * 60 + 5, where: 'street' },
@@ -315,6 +324,7 @@ export const TUTORIAL_EVENTS = {
   legal_view_toggled: 'la vue des zones légales a été activée (L / LT)',
   corridor_measured: 'un débordement sur le couloir a été mesuré (photo dans la rue, < 5 m)',
   bed_tried: 'le joueur s’est mis au lit (E / A près du lit)',
+  talk_started: 'une conversation a été ouverte avec quelqu’un dans la nuit (E / A, talk.js)',
   who_watches_seen: 'l’indicateur « Qui regarde ? » a été affiché au moins 3 s dans la rue',
   window_seen: 'une « Fenêtre propice » d’un twist a commencé (HUD affiché)',
 };
