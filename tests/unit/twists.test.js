@@ -5,7 +5,7 @@ import { FLAGS } from '../../src/content/flags.js';
 import { ACTIONS } from '../../src/content/actions.js';
 import { MEDIA } from '../../src/content/media.js';
 
-const SIM_KEYS = ['crowd', 'noise', 'closeDelay', 'tables', 'witnesses', 'darkness', 'rain', 'exhaustOff', 'corridorBlocked', 'events', 'opportunities', 'dog'];
+const SIM_KEYS = ['crowd', 'noise', 'closeDelay', 'tables', 'witnesses', 'darkness', 'rain', 'exhaustOff', 'corridorBlocked', 'events', 'opportunities', 'dog', 'windows'];
 const GAMEPLAY = ['crowd', 'noise', 'closeDelay', 'tables', 'witnesses', 'darkness', 'rain', 'exhaustOff', 'corridorBlocked'];
 const NIGHT = [20 * 60 + 30, 25 * 60 + 30];
 const FIXED_DAYS = [4, 6, 9, 10, 11, 13];
@@ -39,6 +39,13 @@ describe('twists.js', () => {
     expect(t.title, id).toBeTruthy();
     expect(t.intro.length, `${id} intro`).toBeLessThanOrEqual(300);
     expect(Object.keys(t.sim).every((k) => SIM_KEYS.includes(k)), `${id} : clés sim`).toBe(true);
+    // §12d : fenêtres naturelles { at, minutes, turns, text }, dans la nuit, témoins connus du contrat
+    for (const w of t.sim.windows ?? []) {
+      expect(w.at >= 20 * 60 + 30 && w.at <= 26 * 60 + 30, `${id} : fenêtre à ${w.at}`).toBe(true);
+      expect(w.minutes > 0 && w.minutes <= 5, `${id} : durée de fenêtre`).toBe(true);
+      for (const x of w.turns) expect(['klaas', 'seb_nico', 'waiter', 'dede', 'ghislain', 'customers', 'patrol'], `${id} : ${x}`).toContain(x);
+      expect(w.text.length > 0 && w.text.length <= 100, `${id} : texte de fenêtre`).toBe(true);
+    }
     expect(GAMEPLAY.some((k) => t.sim[k] !== undefined) || (t.sim.events ?? []).some((e) => e.simEffect), `${id} : la nuit change`).toBe(true);
     for (const e of t.sim.events ?? []) {
       expect(e.at, `${id} heure`).toBeGreaterThanOrEqual(NIGHT[0]);

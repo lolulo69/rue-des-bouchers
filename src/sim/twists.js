@@ -5,7 +5,8 @@
 import { evalCondition } from './conditions.js';
 
 // Champs de `sim` compris par le moteur (le linter signale les autres)
-export const TWIST_SIM_KEYS = ['crowd', 'noise', 'closeDelay', 'tables', 'witnesses', 'darkness', 'rain', 'exhaustOff', 'corridorBlocked', 'events', 'opportunities', 'dog'];
+// 'windows' (§12d, contrat §14) : fenêtres naturelles d'inattention, déclarées par le contenu ; le moteur les lit (agent build).
+export const TWIST_SIM_KEYS = ['crowd', 'noise', 'closeDelay', 'tables', 'witnesses', 'darkness', 'rain', 'exhaustOff', 'corridorBlocked', 'events', 'opportunities', 'dog', 'windows'];
 
 // ctx : contexte de conditions de la campagne (c.ctx()) ; history : ids déjà joués ; rng : RNG de la campagne
 export function pickTwist(TWISTS, ctx, history, rng) {
