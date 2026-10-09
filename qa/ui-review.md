@@ -15,3 +15,10 @@ Works end-to-end with no console errors: new campaign → event card → Koddex 
 | U8 | Phone | The feed isn't surfaced in the day flow | A phone notification badge between phases + T opens it; the morning shows the overnight WhatsApp messages | ui |
 | U9 | Look | Plain dark cards over the blurred 3D street; art.scenes.koddex/atelier/mairie vignettes are unused | Use the vignettes behind the Koddex/afternoon/commission screens; warmer card style matching §10 | ui (+ art API) |
 | U10 | Carnet / Aide / À propos | `src/content/codex.js` (`CODEX`) has no screen yet | A **Carnet** screen on key **C** (and a 📓 button in the day header) with three tabs, Personnes / Lieux / Règles. Show only the cards whose `when` matches (`c.check(card.when)`), each with its portrait (`speaker`), `text`, `position`, `quote`, and under it every `updates[]` line whose `when` matches. Mark a card « nouveau » the first time it appears. Plus **Aide** (`CODEX.help`, ≤ 10 short cards, from the title screen and the pause menu) and **À propos** (`CODEX.about.lines`, from the title screen). Also bind **M** to mute: the help text doesn't mention it until it exists | ui |
+
+## 2026-10-09 06:15 · deployed f296800 (v1.1) · new campaign, seed 3 · real Chrome GPU
+- ✅ One title screen (Campagne → Nouvelle campagne / Continuer, Nuit libre, Comment jouer, À propos).
+- ✅ The day in 3D: the Koddex office (a colleague coding, « SHIP IT » poster, stepped gables in the window, Clode Kode's monitor) behind the intro and the morning cards.
+- ✅ Office day + e-bike commute card faithful to the apartment (the bike in the corridor between the bookshelf and the door, two floors without a lift).
+- ✅ Night 1 twist = guide_tour (gentle tutorial night).
+- U11 (minor, for after Lucas's playtest): the WhatsApp feed block stays pinned on top of every morning card; collapse it to the badge once read.
