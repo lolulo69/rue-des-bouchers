@@ -167,11 +167,16 @@ export function availableNightActions(sim, c, player) {
     const repeatable = spec.repeat && done.has(a.id) && !a.once;
     if (!base.includes(a) && !repeatable) continue;
     const reason = blocked(sim, a, spec, player);
-    const pos = LOCATIONS[spec.at].pos(sim, player);
-    const witnesses = a.legality === 'legal' ? [] : [...new Set(sim.potentialWitnesses(pos).map((w) => (w.kind === 'customers' ? 'des clients' : w.name)))];
+    // witnesses : calculé seulement si on le lit (le menu) ; les bots et le simulateur n'en ont pas besoin (chemin chaud)
+    let witnesses = null;
     list.push({
       id: a.id, label: a.label, legality: a.legality, minutes: a.cost?.minutes ?? 5, at: spec.at, where: LOCATIONS[spec.at].label,
-      available: !reason, reason, witnesses,
+      available: !reason, reason,
+      get witnesses() {
+        if (witnesses) return witnesses;
+        const pos = LOCATIONS[spec.at].pos(sim, player);
+        return (witnesses = a.legality === 'legal' ? [] : [...new Set(sim.potentialWitnesses(pos).map((w) => (w.kind === 'customers' ? 'des clients' : w.name)))]);
+      },
     });
   }
   return list;

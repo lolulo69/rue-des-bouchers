@@ -29,10 +29,19 @@ export function klaasDetection(sim, d) {
 // Alias de `turns` : le teckel suit Jérémie ; Tatie n'est pas un témoin de la sim (accepté, sans effet pour l'instant)
 const TURN_OF = { police: 'patrol' };
 const TURN_ALIAS = { biloute: 'jeremie' };
-export const activeAttention = (sim) => (sim.state.attention ?? []).filter((a) => sim.state.min >= a.from && sim.state.min < a.until);
+const NONE = Object.freeze([]);
+// (chemin chaud : appelé pour chaque témoin possible ; sans fenêtre ouverte, rien n'est alloué)
+export const activeAttention = (sim) => {
+  const A = sim.state.attention;
+  return A?.length ? A.filter((a) => sim.state.min >= a.from && sim.state.min < a.until) : NONE;
+};
 export function attentionFactor(sim, kind) {
+  const A = sim.state.attention;
+  if (!A?.length) return 1;
   const t = TURN_OF[kind] ?? kind;
-  return activeAttention(sim).some((a) => a.turns.some((x) => (TURN_ALIAS[x] ?? x) === t)) ? (sim.cfg.WITNESS.attention?.away ?? 0.08) : 1;
+  const m = sim.state.min;
+  for (const a of A) if (m >= a.from && m < a.until && a.turns.some((x) => (TURN_ALIAS[x] ?? x) === t)) return sim.cfg.WITNESS.attention?.away ?? 0.08;
+  return 1;
 }
 // Ouvre une fenêtre d'attention détournée (diversion ou moment du twist), pour `minutes` minutes de jeu à partir de maintenant
 export function divertAttention(sim, { source, id, turns, minutes, text = null }) {
