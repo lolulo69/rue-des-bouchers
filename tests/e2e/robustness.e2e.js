@@ -304,7 +304,7 @@ test('objectifs du soir (§12c.5) : « Ce soir » sous le twist à l’entrée, 
   if (todo) await expect(page.locator(`#objectives li[data-id="${todo}"]`)).toHaveClass(/done/);
 });
 
-test('« Qui regarde ? » et « Fenêtre propice » (§12d) : en direct dans la rue, les regards détournés passent « ailleurs », l’horloge repasse à ×1', async ({ page }) => {
+test('« Qui regarde ? » et « Fenêtre propice » (§12d) : en direct dans la rue, les regards détournés passent « ailleurs », l’horloge ralentit', async ({ page }) => {
   await page.goto('/?nolock=1&seed=3');
   await page.click('#start');
   const r = await page.evaluate(() => {
@@ -329,7 +329,49 @@ test('« Qui regarde ? » et « Fenêtre propice » (§12d) : en direct dans la 
   expect(r.before).toMatch(/clients/);
   expect(r.shownBefore).toBe(false);
   expect(r.during).toMatch(/ailleurs :.*clients/);
-  expect(r.window).toMatch(/Fenêtre propice · encore/);
-  expect(r.clock).toBe('busy:window');
+  expect(r.window).toMatch(/Fenêtre propice · ⏳ \d:\d\d/);
+  expect(r.clock).toBe('window'); // §12e.1 : ×0.5 pendant la fenêtre
   await page.screenshot({ path: 'test-results/who-watches.png' });
+});
+
+test('parler aux gens (§12e.3) : « Parler à Jérémie » près de lui, E ouvre le dialogue, un choix pose ses drapeaux', async ({ page }) => {
+  test.setTimeout(240_000);
+  await page.goto('/?nolock=1&seed=12');
+  await page.evaluate(() => localStorage.clear());
+  await page.reload();
+  await page.click('#campaign');
+  await page.click('[data-testid=title-new]');
+  if (await page.locator('[data-testid=intro-skip]').count()) await page.click('[data-testid=intro-skip]');
+  await page.evaluate(() => {
+    const c = window.__rdb.ui.campaign;
+    for (let i = 0; i < 200 && c.step !== 'night'; i++) {
+      if (c.step === 'cards') c.resolveCard(c.card().choices.find((x) => x.available)?.i ?? 0);
+      else if (c.step === 'koddex') c.koddex(['work', 'work', 'work']);
+      else if (c.step === 'actions') c.endAfternoon();
+    }
+    c.apply({ clearFlags: ['met_jeremie', 'joined_rounds'] }, 'engine', 'test');
+    c.state.tutorials.done = c.content.TOOL_TUTORIALS?.map((t) => t.id) ?? [];
+    localStorage.setItem(window.__rdb.saveKey, JSON.stringify(c.save()));
+  });
+  await page.goto('/?nolock=1&mode=night&seed=12');
+  await page.locator('#hud').waitFor({ state: 'visible' });
+  const prompt = await page.evaluate(() => {
+    const { sim, player, step } = window.__rdb;
+    while (sim.state.min < 22 * 60) sim.tick(1);
+    const d = sim.dogPos();
+    player.loc = 'street';
+    player.pos.set(d.x + 0.8, 0, d.z);
+    step(4);
+    return document.getElementById('prompt').textContent;
+  });
+  expect(prompt).toMatch(/Parler à Jérémie/);
+  await page.evaluate(() => { window.__rdb.key('KeyE'); window.__rdb.step(1); });
+  const menu = page.locator('#nightmenu');
+  await expect(menu).toBeVisible();
+  await expect(menu.locator('h2')).toContainText('Jérémie');
+  const choices = menu.locator('.talk-choice');
+  expect(await choices.count()).toBeGreaterThanOrEqual(2);
+  await choices.first().click();
+  await expect(menu.locator('.talk-reply')).not.toBeEmpty();
+  expect(await page.evaluate(() => window.__rdb.campaign.has('met_jeremie'))).toBe(true);
 });

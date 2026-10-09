@@ -17,7 +17,8 @@ import { evalCondition, STAT_KEYS, HIDDEN_KEYS } from './conditions.js';
 import { normalizeContent } from './content.js';
 import { pickTwist, nightTwist } from './twists.js';
 import { createUnlocks } from './unlocks.js';
-import { performNightAction, availableNightActions } from './nightActions.js';
+import { performNightAction, availableNightActions, applyEffects } from './nightActions.js';
+import { talkTargets, talkFits, stripNightKeys, tableNear } from './talk.js';
 import { pickObjectives, matchDone, journalEvents, bedtimeHint } from './objectives.js';
 import { fmt } from './time.js';
 
@@ -59,7 +60,7 @@ export function initialState(seed, cfg = CONFIG) {
     witnessMemories: [],
     police: { fatigue: 0, serialComplainer: false, benaliTransferred: false, lemaireTransferred: false },
     igpn: null,
-    seen: { events: [], dialogue: [], countermoves: [], actions: [], tutorial: [], media: [] },
+    seen: { events: [], dialogue: [], countermoves: [], actions: [], tutorial: [], media: [], talk: [] },
     counts: { actions: {}, events: {}, dialogue: {}, countermoves: {}, koddex: {} },
     cards: [],
     lastCard: null,
@@ -100,6 +101,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
   rng.setState(S.rng);
   S.seen.tutorial ??= [];
   S.seen.media ??= [];
+  S.seen.talk ??= []; // §12e.3 : conversations « une fois par campagne » déjà eues
   // Pas de redite (QA « pass 2 (transcripts) ») : une entrée rejouable (`once: false`, travail Koddex, gag…) ne revient pas
   // avant C.repeatCooldownDays jours, sauf `repeatable: true` dans le contenu. S.lastShown[id] = dernier jour montré.
   S.lastShown ??= {};
@@ -502,6 +504,43 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     return S.tonightTwist.id ? TWISTS[S.tonightTwist.id] ?? null : null;
   };
   c.tonightTwist = () => c.twistTonight(); // nom utilisé par src/ui
+
+  // ---------- parler aux gens, la nuit (§12e.3, src/sim/talk.js, src/content/talk.js) ----------
+  // c.talkTargets(sim, player, at?) → qui on peut aborder (le plus proche d'abord), seulement s'il a une conversation ce soir
+  // c.talkStart(sim, who, player) → { id, who, speaker, say, choices: [{ i, label, available }] } ou null
+  // c.talkChoose(sim, convo, i) → { reply, speaker, next: échange suivant (même forme) | null, sim: 'waiter'? }
+  // Une conversation `once` ne se joue qu'une fois par campagne (S.seen.talk) ; les autres, une fois par nuit (sim.talkedTonight).
+  const TALK = K.TALK ?? [];
+  const talkOk = (cond, sim, opts) => talkFits(cond, sim, opts) && c.check(stripNightKeys(cond), false);
+  const talkFor = (sim, who, player) => {
+    const table = who === 'customers' && player?.pos ? tableNear(sim, player.pos) : null;
+    const done = sim.talkedTonight ?? [];
+    return TALK.find((t) => t.who === who && !(t.once ? S.seen.talk.includes(t.id) : done.includes(t.id)) && talkOk(t.when, sim, { table }));
+  };
+  const exchangeView = (sim, t, k) => {
+    const x = t.exchanges[k];
+    return { id: t.id, who: t.who, k, speaker: x.speaker ?? null, say: x.say ?? '', choices: x.choices.map((ch, i) => ({ i, label: ch.label, available: talkOk(ch.requires, sim, {}) })) };
+  };
+  c.talkTargets = (sim, player, at = null) => talkTargets(sim, player, at, (who) => !!talkFor(sim, who, player));
+  c.talkStart = (sim, who, player) => {
+    const t = talkFor(sim, who, player);
+    if (!t) return null;
+    (sim.talkedTonight ??= []).push(t.id);
+    if (t.once && !S.seen.talk.includes(t.id)) S.seen.talk.push(t.id);
+    c.note('talk', { id: t.id, who });
+    sim.note('talk', { id: t.id, who });
+    return exchangeView(sim, t, 0);
+  };
+  c.talkChoose = (sim, convo, i) => {
+    const t = TALK.find((x) => x.id === convo.id);
+    const ch = t?.exchanges[convo.k]?.choices[i];
+    if (!ch || !talkOk(ch.requires, sim, {})) return null;
+    applyEffects(sim, c, ch.effects, 'talk', t.id);
+    if (ch.sim === 'waiter') sim.act({ type: 'waiter' }); // la demande au serveur, comme la touche E l'a toujours fait
+    c.note('talk-choice', { id: t.id, k: convo.k, i });
+    const next = !ch.end && convo.k + 1 < t.exchanges.length ? exchangeView(sim, t, convo.k + 1) : null;
+    return { reply: ch.reply ?? null, speaker: t.exchanges[convo.k].speaker ?? null, next, sim: ch.sim ?? null };
+  };
 
   // ---------- objectifs du soir (§12c.5, src/sim/objectives.js, src/content/objectives.js) ----------
   // c.tonightObjectives() → [{ id, text, stance, info, done }] : choisis à l'entrée de la nuit (2 à 4), cochés au fil de la nuit

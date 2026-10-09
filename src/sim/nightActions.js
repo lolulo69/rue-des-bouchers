@@ -202,7 +202,7 @@ function rollAll(sim, a, pos) {
 
 // Effets côté nuit / campagne, comme c.doNightAction : Asso et Sommeil vivent dans la sim pendant la nuit,
 // le Risque ne vient que des témoins (sim.punish), tout le reste passe par la campagne (c.apply).
-function applyEffects(sim, c, effects, cause, id) {
+export function applyEffects(sim, c, effects, cause, id) {
   if (!effects) return;
   const N = sim.state;
   if (typeof effects.asso === 'number') N.asso = clamp(N.asso + effects.asso, 0, 100);

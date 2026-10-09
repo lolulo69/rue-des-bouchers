@@ -270,7 +270,10 @@ function updateHud() {
   win.classList.toggle('hidden', !open.length || S.sleeping);
   if (open.length) {
     const left = Math.max(...open.map((a) => a.until)) - S.min;
-    win.textContent = `✨ Fenêtre propice · encore ${left >= 1 ? `${Math.ceil(left)}\u00a0min` : 'quelques secondes'}`;
+    // Compte à rebours en secondes réelles (§12e.1 : la nuit tourne à ×windowScale pendant la fenêtre)
+    const secs = Math.max(0, Math.ceil(left / (RULES.gameMinutesPerSecond * (RULES.clock.windowScale ?? 1))));
+    win.textContent = `✨ Fenêtre propice · ⏳ ${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
+    win.dataset.seconds = String(secs);
     tutoEvent('window_seen');
   }
   // Évènements de tutoriel liés à l'affichage (fenêtre, indice du seau, « Qui regarde ? » lu ≥ 3 s dans la rue)
@@ -366,6 +369,9 @@ const nearWindow = () => player.loc === 'apt' && player.pos.x > apt.x1 - 1.6 && 
 function interaction() {
   if (player.loc === 'street') {
     if (flat(player.pos, ANCHORS.streetDoor) < INTERACT.door) return { label: 'Monter chez Pilou', act: () => teleport('apt') };
+    // Parler à quelqu'un (§12e.3) : le plus proche qui a une conversation ce soir ; sinon, la demande au serveur d'avant
+    const who = campaign?.talkTargets?.(sim, playerWhere(), castAt)[0];
+    if (who) return { label: who.label, act: () => openTalk(who.who) };
     if (sim.waiterOnDuty() && flat(player.pos, sim.waiterPos()) < INTERACT.waiter) return { label: 'Demander au serveur de rentrer les tables', act: () => { tuto('first_waiter'); sim.act({ type: 'waiter' }); tutoEvent('waiter_asked'); } };
   } else {
     if (flat(player.pos, world.aptDoor) < INTERACT.aptDoor) return { label: 'Descendre dans la rue', act: () => teleport('street') };
@@ -618,7 +624,7 @@ addEventListener('keydown', (e) => {
   if (e.code === 'Tab') return overlay === 'dossier' ? closeOverlay() : !overlay && openOverlay('dossier');
   if (e.code === 'KeyT') return overlay === 'phone' ? closeOverlay() : !overlay && openOverlay('phone');
   if (e.code === 'KeyN' && campaign) return overlay === 'nightmenu' ? closeOverlay() : !overlay && openOverlay('nightmenu');
-  if (overlay === 'nightmenu' && $('nightmenu').dataset.mode === 'actions' && nightMenuKey(e)) return;
+  if (overlay === 'nightmenu' && ['actions', 'talk'].includes($('nightmenu').dataset.mode) && nightMenuKey(e)) return;
   if (overlay || e.repeat) return keys.add(e.code);
   keys.add(e.code);
   if (S.sleeping && (e.code === 'Enter' || e.code === 'KeyP')) return skipToMorning();
@@ -754,6 +760,55 @@ function nightMenuRow(r, n) {
   });
   return b;
 }
+// ---------- Parler aux gens (§12e.3) : dialogue court, 2–3 choix (src/content/talk.js, campaign.talkStart / talkChoose) ----------
+// Position 3D réelle des personnages (world.cast) : la proximité suit ce qu'on voit à l'écran
+const CAST_OF = { jeremie: 'jeremie', tatie: 'tatie', seb_nico: 'seb', waiter: 'waiter', dede: 'dede', ghislain: 'ghislain', klaas: 'klaas' };
+const castV = new THREE.Vector3();
+function castAt(who) {
+  const o = world.cast?.[CAST_OF[who]];
+  if (!o?.visible && who !== 'klaas') return null;
+  return o ? o.getWorldPosition(castV) && { x: castV.x, z: castV.z } : null;
+}
+const speakerName = (id) => (id ? campaign.content.CHARACTERS?.[id]?.name ?? id : null);
+function openTalk(who) {
+  const convo = campaign.talkStart(sim, who, playerWhere());
+  if (!convo) return;
+  openOverlay('nightmenu');
+  $('nightmenu').dataset.mode = 'talk';
+  tutoEvent('talk_started');
+  renderTalk(convo);
+}
+function renderTalk(convo, said = null) {
+  const root = $('nightmenu');
+  root.querySelector('h2').textContent = speakerName(convo?.speaker ?? said?.speaker) ?? 'Conversation';
+  root.querySelector('.note').textContent = `↑ ↓ et Entrée (ou 1–3) · ${padGlyph('A')} répondre · ${padGlyph('B')} partir`;
+  const list = $('nightmenu-list');
+  list.innerHTML = '';
+  if (said?.reply) list.append(el('p', 'talk-reply', said.reply));
+  if (!convo) {
+    const done = el('button', 'talk-end', 'Continuer');
+    done.addEventListener('click', () => { closeOverlay(); drainSim(); });
+    list.append(done);
+    done.focus({ preventScroll: true });
+    return;
+  }
+  list.append(el('p', 'talk-say', convo.say));
+  convo.choices.forEach((ch, k) => {
+    const b = el('button', 'talk-choice', `${k + 1}. ${ch.label}`);
+    b.dataset.i = String(ch.i);
+    if (!ch.available) b.setAttribute('aria-disabled', 'true');
+    b.addEventListener('click', () => {
+      if (!ch.available) return;
+      const r = campaign.talkChoose(sim, convo, ch.i);
+      if (!r) return;
+      if (r.sim === 'waiter') { tuto('first_waiter'); tutoEvent('waiter_asked'); }
+      renderTalk(r.next, r);
+    });
+    list.append(b);
+  });
+  list.querySelector('.talk-choice:not([aria-disabled])')?.focus({ preventScroll: true });
+}
+
 function renderNightMenu(focusToggle = false) {
   const root = $('nightmenu');
   root.dataset.mode = 'actions';
@@ -785,7 +840,7 @@ function renderNightMenu(focusToggle = false) {
 function nightMenuKey(e) {
   if (e.code === 'ArrowUp' || e.code === 'ArrowDown') { e.preventDefault(); moveFocus($('nightmenu'), e.code === 'ArrowUp' ? 'up' : 'down'); return true; }
   const k = /^(?:Digit|Numpad)([1-9])$/.exec(e.code);
-  if (k) { $('nightmenu-list').querySelectorAll('[data-group=here] .nm-row')[k[1] - 1]?.click(); return true; }
+  if (k) { $('nightmenu-list').querySelectorAll('[data-group=here] .nm-row, .talk-choice')[k[1] - 1]?.click(); return true; }
   return false;
 }
 
