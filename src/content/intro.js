@@ -90,7 +90,7 @@ export const TUTORIAL = [
     trigger: 'night_start',
     when: { day: [1, 1] },
     once: true,
-    text: '20h30. Déplacez-vous avec ZQSD (ou WASD) et la souris. La nuit dure jusqu’à 1h30 environ. Les menus mettent le jeu en pause.',
+    text: '20h30. Déplacez-vous avec ZQSD (ou WASD) et la souris. La nuit dure jusqu’à 2h30 (elle file plus vite après 22h30). Les menus mettent le jeu en pause.',
   },
   {
     id: 'tuto_door',

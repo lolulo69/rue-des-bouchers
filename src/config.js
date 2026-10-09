@@ -8,7 +8,8 @@ export const RULES = {
   lateGraceMinutes: 5,           // tolérance avant qu'une table dehors devienne une infraction "après 22h"
   maxPeoplePerTable: 6,          // spécifique à la rue des Bouchers
   nightStart: 20 * 60 + 30,      // début de partie (20:30)
-  nightEnd: 25 * 60 + 30,        // fin de partie (01:30)
+  nightEnd: 26 * 60 + 30,        // fin de partie (02:30 ; §12d.4 : la fenêtre tardive, l'horloge ×3 la garde courte)
+  streetEmptyAt: 25 * 60,        // 01:00 : terrasses rentrées, buveurs partis (§12d.4) ; Klaas dort (WITNESS.klaas.sleepAt)
   gameMinutesPerSecond: 0.5,     // 1 s réelle = 30 s de jeu → ~10 min de jeu réel pour la nuit
   sleepTimeMultiplier: 40,       // accélération du temps quand Pilou essaie de dormir (§12c.5 : ×12 → ×40)
   // Horloge adaptative (§12c.5, src/sim/nightClock.js) : après fastAfter, ×fastScale sauf si quelque chose se passe ou

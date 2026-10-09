@@ -484,7 +484,7 @@ export const RECAP_HEADLINES = [
 // Fin de nuit : une phrase d'ambiance selon la raison (complète summary.verdict)
 export const NIGHT_END = {
   time: [
-    '01h30. La dernière chaise a raclé. La gaine s’est tue. Il reste quatre heures de nuit, en théorie.',
+    '02h30. La dernière chaise a raclé depuis longtemps. La gaine s’est tue. Il reste quatre heures de nuit, en théorie.',
     'Les derniers clients remontent vers la place, en chantant faux. La rue se tait, à regret.',
     'La rue s’éteint. Une bouteille roule quelque part sur les pavés, puis plus rien.',
     'Le dernier store descend avec un grincement. La rue des Bouchers redevient une rue.',

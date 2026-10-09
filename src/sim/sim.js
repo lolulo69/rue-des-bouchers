@@ -209,6 +209,12 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
         if (t.hiddenUntil !== null && S.min >= t.hiddenUntil) returnTable(t);
         if (t.out && S.min >= t.clearAt) sim.clearTable(t, t.pendingBy || 'resto');
       }
+      // 01h00 (§12d.4) : la rue se vide pour de bon, terrasses rentrées, buveurs partis, plus de retour de table
+      if (S.min >= (RULES.streetEmptyAt ?? Infinity) && !S.streetEmptied) {
+        S.streetEmptied = true;
+        for (const t of S.tables) { if (t.out) sim.clearTable(t, 'resto'); t.clearAt = Math.min(t.clearAt ?? S.min, S.min); }
+        for (const g of S.standing) g.leaveAt = Math.min(g.leaveAt, S.min);
+      }
       for (let i = S.clatters.length - 1; i >= 0; i--) if (S.clatters[i].until < S.min) S.clatters.splice(i, 1);
       updatePolice(sim);
       updateVisit();

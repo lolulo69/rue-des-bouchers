@@ -9,6 +9,7 @@
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const H = (h, m = 0) => h * 60 + m; // 1h30 du matin = H(25, 30)
+const END = Infinity; // jusqu'à la fin de la nuit (RULES.nightEnd, 02h30 depuis §12d.4)
 
 // ════════════════════════════════════════════════════════════════════════════
 // LIEUX : où l'acte a lieu (position pour les témoins) et où Pilou doit se trouver.
@@ -38,7 +39,7 @@ export const LOCATIONS = {
 // ════════════════════════════════════════════════════════════════════════════
 // FICHES : pour chaque action de nuit du contenu, lieu, créneau, condition de scène et crochets.
 //   at       : un des LIEUX
-//   window   : [début, fin] en minutes depuis minuit (nuit : 20h30 → 1h30)
+//   window   : [début, fin] en minutes depuis minuit (nuit : 20h30 → 2h30 ; END = jusqu'à la fin de la nuit)
 //   needs    : condition de scène (voir SCENE) · repeat : rejouable dans la même nuit
 //   art      : crochets 3D émis tels quels (sim event { type: 'art', ... }) :
 //              fx : 'splash'|'smoke'|'stink'|'exhaustBlocked'|'puddle'|'barkPuff' (art.fx.*)
@@ -49,19 +50,19 @@ export const LOCATIONS = {
 // ════════════════════════════════════════════════════════════════════════════
 export const NIGHT_ACTION_SPECS = {
   night_ronde_jeremie: { at: 'street', window: [H(21, 30), H(22, 30)], needs: 'roundTonight', art: { anim: ['jeremie', 'walk'] } },
-  night_camera_window: { at: 'window', window: [H(20, 30), H(25, 30)], art: { prop: 'gadget' } },
+  night_camera_window: { at: 'window', window: [H(20, 30), END], art: { prop: 'gadget' } },
   night_film_faces: { at: 'street', window: [H(20, 30), H(25)], needs: 'terraceOut', repeat: true, art: { terrace: 'film' } },
   night_flood_police: { at: 'apartment', window: [H(20, 30), H(25)] },
-  night_camera_awning: { at: 'awning', window: [H(21, 30), H(25, 30)], art: { prop: 'gadget' } },
-  night_borrow_power: { at: 'awning', window: [H(21, 30), H(25, 30)], art: { prop: 'line' } },
-  night_wifi: { at: 'apartment', window: [H(20, 30), H(25, 30)] },
+  night_camera_awning: { at: 'awning', window: [H(21, 30), END], art: { prop: 'gadget' } },
+  night_borrow_power: { at: 'awning', window: [H(21, 30), END], art: { prop: 'line' } },
+  night_wifi: { at: 'apartment', window: [H(20, 30), END] },
   night_cardboard_exhaust: { at: 'window', window: [H(20, 30), H(23, 30)], needs: 'exhaustOn', art: { prop: 'cardboard', fx: 'exhaustBlocked' }, simEffect: 'exhaustBlocked' },
   night_stink_bomb: { at: 'terrace', window: [H(20, 30), H(25)], needs: 'terraceOut', repeat: true, art: { fx: 'stink', terrace: 'rush' }, simEffect: 'clearBernadette' },
   night_saboter_cuisine: { at: 'kitchen_door', window: [H(20, 30), H(23)], needs: 'kitchenOpen', art: { fx: 'smoke' } },
   night_laxatif_carbonnade: { at: 'kitchen_door', window: [H(20, 30), H(23)], needs: 'kitchenOpen', art: { terrace: 'rush' } },
-  night_sabotage_chairs: { at: 'terrace', window: [H(23, 30), H(25, 30)], art: { terrace: 'collapse' } },
-  night_sabotage_parasols: { at: 'terrace', window: [H(23, 30), H(25, 30)], art: { terrace: 'parasols' } },
-  night_sabotage_locks: { at: 'terrace', window: [H(24), H(25, 30)] },
+  night_sabotage_chairs: { at: 'terrace', window: [H(23, 30), END], art: { terrace: 'collapse' } },
+  night_sabotage_parasols: { at: 'terrace', window: [H(23, 30), END], art: { terrace: 'parasols' } },
+  night_sabotage_locks: { at: 'terrace', window: [H(24), END] },
   night_bribe_waiter: { at: 'terrace', window: [H(20, 30), H(25)], needs: 'waiterOnDuty', art: { anim: ['serveur', 'give'] } },
   night_backroom_photo: { at: 'estaminet', window: [H(20, 30), H(24, 30)], needs: 'policeOnsite', art: { anim: ['dede', 'give'] } },
   night_bribe_photo_window: { at: 'window', window: [H(20, 30), H(24, 30)], needs: 'policeOnsite' }, // pas d'enveloppe sans patrouille
@@ -107,7 +108,7 @@ export const SIM_EFFECTS = {
 // modélisés par la sim : ils sont tirés ici (EXTRA_WITNESSES).
 export const SIM_KIND = { klaas: 'klaas', seb_nico: 'seb_nico', waiter: 'waiter', customers: 'customers', biloute: 'jeremie', jeremie: 'jeremie' };
 export const EXTRA_WITNESSES = {
-  dede: { name: 'Dédé', weight: 0.6, range: 14, present: (sim) => sim.state.min < H(25, 30) },
+  dede: { name: 'Dédé', weight: 0.6, range: 14, present: (sim) => sim.state.min < (sim.cfg.RULES.streetEmptyAt ?? H(25)) }, // il ferme à 1h
   ghislain: { name: 'Ghislain', weight: 0.6, range: 10, present: (sim) => sim.state.min < H(25) },
   police: { name: 'la patrouille', weight: 1, range: 25, present: (sim) => sim.state.police?.phase === 'onsite' },
 };
