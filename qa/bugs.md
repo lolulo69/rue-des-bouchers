@@ -5,6 +5,15 @@ When a bug is fixed, remove the `fixme` (the test then guards against regression
 
 ## Open
 
+### BUG-010 · CRITICAL · A photo on a twist night with an extra table crashes the game (every campaign's night 4)
+- **Test**: `tests/e2e/v11.e2e.js` › « BUG-010 · nuit à twist (J4) : photographier les tables ne plante pas le jeu » (`QA_RUN_FIXME=1` to run it; fails on main).
+- **Files**: `src/sim/twistNight.js:40` adds twist tables with ids like `bernadette-x1`; `src/world.js:421` builds each table's view with `Number(l.id.split('-').pop()) - 1` as its index, so the view's id becomes `bernadette-NaN`; `src/game.js:276` (`photo()`) then does `viewTables.get(t.id).hit` on the sim's id → `undefined.hit` → « Cannot read properties of undefined (reading 'hit') » → the fatal error screen.
+- **Steps**: new campaign (seed 3), play to night 4 (the D4 twist adds « la table de Colette » at the estaminet), answer the dinner night event, press P on the terrace.
+- **Expected**: a photo (or « rien d'exploitable »).
+- **Actual**: « Oups. La rue des Bouchers a planté. » (fatal screen). Any twist with `sim.tables` (D4 Colette, the birthday at table 4, the EVJF, the jury table) crashes the night the moment the player takes a photo; other code paths that look up `viewTables` by sim id may too. Found by the flow album at fe57180 (it crashed at the end of night 4).
+- **Owner guess**: art agent (`world.js`) with the build agent: in `buildWorld`, keep the sim's id on the view (`const v = buildTable(r, l.x, l.z, i, scene, l.count); v.id = l.id; tables.push(v)`, with `i` the position in `opts.tables`), and make `game.js` tolerate a missing view (`viewTables.get(t.id)?.hit` + `.filter(Boolean)`). Two lines.
+
+
 ### BUG-007 · The D14 commission's verdict text is skipped: the screen jumps straight to the ending
 - **Test**: `tests/e2e/fullrun.e2e.js` › « BUG-004 (corrigé) · le résultat de la dernière carte d’une phase est affiché » (fails after a full run whose commission choice has a `result`: `lostResults: [{ day: 14, id: 'd14_commission', step: 'ended' }]`).
 - **Files**: `src/ui/index.js` › `shown()`: `c.step === 'ended'` takes priority over `view.cardResult` (my BUG-004 fix, b0677ae), so `choose()`'s result card is never drawn when that choice ends the campaign.

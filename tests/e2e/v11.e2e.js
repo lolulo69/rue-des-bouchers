@@ -146,3 +146,38 @@ test.describe('v1.1 · le jour en 3D', () => {
     expect(places.find(([d]) => d === 14)?.[1] ?? 'office').not.toBe('home');
   });
 });
+
+// BUG-010 (qa/bugs.md) : les tables ajoutées par un twist (id « bernadette-x1 ») n'ont pas de vue 3D sous leur id
+// (world.js dérive l'index de l'id → « bernadette-NaN ») ; une photo (P) cette nuit-là plante le jeu. Le J4 en a une.
+(process.env.QA_RUN_FIXME ? test : test.fixme)('BUG-010 · nuit à twist (J4) : photographier les tables ne plante pas le jeu', async ({ page }) => {
+  test.setTimeout(240_000);
+  const errors = watchErrors(page);
+  await newCampaign(page, 3);
+  expect((await playUntil(page, (c) => c.step === 'night' && c.state.day === 4)).day).toBe(4);
+  await Promise.all([page.waitForURL(/mode=night/), page.click('[data-testid=night-go]')]);
+  await page.locator('#hud:visible, #start:visible').first().waitFor({ timeout: 60_000 });
+  if (await page.locator('#start').isVisible()) await page.click('#start');
+  // Jusqu'à 22h10, en jouant au clic les événements de nuit (le dîner de Colette met le jeu en pause sur sa carte)
+  for (let k = 0; k < 10; k++) {
+    const due = await page.evaluate(() => {
+      const r = window.__rdb, { sim } = r, c = r.campaign;
+      for (let i = 0; sim.state.min < 22 * 60 + 10 && i < 4000; i++) {
+        if (c.nightEventDue?.(sim)) { r.step(1); return true; }
+        sim.tick(0.5); if (i % 60 === 0) r.step(1);
+      }
+      r.step(1);
+      return false;
+    });
+    if (!due) break;
+    await page.locator('#nightmenu-list button:not([disabled])').first().click();
+  }
+  const twistTables = await page.evaluate(() => {
+    const r = window.__rdb, { sim } = r;
+    const ids = sim.state.tables.filter((t) => t.twist && t.out).map((t) => t.id);
+    for (const t of sim.state.tables.filter((x) => x.out)) { r.aimAt(t.id); r.step(1); r.key('KeyP'); r.step(1); }
+    return ids;
+  });
+  expect(twistTables.length, 'le twist du J4 ajoute une table').toBeGreaterThan(0);
+  await expect(page.locator('#fatal')).toBeHidden();
+  expect(errors).toEqual([]);
+});
