@@ -265,3 +265,17 @@ Dialogue never shown (15/211): the same crowding as pass 3 (routed to the build 
 
 No dominant action (1000 runs, base 98 %): `pm_klaas_roster` −17, `pm_klaas_notebook` −15, `night_whatsapp` / `pm_press_contact` −4. Max **17** < 25 ✅ (more margin than before the rebase, but the Klaas roster remains the biggest single dependency).
 dialogue (20/211) : klaas_persuaded, klaas_saturday2, klaas_cardboard, tatie_mail_12, dede_threat_smile, dede_carbonnade, ghislain_hygiene, ghislain_lawyer, lemaire_transferred, benali_transferred, chef_scandal, chef_inquiry, chef_warning, delphine_conflict, avocat_illicit, avocat_complaint, nico_hate_wave_answered, hilde_laxative, avocat_backroom_caught, tw_match_tatie. Most are the crowding / rare states already routed in pass 3.
+
+**Confirmation with the d285f66 twist set** (guide_tour fixed on night 1, new pool twist carbonnade_contest), main 2e5e705, no value changed. 1000 × 7, invariants ✅, 68/68 actions, 28/28 events, 8/8 endings, 42/42 counter-moves:
+
+| bot | custody | fired | legal_victory | moving_out | negotiated_peace | scandal | the_return | turncoat | score | sommeil | asso | risque | job | dossier | garde à vue (nuit méd.) | cibles §13.H |
+| passif | · | · | · | 100% | · | · | · | · | 0 | 45 | 40 | 0 | 97 | 13 | – | ✅ ≥ 90 % déménagement / défaite |
+| légal prudent | · | · | 49% | 3% | · | 48% | · | · | 82 | 60 | 75 | 0 | 99 | 50 | – | ✅ victoire légale 35–60 %<br>✅ jamais de garde à vue |
+| illégal imprudent | 100% | · | · | · | · | · | · | · | -20 | 64 | 0 | 96 | 31 | 14 | 5 | ✅ ≥ 70 % garde à vue / procès |
+| illégal discret | 19% | · | · | 42% | · | 34% | 5% | · | 24 | 29 | 18 | 42 | 81 | 27 | 7 | ✅ ≤ 40 % garde à vue<br>✅ scandale atteignable |
+| mixte malin | · | · | 89% | 2% | · | 8% | · | · | 95 | 36 | 75 | 1 | 76 | 55 | – | ✅ meilleur score moyen |
+| diplomate | · | · | · | 21% | 27% | 3% | 35% | 14% | 60 | 68 | 80 | 0 | 92 | 34 | – | ✅ paix négociée ≥ 40 % |
+| tire-au-flanc | · | 89% | 6% | 2% | · | 3% | · | · | 17 | 77 | 71 | 1 | 13 | 30 | – | ✅ licenciement atteignable (≥ 2 %, §13.F) |
+
+No dominant action (1000 runs, base 98 %): `pm_klaas_roster` −18, `pm_klaas_notebook` −13, `pm_press_contact` −5. Max 18 < 25 ✅.
+Twists over 48 campaigns (4 bots × 12 seeds): 25/26 come up (`carbonnade_contest` 19×, `guide_tour` every campaign). Never: **`inspector_quiet_night`**, day 9's fallback for when neither `inspector_surprise` nor `inspector_announced` is set. Every choice of `d9_inspector` sets one of the two, so it can only fire if the day-9 event is skipped (content agent's call: unreachable by design, or let choice 3 « laisser la procédure » lead to a quiet night).
