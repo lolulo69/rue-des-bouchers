@@ -7,7 +7,7 @@ canvas#game { display: block; width: 100vw; height: 100vh; }
 #clock { position: absolute; top: 16px; right: 20px; font: 700 40px/1 ui-monospace, monospace; text-shadow: 0 2px 8px #000; }
 #clock.late { color: #ff6b5b; }
 #day { position: absolute; top: 60px; right: 20px; opacity: .7; }
-#fast { position: absolute; top: 84px; right: 20px; color: #e9c46a; font-weight: 700; text-shadow: 0 2px 6px #000; }
+#fast { position: absolute; top: 124px; right: 20px; color: #e9c46a; font-weight: 700; text-shadow: 0 2px 6px #000; }
 #fast.manual::after { content: ' (V)'; opacity: .7; font-weight: 400; }
 .bars { position: absolute; top: 16px; left: 16px; display: grid; gap: 6px; width: 240px; }
 .bar { display: grid; grid-template-columns: 64px 1fr 52px; align-items: center; gap: 8px; font-size: 13px; text-shadow: 0 1px 3px #000; }
@@ -79,3 +79,19 @@ kbd { background: #ffffff1a; border: 1px solid #ffffff33; border-radius: 4px; pa
 .nm-reason { display: block; color: #ffd6a0; font-size: 13px; }
 .nm-meta { display: block; font-size: 13px; opacity: .85; }
 .nm-toggle { align-self: flex-start; margin-top: 6px; background: transparent; border: 1px dashed #ffffff44; }
+/* Objectifs du soir (§12c.5) et « Ce soir » sur l'écran d'entrée de la nuit */
+#objectives { position: absolute; top: 150px; right: 20px; width: min(320px, 44vw); background: #0d0d12b3; border-radius: 8px; padding: 8px 12px; font-size: 13px; line-height: 1.35; }
+#objectives b { color: #e9c46a; font-size: 13px; }
+#objectives ul, .tonight ul { margin: 4px 0 0; padding: 0; list-style: none; display: grid; gap: 3px; }
+#objectives li.done { opacity: .55; text-decoration: line-through; }
+#objectives li.info { opacity: .8; font-style: italic; }
+#objectives li.bed { color: #a8dadc; border-top: 1px solid #ffffff22; padding-top: 4px; }
+.tonight { max-width: 520px; text-align: left; background: #ffffff10; border-radius: 10px; padding: 10px 14px; line-height: 1.4; }
+.tonight b { color: #e9c46a; }
+#sleepveil { position: absolute; inset: 0; z-index: 3; background: #05050ad0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; text-shadow: 0 2px 6px #000; }
+#sleepveil p { margin: 0; max-width: 560px; }
+#sleep-status { font-size: 22px; }
+#sleep-peaks { font-size: 14px; color: #ffd6a0; }
+#sleepveil button { pointer-events: auto; background: #e9c46a; color: #1a1a1a; border: 0; padding: 10px 18px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; }
+#sleepveil button#sleep-up { background: #ffffff22; color: #f2efe6; }
+#sleepveil button:disabled { opacity: .6; cursor: default; }

@@ -3,11 +3,12 @@
 import * as THREE from 'three';
 import { buildWorld } from './world.js';
 import { createDirector } from './scene/director.js';
-import { RULES, SKY, STREET, NOISE, EVIDENCE, INTERACT, ZONES, POLICE, NIGHT_MENU } from './config.js';
-import { createSim, makeConfig, fmt, createCampaign, contentFromGlob, checkSave, nightMenu, LOCATIONS, nightClock } from './sim/index.js';
+import { RULES, SKY, STREET, NOISE, EVIDENCE, INTERACT, ZONES, POLICE, NIGHT_MENU, SLEEP } from './config.js';
+import { createSim, makeConfig, fmt, createCampaign, contentFromGlob, checkSave, nightMenu, LOCATIONS, nightClock, busyReason } from './sim/index.js';
 import * as narrative from './sim/narrative.js';
 import { audio } from './audio/index.js';
 import { padGlyph, moveFocus } from './input/index.js';
+import { keyHint } from './input/hints.js';
 import { createRng } from './sim/rng.js';
 import { WHATSAPP_GROUP } from './content/characters.js';
 import { bindNight } from './input/night.js'; // manette (agent UI, src/input)
@@ -186,6 +187,7 @@ function updateCoach() {
 }
 function tutoEvent(name) {
   if (!campaign) return;
+  for (const o of campaign.objectiveEvent(name)) log(`✓ Objectif\u00a0: ${o.text}`, 'good'); // §12c.5
   for (const t of campaign.tutorialEvent(name)) {
     if (t.congrats) log(`✔ ${t.congrats}`, 'good');
     if (coach?.id === t.id) coach = null;
@@ -237,8 +239,7 @@ function updateHud() {
   $('where').textContent = player.loc === 'apt' ? (nearWindow() ? 'Chez Pilou · à la fenêtre' : 'Chez Pilou') : 'Rue des Bouchers';
   const hints = [];
   const it = interaction();
-  if (S.sleeping) hints.push('Pilou essaie de dormir…  [E] se relever');
-  else if (it) hints.push(`[E] ${it.label}`);
+  if (S.sleeping) { /* le voile « Pilou dort… » (#sleepveil) dit tout */ } else if (it) hints.push(`[E] ${it.label}`);
   if (it?.label === 'Monter chez Pilou') tuto('near_door');
   if (it?.label?.startsWith('Essayer de dormir')) tuto('bed');
   if (nearWindow()) { tuto('at_window'); if (S.min >= CLOSE) tuto('near_bucket'); }
@@ -258,6 +259,50 @@ function updateHud() {
   if (nearWindow()) { tutoEvent('at_window'); if (!S.sleeping) tutoEvent('bucket_noticed'); }
   if (wit) { witnessShownSince ??= now; if (now - witnessShownSince >= 3) tutoEvent('witnesses_read'); } else witnessShownSince = null;
   updateCoach();
+  updateObjectives();
+  updateSleepVeil();
+}
+
+// Objectifs du soir (§12c.5) : liste compacte en haut à droite, cochée au fil de la nuit ; en dernière ligne, le conseil
+// « au lit » (après 22h30, quand tout est fait ou Pilou épuisé) avec la touche et la direction du lit.
+const ARROWS = ['↑', '↗', '→', '↘', '↓', '↙', '←', '↖'];
+function bedPointer() {
+  if (player.loc !== 'apt') return 'montez chez vous';
+  const dx = world.bed.x - player.pos.x, dz = world.bed.z - player.pos.z;
+  const d = Math.hypot(dx, dz);
+  if (d < INTERACT.bed) return `[${keyHint('E')}] au lit`;
+  // angle du lit par rapport au regard (yaw 0 = vers -z ; un angle positif = à gauche)
+  const a = Math.atan2(-dx, -dz) - player.yaw;
+  const k = ((Math.round(-a / (Math.PI / 4)) % 8) + 8) % 8;
+  return `${ARROWS[k]} lit à ${Math.round(d)}\u00a0m, puis [${keyHint('E')}]`;
+}
+let objectivesKey = '';
+function updateObjectives() {
+  const box = $('objectives');
+  if (!campaign) { box.classList.add('hidden'); return; }
+  for (const o of campaign.objectivesTick(sim)) log(`✓ Objectif\u00a0: ${o.text}`, 'good');
+  const list = campaign.tonightObjectives();
+  const bed = campaign.bedtimeHint(sim, { busy: busyReason(sim, campaign) });
+  const bedLine = bed ? `🛏 ${bed.text} (${bedPointer()})` : '';
+  const key = JSON.stringify([list.map((o) => o.done), bedLine]);
+  if (key === objectivesKey) return;
+  objectivesKey = key;
+  box.classList.toggle('hidden', !list.length && !bed);
+  const ul = box.querySelector('ul');
+  ul.replaceChildren(...list.map((o) => {
+    const li = document.createElement('li');
+    li.className = o.done ? 'done' : o.info ? 'info' : 'todo';
+    li.dataset.id = o.id;
+    li.textContent = `${o.done ? '✓' : o.info ? 'ℹ' : '○'} ${o.text}`;
+    return li;
+  }));
+  if (bed) {
+    const li = document.createElement('li');
+    li.className = 'bed';
+    li.dataset.id = bed.id;
+    li.textContent = bedLine;
+    ul.append(li);
+  }
 }
 
 // ---------- Photo ----------
@@ -319,8 +364,47 @@ function teleport(where) {
 function toggleSleep(where = 'bed') {
   sim.act({ type: 'sleep', on: !S.sleeping, where });
   player.pitch = S.sleeping ? 0.9 : 0;
+  skipping = false;
+  sleepPeaks.length = 0;
   if (S.sleeping) { log('Pilou se couche. Le temps file…'); tutoEvent('bed_tried'); }
 }
+
+// ---------- Sommeil (§12c.5) : voile « Pilou dort… », pics de bruit, « Passer à demain matin » ----------
+// Passer à demain matin = la même nuit, minute par minute (sim.tick(1), comme les bots), à toute vitesse : police, tables,
+// événements de nuit (la nuit s'arrête sur leur carte, puis reprend), sommeil — rien n'est sauté.
+let skipping = false;
+const sleepPeaks = []; // [{ min, db }] : ce qui l'a réveillé (au-dessus du seuil du sommeil)
+let lastPeakDb = 0;
+function skipToMorning() {
+  if (!S.sleeping || S.ended) return;
+  skipping = true;
+  log('Pilou s’endort pour de bon. On verra demain matin.');
+}
+function fastForward(maxMinutes) {
+  for (let m = 0; m < maxMinutes && !S.ended && !overlay; m++) {
+    if (campaign) { const ev = campaign.nightEventDue?.(sim); if (ev) { openNightEvent(ev); return; } }
+    sim.tick(1);
+    drainSim();
+  }
+}
+function updateSleepVeil() {
+  const veil = $('sleepveil');
+  veil.classList.toggle('hidden', !S.sleeping || S.ended);
+  if (!S.sleeping) return;
+  const db = S.noiseBed ?? 0;
+  if (db > SLEEP.thresholdDb && db > lastPeakDb + 3) { sleepPeaks.push({ min: S.min, db: Math.round(db) }); if (sleepPeaks.length > 4) sleepPeaks.shift(); }
+  lastPeakDb = db > SLEEP.thresholdDb ? Math.max(lastPeakDb, db) : 0;
+  $('sleep-status').textContent = `${skipping ? 'Pilou dort… jusqu’au matin.' : 'Pilou dort…'} Sommeil ${Math.round(S.sleep)}/100 · ${Math.round(db)}\u00a0dB dans la chambre`;
+  $('sleep-peaks').textContent = sleepPeaks.length
+    ? `Réveillé par\u00a0: ${sleepPeaks.map((p) => `${fmt(p.min)} (${p.db}\u00a0dB)`).join(', ')}`
+    : 'Rien ne le réveille pour l’instant.';
+  $('sleep-skip').textContent = `Passer à demain matin [${inputModeIsPad() ? padGlyph('X') : 'Entrée'}]`;
+  $('sleep-skip').disabled = skipping;
+  $('sleep-up').textContent = `Se relever [${keyHint('E')}]`;
+}
+const inputModeIsPad = () => document.documentElement.dataset.input === 'pad';
+$('sleep-skip').addEventListener('click', skipToMorning);
+$('sleep-up').addEventListener('click', () => { if (S.sleeping) toggleSleep(S.sleepSpot ?? 'bed'); });
 
 // ---------- Overlays ----------
 function openOverlay(name) {
@@ -442,6 +526,18 @@ if (campaign) {
     p.innerHTML = `<b>${sim.twist.title}</b><br>${sim.twist.intro ?? ''}`;
     $('pause-keys').prepend(p);
   }
+  // « Ce soir » (§12c.5) : les objectifs du soir, sous le twist
+  const tonight = campaign.tonightObjectives();
+  if (tonight.length) {
+    const box = document.createElement('div');
+    box.className = 'tonight';
+    const h = document.createElement('b');
+    h.textContent = 'Ce soir';
+    const ul = document.createElement('ul');
+    for (const o of tonight) { const li = document.createElement('li'); li.textContent = `${o.info ? 'ℹ' : '○'} ${o.text}`; ul.append(li); }
+    box.append(h, ul);
+    $('pause-keys').querySelector('.twist-intro') ? $('pause-keys').querySelector('.twist-intro').after(box) : $('pause-keys').prepend(box);
+  }
   if (campaign.state.nightCount === 0) $('pause-keys').append($('title').querySelector('.keys').cloneNode(true));
   $('pause').addEventListener('click', () => { $('pause-text').textContent = 'Pause. Cliquez pour reprendre.'; $('pause-keys').replaceChildren(); }, { once: true });
   startNight();
@@ -504,6 +600,7 @@ addEventListener('keydown', (e) => {
   if (overlay === 'nightmenu' && $('nightmenu').dataset.mode === 'actions' && nightMenuKey(e)) return;
   if (overlay || e.repeat) return keys.add(e.code);
   keys.add(e.code);
+  if (S.sleeping && (e.code === 'Enter' || e.code === 'KeyP')) return skipToMorning();
   if (e.code === 'KeyE') interaction()?.act();
   else if (e.code === 'KeyV') { fastManual = !fastManual; log(fastManual ? '⏩ Accélérer\u00a0: la nuit file dès que rien ne se passe.' : 'Vitesse normale (après 22h30, la nuit accélère d’elle-même quand rien ne se passe).'); }
   else if (e.code === 'KeyL') {
@@ -715,7 +812,8 @@ function update(dt) {
   // On ralentit d'un coup en se relevant ; sinon la vitesse glisse vers sa cible (easeSeconds)
   if (!S.sleeping && clockScale > RULES.clock.fastScale) clockScale = clockInfo.scale;
   else clockScale += (clockInfo.scale - clockScale) * (1 - Math.exp(-dt / RULES.clock.easeSeconds));
-  if (now >= coachPauseUntil) sim.tick(dt * RULES.gameMinutesPerSecond * clockScale);
+  if (skipping && S.sleeping) fastForward(RULES.skipMinutesPerFrame);
+  else if (now >= coachPauseUntil) sim.tick(dt * RULES.gameMinutesPerSecond * clockScale);
   camPos.set(player.pos.x, player.pos.y + 1.65, player.pos.z);
   noiseDb = sim.noiseAt(camPos, player.loc === 'apt');
 }
@@ -757,7 +855,7 @@ window.__rdb = {
   get campaign() { return dayUI?.campaign ?? campaign; },
   get ui() { return dayUI; },
   get renderCount() { return renderCount; },
-  get clock() { return { scale: clockScale, manual: fastManual, ...clockInfo }; },
+  get clock() { return { scale: clockScale, manual: fastManual, skipping, ...clockInfo }; },
   goNight: () => goNight(dayUI.campaign),
   saveKey: SAVE_KEY,
   step(n = 1, dt = 1 / 30) { for (let i = 0; i < n; i++) tick(dt); return S.min; },

@@ -19,6 +19,7 @@ export const RULES = {
   // visible `show` minutes de jeu, au plus une fois toutes les `every` minutes
   bedtime: { after: 22 * 60 + 30, tiredSleep: 25, show: 8, every: 20 },
   objectives: { max: 4, maxInfo: 1 },
+  skipMinutesPerFrame: 30,      // « Passer à demain matin » : minutes de nuit simulées par image (même sim, minute par minute)
 };
 
 // Variantes de soirée (?day=sat). Le lundi est la soirée de référence.

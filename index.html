@@ -30,6 +30,14 @@
       <div class="bar danger"><span>Risque</span><i><b id="bar-risk"></b></i></div>
     </div>
     <div id="where"></div>
+    <!-- Objectifs du soir (§12c.5) : cochés au fil de la nuit ; dernière ligne = conseil « au lit » -->
+    <!-- Sommeil (§12c.5) : voile sombre, ce qui réveille Pilou, passer à demain matin -->
+    <div id="sleepveil" class="hidden">
+      <p id="sleep-status">Pilou dort…</p>
+      <p id="sleep-peaks"></p>
+      <div><button id="sleep-skip" type="button" data-testid="sleep-skip">Passer à demain matin</button> <button id="sleep-up" type="button">Se relever</button></div>
+    </div>
+    <div id="objectives" class="hidden"><b>Objectifs du soir</b><ul></ul></div>
     <div id="prompt"></div>
     <div id="witness"></div>
     <div id="log"></div>

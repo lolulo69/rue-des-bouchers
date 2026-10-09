@@ -231,3 +231,75 @@ test('horloge adaptative (§12c.5) : ⏩ après 22h30 quand rien ne se passe, re
   expect(r.police.reason).toBe('busy:police');
   expect(r.police.scale).toBeLessThan(1.2);
 });
+
+test('dormir (§12c.5) : voile « Pilou dort… », ×40, puis « Passer à demain matin » joue la fin de la nuit minute par minute', async ({ page }) => {
+  test.setTimeout(120_000);
+  await page.goto('/?nolock=1&seed=2');
+  await page.click('#start');
+  const r = await page.evaluate(() => {
+    const { world, player, step, sim, key } = window.__rdb;
+    player.loc = 'apt';
+    player.pos.set(world.bed.x, world.apt.floor, world.bed.z + 0.6);
+    step(3);
+    key('KeyE');
+    step(90); // 3 s réelles
+    const veil = !document.getElementById('sleepveil').classList.contains('hidden');
+    const scale = window.__rdb.clock.scale;
+    const status = document.getElementById('sleep-status').textContent;
+    return { veil, scale, status };
+  });
+  await page.screenshot({ path: 'test-results/sleep-veil.png' });
+  Object.assign(r, await page.evaluate(() => {
+    const { sim, step } = window.__rdb;
+    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'Enter', bubbles: true }));
+    for (let i = 0; i < 40 && !sim.state.ended; i++) step(1);
+    return { end: sim.state.min, ended: sim.state.ended, endShown: !document.getElementById('end').classList.contains('hidden') };
+  }));
+  expect(r.veil).toBe(true);
+  expect(r.status).toMatch(/Pilou dort/);
+  expect(r.scale).toBeGreaterThan(30); // vers ×40
+  expect(r.ended).toBe(true);
+  expect(r.end).toBeGreaterThanOrEqual(25 * 60 + 30);
+  expect(r.endShown).toBe(true);
+});
+
+test('objectifs du soir (§12c.5) : « Ce soir » sous le twist à l’entrée, liste du HUD qui se coche', async ({ page }) => {
+  test.setTimeout(240_000);
+  await page.goto('/?nolock=1&seed=12');
+  await page.evaluate(() => localStorage.clear());
+  await page.reload();
+  await page.click('#campaign');
+  await page.click('[data-testid=title-new]');
+  if (await page.locator('[data-testid=intro-skip]').count()) await page.click('[data-testid=intro-skip]');
+  const picked = await page.evaluate(() => {
+    const c = window.__rdb.ui.campaign;
+    for (let i = 0; i < 200 && c.step !== 'night'; i++) {
+      if (c.step === 'cards') c.resolveCard(c.card().choices.find((x) => x.available)?.i ?? 0);
+      else if (c.step === 'koddex') c.koddex(['work', 'work', 'work']);
+      else if (c.step === 'actions') c.endAfternoon();
+    }
+    c.state.tutorials.done = c.content.TOOL_TUTORIALS?.map((t) => t.id) ?? [];
+    const list = c.tonightObjectives();
+    localStorage.setItem(window.__rdb.saveKey, JSON.stringify(c.save()));
+    return list;
+  });
+  expect(picked.length).toBeGreaterThanOrEqual(2);
+  await page.goto('/?nolock=1&mode=night&seed=12');
+  await page.locator('#hud').waitFor({ state: 'visible' });
+  await expect(page.locator('#pause-keys .tonight')).toContainText(picked[0].text.slice(0, 30));
+  await page.evaluate(() => window.__rdb.step(4)); // ?nolock : pas d'overlay de pause à cliquer
+  const items = page.locator('#objectives li');
+  await expect(items).toHaveCount(picked.length);
+  await page.screenshot({ path: 'test-results/objectives-hud.png' });
+  // Un objectif cochable, coché par l'événement du jeu qui le termine
+  const todo = await page.evaluate(() => {
+    const c = window.__rdb.campaign;
+    const o = c.tonightObjectives().find((x) => !x.info && !x.done);
+    const d = o && c.content.OBJECTIVES.find((x) => x.id === o.id).done;
+    if (!d?.event) return null;
+    c.objectiveEvent(d.event, { db: 120, overLimit: true, late: true, corridor: true, table: d.table, patrol: d.patrol, asso: d.asso });
+    window.__rdb.step(4);
+    return o.id;
+  });
+  if (todo) await expect(page.locator(`#objectives li[data-id="${todo}"]`)).toHaveClass(/done/);
+});
