@@ -5,15 +5,6 @@ When a bug is fixed, remove the `fixme` (the test then guards against regression
 
 ## Open
 
-### BUG-007 · The D14 commission's verdict text is skipped: the screen jumps straight to the ending
-- **Test**: `tests/e2e/fullrun.e2e.js` › « BUG-004 (corrigé) · le résultat de la dernière carte d’une phase est affiché » (fails after a full run whose commission choice has a `result`: `lostResults: [{ day: 14, id: 'd14_commission', step: 'ended' }]`).
-- **Files**: `src/ui/index.js` › `shown()`: `c.step === 'ended'` takes priority over `view.cardResult` (my BUG-004 fix, b0677ae), so `choose()`'s result card is never drawn when that choice ends the campaign.
-- **Steps**: full run « mixte malin » (seed 505): D14, pick « Faire sortir l’affaire de corruption le matin même dans La Voix du Nordiste ».
-- **Expected**: the choice's `result` (« La une du journal : « Terrasses et waterzooi : la police municipale mange-t-elle à l’œil ? » La salle bruisse. Colette se découvre un rendez-vous urgent… ») shows, then « Continuer » → the ending screen.
-- **Actual**: the ending screen appears immediately; the commission's verdict narration, the climax of the campaign, is never seen. Same for every D14 pitch with a `result`.
-- **Owner guess**: UI agent (src/ui): in `shown()`, test `view.cardResult` before `ended` (`view.cardResult ? 'cards' : c.step === 'ended' ? …`); `result-next` then clears the view and the ending renders. One line. (Not fixed by QA: the gamepad agent is editing src/ui.)
-
-
 ## Notes (not bugs, for the design agent)
 - **`?day=`** in the standalone night now accepts all 7 days (`mon…sun` or `lundi…dimanche`), which picks the police roster. The night e2e still tests tip-offs on Monday after 23:00 (Lemaire's shift).
 - **Window view**: standing at the window, the sill and Bernadette's awning hide the tables right below. Leaning out (forward to the window frame) shows them (`qa/screens/03b-window-lean.jpg`), and a photo of the nearest Bernadette table from the window works. The raycast ignores the awning, so the photo works even when the table looks hidden. Worth a look in the art pass. → **Fixed (art-v0.7)**: no protruding sill or string course under Pilou's window, recessed panel below it, shallower awning, slimmer parasols (`qa/art-v0.7/window-view.jpg`).
@@ -23,6 +14,7 @@ When a bug is fixed, remove the `fixme` (the test then guards against regression
 - **Duration (§13.A)**: see `qa/duration.md`. Both full campaigns land at ~3h05 (target 2h30–4h); the custody run stops at day 5 (1h16), as expected for an early ending.
 
 ## Fixed
+- **BUG-007** · the D14 commission's verdict text was skipped (straight to the ending). Fixed in `src/ui/index.js` (UI agent): `shown()` checks `view.cardResult` before `ended`, so the pitch's `result` shows, then « Continuer » → the ending. Regression test: `ui-day.e2e.js` › « BUG-007 » (seed 3 reaches the commission); the nightly full run's `lostResults` check covers it too.
 - **BUG-010** · CRITICAL · a photo on a twist night with an extra table crashed the game (night 4 of every campaign). Fixed by the design agent: the 3D table views keep the sim's id (`src/world.js`), and `photo()` tolerates a missing view (`src/game.js`). The test in `tests/e2e/v11.e2e.js` is now a regular regression test.
 - **BUG-008** · the night card never showed the twist (UI called `c.tonightTwist()`, the engine had `c.twistTonight()`). Fixed by the build agent in 13e6ec1 (the engine answers `c.tonightTwist()`). Test: `v11.e2e.js` › « la carte de nuit annonce le twist du soir ».
 - **BUG-009** · « Nouveau » cards lost their title/text/hint (the UI read them from the unlock id string). Fixed in 13e6ec1 / fe57180 (object payload, UI falls back to the card). Test: `v11.e2e.js` › « une carte « Nouveau » s’affiche ».

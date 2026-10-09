@@ -157,7 +157,8 @@ export function mount(engine = {}, opts = {}) {
   // Étape affichée : le bilan de la matinée Koddex reste à l'écran jusqu'à « Quitter Koddex » (BUG-002),
   // même si le moteur est déjà passé à l'après-midi.
   // BUG-002 : le bilan Koddex reste affiché ; BUG-004 : le résultat de la dernière carte d'une phase aussi
-  const shown = () => (c.step === 'ended' ? c.step : view.k?.done && !view.k.left ? 'koddex' : view.cardResult ? 'cards' : c.step);
+  // BUG-007 : le résultat d'une carte passe avant la fin (le verdict de la commission du J14 termine la campagne)
+  const shown = () => (view.cardResult ? 'cards' : c.step === 'ended' ? c.step : view.k?.done && !view.k.left ? 'koddex' : c.step);
 
   // ── tutoriel (déclencheurs de jour) ────────────────────────────────
   function tutorial(trigger) {

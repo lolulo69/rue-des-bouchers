@@ -318,3 +318,32 @@ test('fin anticipée : la garde à vue au jour 5 affiche son vrai jour, pas la c
   await expect(page.locator('[data-testid=ending-kicker]')).toContainText('Jour 5 · Fin anticipée');
   await expect(page.locator('[data-testid=ending-kicker]')).not.toContainText('Commission');
 });
+
+// BUG-007 (qa/bugs.md) : le verdict de la commission du J14 (le résultat du choix) s'affiche avant l'écran de fin
+test('BUG-007 · le verdict de la commission du J14 est affiché avant l’écran de fin', async ({ page }) => {
+  test.setTimeout(300_000);
+  await page.goto('/ui.html?fresh=1&fast=1&seed=3');
+  await page.click('[data-testid=title-new]');
+  await page.click('[data-testid=intro-skip]');
+  const reached = await page.evaluate(() => {
+    const ui = window.__rdbUi; const c = ui.campaign;
+    for (let i = 0; i < 6000 && !c.ended; i++) {
+      if (c.step === 'cards') { const k = c.card(); if (k.id === 'd14_commission') break; c.resolveCard(k.choices.find((x) => x.available)?.i ?? 0); }
+      else if (c.step === 'koddex') c.koddex(['work', 'work', 'work']);
+      else if (c.step === 'actions') c.endAfternoon();
+      else if (c.step === 'night') { const sim = c.createNight(); for (let k = 0; !sim.state.ended && k < 3000; k++) { for (let ev = c.nightEventDue?.(sim); ev; ev = c.nightEventDue(sim)) c.resolveNightEvent(sim, ev.choices.find((x) => x.available)?.i ?? 0); sim.tick(1); } c.finishNight(sim); }
+      else if (c.step === 'recap') c.nextDay();
+    }
+    ui.render();
+    return c.card()?.id ?? null;
+  });
+  test.skip(reached !== 'd14_commission', 'cette graine n’atteint pas la commission');
+  // une plaidoirie disponible qui a un texte de résultat
+  const i = await page.evaluate(() => { const c = window.__rdbUi.campaign; const k = c.card(); return k.choices.find((ch) => ch.available && k.data.choices?.[ch.i]?.result)?.i ?? null; });
+  test.skip(i === null, 'aucune plaidoirie avec un résultat');
+  await page.click(`[data-testid=card-choice][data-i="${i}"]`);
+  await expect(page.locator('[data-testid=result]')).toBeVisible();
+  await expect(page.locator('[data-testid=ending]')).toHaveCount(0);
+  await page.click('[data-testid=result-next]');
+  await expect(page.locator('[data-testid=ending]')).toBeVisible();
+});
