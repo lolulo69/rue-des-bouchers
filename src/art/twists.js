@@ -300,6 +300,83 @@ export function createTwists(scene, world, { onFrame, audio, anim }) {
         },
       });
     },
+
+    // Concours de carbonnade : la longue table du jury au bord de la terrasse de l'estaminet, trois jurés (cartons, carnets),
+    // les cassolettes à goûter, et la coupe dorée posée au milieu (le « trophy » vit sur cette table s'il y en a une)
+    jury_table: () => {
+      const bern = world.tables.filter((t) => (t.rest?.id ?? t.restId) === 'bernadette').map((t) => t.group.position);
+      const side = Math.sign(A.bernadetteDoor.x) || -1; // -1 : l'estaminet est côté x < 0
+      const x = bern.length ? Math.max(...bern.map((q) => q.x * -side)) * -side - side * 1.35 : A.bernadetteDoor.x - side * 3;
+      const z = bern.length ? bern.reduce((s, q) => s + q.z, 0) / bern.length : A.bernadetteDoor.z + 2;
+      const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = side < 0 ? 0 : Math.PI; // le jury fait face à la terrasse
+      const cloth = M(0xf4efe2);
+      g.add(mesh(B(0.8, 0.04, 2.6), cloth, 0, 0.76, 0), mesh(B(0.02, 0.28, 2.6), cloth, -0.4, 0.62, 0)); // nappe qui tombe côté terrasse
+      for (const dz of [-1.2, 1.2]) for (const dx of [-0.32, 0.32]) g.add(mesh(B(0.05, 0.74, 0.05), M(0x5b3a1e), dx, 0.37, dz));
+      const jury = [];
+      const card = (txt) => canvasTexture(256, 96, (c, w, h) => { c.fillStyle = '#fbf8f0'; c.fillRect(0, 0, w, h); c.strokeStyle = '#a83232'; c.lineWidth = 6; c.strokeRect(6, 6, w - 12, h - 12); c.fillStyle = '#2a2a35'; c.font = 'bold 40px Georgia'; c.textAlign = 'center'; c.fillText(txt, w / 2, 62); });
+      const looks = [
+        { hair: 'bald', hairColor: 0x8a8a8a, mustache: 0xd8d8d8, shirt: 0x2f3a4a, glasses: 0x222222 }, // l'ancien adjoint
+        { hair: 'bun', hairColor: 0x6b4a2b, shirt: 0x9e3b52, glasses: null },
+        { hair: 'short', hairColor: 0x2a1d14, beard: 0x2a1d14, shirt: 0x5c7a4f, glasses: null },
+      ];
+      ['Jury', 'Présidente', 'Jury'].forEach((txt, i) => {
+        const dz = (i - 1) * 0.85;
+        const j = humanoid({ pose: 'sit', anim: 'write', held: 'notebook', talk: 0.3, expr: 'neutral', pants: 0x2f3542, ...looks[i] });
+        j.position.set(0.55, 0, dz); j.rotation.y = -Math.PI / 2; jury.push(j); g.add(j);
+        g.add(mesh(B(0.4, 0.04, 0.4), M(0xc49152), 0.62, 0.45, dz), mesh(B(0.04, 0.5, 0.4), M(0xc49152), 0.82, 0.7, dz)); // chaise
+        for (const [cx, cz] of [[0.45, -0.17], [0.45, 0.17], [0.79, -0.17], [0.79, 0.17]]) g.add(mesh(B(0.03, 0.45, 0.03), M(0x8a5a35), cx, 0.22, dz + cz));
+        const tent = new THREE.Group(); tent.position.set(-0.22, 0.83, dz); tent.rotation.y = -Math.PI / 2;
+        const m = new THREE.MeshStandardMaterial({ map: card(txt), roughness: 0.9 });
+        tent.add(mesh(new THREE.PlaneGeometry(0.24, 0.09), m, 0, 0, 0.018, -0.35), mesh(B(0.24, 0.09, 0.003), M(0xfbf8f0), 0, 0, -0.018, 0.35));
+        g.add(tent);
+        g.add(mesh(B(0.16, 0.012, 0.22), M(0xf6f2ea), 0.1, 0.785, dz + 0.22), mesh(B(0.012, 0.004, 0.16), M(0x223355), 0.1, 0.795, dz + 0.3)); // carnet + stylo
+        g.add(mesh(C(0.09, 0.07, 0.06, 12), M(0x3a2a20), -0.02, 0.81, dz - 0.15), mesh(C(0.08, 0.08, 0.01, 12), M(0x6b3a1a), -0.02, 0.84, dz - 0.15)); // cassolette de carbonnade
+      });
+      g.userData.trophySpot = V(-0.05, 0.78, 0); // le centre de la table
+      return handle('jury_table', [g], {
+        trigger(m) {
+          const k = String(m);
+          if (k === 'moment0' || k === 'taste') for (const j of jury) setState(j, { anim: 'write', held: 'notebook', expr: 'neutral' });
+          if (k === 'moment1' || k === 'award' || k === 'win') for (const j of jury) setState(j, { anim: 'cheer', held: null, expr: 'happy' });
+        },
+      });
+    },
+
+    // La coupe dorée : sur la table du jury (ou sur une table de l'estaminet) ; « award » / moment1 (22h10) : Dédé la brandit
+    trophy: () => {
+      const cup = new THREE.Group();
+      const gold = M(0xd4a62a, { metalness: 0.85, roughness: 0.25, emissive: 0xa8780f, emissiveIntensity: 0.55 });
+      cup.add(mesh(B(0.12, 0.05, 0.12), M(0x2a1d14), 0, 0.025, 0), mesh(C(0.025, 0.04, 0.1, 10), gold, 0, 0.1, 0));
+      cup.add(mesh(new THREE.SphereGeometry(0.085, 14, 8, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), M(0xd4a62a, { metalness: 0.85, roughness: 0.25, side: THREE.DoubleSide, emissive: 0xa8780f, emissiveIntensity: 0.55 }), 0, 0.235, 0));
+      for (const s of [-1, 1]) cup.add(mesh(new THREE.TorusGeometry(0.04, 0.008, 5, 10, Math.PI), gold, s * 0.085, 0.2, 0, 0, 0, -s * Math.PI / 2));
+      cup.add(mesh(B(0.07, 0.025, 0.005), M(0x2a1d14), 0, 0.03, 0.062));
+      cup.scale.setScalar(1.6); // une vraie coupe de concours, lisible de la rue
+      const rest = () => {
+        const jt = active.get('jury_table')?.h?.objects[0];
+        if (jt) { jt.updateMatrixWorld(); return jt.localToWorld(jt.userData.trophySpot.clone()); }
+        const t = tableNo('bernadette', 1).group.position; return V(t.x + 0.1, 0.78, t.z);
+      };
+      const home = rest(); cup.position.copy(home);
+      const dede = world.cast?.dede;
+      let held = 0, before = null;
+      return handle('trophy', [cup], {
+        tick(dt, tt) {
+          if (held > 0 && dede) {
+            const fy = dede.rotation.y; // le socle dans les poings levés, la coupe devant son front
+            cup.position.set(dede.position.x + Math.sin(fy) * 0.24, dede.position.y + 1.16 + Math.abs(Math.sin(tt * 8)) * 0.06, dede.position.z + Math.cos(fy) * 0.24); cup.rotation.y += dt;
+            if ((held -= dt) <= 0) { setState(dede, before); cup.position.copy(rest()); cup.rotation.y = 0; }
+          } else if (held <= 0) cup.position.copy(rest()); // la table du jury peut arriver après la coupe
+        },
+        trigger(m) {
+          const k = String(m);
+          if (!dede || !(k === 'moment1' || k === 'award' || k === 'win')) return;
+          if (held <= 0) before = { anim: dede.userData.rig.anim, held: dede.userData.rig.held, expr: dede.userData.rig.expr };
+          held = 25; setState(dede, { anim: 'cheer', held: null, expr: 'happy' });
+          audio?.play('cheer', { pos: dede.position });
+        },
+        cleanup() { if (held > 0 && dede) setState(dede, before); },
+      });
+    },
   };
 
   // Plusieurs ids de contenu pour la même petite scène

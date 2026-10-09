@@ -141,8 +141,10 @@ Props and small scenes for the night twists (§12b.A). The scene director places
 | `fete_voisins` (`bunting`) | gingham tables, bunting across the street, banner, neighbours | — |
 | `firefighters` (`fire_brigade`, `tape_measure`) | two sapeurs-pompiers measuring the corridor (tape measure, clipboard) | — |
 | `tour_group` (`tour_guide`, `guide_umbrella`) | the guide with her raised umbrella, 8 tourists, back and forth, a stop at the estaminet | — |
+| `jury_table` | carbonnade contest: long table at the edge of the estaminet terrace, 3 seated jurors writing (name cards, notebooks, casseroles) | `moment0` / `taste` (writing), `moment1` / `award` / `win` (jury cheers) |
+| `trophy` | golden cup on the jury table (or on estaminet table 1); at 22:10 Dédé raises it for 25 s, then it goes back on the table | `moment1` / `award` / `win` |
 
-Manual: `art.twists.show(id)` / `hide(id)` / `trigger(id, moment)` / `clear()`. `sync(ids)` (director) only touches what it placed itself.
+Manual: `art.twists.show(id)` / `hide(id)` / `trigger(id, moment)` / `clear()`. `sync(ids)` (director) only touches what it placed itself, and silently skips ids it has no builder for (e.g. `white_tablecloth`), so content can list props before art ships them; `trigger` on an unknown id is a no-op.
 
 ## The day in 3D (`art.day`, v1.1)
 ```js
