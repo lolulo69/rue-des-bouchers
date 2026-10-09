@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { buildWorld } from './world.js';
 import { createDirector } from './scene/director.js';
 import { RULES, SKY, STREET, NOISE, EVIDENCE, INTERACT, ZONES, POLICE, NIGHT_MENU, SLEEP } from './config.js';
-import { createSim, makeConfig, fmt, createCampaign, contentFromGlob, checkSave, nightMenu, LOCATIONS, nightClock, busyReason } from './sim/index.js';
+import { createSim, makeConfig, fmt, createCampaign, contentFromGlob, checkSave, nightMenu, LOCATIONS, nightClock, busyReason, whoWatches, activeAttention } from './sim/index.js';
 import * as narrative from './sim/narrative.js';
 import { audio } from './audio/index.js';
 import { padGlyph, moveFocus } from './input/index.js';
@@ -178,7 +178,7 @@ function renderCoach() {
 function updateCoach() {
   if (!campaign || !started || S.ended) return;
   if (!coach) {
-    const due = campaign.toolTutorialDue({ min: S.min, where: placeWhere() });
+    const due = campaign.toolTutorialDue({ min: S.min, where: placeWhere(), window: activeAttention(sim).length > 0 });
     if (!due) return;
     coach = due;
     if (campaign.tutorialSeen(due.id)) coachPauseUntil = now + 3; // première apparition : l'horloge se fige un instant
@@ -227,7 +227,7 @@ function updateHud() {
   $('clock').textContent = fmt(S.min);
   $('clock').classList.toggle('late', S.min >= CLOSE);
   const fast = $('fast');
-  fast.classList.toggle('hidden', clockScale < 1.05 || S.sleeping);
+  fast.classList.toggle('hidden', clockScale < 1.5 || S.sleeping); // « ×1 » ne veut rien dire
   fast.classList.toggle('manual', fastManual);
   fast.textContent = `⏩ ×${Math.round(clockScale)}`;
   bar('bar-noise', ((noiseDb - NOISE.hudMinDb) / (NOISE.hudMaxDb - NOISE.hudMinDb)) * 100);
@@ -245,19 +245,35 @@ function updateHud() {
   if (nearWindow()) { tuto('at_window'); if (S.min >= CLOSE) tuto('near_bucket'); }
   if (nearWindow() && !S.sleeping) hints.push('[P] photo · [F] seau d’eau (illégal)');
   $('prompt').textContent = hints.join('   ');
-  // À la fenêtre : qui pourrait me voir ?
+  // « Qui regarde ? » (§12d) : qui pourrait voir Pilou là où il est, en direct (diversions et fenêtres comprises)
   let wit = '';
-  if (nearWindow() && !S.sleeping) {
-    const ws = sim.potentialWitnesses(ANCHORS.pilouWindow);
-    const named = [...new Set(ws.filter((w) => w.kind !== 'customers').map((w) => w.name))];
-    const groups = ws.filter((w) => w.kind === 'customers').length;
-    if (groups) named.push(`${groups} groupe(s) de clients`);
-    wit = named.length ? `👁 Témoins possibles : ${named.join(', ')}` : '👁 Personne ne regarde.';
+  const here = placeWhere();
+  if (!S.sleeping) {
+    if (here === 'apt') wit = '👁 Qui regarde\u00a0? Personne\u00a0: vous êtes chez vous.';
+    else {
+      const ws = whoWatches(sim, here === 'window' ? ANCHORS.pilouWindow : { x: player.pos.x, y: 1.2, z: player.pos.z });
+      const name = (w) => `${w.icon ? `${w.icon} ` : ''}${w.label}${w.count > 1 && w.key === 'customers' ? ` ×${w.count}` : ''}`;
+      const look = ws.filter((w) => !w.distracted);
+      const away = ws.filter((w) => w.distracted);
+      wit = `👁 Qui regarde\u00a0? ${look.length ? look.map(name).join(' · ') : 'personne'}${away.length ? ` — ailleurs\u00a0: ${away.map(name).join(', ')}` : ''}`;
+    }
   }
   $('witness').textContent = wit;
-  // Évènements de tutoriel liés à l'affichage (fenêtre, indice du seau, ligne des témoins lue ≥ 3 s)
+  // « Fenêtre propice » : une diversion ou un moment du twist détourne des regards (l'horloge repasse à ×1)
+  const open = activeAttention(sim);
+  const win = $('window');
+  win.classList.toggle('hidden', !open.length || S.sleeping);
+  if (open.length) {
+    const left = Math.max(...open.map((a) => a.until)) - S.min;
+    win.textContent = `✨ Fenêtre propice · encore ${left >= 1 ? `${Math.ceil(left)}\u00a0min` : 'quelques secondes'}`;
+    tutoEvent('window_seen');
+  }
+  // Évènements de tutoriel liés à l'affichage (fenêtre, indice du seau, « Qui regarde ? » lu ≥ 3 s dans la rue)
   if (nearWindow()) { tutoEvent('at_window'); if (!S.sleeping) tutoEvent('bucket_noticed'); }
-  if (wit) { witnessShownSince ??= now; if (now - witnessShownSince >= 3) tutoEvent('witnesses_read'); } else witnessShownSince = null;
+  if (wit && here !== 'apt') {
+    witnessShownSince ??= now;
+    if (now - witnessShownSince >= 3) { tutoEvent('witnesses_read'); if (here === 'street') tutoEvent('who_watches_seen'); }
+  } else witnessShownSince = null;
   updateCoach();
   updateObjectives();
   updateSleepVeil();

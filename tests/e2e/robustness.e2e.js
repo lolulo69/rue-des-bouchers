@@ -303,3 +303,33 @@ test('objectifs du soir (§12c.5) : « Ce soir » sous le twist à l’entrée, 
   });
   if (todo) await expect(page.locator(`#objectives li[data-id="${todo}"]`)).toHaveClass(/done/);
 });
+
+test('« Qui regarde ? » et « Fenêtre propice » (§12d) : en direct dans la rue, les regards détournés passent « ailleurs », l’horloge repasse à ×1', async ({ page }) => {
+  await page.goto('/?nolock=1&seed=3');
+  await page.click('#start');
+  const r = await page.evaluate(() => {
+    const { sim, player, step } = window.__rdb;
+    while (sim.state.min < 22 * 60 + 40) sim.tick(1);
+    sim.state.journal = [];
+    player.loc = 'street';
+    player.pos.set(-1.5, 0, -22);
+    step(4);
+    const before = document.getElementById('witness').textContent;
+    const shownBefore = !document.getElementById('window').classList.contains('hidden');
+    sim.state.attention = [{ source: 'window', id: 'test', turns: ['customers', 'waiter', 'klaas'], from: sim.state.min, until: sim.state.min + 2, text: null }];
+    step(4);
+    return {
+      before, shownBefore,
+      during: document.getElementById('witness').textContent,
+      window: document.getElementById('window').textContent,
+      clock: window.__rdb.clock.reason,
+    };
+  });
+  expect(r.before).toMatch(/Qui regarde/);
+  expect(r.before).toMatch(/clients/);
+  expect(r.shownBefore).toBe(false);
+  expect(r.during).toMatch(/ailleurs :.*clients/);
+  expect(r.window).toMatch(/Fenêtre propice · encore/);
+  expect(r.clock).toBe('busy:window');
+  await page.screenshot({ path: 'test-results/who-watches.png' });
+});
