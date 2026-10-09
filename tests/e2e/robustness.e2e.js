@@ -90,3 +90,21 @@ test('tutoriel pratique, nuit 1 : la marque apparaît, l\'horloge se fige un ins
   await page.click('#coach-skip');
   expect(await page.evaluate(() => window.__rdb.campaign.state.tutorials.done.length)).toBeGreaterThan(0);
 });
+
+test('twist « camionnette dans le couloir » : la photo de la camionnette entre au dossier', async ({ page }) => {
+  await page.goto('/?nolock=1&seed=4');
+  await page.click('#start');
+  const r = await page.evaluate(() => {
+    const { sim, player, step } = window.__rdb;
+    sim.state.corridorBlocked = true; // nuit libre : on pose le twist à la main
+    const v = sim.cfg.ANCHORS.van;
+    player.loc = 'street';
+    player.pos.set(v.x, 0, v.z + 6);
+    player.yaw = 0; // regarde vers -z, la camionnette
+    player.pitch = -0.1;
+    step(2);
+    window.__rdb.key('KeyP');
+    return sim.state.evidence.map((e) => e.kind);
+  });
+  expect(r).toContain('corridor_blocked');
+});

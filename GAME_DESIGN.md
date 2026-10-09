@@ -870,3 +870,44 @@ so it reflects what the player actually did.
 - **Deploy**: `deploy/setup.sh` installs `deploy.sh` as `/usr/local/bin/rdb-deploy.sh`, and the service runs that copy, as on CT 105.
 
 - **Build note art-v1.1 · pour l'agent UI (info, pas de correctif côté e2e)** — Dans `art.day`, les scènes `koddex` et `home` ont un léger balancement de caméra : `screenRect()` / `onScreenRect` change donc un peu à chaque image, et un terminal projeté en matrix3d n'est jamais « stable » au sens de Playwright (ça peut expliquer des attentes « waiting for element to be stable »). Autre point : à 1280×720, le rectangle de `home` fait environ 402×222 px, sous le seuil UI de 420×240, donc `home` retombe aujourd'hui sur la vignette 2D. Sur demande, je peux rendre la caméra fixe (ou ajouter une option `opts.still`) et rapprocher la caméra de `home`. L'appartement est aussi retouché (1407274) : bibliothèque ouverte, chambres éclairées, portes coulissantes ouvertes, lavabo hors de l'embrasure.
+
+**v1.1 (build-v1.1, engine)**
+- **Twists** (`src/sim/twists.js`, `src/sim/twistNight.js`):
+  - **Picking:** a fixed night takes its day (first matching variant in file order); otherwise a weighted draw (`weight`, default 1) from the pool under the §14 conditions (now with `weekday` and `workplace`), never the same twist twice in a campaign.
+  - **When and where:** chosen when the night phase begins and kept in the save (`tonightTwist`); a reload replays the same twist. `c.tonightTwist()` for the UI, `sim.twist` for the narration and the director.
+  - **Sim block, applied by the night:**
+    - `crowd` (×headcounts);
+    - `noise` (amplitude ratio: +20·log10, so ×1.3 ≈ +2.3 dB);
+    - `closeDelay`;
+    - `tables` (same « table N » label = altered, otherwise added after the terrace);
+    - `witnesses` (`at`, `p`, `from`/`to`, `filming` always films);
+    - `darkness` (everyone ×(1 − 0.6·darkness));
+    - `rain` (between 21:00 and 22:00; the tables under Bernadette's awning stay);
+    - `exhaustOff` (no noise, no sleep drain);
+    - `corridorBlocked` (police ×1.5; the van photographed = `corridor_blocked` piece, target at `ANCHORS.van`);
+    - `events` (`at`, text, `simEffect`: `noise` dB for 5 min by default, `rain`, `exhaustOff`, `darkness`);
+    - `opportunities` (actions open that night only).
+  - **Own RNG:** a twist draws from its own RNG, so a night without a twist is unchanged.
+  - **After the night:** `after.setFlags` / `clearFlags` apply, and `after.media` pushes those media items into the next days' feed.
+  - **Recap:** the verdict opens with the twist (`lines.recap[0]` or « Ce soir : … »), and `summary.twist` carries it.
+- **Unlocks** (`src/sim/unlocks.js`):
+  - An action or key named by an unlock stays locked until one of its unlocks is acquired; everything else stays free. Unlocks are evaluated at each phase start, each with one « Nouveau » card (`unlock: { id, title, text, hint }`).
+  - Checks: `c.actionAllowed(id, sim)`, `c.keyAllowed('B' | 'L', sim)`, `c.nativeAllowed('db' | 'asso' | 'mairie' | 'police', { asso }, sim)` (db ↔ B).
+  - The bots go through the same check (`playNight`). A save from before v1.1 keeps every tool.
+- **Campaign sleep:** a sleepless night no longer ends the campaign by itself. The night sim in campaign mode has `sleepEndsNight: false`, so a night at 0 costs the full campaign Sleep, and moving out is decided on the campaign stat.
+- **Office / home (§12b.D):**
+  - **Plan:** `workplacePlan(seed)`, two home weekdays per week, never D14, exposed as `c.state.workplace`.
+  - **Office morning:** a `commute` card (its `effects` apply, e.g. the dead battery), plus an office scene half the time.
+  - **Home morning:** a `home.distractions` event with choices (such as the 11:30 terrace photo), and sometimes Stéphane's call. Each real work prompt pays `workdays.homeJobPenalty` (1) less Job.
+  - **Clode Kode:** his gags come from `WORKDAYS.koddex[workplace]` first.
+  - **Sleep spot:** `sleep { where: 'sofa' }` listens at the sofa (living room, street side) and recovers ×0.6. **@art agent**: expose `world.sofa` if you want the « s'assoupir sur le canapé » interaction in the night.
+- **Hands-on tool tutorials** (`tutorials.js`):
+  - **Engine:** `c.toolTutorialDue({ min, where })` (first due: night N, after a given minute, at a given spot, or once its unlock is acquired), plus `tutorialSeen`, `tutorialEvent(name)` (advances the step whose `done` matches) and `tutorialSkip`. Seen / done / current step live in the save.
+  - **The 3D night:** shows the coach mark (`#coach`: text, key, pad glyph via `input/padGlyph`, « Passer » or Backspace). The night clock freezes ~3 s the first time a mark appears.
+  - **Events:** every event of `TUTORIAL_EVENTS` (moved, ran, entered_building, at_window, bucket_noticed, witnesses_read, photo_taken, corridor_measured, db_taken, phone_opened, police_called, waiter_asked, dossier_opened, night_menu_opened, legal_view_toggled, bed_tried) plus `action:<id>`.
+  - Replaying from « Aide » is the UI's.
+- **Save:** schema v4 (v2 → v3: twists, unlocks, pushed media; v3 → v4: the office/home plan and the tutorials).
+- **Tests:**
+  - **New files:** `twistEngine.test.js` (200 campaigns without repeats, one test per sim field, unlocks, migration, invariants), `workdays.test.js` and `toolTutorials.test.js`.
+  - **E2E:** the coach mark and the van photo, in `robustness.e2e.js`.
+  - **Mechanics tests in other files** (nightActions, checklist G1): they mark the tools acquired.

@@ -256,6 +256,12 @@ const CENTER = new THREE.Vector2(0, 0);
 // Bruitages ponctuels (moteur audio de l'agent art) : jamais bloquants
 const cue = (name, opts) => { try { audio?.play?.(name, opts); } catch { /* audio indisponible */ } };
 
+// Twist « camionnette dans le couloir » : une cible invisible à sa place pour la photo (le décor vient de art.twists)
+const vanHit = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2.4, 5), new THREE.MeshBasicMaterial({ visible: false }));
+vanHit.position.set(ANCHORS.van.x, 1.2, ANCHORS.van.z);
+vanHit.userData.target = { kind: 'van' };
+scene.add(vanHit);
+
 function photo() {
   if (player.loc === 'apt' && !nearWindow()) return log('Depuis l’appartement, il faut être à la fenêtre.');
   flash();
@@ -267,6 +273,7 @@ function photo() {
   const hits = [
     ...S.tables.filter((t) => t.out).map((t) => viewTables.get(t.id).hit),
     ...director.hitTargets(), // pipis, policiers
+    ...(S.corridorBlocked ? [vanHit] : []),
   ];
   const hit = raycaster.intersectObjects(hits, false)[0];
   const target = hit?.object.userData.target;
