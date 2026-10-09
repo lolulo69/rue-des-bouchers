@@ -1,5 +1,5 @@
 // Bruitages ponctuels, tous synthétisés (aucun fichier). play(name, { when, gain, pan, ... }).
-export const SFX_NAMES = ['cheer', 'megaphone', 'birthday', 'whatsapp', 'notify', 'footsteps', 'radio', 'splash', 'shutter', 'keyboard', 'bark', 'crash', 'rattle', 'paper', 'rumble', 'pfff', 'flush', 'bell', 'click'];
+export const SFX_NAMES = ['cheer', 'sigh', 'applause', 'chant', 'voice', 'sing', 'whistle', 'megaphone', 'siren', 'birthday', 'whatsapp', 'notify', 'footsteps', 'heels', 'wheels', 'bottle', 'glassbreak', 'scooter', 'bikebell', 'horn', 'carsiren', 'snore', 'owl', 'cats', 'window', 'drip', 'radio', 'splash', 'shutter', 'keyboard', 'bark', 'crash', 'rattle', 'paper', 'rumble', 'pfff', 'flush', 'bell', 'click'];
 
 export function makeSfx(ctx, out, noise, reverbIn) {
   const env = (g, t, a, peak, d) => { g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(peak, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + a + d); };
@@ -19,6 +19,42 @@ export function makeSfx(ctx, out, noise, reverbIn) {
     s.connect(fl).connect(g).connect(dest);
     s.start(t, Math.random() * 3); s.stop(t + a + d + 0.05);
   }
+
+  // Voix tonale (pas de bruit) : syllabes sur une scie adoucie + deux formants de voyelle. o : { f0, n, rate, peak, contour, notes }
+  const VOW = [[730, 1090], [270, 2290], [300, 870], [530, 1840], [570, 840], [440, 1020]];
+  function voice(dest, t, { f0 = 160, n = 6, rate = 1, peak = 0.2, contour = 0.12, notes = null, vowel = null, legato = false } = {}) {
+    const o = ctx.createOscillator(); o.type = 'sawtooth';
+    const vib = ctx.createOscillator(); vib.frequency.value = 5.5; const vg = ctx.createGain(); vg.gain.value = f0 * 0.012; vib.connect(vg).connect(o.frequency);
+    const soft = ctx.createBiquadFilter(); soft.type = 'lowpass'; soft.frequency.value = 1100;
+    const f1 = ctx.createBiquadFilter(); f1.type = 'bandpass'; f1.Q.value = 5; const f2 = ctx.createBiquadFilter(); f2.type = 'bandpass'; f2.Q.value = 7;
+    const m2 = ctx.createGain(); m2.gain.value = 0.45; const e = ctx.createGain(); e.gain.value = 0;
+    o.connect(soft); soft.connect(f1).connect(e); soft.connect(f2).connect(m2).connect(e); e.connect(dest);
+    let tt = t; const N = notes ? notes.length : n;
+    for (let i = 0; i < N; i++) {
+      const [a, b] = vowel ?? VOW[Math.floor(Math.random() * VOW.length)];
+      const d = notes ? notes[i][1] : (0.09 + Math.random() * 0.1) / rate, gap = notes || legato ? 0.02 : (0.03 + Math.random() * 0.07) / rate;
+      const k = i / Math.max(1, N - 1);
+      const f = notes ? f0 * 2 ** (notes[i][0] / 12) : f0 * (1 + contour * Math.sin(k * Math.PI)) * (1 + (Math.random() - 0.5) * 0.06);
+      o.frequency.setTargetAtTime(f, tt, 0.02); f1.frequency.setTargetAtTime(a, tt, 0.015); f2.frequency.setTargetAtTime(b, tt, 0.015);
+      e.gain.setTargetAtTime(peak * (0.75 + Math.random() * 0.25), tt, 0.02); e.gain.setTargetAtTime(0, tt + d, 0.03);
+      tt += d + gap;
+    }
+    o.start(t); vib.start(t); o.stop(tt + 0.25); vib.stop(tt + 0.25);
+    return tt - t;
+  }
+  // Une foule = plusieurs voix tenues (« ouais ! », « ooooh… »), légèrement décalées
+  function crowd(dest, t, { n = 12, f0 = 200, rise = 1.25, dur = 1.6, peak = 0.05, vowel = [730, 1090] } = {}) {
+    for (let i = 0; i < n; i++) {
+      const ti = t + Math.random() * 0.25, f = f0 * (0.7 + Math.random() * 0.8);
+      const o = ctx.createOscillator(); o.type = 'sawtooth';
+      o.frequency.setValueAtTime(f, ti); o.frequency.exponentialRampToValueAtTime(f * rise, ti + dur * 0.4); o.frequency.exponentialRampToValueAtTime(f * rise * 0.85, ti + dur);
+      const soft = ctx.createBiquadFilter(); soft.type = 'lowpass'; soft.frequency.value = 1300;
+      const f1 = ctx.createBiquadFilter(); f1.type = 'bandpass'; f1.frequency.value = vowel[0] * (0.9 + Math.random() * 0.2); f1.Q.value = 4;
+      const g = ctx.createGain(); env(g, ti, 0.12, peak, dur);
+      o.connect(soft).connect(f1).connect(g).connect(dest); o.start(ti); o.stop(ti + dur + 0.2);
+    }
+  }
+  function clap(dest, t, peak) { burst(dest, t, { type: 'bandpass', f: 1400 + Math.random() * 900, q: 1.2, d: 0.03, peak }); }
 
   const S = {
     // « Ploc-ploc » de message reçu (groupe WhatsApp de l'asso)
@@ -99,11 +135,66 @@ export function makeSfx(ctx, out, noise, reverbIn) {
     pfff(t, o, dest) { burst(dest, t, { type: 'lowpass', f: 1500, f2: 400, a: 0.2, d: 1.2, peak: 0.25 * o.gain }); },
     flush(t, o, dest) { burst(dest, t, { type: 'bandpass', f: 600, q: 0.5, f2: 300, a: 0.1, d: 1.6, peak: 0.3 * o.gain }); },
     // But ! clameur de la terrasse qui monte puis retombe
-    cheer(t, o, dest) {
-      burst(dest, t, { type: 'bandpass', f: 900, q: 0.6, a: 0.25, d: 2.2, peak: 0.5 * o.gain });
-      burst(dest, t + 0.1, { type: 'bandpass', f: 2200, q: 0.8, a: 0.3, d: 1.6, peak: 0.25 * o.gain });
-      for (let i = 0; i < 6; i++) tone(dest, t + 0.2 + i * 0.12, { type: 'sawtooth', f: 260 + Math.random() * 200, f2: 400 + Math.random() * 200, a: 0.05, d: 0.35, peak: 0.04 * o.gain });
+    cheer(t, o, dest) { // des voix qui montent (« OUAIS ! ») et des applaudissements, pas un souffle
+      crowd(dest, t, { n: o.n ?? 14, f0: 210, rise: 1.3, dur: 1.8, peak: 0.045 * o.gain });
+      for (let i = 0; i < 40; i++) clap(dest, t + 0.3 + Math.random() * 2.2, 0.06 * o.gain);
     },
+    sigh(t, o, dest) { crowd(dest, t, { n: 12, f0: 240, rise: 0.6, dur: 2.2, peak: 0.04 * o.gain, vowel: [570, 840] }); }, // « ooooh… »
+    applause(t, o, dest) { const n = o.n ?? 60, d = o.seconds ?? 2.5; for (let i = 0; i < n; i++) clap(dest, t + Math.random() * d * (0.4 + 0.6 * Math.random()), 0.07 * o.gain); },
+    // Une rue qui chante (« Lille ! Lille ! » / un refrain) : quelques voix sur une petite mélodie
+    chant(t, o, dest) {
+      const tune = o.notes ?? [[0, 0.35], [0, 0.35], [-3, 0.7], [0, 0.35], [0, 0.35], [-3, 0.7], [2, 0.35], [3, 0.35], [2, 0.35], [0, 0.7]];
+      for (let v = 0; v < (o.voices ?? 6); v++) voice(dest, t + Math.random() * 0.05, { f0: 180 * (v % 2 ? 1 : 0.5) * (1 + (Math.random() - 0.5) * 0.03), notes: tune, peak: 0.05 * o.gain, vowel: [700, 1150] });
+    },
+    // Quelqu'un parle : o.mood 'calm' | 'angry' | 'shout' | 'ask', o.f0 (hauteur), o.n (syllabes)
+    voice(t, o, dest) {
+      const m = o.mood ?? 'calm';
+      const k = { calm: [1, 0.12, 0.16], ask: [1, 0.25, 0.18], angry: [1.35, 0.3, 0.26], shout: [0.9, 0.2, 0.4] }[m] ?? [1, 0.12, 0.16];
+      return voice(dest, t, { f0: (o.f0 ?? 150) * (m === 'shout' ? 1.5 : 1), n: o.n ?? 6, rate: k[0], contour: k[1], peak: k[2] * o.gain, legato: m === 'shout', vowel: m === 'shout' ? [700, 1200] : null });
+    },
+    // Quelqu'un chante (le P'tit Quinquin approximatif, ou o.notes)
+    sing(t, o, dest) {
+      const notes = o.notes ?? [[0, 0.3], [2, 0.3], [4, 0.3], [5, 0.6], [4, 0.3], [2, 0.3], [0, 0.6], [-1, 0.3], [0, 0.3], [2, 0.9]];
+      voice(dest, t, { f0: o.f0 ?? 165, notes: notes.map(([n, d]) => [n + (Math.random() - 0.5) * 0.6, d]), peak: 0.18 * o.gain });
+    },
+    whistle(t, o, dest) { // sifflotement
+      let tt = t; for (const [n, d] of o.notes ?? [[0, 0.25], [4, 0.25], [7, 0.4], [5, 0.25], [4, 0.25], [2, 0.5]]) { tone(dest, tt, { f: 1046 * 2 ** (n / 12), a: 0.03, d: d * 0.9, peak: 0.07 * o.gain }); tt += d; }
+    },
+    siren(t, o, dest) { // option sirène du mégaphone : glissando qui monte et descend
+      const osc = ctx.createOscillator(); osc.type = 'square'; const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1400; bp.Q.value = 1.5;
+      for (let i = 0; i < 3; i++) { osc.frequency.setValueAtTime(500, t + i * 0.9); osc.frequency.linearRampToValueAtTime(1300, t + i * 0.9 + 0.45); osc.frequency.linearRampToValueAtTime(500, t + i * 0.9 + 0.9); }
+      const g = ctx.createGain(); env(g, t, 0.05, 0.08 * o.gain, 2.7); osc.connect(bp).connect(g).connect(dest); osc.start(t); osc.stop(t + 2.8);
+    },
+    carsiren(t, o, dest) { // pin-pon lointain qui passe
+      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1500; lp.connect(dest);
+      for (let i = 0; i < 6; i++) tone(lp, t + i * 0.55, { type: 'triangle', f: i % 2 ? 580 : 435, a: 0.03, d: 0.5, peak: 0.07 * o.gain * (1 - Math.abs(i - 2.5) / 4) });
+    },
+    heels(t, o, dest) { for (let i = 0; i < (o.steps ?? 6); i++) { const ti = t + i * (o.interval ?? 0.42); burst(dest, ti, { type: 'bandpass', f: 3200, q: 3, d: 0.025, peak: 0.16 * o.gain }); tone(dest, ti, { f: 900, d: 0.03, peak: 0.04 * o.gain }); } },
+    wheels(t, o, dest) { const d = o.seconds ?? 3.5; for (let ti = t; ti < t + d; ti += 0.07 + Math.random() * 0.05) burst(dest, ti, { type: 'bandpass', f: 600 + Math.random() * 400, q: 2, d: 0.03, peak: 0.07 * o.gain }); },
+    bottle(t, o, dest) { // bouteille qui roule (tintements irréguliers), puis tinte contre un pied de chaise
+      const d = o.seconds ?? 3;
+      for (let ti = t; ti < t + d; ti += 0.12 + Math.random() * 0.15) tone(dest, ti, { type: 'triangle', f: 1900 + Math.random() * 300, d: 0.05, peak: 0.03 * o.gain });
+      tone(dest, t + d, { type: 'triangle', f: 2400, d: 0.4, peak: 0.12 * o.gain }); tone(dest, t + d, { f: 3600, d: 0.25, peak: 0.05 * o.gain });
+    },
+    glassbreak(t, o, dest) {
+      burst(dest, t, { type: 'highpass', f: 2500, d: 0.12, peak: 0.3 * o.gain });
+      for (let i = 0; i < 14; i++) tone(dest, t + Math.random() * 0.35, { type: 'triangle', f: 2500 + Math.random() * 4000, d: 0.08 + Math.random() * 0.2, peak: 0.05 * o.gain });
+    },
+    scooter(t, o, dest) { // un scooter qui passe (moteur deux-temps, effet Doppler)
+      const d = o.seconds ?? 4, osc = ctx.createOscillator(); osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(118, t); osc.frequency.linearRampToValueAtTime(132, t + d * 0.45); osc.frequency.linearRampToValueAtTime(98, t + d);
+      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 900;
+      const am = ctx.createGain(); am.gain.value = 0.7; const lfo = ctx.createOscillator(); lfo.type = 'square'; lfo.frequency.value = 28; const lg = ctx.createGain(); lg.gain.value = 0.3; lfo.connect(lg).connect(am.gain);
+      const g = ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.16 * o.gain, t + d * 0.45); g.gain.linearRampToValueAtTime(0, t + d);
+      osc.connect(lp).connect(am).connect(g).connect(dest); osc.start(t); lfo.start(t); osc.stop(t + d + 0.05); lfo.stop(t + d + 0.05);
+    },
+    bikebell(t, o, dest) { for (let i = 0; i < (o.rings ?? 2); i++) for (const f of [2950, 4150]) tone(dest, t + i * 0.28, { type: 'triangle', f, d: 0.35, peak: 0.08 * o.gain }); },
+    horn(t, o, dest) { for (let i = 0; i < (o.beeps ?? 3); i++) for (const f of [415, 523]) tone(dest, t + i * 0.32, { type: 'square', f, a: 0.01, d: 0.2, peak: 0.035 * o.gain }); },
+    snore(t, o, dest) { for (let i = 0; i < 2; i++) { const ti = t + i * 2.4; burst(dest, ti, { type: 'lowpass', f: 400, a: 0.6, d: 0.7, peak: 0.1 * o.gain }); tone(dest, ti + 0.2, { type: 'sawtooth', f: 70, f2: 55, a: 0.3, d: 0.7, peak: 0.05 * o.gain }); } },
+    owl(t, o, dest) { for (const [dt, d] of [[0, 0.25], [0.45, 0.6]]) tone(dest, t + dt, { f: 420, f2: 360, a: 0.05, d, peak: 0.08 * o.gain }); },
+    cats(t, o, dest) { for (let i = 0; i < 4; i++) tone(dest, t + i * 0.5 + Math.random() * 0.2, { type: 'sawtooth', f: 500 + Math.random() * 300, f2: 900 + Math.random() * 300, a: 0.1, d: 0.4, peak: 0.04 * o.gain }); },
+    window(t, o, dest) { tone(dest, t, { type: 'sawtooth', f: 180, f2: 240, a: 0.05, d: 0.25, peak: 0.03 * o.gain }); burst(dest, t + 0.3, { type: 'highpass', f: 3000, d: 0.02, peak: 0.12 * o.gain }); },
+    drip(t, o, dest) { for (let i = 0; i < (o.n ?? 3); i++) tone(dest, t + i * 0.9, { f: 1400, f2: 700, d: 0.06, peak: 0.08 * o.gain }); },
     // Mégaphone : voix nasillarde saturée, quelques syllabes (« WOUHOU ! »)
     megaphone(t, o, dest) {
       const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1500; bp.Q.value = 2; bp.connect(dest);

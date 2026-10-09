@@ -169,7 +169,11 @@ function createEngine() {
     },
     // État de la nuit fourni par le metteur en scène : { twist, exhaust (0..1.4), darkness (0..1) }
     street(st) { try { street?.state(st); } catch (err) { if (!warned) { warned = true; console.warn('audio :', err); } } },
-    twistMoment(e) { street?.moment(e); },
+    // Source positionnée qui suit e.pos jusqu'à e.stop() : 'engine' | 'generator' | 'talker' | 'musette' | 'speakers' | 'fans'
+    // | 'sweeper' | 'hazard' | 'ac' (opts : gain, ref, et selon la source f0, bpm…). null avant le premier geste.
+    emitter(kind, pos, opts) { try { return street && ctx.state !== 'closed' ? street.emitter(kind, pos, opts) : null; } catch (err) { if (!warned) { warned = true; console.warn('audio :', err); } return null; } },
+    setPower(on) { street?.setPower(on); }, // coupure de courant (twist) : hotte arrêtée, groupe électrogène
+    twistMoment() {}, // (v2) les moments des twists jouent leurs sons depuis src/scene (stage / twists)
     rain(level = 0) { street?.rain(level); },
     // ---- bruitages et boucles ----
     // play(name, { pos (Vector3, spatialisé), gain, delay (s), … }) — voir sfx.js
@@ -207,7 +211,7 @@ function createEngine() {
       return {
         state: this.state, scene: scene ?? currentScene(), music: track, dayLoop, mix: this.mix,
         buses: Object.fromEntries(BUSES.map((b) => [b, { gain: bus[b] ? +bus[b].gain.value.toFixed(3) : null, effective: busGain(mix, b) }])),
-        street: { attached: !!streetOpts, gate: streetGate ? +streetGate.gain.value.toFixed(3) : null, room: street?.room ?? null, twist: street?.twist ?? null, emitters: street?.emitters ?? 0, hum: street?.hum ?? null },
+        street: { attached: !!streetOpts, gate: streetGate ? +streetGate.gain.value.toFixed(3) : null, room: street?.room ?? null, emitters: street?.emitters ?? 0, hum: street?.hum ?? null },
         rms, time: ctx ? +ctx.currentTime.toFixed(2) : 0,
       };
     },

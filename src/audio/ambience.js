@@ -1,13 +1,13 @@
 // Ambiance de la rue la nuit (WebAudio, tout synthétisé) — branchée par world.js (attach) et animée à chaque image
 // de la nuit (update). Tout passe par `out` (le bus d'ambiance de la rue, coupé le jour et à l'écran titre).
-//   • brouhaha positionnel : 4 « tablées » de voix suivent les 4 terrasses les plus proches (niveau ∝ convives),
-//     un fond lointain pour les autres ; verres, couverts, rires, chaises sur les pavés (une table qui rentre :
+//   • terrasses : PAS de brouhaha continu (§12e.5) — des bruits rares et discrets près de soi : une phrase en babil
+//     tonal, un rire, des verres, des couverts ; chaises sur les pavés (une table qui rentre :
 //     toutes les chaises raclent ; un convive qui s'en va : une chaise) ;
 //   • pas : ceux de Pilou (pavés dans la rue, parquet / carrelage chez lui), des passants au loin ;
 //   • la ville au loin (rumeur grave, une voiture de temps en temps), la cloche de 22:00, la pluie de la drache ;
 //   • la hotte : seulement chez Pilou (loi dans mix.js › humMix), un souffle juste sous la gaine dans la rue ;
-//   • chaque twist a ses sons (émetteurs positionnés) : accordéon, match à la télé, mégaphone, chanson
-//     d'anniversaire, guide, groupe électrogène pendant la coupure, balayeuse, sono, camion, fourgon…
+//   • sources positionnées (audio.emitter) pour les scènes de la rue et les twists : moteur, sono, accordéon,
+//     guide qui parle, balayeuse, groupe électrogène pendant la coupure…
 // Chez Pilou, la rue est étouffée (passe-bas) et plus basse ; penché à la fenêtre, on l'entend comme dehors.
 import * as THREE from 'three';
 import { humMix } from './mix.js';
@@ -41,9 +41,8 @@ export function makeAmbience(ctx, { out, sfxOut, noise, makeReverbBus, music, pl
   const bellBus = makeReverbBus(4.5, 0.55, out);
 
   // ---------- rumeur de la ville au loin ----------
-  const cityG = gainN(0.05);
+  const cityG = gainN(0.03); // rumeur grave très basse (pas de souffle aigu)
   loopNoise(filt('lowpass', 190, 0.7)).connect(cityG);
-  { const traffic = gainN(0.012); loopNoise(filt('bandpass', 700, 0.5)).connect(traffic).connect(cityG); }
   cityG.connect(streetIn);
   let carT = 6 + Math.random() * 10;
   function farCar(t) { // une voiture passe au bout de la rue : souffle qui monte, glisse d'un côté à l'autre, retombe
@@ -55,30 +54,31 @@ export function makeAmbience(ctx, { out, sfxOut, noise, makeReverbBus, music, pl
     s.connect(bp).connect(g).connect(p).connect(streetIn); s.start(t, Math.random() * 2); s.stop(t + 3.6);
   }
 
-  // ---------- brouhaha : « tablées » de voix (formants modulés au rythme des syllabes) ----------
-  function voiceSet(n, dest) {
-    const g = gainN(0), p = ctx.createStereoPanner();
-    g.connect(p).connect(dest);
-    const voices = [];
+  // ---------- voix : « babil » tonal (pas de bruit filtré : ça sonnait comme la pluie, §12e.5) ----------
+  // une courte phrase : quelques syllabes chantées (source glottale douce + deux formants de voyelle), contour de
+  // hauteur montant puis descendant, filtrée, très bas. f0 ~ 110 (voix grave) à 230 (voix aiguë).
+  const VOWELS = [[730, 1090], [270, 2290], [300, 870], [530, 1840], [570, 840], [440, 1020]];
+  function babble(t, g, pan, { f0 = 110 + Math.random() * 120, n = 3 + Math.floor(Math.random() * 6), dest = streetIn, rate = 1 } = {}) {
+    const p = ctx.createStereoPanner(); p.pan.value = Math.max(-1, Math.min(1, pan)); p.connect(dest);
+    const lp = filt('lowpass', 2400, 0.4); lp.connect(p);
+    const o = ctx.createOscillator(); o.type = 'sawtooth';
+    const soft = filt('lowpass', 900, 0.5); // adoucit la scie : une voix, pas un buzzer
+    const f1 = filt('bandpass', 600, 5), f2 = filt('bandpass', 1300, 7), m2 = gainN(0.45), e = gainN(0);
+    o.connect(soft); soft.connect(f1).connect(e); soft.connect(f2).connect(m2).connect(e); e.connect(lp);
+    let tt = t;
     for (let i = 0; i < n; i++) {
-      const vg = gainN(0), mix = gainN(0.5), src = loopNoise();
-      const f1 = filt('bandpass', 330 + Math.random() * 520, 3), f2 = filt('bandpass', 1150 + Math.random() * 950, 5);
-      src.connect(f1).connect(vg); src.connect(f2).connect(mix).connect(vg); vg.connect(g);
-      voices.push({ vg, rate: 3 + Math.random() * 3, ph: Math.random() * 10, base: 0.5 + Math.random() * 0.5 });
+      const [a, b] = VOWELS[Math.floor(Math.random() * VOWELS.length)];
+      const syl = (0.09 + Math.random() * 0.09) / rate, gap = (0.03 + Math.random() * 0.07) / rate;
+      const k = i / Math.max(1, n - 1), contour = 1 + 0.12 * Math.sin(k * Math.PI) - (i === n - 1 ? 0.08 : 0);
+      o.frequency.setTargetAtTime(f0 * contour * (1 + (Math.random() - 0.5) * 0.06), tt, 0.02);
+      f1.frequency.setTargetAtTime(a, tt, 0.015); f2.frequency.setTargetAtTime(b, tt, 0.015);
+      e.gain.setTargetAtTime(g * (0.7 + Math.random() * 0.3), tt, 0.018); e.gain.setTargetAtTime(0, tt + syl, 0.025);
+      tt += syl + gap;
     }
-    const bed = gainN(0.22); loopNoise(filt('bandpass', 450, 0.7)).connect(bed).connect(g);
-    return { g, p, voices, table: null };
+    o.start(t); o.stop(tt + 0.2);
+    return tt - t;
   }
-  const syllables = (set, dt, busy) => {
-    for (const v of set.voices) {
-      v.ph += dt * v.rate;
-      const syl = Math.max(0, Math.sin(v.ph * 6.28)) * (0.4 + 0.6 * Math.max(0, Math.sin(v.ph * 0.37 + v.base * 9)));
-      setT(v.vg.gain, syl * v.base * busy, 0.03);
-    }
-  };
-  const pool = [0, 1, 2, 3].map(() => voiceSet(3, streetIn));
-  const farLp = filt('lowpass', 1400, 0.5); farLp.connect(streetIn);
-  const far = voiceSet(5, farLp);
+
 
   // ---------- petits bruits de terrasse ----------
   function clink(t, g, pan) {
@@ -185,17 +185,10 @@ export function makeAmbience(ctx, { out, sfxOut, noise, makeReverbBus, music, pl
   }
   const osc = (e, type, f, into, a = 1) => { const o = ctx.createOscillator(); o.type = type; o.frequency.value = f; const g = gainN(a); o.connect(g).connect(into); o.start(); return e.src(o); };
   const am = (e, into, rate, depth, type = 'sine') => { const g = gainN(1 - depth), lfo = ctx.createOscillator(), lg = gainN(depth); lfo.type = type; lfo.frequency.value = rate; lfo.connect(lg).connect(g.gain); lfo.start(); e.src(lfo); g.connect(into); return g; };
-  // une voix qui parle sans s'arrêter (guide, commentateur, présentateur), syllabes calculées à chaque image
-  function talker(e, { f1 = 600, f2 = 1600, rate = 4.5, gain = 0.5 } = {}) {
-    const vg = gainN(0), src = e.src(loopNoise()), m = gainN(0.6);
-    src.connect(filt('bandpass', f1, 4)).connect(vg); src.connect(filt('bandpass', f2, 6)).connect(m).connect(vg); vg.connect(e.input);
-    let ph = Math.random() * 10, pause = 0;
-    e.ticks.push((dt) => {
-      ph += dt * rate; pause -= dt;
-      if (pause <= 0 && Math.random() < dt * 0.15) pause = 0.6 + Math.random() * 1.2; // reprise de souffle
-      const syl = pause > 0 ? 0 : Math.max(0, Math.sin(ph * 6.28)) * (0.5 + 0.5 * Math.abs(Math.sin(ph * 0.31)));
-      setT(vg.gain, syl * gain, 0.025);
-    });
+  // une voix qui parle sans s'arrêter (guide, commentateur, présentateur) : des phrases de babil tonal, des respirations
+  function talker(e, { f0 = 150, rate = 1, gain = 0.5 } = {}) {
+    let next = 0.2;
+    e.ticks.push((dt) => { if ((next -= dt) > 0) return; next = babble(now() + 0.02, gain * 0.35, 0, { f0: f0 * (0.95 + Math.random() * 0.1), n: 4 + Math.floor(Math.random() * 8), dest: e.input, rate }) + 0.25 + Math.random() * 0.7; });
   }
   function engine(e, { f = 30, putter = 15, gain = 0.5, lp = 380 } = {}) { // moteur diesel / groupe électrogène au ralenti
     const l = filt('lowpass', lp, 0.8); const a = am(e, l, putter, 0.6, 'square');
@@ -219,138 +212,65 @@ export function makeAmbience(ctx, { out, sfxOut, noise, makeReverbBus, music, pl
   };
   const zRange = () => { const zs = (S?.tables ?? []).map((t) => t.group.position.z); return zs.length ? [Math.min(...zs) - 4, Math.max(...zs) + 4] : [-30, 30]; };
 
-  // ---------- twists : la bande-son de chaque soirée ----------
-  let twist = null, twistE = [], power = false, generator = null, moments = [];
-  const TWISTS = {
-    football_match() { // le match à la télé des Mal Lunés : commentateur, public du stade, chants de la terrasse
-      const r = restPos('malunes'), side = Math.sign(r.x) || 1;
-      const e = emitter(V(side * ((S?.W ?? 3.2) - 0.3), 3.6, r.z + 1.5), { gain: 0.55, ref: 6 });
-      talker(e, { f1: 700, f2: 1900, rate: 5.5, gain: 0.45 });
-      e.src(loopNoise(filt('bandpass', 1000, 0.6))).connect(gainN(0.05)).connect(e.input);
-      every(e, [30, 55], () => play('cheer', { pos: r, gain: 0.35 }));
-      return [e];
-    },
-    busker() { // l'accordéoniste sous la fenêtre
-      const w = S?.window ?? V(-3.5, 6, 0);
-      const e = emitter(V(w.x + 1.6, 1.3, w.z - 1.4), { gain: 1, ref: 5 });
-      music.loop('musette', true, e.input); e.ends.push(() => music.loop('musette', false));
-      return [e];
-    },
-    fete_voisins() { // fête des voisins : accordéon doux à la grande table, rires
-      const w = S?.window ?? V(-3.5, 6, 0);
-      const e = emitter(V(0.5, 1.2, w.z + 8), { gain: 0.5, ref: 6 });
-      music.loop('musette', true, e.input); e.ends.push(() => music.loop('musette', false));
-      every(e, [4, 9], () => laugh(now() + 0.02, 0.06 * att(rel(e.pos).d, 5), rel(e.pos).pan));
-      return [e];
-    },
-    hen_party() { // l'EVJF : mégaphone et « wouhou »
-      const p = restPos('bernadette').add(V(1.5, 0, 3));
-      const e = emitter(p, { gain: 0.8, ref: 5 });
-      every(e, [9, 18], () => play('megaphone', { pos: e.pos, gain: 0.8 }));
-      every(e, [3, 7], () => laugh(now() + 0.02, 0.12 * att(rel(e.pos).d, 5), rel(e.pos).pan));
-      return [e];
-    },
-    guide_tour() { // le guide parle en marchant, le groupe le suit d'un bout à l'autre de la rue
-      const [z0, z1] = zRange();
-      const e = emitter(V(0.5, 1.6, z0), { gain: 0.7, ref: 5 });
-      talker(e, { f1: 520, f2: 1500, rate: 4, gain: 0.5 });
-      let s = 0; e.ticks.push((dt) => { s += dt / 160; const k = (1 - Math.cos(s * Math.PI * 2)) / 2; e.pos.z = z0 + (z1 - z0) * k; });
-      return [e];
-    },
-    street_sweeper() { // la balayeuse ne passe qu'au moment prévu (moments)
-      return [];
-    },
-    regis_party() { // la sono de Régis, étouffée derrière ses fenêtres
-      const a = S?.anchors?.balcony ?? S?.window ?? V(3, 6, 0);
-      const e = emitter(V(a.x, a.y ?? 6, a.z), { gain: 0.7, ref: 8 });
-      const l = filt('lowpass', 320, 0.7); l.connect(e.input);
-      let next = now() + 0.2; const beat = 60 / 118;
+  // ---------- sources positionnées réutilisables (scènes de la rue, twists) : audio.emitter(kind, pos, opts) ----------
+  // Le metteur en scène (src/scene/stage.js, twists) déplace e.pos et appelle e.stop() ; le son suit tout seul.
+  const KINDS = {
+    engine: (e, o) => engine(e, { f: o.f ?? 30, putter: o.putter ?? 15, gain: 0.7, lp: o.lp ?? 380 }), // diesel / scooter au ralenti
+    generator: (e) => engine(e, { f: 25, putter: 12.5, gain: 0.8, lp: 450 }),
+    talker: (e, o) => talker(e, { f0: o.f0 ?? 160, rate: o.rate ?? 1, gain: o.voice ?? 0.6 }), // guide, commentateur, présentateur
+    musette: (e) => { music.loop('musette', true, e.input); e.ends.push(() => music.loop('musette', false)); },
+    speakers: (e, o) => { // une sono derrière des fenêtres : grosse caisse et basse étouffées
+      const l = filt('lowpass', o.lp ?? 320, 0.7); l.connect(e.input);
+      let next = now() + 0.2; const beat = 60 / (o.bpm ?? 118), bass = [55, 55, 65.4, 49];
       e.ticks.push(() => {
+        if (next < now()) next = now() + 0.05;
         while (next < now() + 0.3) {
-          const o = ctx.createOscillator(); o.frequency.setValueAtTime(120, next); o.frequency.exponentialRampToValueAtTime(48, next + 0.12);
+          const k = ctx.createOscillator(); k.frequency.setValueAtTime(120, next); k.frequency.exponentialRampToValueAtTime(48, next + 0.12);
           const g = gainN(0); g.gain.setValueAtTime(0.5, next); g.gain.exponentialRampToValueAtTime(0.0001, next + 0.2);
-          o.connect(g).connect(l); o.start(next); o.stop(next + 0.22);
-          const b = ctx.createOscillator(); b.type = 'sawtooth'; b.frequency.value = [55, 55, 65.4, 49][Math.floor(next / beat) % 4] ?? 55;
+          k.connect(g).connect(l); k.start(next); k.stop(next + 0.22);
+          const b = ctx.createOscillator(); b.type = 'sawtooth'; b.frequency.value = bass[Math.floor(next / beat) % 4];
           const bg = gainN(0); bg.gain.setValueAtTime(0, next + beat / 2); bg.gain.linearRampToValueAtTime(0.12, next + beat / 2 + 0.01); bg.gain.exponentialRampToValueAtTime(0.0001, next + beat * 0.95);
           b.connect(bg).connect(l); b.start(next + beat / 2); b.stop(next + beat);
           next += beat;
         }
       });
-      return [e];
     },
-    fire_inspection() { // le camion des pompiers au ralenti au bout de la rue, la radio
-      const [z0] = zRange();
-      const e = emitter(V(0, 1, z0 - 2), { gain: 0.6, ref: 7 });
-      engine(e, { f: 28, putter: 14, gain: 0.7 });
-      every(e, [25, 45], () => play('radio', { pos: e.pos, gain: 0.6 }));
-      return [e];
-    },
-    saturday_van() { // le fourgon de livraison : moteur au ralenti, warnings
-      const w = S?.window ?? V(-3.5, 6, 0);
-      const e = emitter(V(0.6, 1, w.z + 9), { gain: 0.5, ref: 6 });
-      engine(e, { f: 33, putter: 16, gain: 0.6 });
-      let tk = 0; e.ticks.push((dt) => { if ((tk -= dt) > 0) return; tk = 0.75; const t = now() + 0.01, o = ctx.createOscillator(); o.type = 'square'; o.frequency.value = 2600; const g = gainN(0); g.gain.setValueAtTime(0.03, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.02); o.connect(g).connect(e.input); o.start(t); o.stop(t + 0.03); });
-      return [e];
-    },
-    lost_dog() { // un chien aboie au loin, de temps en temps
-      const e = emitter(V(0, 1, 0), { gain: 0 });
-      every(e, [18, 40], () => { const [z0, z1] = zRange(); play('bark', { pos: V((Math.random() - 0.5) * 4, 0.5, z0 + Math.random() * (z1 - z0)), gain: 0.5 }); });
-      return [e];
-    },
-    heatwave() { // ventilateurs qui tournent en terrasse
-      const e = emitter(restPos('bernadette'), { gain: 0.35, ref: 4 });
-      const a = am(e, e.input, 22, 0.3); e.src(loopNoise(filt('bandpass', 420, 0.8))).connect(gainN(0.25)).connect(a);
-      return [e];
-    },
-    influencer_night() { // déclencheurs de téléphone
-      const p = restPos('bernadette').add(V(0.5, 0, 2.5));
-      const e = emitter(p, { gain: 0 });
-      every(e, [5, 12], () => play('shutter', { pos: p, gain: 0.5 }));
-      return [e];
-    },
-  };
-  // Moments des twists (sim : { twistId, i, moment, prop }) : moment0 = premier événement, moment1 = second…
-  const MOMENTS = {
-    football_match: (e) => { play('cheer', { pos: restPos('malunes'), gain: 1 }); duck(4); }, // but !
-    birthday_t4: () => { const t = (S?.tables ?? []).filter((x) => restOf(x) === 'bernadette')[3] ?? S?.tables?.[0]; const p = t ? t.group.position.clone().setY(1.2) : V(0, 1.2, 0); play('birthday', { pos: p, gain: 1 }); play('cheer', { pos: p, gain: 0.5, delay: 6 }); duck(9); },
-    hen_party: () => { play('megaphone', { pos: restPos('bernadette').add(V(1.5, 0, 3)), gain: 1 }); duck(3); },
-    carbonnade_contest: (e) => { if (e.i === 1) { play('cheer', { pos: restPos('bernadette'), gain: 0.9 }); duck(4); } },
-    saturday_van: (e) => { if (e.i !== 1) return; const w = S?.window ?? V(0, 0, 0), p = V(0.6, 1, w.z + 9); for (let k = 0; k < 6; k++) play('notify', { pos: p, gain: 0.5, delay: k * 0.6 }); play('megaphone', { pos: p, gain: 0.3, delay: 4 }); },
-    street_sweeper: (m) => { // la balayeuse remonte la rue (moteur, brosses, eau), ~70 s, au premier moment
-      if (m.i) return;
-      const [z0, z1] = zRange();
-      const e = emitter(V(-0.5, 0.8, z1), { gain: 0.8, ref: 6 });
+    fans: (e) => { const a = am(e, e.input, 22, 0.3); e.src(loopNoise(filt('bandpass', 420, 0.8))).connect(gainN(0.25)).connect(a); },
+    sweeper: (e) => { // balayeuse-laveuse : moteur, brosses, jets d'eau
       const l = filt('lowpass', 900); l.connect(e.input); osc(e, 'sawtooth', 92, l, 0.18); osc(e, 'sawtooth', 184, l, 0.08);
       const br = am(e, e.input, 7, 0.5); e.src(loopNoise(filt('bandpass', 3000, 0.7))).connect(gainN(0.3)).connect(br);
       e.src(loopNoise(filt('highpass', 5000))).connect(gainN(0.06)).connect(e.input);
-      let s = 0; e.ticks.push((dt) => { s += dt / 70; e.pos.z = z1 + (z0 - z1) * s; if (s >= 1) e.stop(); });
-      twistE.push(e);
     },
-    delandre_walk: () => duck(3),
+    hazard: (e) => { let tk = 0; e.ticks.push((dt) => { if ((tk -= dt) > 0) return; tk = 0.75; const t = now() + 0.01, o = ctx.createOscillator(); o.type = 'square'; o.frequency.value = 2600; const g = gainN(0); g.gain.setValueAtTime(0.03, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.02); o.connect(g).connect(e.input); o.start(t); o.stop(t + 0.03); }); },
+    ac: (e) => { const l = filt('lowpass', 300); l.connect(e.input); osc(e, 'sawtooth', 60, l, 0.05); e.src(loopNoise(filt('bandpass', 900, 0.6))).connect(gainN(0.12)).connect(e.input); },
   };
+  function spawnEmitter(kind, pos, o = {}) {
+    if (!KINDS[kind]) { console.warn(`audio.emitter : source inconnue « ${kind} »`); return null; }
+    const e = emitter(pos, { gain: o.gain ?? 0.7, ref: o.ref ?? 5 });
+    KINDS[kind](e, o);
+    return e;
+  }
+  let power = false, generator = null;
 
   return {
     attach(o) {
       S = o; prevOut = new Map(o.tables.map((t) => [t, isOut(t)])); prevHeads = new Map(o.tables.map((t) => [t, heads(t)]));
     },
-    get twist() { return twist; },
     get emitters() { return emitters.size; },
     get room() { return listenerRoom; },
     get hum() { return { motor: +motorG.gain.value.toFixed(3), hiss: +hissG.gain.value.toFixed(3), cutoff: Math.round(humLp.frequency.value) }; },
     rain(level) { setT(rainG.gain, Math.max(0, Math.min(1, level || 0)) * 0.4, 0.6); },
-    // État fourni par le metteur en scène à chaque image : { twist, exhaust (0..1.4), darkness (0..1) }
-    state(st = {}) {
-      exhaustOn = ok(st.exhaust) ? st.exhaust : null;
-      const id = st.twist ?? null;
-      if (id !== twist) { for (const e of twistE) e.stop(); twistE = []; twist = id; if (id && TWISTS[id]) twistE = TWISTS[id]() ?? []; }
-      const cut = (st.darkness ?? 0) > 0.3;
-      if (cut !== power) { // coupure de courant : la hotte s'arrête, la rue baisse la voix, un groupe électrogène démarre
-        power = cut;
-        if (cut) { generator = emitter(restPos('goulot').add(V(0, -0.6, -2)), { gain: 0.45, ref: 5 }); engine(generator, { f: 25, putter: 12.5, gain: 0.8, lp: 450 }); duck(5); }
-        else { generator?.stop(); generator = null; }
-      }
+    // État fourni par le metteur en scène à chaque image : { exhaust (0..1.4) } (les sons des twists : audio.emitter / play)
+    state(st = {}) { exhaustOn = ok(st.exhaust) ? st.exhaust : null; },
+    // Coupure de courant : la hotte s'arrête, la rue baisse la voix, un groupe électrogène tourne près du Goulot
+    setPower(on) {
+      const cut = !on;
+      if (cut === power) return;
+      power = cut;
+      if (cut) { generator = spawnEmitter('generator', restPos('goulot').add(V(0, -0.6, -2)), { gain: 0.45, ref: 5 }); duck(5); }
+      else { generator?.stop(); generator = null; }
     },
-    moment(e) { moments.push(e); },
+    emitter: spawnEmitter,
     bell: (n = 1) => ringBells(n, 0.6),
     update(dt, camera) {
       cam = camera;
@@ -361,10 +281,9 @@ export function makeAmbience(ctx, { out, sfxOut, noise, makeReverbBus, music, pl
       listenerRoom = room;
       const [sg, slp] = STREET_ROOM[room] ?? [1, 9000];
       setT(streetG.gain, sg * (power ? 0.75 : 1), 0.25); setT(streetLp.frequency, slp, 0.25);
-      for (const e of moments.splice(0)) { (MOMENTS[e.twistId] ?? (() => {}))(e); }
-      // terrasses : les 4 tables les plus présentes ont leur propre tablée de voix, le reste fait un fond lointain
+      // terrasses : qui est dehors, à quelle distance (pour les petits bruits) ; chaises qui raclent
       const outT = [];
-      let farL = 0, farP = 0, near = 0;
+      let near = 0;
       for (const tb of S.tables) {
         const isout = isOut(tb), n = isout ? heads(tb) : 0;
         if (prevOut.get(tb) !== isout) { // la table rentre (ou ressort en douce) : toutes ses chaises raclent
@@ -382,26 +301,17 @@ export function makeAmbience(ctx, { out, sfxOut, noise, makeReverbBus, music, pl
         outT.push({ tb, n, d, pan, w: Math.sqrt(n) * att(d, 4) });
         near += n * att(d, 5);
       }
-      outT.sort((a, b) => b.w - a.w);
-      const top = outT.slice(0, pool.length), busy = 0.55 + 0.45 * Math.min(1, near / 20);
-      for (const s of pool) if (!top.some((x) => x.tb === s.table)) s.table = null;
-      for (const x of top) if (!pool.some((s) => s.table === x.tb)) { const free = pool.find((s) => !s.table); if (free) free.table = x.tb; }
-      for (const s of pool) {
-        const x = top.find((y) => y.tb === s.table);
-        setT(s.g.gain, x ? Math.min(0.32, 0.075 * Math.sqrt(x.n) * att(x.d, 4) * 2.2) : 0, 0.35);
-        if (x) setT(s.p.pan, x.pan * 0.9, 0.3);
-        syllables(s, dt, busy);
-      }
-      for (const x of outT.slice(pool.length)) { const w = x.n * att(x.d, 7); farL += w; farP += w * x.pan; }
-      setT(far.g.gain, Math.min(0.22, 0.04 * Math.sqrt(farL)), 0.5); setT(far.p.pan, farL ? farP / farL * 0.7 : 0, 0.6);
-      syllables(far, dt, 0.7);
       // verres, couverts, rires : plus il y a de monde près de soi, plus c'est fréquent
       chatterT -= dt;
       if (chatterT <= 0 && outT.length) {
-        chatterT = 0.25 + Math.random() * 5 / Math.sqrt(near + 0.5);
+        // rare et discret : une phrase, un rire, un verre, des couverts — jamais un fond continu
+        chatterT = 1.2 + Math.random() * 7 / Math.sqrt(near + 0.5);
+        outT.sort((a, b) => b.w - a.w);
         const x = outT[Math.floor(Math.random() ** 2 * Math.min(outT.length, 6))];
-        const g = Math.min(0.14, 0.7 / (1 + x.d * 0.45)), r = Math.random(), tt = t + 0.01;
-        if (r < 0.35) clink(tt, g * 0.5, x.pan); else if (r < 0.7) cutlery(tt, g * 0.7, x.pan); else laugh(tt, g, x.pan);
+        const g = Math.min(0.12, 0.6 / (1 + x.d * 0.45)), r = Math.random(), tt = t + 0.01;
+        if (r < 0.3) babble(tt, g * 0.45, x.pan);
+        else if (r < 0.5) { laugh(tt, g * 0.8, x.pan); if (x.n > 3 && Math.random() < 0.5) laugh(tt + 0.12, g * 0.6, x.pan * 0.8); }
+        else if (r < 0.75) clink(tt, g * 0.45, x.pan); else cutlery(tt, g * 0.6, x.pan);
       }
       // la ville au loin, une voiture parfois
       if ((carT -= dt) <= 0) { carT = 12 + Math.random() * 25; farCar(t + 0.05); }
