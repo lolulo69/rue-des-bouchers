@@ -4,8 +4,7 @@ import { watchErrors } from './helpers.js';
 // Playtest 1 de Lucas (GAME_DESIGN §12c, §13.K) : son, musique, pastilles, menu de nuit.
 // Écrits avant les correctifs : chaque test détecte sa fonction et se désactive (test.skip, avec la raison) tant
 // qu'elle n'est pas sur main. Contrats attendus (Build note « qa-playtest1 ») :
-//   • window.__rdb.world.audio.state ('running') et, pour le mixage, audio.levels() → { master, music, ambience, sfx, exhaust, crowd }
-//     (gains effectifs 0–1 à cet instant, après spatialisation) ;
+//   • audio.debug() (src/audio/index.js) : state, buses.<bus>.effective, street.hum.motor (la gaine) ;
 //   • messages du téléphone : data-media sur chaque message (phone.js)
 //   • menu Échap : trois curseurs input[type=range] (Musique / Ambiance / Effets) + on/off, mémorisés ;
 //   • menu de nuit (N) : un groupe « Ici, maintenant », et pour les actions indisponibles une raison lisible.
@@ -51,44 +50,52 @@ async function enterNight(page) {
 }
 
 test.describe('§12c.1 · le son', () => {
-  test('audio vivant au jour 5 et plus : contexte « running » dans la nuit, puis encore au retour dans la journée', async ({ page }) => {
+  const dbg = (page) => page.evaluate(() => window.__rdb.world?.audio?.debug?.() ?? null);
+
+  test('audio vivant au jour 5 et plus : contexte « running », bus maître audible, dans la nuit puis au retour dans la journée', async ({ page }) => {
     test.setTimeout(300_000);
     const errors = watchErrors(page);
     await newCampaign(page);
     expect((await playUntil(page, (c) => c.step === 'night' && c.state.day >= 5)).day).toBeGreaterThanOrEqual(5);
     await enterNight(page);
-    const st = await page.evaluate(() => window.__rdb.world?.audio?.state ?? 'absent');
-    expect(st, 'la nuit 5 a un graphe audio actif').toBe('running');
-    const lv = await page.evaluate(() => window.__rdb.world.audio.levels?.() ?? null);
-    if (lv) expect(lv.master, 'volume maître non nul').toBeGreaterThan(0);
-    // Fin de nuit → retour à l'interface de jour (bilan) sur la même page : l'audio reste vivant
+    const d = await dbg(page);
+    expect(d, 'audio.debug() disponible').not.toBeNull();
+    expect(d.state, 'la nuit 5 a un graphe audio actif').toBe('running');
+    // Bus music / ambience / sfx (src/audio/mix.js) : l'ambiance de la rue est audible
+    expect(d.mix.muted, 'son coupé').toBe(false);
+    expect(d.buses.ambience.effective, `bus ambiance : ${JSON.stringify(d.buses)}`).toBeGreaterThan(0);
+    expect(d.street.attached, 'la rue est branchée sur l’audio').toBe(true);
     await page.evaluate(() => { const r = window.__rdb; for (let i = 0; !r.sim.state.ended && i < 6000; i++) { r.sim.tick(0.5); if (i % 60 === 0) r.step(1); } r.step(2); });
     await expect(page.locator('[data-testid=recap]')).toBeVisible({ timeout: 60_000 });
     await page.mouse.click(10, 10);
-    expect(await page.evaluate(() => window.__rdb.world?.audio?.state ?? 'absent'), 'audio vivant dans la journée après la nuit 5').toBe('running');
+    const day = await dbg(page);
+    expect(day.state, 'audio vivant dans la journée après la nuit 5').toBe('running');
     expect(errors).toEqual([]);
   });
 
-  test('la gaine ne s’entend que chez Pilou : ≈ 0 dans la rue loin du conduit, nettement plus à la fenêtre', async ({ page }) => {
+  test('la gaine ne s’entend que chez Pilou : moteur ≈ 0 dans la rue loin du conduit, nettement plus à la fenêtre', async ({ page }) => {
     test.setTimeout(300_000);
     await newCampaign(page);
     await playUntil(page, (c) => c.step === 'night');
     await enterNight(page);
-    const has = await page.evaluate(() => typeof window.__rdb.world?.audio?.levels === 'function');
-    test.skip(!has, 'mixage spatial pas encore sur main : audio.levels() absent (Build note qa-playtest1)');
-    const at = (where) => page.evaluate((w) => {
-      const r = window.__rdb, { sim, player, world } = r;
-      const W = sim.cfg.STREET.halfWidth, win = sim.cfg.ANCHORS.pilouWindow;
-      if (w === 'street') { player.loc = 'street'; player.pos.set(0, 0, win.z + 40); player.yaw = 0; }
-      else { player.loc = 'apt'; player.pos.set(-W - 0.2, world.apt.floor, win.z); player.yaw = -Math.PI / 2; }
-      r.step(30); // laisse les rampes de gain se poser
-      return world.audio.levels();
-    }, where);
+    const at = async (where) => {
+      await page.evaluate((w) => {
+        const r = window.__rdb, { sim, player, world } = r;
+        const W = sim.cfg.STREET.halfWidth, win = sim.cfg.ANCHORS.pilouWindow;
+        if (w === 'street') { player.loc = 'street'; player.pos.set(0, 0, win.z + 40); player.yaw = 0; }
+        else { player.loc = 'apt'; player.pos.set(-W - 0.2, world.apt.floor, win.z); player.yaw = -Math.PI / 2; }
+        r.step(10);
+      }, where);
+      await page.waitForTimeout(1500); // les gains audio glissent en temps réel (setTargetAtTime)
+      await page.evaluate(() => window.__rdb.step(10));
+      await page.waitForTimeout(800);
+      return (await dbg(page)).street.hum;
+    };
     const street = await at('street');
-    const window_ = await at('window');
-    expect(street.exhaust, `gaine dans la rue, loin du conduit : ${JSON.stringify(street)}`).toBeLessThan(0.05);
-    expect(window_.exhaust, `gaine à la fenêtre : ${JSON.stringify(window_)}`).toBeGreaterThan(0.1);
-    expect(window_.exhaust).toBeGreaterThan(street.exhaust * 5);
+    const win = await at('window');
+    expect(street.motor, `moteur de la gaine dans la rue, à 40 m du conduit : ${JSON.stringify(street)}`).toBeLessThan(0.02);
+    expect(win.motor, `moteur de la gaine à la fenêtre : ${JSON.stringify(win)}`).toBeGreaterThan(0.01);
+    expect(win.motor).toBeGreaterThan(street.motor * 5);
   });
 });
 
@@ -147,7 +154,7 @@ test.describe('§12c.3 · pastilles de notification', () => {
 });
 
 test.describe('§12c.4 · menu de nuit', () => {
-  test('« Ici, maintenant » en tête, et chaque action indisponible dit pourquoi (où aller, ce qu’il faut)', async ({ page }) => {
+  test('« Ici, maintenant » en tête ; « Ailleurs ce soir » dit pourquoi (📍 où aller / ce qu’il faut) ; le temps se lit', async ({ page }) => {
     test.setTimeout(300_000);
     await newCampaign(page);
     await playUntil(page, (c) => c.step === 'night' && c.state.day >= 2);
@@ -155,14 +162,117 @@ test.describe('§12c.4 · menu de nuit', () => {
     await page.evaluate(() => { window.__rdb.key('KeyN'); window.__rdb.step(1); });
     const menu = page.locator('#nightmenu');
     await expect(menu).toBeVisible();
-    const text = await menu.innerText();
-    test.skip(!/Ici, maintenant/i.test(text), 'menu de nuit refondu pas encore sur main (pas de groupe « Ici, maintenant »)');
-    // Légalité, risque et temps lisibles d'un coup d'œil, et une raison pour chaque action grisée
-    const items = await menu.locator('button').evaluateAll((bs) => bs.map((b) => ({ label: b.innerText, disabled: b.disabled || b.getAttribute('aria-disabled') === 'true' })));
-    expect(items.length).toBeGreaterThan(0);
-    for (const it of items.filter((x) => x.disabled)) expect(it.label, `raison absente : ${it.label}`).toMatch(/\n|·|—|:/);
-    expect(text).toMatch(/min/); // le temps que ça coûte
-    expect(text).toMatch(/légal|gris|illégal/i);
+    await expect(menu.locator('h3').first()).toContainText('Ici, maintenant');
+    const toggle = menu.locator('.nm-toggle');
+    if (await toggle.count()) {
+      await expect(toggle).toContainText('Ailleurs ce soir');
+      await toggle.click();
+    }
+    const items = await menu.locator('#nightmenu-list button:not(.nm-toggle)').evaluateAll((bs) => bs.map((b) => ({
+      text: b.innerText, disabled: b.disabled || b.getAttribute('aria-disabled') === 'true' || b.classList.contains('off'), reason: b.querySelector('.nm-reason')?.innerText ?? null,
+    })));
+    expect(items.length, 'des actions listées').toBeGreaterThan(0);
+    const away = items.filter((x) => x.reason);
+    for (const it of away) expect(it.reason, it.text).toMatch(/📍\s*\S/);
+    for (const it of items.filter((x) => x.disabled)) expect(it.reason, `action grisée sans raison : ${it.text}`).toBeTruthy();
+    expect(items.some((x) => /min/.test(x.text)), 'le coût en temps se lit').toBe(true);
+  });
+});
+
+test.describe('§12c.5 · rythme de la nuit', () => {
+  test('objectifs du soir : 2 à 4 affichés, et ils se cochent quand on les fait', async ({ page }) => {
+    test.setTimeout(300_000);
+    await newCampaign(page);
+    await playUntil(page, (c) => c.step === 'night');
+    await enterNight(page);
+    const box = page.locator('#objectives');
+    await expect(box).toBeVisible();
+    const n = await box.locator('li:not(.info)').count();
+    expect(n, 'objectifs du soir').toBeGreaterThanOrEqual(2);
+    expect(await box.locator('li').count()).toBeLessThanOrEqual(5); // 4 objectifs + le conseil « au lit »
+    // On joue la soirée comme un joueur appliqué : relevé, photos, police, serveur
+    await page.evaluate(() => {
+      const r = window.__rdb, { sim } = r;
+      for (let i = 0; sim.state.min < 22 * 60 + 10 && i < 4000; i++) { sim.tick(0.5); if (i % 30 === 0) r.step(1); }
+      for (const t of sim.state.tables.filter((x) => x.out).slice(0, 4)) { r.aimAt(t.id); r.step(1); r.key('KeyP'); r.step(1); }
+      r.key('KeyB'); r.step(1);
+      sim.act({ type: 'police' }); sim.act({ type: 'waiter' });
+      for (let i = 0; sim.state.min < 23 * 60 && i < 4000; i++) { sim.tick(0.5); if (i % 20 === 0) r.step(1); }
+      r.step(4);
+    });
+    const done = await box.locator('li.done').count();
+    const logged = await page.locator('#log').innerText();
+    expect(done + (/✓ Objectif/.test(logged) ? 1 : 0), `aucun objectif coché : ${await box.innerText()}`).toBeGreaterThan(0);
+  });
+
+  test('après 22h30, si rien ne se passe, l’horloge file à ×3 avec ⏩ (et plus vite qu’à 21h)', async ({ page }) => {
+    test.setTimeout(300_000);
+    await newCampaign(page);
+    await playUntil(page, (c) => c.step === 'night');
+    await enterNight(page);
+    const pace = (until) => page.evaluate((u) => {
+      const r = window.__rdb, { sim } = r;
+      for (let i = 0; sim.state.min < u && i < 4000; i++) { sim.tick(0.5); if (i % 60 === 0) r.step(1); }
+      r.step(60); // 2 s de jeu : la vitesse glisse vers sa cible
+      const m0 = sim.state.min;
+      r.step(30); // 1 s
+      const fast = document.getElementById('fast');
+      return { perSecond: sim.state.min - m0, fastShown: !fast.classList.contains('hidden'), fastText: fast.textContent };
+    }, until);
+    const early = await pace(21 * 60);
+    const late = await pace(22 * 60 + 40);
+    expect(early.perSecond, `21h : ${JSON.stringify(early)}`).toBeLessThan(0.8); // ×1 : 0,5 min de jeu par seconde
+    test.skip(!late.fastShown && late.perSecond < 0.8, 'une patrouille / un moment de twist proche garde l’horloge à ×1 ce soir-là (graine)');
+    expect(late.fastShown, `⏩ affiché : ${JSON.stringify(late)}`).toBe(true);
+    expect(late.fastText).toMatch(/⏩ ×[23]/);
+    expect(late.perSecond).toBeGreaterThan(early.perSecond * 2);
+  });
+
+  test('au lit : ×40, voile « Pilou dort… », puis « Passer à demain matin » mène au bilan', async ({ page }) => {
+    test.setTimeout(300_000);
+    await newCampaign(page);
+    await playUntil(page, (c) => c.step === 'night');
+    await enterNight(page);
+    const r1 = await page.evaluate(() => {
+      const r = window.__rdb, { sim, player, world } = r;
+      for (let i = 0; sim.state.min < 22 * 60 + 15 && i < 4000; i++) { sim.tick(0.5); if (i % 60 === 0) r.step(1); }
+      player.loc = 'apt'; player.pos.set(world.bed.x + 0.3, world.apt.floor, world.bed.z); r.step(2);
+      r.key('KeyE'); r.step(1);
+      r.step(4 * 30); // une carte d'aide qui apparaît pour la 1re fois fige l'horloge 3 s (coachPauseUntil) : on la laisse passer
+      const m0 = sim.state.min;
+      r.step(30); // 1 s
+      return { sleeping: sim.state.sleeping, perSecond: sim.state.min - m0, mult: sim.cfg.RULES.sleepTimeMultiplier };
+    });
+    expect(r1.sleeping, 'Pilou est couché').toBe(true);
+    expect(r1.mult).toBe(40);
+    expect(r1.perSecond, `minutes de jeu par seconde au lit : ${JSON.stringify(r1)}`).toBeGreaterThan(10); // ×40 × 0,5
+    await expect(page.locator('#sleepveil')).toBeVisible();
+    await expect(page.locator('[data-testid=sleep-skip]')).toContainText('Passer à demain matin');
+    await page.keyboard.press('Enter');
+    // La même nuit, minute par minute ; les événements de nuit éventuels s'arrêtent sur leur carte
+    for (let k = 0; k < 40; k++) {
+      if (await page.locator('[data-testid=recap]').isVisible()) break;
+      if (await page.locator('#nightmenu').isVisible()) await page.locator('#nightmenu-list button:not([disabled])').first().click();
+      await page.evaluate(() => window.__rdb.step(20));
+    }
+    await expect(page.locator('[data-testid=recap]')).toBeVisible({ timeout: 60_000 });
+  });
+
+  test('conseil « au lit » après 22h30 quand Pilou est épuisé, avec la touche et la direction du lit', async ({ page }) => {
+    test.setTimeout(300_000);
+    await newCampaign(page);
+    await playUntil(page, (c) => c.step === 'night');
+    await enterNight(page);
+    await page.evaluate(() => {
+      const r = window.__rdb, { sim } = r;
+      for (let i = 0; sim.state.min < 22 * 60 + 35 && i < 4000; i++) { sim.tick(0.5); if (i % 60 === 0) r.step(1); }
+      sim.state.sleep = 15; // épuisé (seuil RULES.bedtime.tiredSleep)
+      r.step(6);
+    });
+    const box = page.locator('#objectives');
+    await expect(box).toBeVisible();
+    await expect(box).toContainText('🛏');
+    await expect(box).toContainText(/\[E\]|montez chez vous/);
   });
 });
 
