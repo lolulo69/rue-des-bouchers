@@ -68,19 +68,20 @@ test.describe('§12e.1 · fenêtres longues', () => {
     await enterNight(page);
     await advance(page, 21 * 60 + 40);
     await goStreet(page);
-    const pace = () => page.evaluate(() => { const r = window.__rdb, m0 = r.sim.state.min; r.step(30); return r.sim.state.min - m0; });
-    await page.evaluate(() => window.__rdb.step(60));
-    const normal = await pace();
+    // Déterministe (pas de vitesse mesurée) : window.__rdb.clock = l'état de nightClock() (échelle cible + raison)
+    const clock = () => page.evaluate(() => { window.__rdb.step(1); const k = window.__rdb.clock; return { scale: k.scale, reason: k.reason ?? null }; });
+    const before = await clock();
     const res = await page.evaluate(() => window.__rdb.campaign.doNightAction(window.__rdb.sim, 'night_fake_alert'));
     expect(res?.ok, JSON.stringify(res)).not.toBe(false);
     const att = await page.evaluate(() => { const S = window.__rdb.sim.state; return (S.attention ?? []).filter((a) => S.min >= a.from && S.min < a.until).map((a) => a.until - a.from); });
     expect(att.length, 'une fenêtre est ouverte').toBeGreaterThan(0);
     expect(Math.max(...att), `durée de la fenêtre (min de jeu) : ${att}`).toBeGreaterThanOrEqual(5);
     expect(Math.max(...att)).toBeLessThanOrEqual(8);
-    await page.evaluate(() => window.__rdb.step(60)); // la vitesse glisse vers ×0,5
-    const slow = await pace();
-    await expect(page.locator('#window')).toContainText(/Fenêtre propice.*(⏳\s*\d+:\d\d|encore\s*\d+\s*min)/); // compte à rebours en temps réel
-    expect(slow, `min de jeu par seconde : ${normal} → ${slow}`).toBeLessThan(normal * 0.75);
+    const during = await clock();
+    expect(before.scale, `horloge avant la diversion : ${JSON.stringify(before)}`).toBeGreaterThanOrEqual(0.9);
+    expect(during.scale, `horloge pendant la fenêtre : ${JSON.stringify(during)}`).toBeCloseTo(0.5, 1);
+    await page.evaluate(() => window.__rdb.step(4)); // > 0,1 s : le HUD se rafraîchit
+    await expect(page.locator('#window')).toContainText(/Fenêtre propice.*(⏳\s*\d+:\d\d|encore\s*\d+\s*min)/); // compte à rebours
   });
 });
 

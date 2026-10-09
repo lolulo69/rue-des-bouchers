@@ -210,22 +210,22 @@ test.describe('§12c.5 · rythme de la nuit', () => {
     await newCampaign(page);
     await playUntil(page, (c) => c.step === 'night');
     await enterNight(page);
-    const pace = (until) => page.evaluate((u) => {
+    // Déterministe : l'échelle cible de nightClock() (window.__rdb.clock), pas une vitesse mesurée
+    const at = (until) => page.evaluate((u) => {
       const r = window.__rdb, { sim } = r;
       for (let i = 0; sim.state.min < u && i < 4000; i++) { sim.tick(0.5); if (i % 60 === 0) r.step(1); }
-      r.step(60); // 2 s de jeu : la vitesse glisse vers sa cible
-      const m0 = sim.state.min;
-      r.step(30); // 1 s
-      const fast = document.getElementById('fast');
-      return { perSecond: sim.state.min - m0, fastShown: !fast.classList.contains('hidden'), fastText: fast.textContent };
+      r.step(4);
+      const fast = document.getElementById('fast'), k = r.clock;
+      return { scale: k.scale, reason: k.reason ?? null, fastShown: !fast.classList.contains('hidden'), fastText: fast.textContent };
     }, until);
-    const early = await pace(21 * 60);
-    const late = await pace(22 * 60 + 40);
-    expect(early.perSecond, `21h : ${JSON.stringify(early)}`).toBeLessThan(0.8); // ×1 : 0,5 min de jeu par seconde
-    test.skip(!late.fastShown && late.perSecond < 0.8, 'une patrouille / un moment de twist proche garde l’horloge à ×1 ce soir-là (graine)');
-    expect(late.fastShown, `⏩ affiché : ${JSON.stringify(late)}`).toBe(true);
-    expect(late.fastText).toMatch(/⏩ ×[23]/);
-    expect(late.perSecond).toBeGreaterThan(early.perSecond * 2);
+    const early = await at(21 * 60);
+    const late = await at(22 * 60 + 40);
+    expect(early.scale, `21h : ${JSON.stringify(early)}`).toBeLessThan(1.2);
+    test.skip(late.scale < 1.2 && /busy/.test(late.reason ?? ''), `ce soir-là, quelque chose garde l’horloge à ×1 à 22h40 (${late.reason})`);
+    expect(late.scale, `22h40 : ${JSON.stringify(late)}`).toBeGreaterThan(2.5);
+    await page.evaluate(() => window.__rdb.step(60)); // l'indicateur suit la vitesse amortie
+    await expect(page.locator('#fast')).toBeVisible();
+    await expect(page.locator('#fast')).toContainText(/⏩ ×[23]/);
   });
 
   test('au lit : ×40, voile « Pilou dort… », puis « Passer à demain matin » mène au bilan', async ({ page }) => {
@@ -238,14 +238,12 @@ test.describe('§12c.5 · rythme de la nuit', () => {
       for (let i = 0; sim.state.min < 22 * 60 + 15 && i < 4000; i++) { sim.tick(0.5); if (i % 60 === 0) r.step(1); }
       player.loc = 'apt'; player.pos.set(world.bed.x + 0.3, world.apt.floor, world.bed.z); r.step(2);
       r.key('KeyE'); r.step(1);
-      r.step(4 * 30); // une carte d'aide qui apparaît pour la 1re fois fige l'horloge 3 s (coachPauseUntil) : on la laisse passer
-      const m0 = sim.state.min;
-      r.step(30); // 1 s
-      return { sleeping: sim.state.sleeping, perSecond: sim.state.min - m0, mult: sim.cfg.RULES.sleepTimeMultiplier };
+      r.step(4);
+      return { sleeping: sim.state.sleeping, scale: r.clock.scale, mult: sim.cfg.RULES.sleepTimeMultiplier };
     });
     expect(r1.sleeping, 'Pilou est couché').toBe(true);
     expect(r1.mult).toBe(40);
-    expect(r1.perSecond, `minutes de jeu par seconde au lit : ${JSON.stringify(r1)}`).toBeGreaterThan(10); // ×40 × 0,5
+    expect(r1.scale, `échelle de l'horloge au lit (nightClock) : ${JSON.stringify(r1)}`).toBeGreaterThan(30); // ×40, déterministe
     await expect(page.locator('#sleepveil')).toBeVisible();
     await expect(page.locator('[data-testid=sleep-skip]')).toContainText('Passer à demain matin');
     await page.keyboard.press('Enter');

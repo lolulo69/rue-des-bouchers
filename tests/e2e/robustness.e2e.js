@@ -227,7 +227,9 @@ test('horloge adaptative (§12c.5) : ⏩ après 22h30 quand rien ne se passe, re
   expect(r.late.scale).toBeGreaterThan(2.5);
   expect(r.late.shown).toBe(true);
   expect(r.late.text).toMatch(/⏩ ×3/);
-  expect(r.fastMinutes).toBeGreaterThan(1.3); // 1 s réelle ≈ 1,5 min de jeu à ×3 (0,5 à ×1)
+  // Échelle cible déjà vérifiée ci-dessus (late.scale > 2.5, déterministe). La vitesse mesurée dépend de l'amorti : marge large
+  // (×1 donnerait 0,5 min de jeu ; ×3 ≈ 1,5), pour ne pas dépendre du moment exact où l'amorti atteint ×3 (QA, CI 2026-10-09).
+  expect(r.fastMinutes).toBeGreaterThan(1.0);
   expect(r.police.reason).toBe('busy:police');
   expect(r.police.scale).toBeLessThan(1.2);
 });
