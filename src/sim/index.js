@@ -14,3 +14,4 @@ export { checkCampaignInvariants } from './campaignInvariants.js';
 export { availableNightActions, performNightAction } from './nightActions.js';
 export { nightMenu, witnessRisk, effectHint } from './nightMenu.js';
 export { LOCATIONS } from './nightActions.js';
+export { nightClock, busyReason } from './nightClock.js';

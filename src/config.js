@@ -10,7 +10,11 @@ export const RULES = {
   nightStart: 20 * 60 + 30,      // début de partie (20:30)
   nightEnd: 25 * 60 + 30,        // fin de partie (01:30)
   gameMinutesPerSecond: 0.5,     // 1 s réelle = 30 s de jeu → ~10 min de jeu réel pour la nuit
-  sleepTimeMultiplier: 12,       // accélération du temps quand Pilou essaie de dormir
+  sleepTimeMultiplier: 40,       // accélération du temps quand Pilou essaie de dormir (§12c.5 : ×12 → ×40)
+  // Horloge adaptative (§12c.5, src/sim/nightClock.js) : après fastAfter, ×fastScale sauf si quelque chose se passe ou
+  // va se passer (patrouille en route ou sur place, moment de twist / événement de nuit dans les lookahead minutes,
+  // témoin / preuve / action dans les calmMinutes dernières minutes). « Accélérer » (manuel) : ×fastScale dès 20h30.
+  clock: { fastAfter: 22 * 60 + 30, fastScale: 3, lookahead: 10, calmMinutes: 5, easeSeconds: 1.2 },
 };
 
 // Variantes de soirée (?day=sat). Le lundi est la soirée de référence.
