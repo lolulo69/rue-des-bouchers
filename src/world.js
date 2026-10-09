@@ -480,7 +480,7 @@ export function buildWorld(scene, opts = {}) {
     pilouSill: P(-(W - 0.12), F + 0.05, bz + 0.6),          // rebord de la fenêtre de Pilou
     pilouBanner: P(-(W - 0.02), F - 0.45, bz),               // sous sa fenêtre
     balconyRail: P(W - 0.83, anchors.balcony.y + 0.55, bz + 0.4), // devant la rambarde de Seb & Nico
-    smokeSpot: P(-(W - 0.5), 0, bz + 4.4),                  // pause clope du serveur, sous le store
+    smokeSpot: P(-(W + 2.3), 0, -HALF - 2.5),               // pause clope du serveur : au coin de la rue de la Barre (src/sim/schedule.js)
     awningCleanSpot: P(-(W - 0.55), 0, bz - 2),             // escabeau de Ghislain sous le store
     awning: P(-(W - 0.3), 2.45, bz - 3.5),                  // sous le bord du store (petit objet discret)
     awningSocket: P(-(W - 0.04), 2.2, bz + 4.3),            // sur la façade, sous le store

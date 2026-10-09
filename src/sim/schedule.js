@@ -4,18 +4,27 @@
 export const SCHEDULE = {
   waiterBreaks: [[21 * 60 + 12, 21 * 60 + 18], [22 * 60 + 24, 22 * 60 + 30], [23 * 60 + 36, 23 * 60 + 42], [24 * 60 + 30, 24 * 60 + 38]],
   ghislainClean: [[20 * 60 + 34, 20 * 60 + 50]],
-  smokeSpot: { wallGap: 0.5, dz: 4.4 }, // sous le store de l'estaminet, près de la porte de l'immeuble de Pilou
+  // pause clope : juste après l'angle, rue de la Barre, côté estaminet — hors de vue de la terrasse (§12e.7 : on soudoie le
+  // serveur là, à l'abri des regards). dx : pas au-delà de la façade ; dz : pas dans la rue de la Barre.
+  smokeSpot: { corner: true, dx: 2.3, dz: 2.5 },
   patrolSpacing: 0.4, // les deux agents marchent côte à côte
 };
 
 export const inWindow = (min, windows) => windows.some(([a, b]) => min >= a && min < b);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
-// Où se trouve le serveur pendant sa pause (contre la façade de l'estaminet)
+// Où se trouve le serveur pendant sa pause : au coin de la rue de la Barre (défaut), ou contre la façade de l'estaminet
+// (ancienne config { wallGap, dz })
 export function smokeSpot(cfg) {
-  const S = cfg.SCHEDULE ?? SCHEDULE;
+  const S = (cfg.SCHEDULE ?? SCHEDULE).smokeSpot ?? SCHEDULE.smokeSpot;
   const b = cfg.RESTAURANTS.find((r) => r.id === 'bernadette') ?? cfg.RESTAURANTS[0];
-  return { x: b.side * (cfg.STREET.halfWidth - S.smokeSpot.wallGap), z: (b.z0 + b.z1) / 2 + S.smokeSpot.dz };
+  if (S.corner) return { x: b.side * (cfg.STREET.halfWidth + S.dx), z: -cfg.STREET.length / 2 - S.dz };
+  return { x: b.side * (cfg.STREET.halfWidth - S.wallGap), z: (b.z0 + b.z1) / 2 + S.dz };
+}
+// Le coin (au ras de l'angle, côté rue des Bouchers) par lequel le serveur passe pour aller fumer
+export function smokeCorner(cfg) {
+  const b = cfg.RESTAURANTS.find((r) => r.id === 'bernadette') ?? cfg.RESTAURANTS[0];
+  return { x: b.side * (cfg.STREET.halfWidth - 0.8), z: -cfg.STREET.length / 2 + 0.6 };
 }
 
 // Positions des deux agents de la patrouille en cours (ou de la visite pour Pilou), [] si personne dans la rue.
