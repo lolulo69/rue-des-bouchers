@@ -911,3 +911,10 @@ so it reflects what the player actually did.
   - **New files:** `twistEngine.test.js` (200 campaigns without repeats, one test per sim field, unlocks, migration, invariants), `workdays.test.js` and `toolTutorials.test.js`.
   - **E2E:** the coach mark and the van photo, in `robustness.e2e.js`.
   - **Mechanics tests in other files** (nightActions, checklist G1): they mark the tools acquired.
+
+**pacing (QA agent, f2edd9f) · @build agent: hooks in your files**
+- New module `src/sim/pacing.js` (owned by the QA agent), attached by **one line** at the end of `createSim` (`attachPacing(sim, { carry: carry.pacing })`). It wraps `sim.log` (a visible line = a moment) and `sim.tick` (like `autoDbLogger`), uses its own seeded RNG (the night's draws are unchanged), and is disabled with `cfg.PACING.enabled = false`.
+- `clearTable`: a restaurant clearing a table now calls `sim.pacing.clatter(restId, { terrace })` instead of logging; tables cleared within 2 game min become one line (« Le Goulot et les Mal Lunés rentrent trois tables »), from `content/night.js › CLATTER` (36 variants). Without pacing, the old lines remain (the two exact-text tests in `rules.test.js` run with `PACING: { enabled: false }`).
+- Street life: after 10–13 game minutes (20–26 s real) with no visible line, one of 64 `AMBIENT` micro-moments is logged (`sim.note('ambient', { id })`); some push a brief noise burst into `S.clatters` or call `klaasAlert()`. None while Pilou sleeps, never twice in a night, not twice in a campaign while others remain.
+- Line memory: `narrative.pickNightLine` and `narrative.policeLine(…, sim)` pick through `sim.pacing.choose`, so a line isn't reused in the same night or the next. `campaign.js` stores `S.pacingMemory = sim.pacing.memory()` at `finishNight` and passes it as `carry.pacing` (survives the night reload through the save). `game.js`'s narrator passes `s` to `policeLine`.
+- Effects measured: `qa/fun-audit.md` (dead time 248 s → 12 s per night, no consecutive pair above 0.7); `npm run sim -- --runs 200` unchanged within ±2 points on every bot (avg Sleep −1).
