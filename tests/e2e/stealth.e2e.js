@@ -159,7 +159,7 @@ test.describe('§12d.1–3 · diversions, fenêtres, « Qui regarde ? »', () =>
       const r = window.__rdb, { sim } = r;
       const open = () => (sim.state.attention ?? []).some((a) => a.source === 'window' && sim.state.min >= a.from && sim.state.min < a.until);
       for (let i = 0; !sim.state.ended && i < 8000; i++) {
-        if (open()) { r.step(2); return true; }
+        if (open()) { r.step(4); return true; } // 4 images > 0,1 s : au moins un rafraîchissement du HUD (#window)
         if (r.campaign.nightEventDue?.(sim)) r.campaign.resolveNightEvent(sim, 0);
         sim.tick(0.25); if (i % 60 === 0) r.step(1);
       }

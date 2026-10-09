@@ -8,6 +8,9 @@ export default defineConfig({
   testDir: 'tests/e2e',
   testMatch: '**/*.e2e.js',
   timeout: 240_000,
+  // CI : un seul worker par shard (les 4 shards tournent déjà en parallèle). À deux workers, deux pages 3D sous SwiftShader
+  // se disputaient le runner et un test attendait plus de 240 s son contexte navigateur (shard 3, 2026-10-09).
+  workers: process.env.CI ? 1 : undefined,
   reporter: [['list']],
   use: {
     baseURL: `http://localhost:${PORT}`,
