@@ -495,3 +495,144 @@ export const NIGHT_END = {
     'Gyrophares bleus dans la vitrine de l’estaminet. Cette fois, la patrouille est venue vite. Pour vous.',
   ],
 };
+
+// ════════════════════════════════════════════════════════════════════════════
+// RACLEMENTS DE CHAISES (pacing.js) : les tables qu'on rentre, regroupées sur ~2 min de jeu.
+// {who} / {Who} = qui rentre (« Le Goulot », « les Mal Lunés et l’estaminet »), {n} = nombre de tables en toutes lettres.
+// one : une table · some : plusieurs tables d'un même resto · terrace : la dernière (« sa terrasse ») · many : plusieurs restos
+// late : après 22h05 (« enfin ») · saturday / rain : remplacent parfois les autres (samedi sans voitures, pluie).
+// Une même ligne ne revient ni dans la même nuit ni la suivante (pacing.js).
+// ════════════════════════════════════════════════════════════════════════════
+export const CLATTER = {
+  names: {
+    bernadette: 'l’estaminet', malunes: 'les Mal Lunés', goulot: 'Le Goulot', bloemkool: 'Bloemkool',
+    endroit: 'L’Endroit', truffe: 'Truffe et Ficelle', mug: 'Mug',
+  },
+  one: [
+    'Raclement de chaises sur les pavés : {who} rentre une table.',
+    'Une table de {who} disparaît à l’intérieur, dans un concert de pieds métalliques.',
+    'Quatre chaises raclent les pavés : {who} rentre une table.',
+    '{Who} plie une table. Le bruit monte jusqu’à votre fenêtre, puis plus rien.',
+    'Crrrrr. Une table de {who} rentre, en traînant les pieds.',
+  ],
+  one_late: [
+    'Raclement de chaises sur les pavés : {who} rentre une table… enfin.',
+    '{Who} rentre une table, avec le retard réglementaire.',
+    'Une table de {who} se décide à rentrer. Il était temps.',
+    'Les chaises de {who} raclent les pavés : une table de moins, enfin.',
+    'Une table de {who} rentre en traînant des pieds, comme un ado à l’heure du coucher.',
+  ],
+  some: [
+    '{Who} rentre {n} tables d’un coup. Les pavés s’en souviendront.',
+    'Raclement en série : {who}, {n} tables.',
+    'Un vacarme de chaises empilées : {who} rentre {n} tables.',
+    '{Who} débarrasse {n} tables, au pas de course et au bruit maximal.',
+  ],
+  some_late: [
+    '{Who} rentre {n} tables… enfin.',
+    '{n} tables de {who} rentrent, bien après l’heure. Mieux vaut tard.',
+    'Grand raclement tardif : {who}, {n} tables.',
+    '{Who} se réveille et rentre {n} tables à la file.',
+  ],
+  terrace: [
+    'Raclement de chaises sur les pavés : {who} rentre sa terrasse.',
+    '{Who} rentre ses dernières chaises. Sa terrasse est vide.',
+    'Dernier raclement chez {who} : la terrasse est rentrée.',
+    '{Who} a tout rentré. Le pavé respire.',
+  ],
+  terrace_late: [
+    'Raclement de chaises sur les pavés : {who} rentre sa terrasse… enfin.',
+    '{Who} rentre enfin sa terrasse. Vous notez l’heure, par principe.',
+    'Plus une chaise dehors chez {who}. Il aura fallu le temps.',
+    '{Who} plie sa terrasse, enfin. Les derniers clients finissent debout.',
+  ],
+  many: [
+    '{Who} rentrent {n} tables en même temps : un orchestre de chaises sur les pavés.',
+    'Raclements croisés : {who}, {n} tables en tout.',
+    'Toute la rue racle en même temps : {who} rentrent {n} tables.',
+    '{Who} rangent {n} tables à l’unisson. La rue des Bouchers fait son bruit de fin de service.',
+  ],
+  saturday: [
+    'Samedi oblige, {who} rentre les chaises en slalomant entre les buveurs debout.',
+    'Les chaises de {who} raclent, couvertes par la foule du samedi.',
+    '{Who} tente de rentrer une table ; un groupe debout s’assoit dessus pour l’empêcher.',
+  ],
+  rain: [
+    'Sous la pluie, {who} rentre les chaises au pas de course.',
+    'Les chaises mouillées de {who} glissent sur les pavés luisants.',
+    '{Who} rentre ses tables en jurant contre la drache.',
+  ],
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+// LA VIE DE LA RUE (pacing.js) : micro-moments injectés quand rien ne s'est passé depuis une vingtaine de secondes.
+// when (facultatif, en ET) : from / to (minutes depuis minuit) · sat: true|false · rain: true|false
+// effects (facultatif) : noise (un bref pic de bruit dans la rue) · klaas (Klaas prend ses jumelles)
+// Jamais deux fois le même dans une campagne tant qu'il en reste d'autres ; jamais dans la même nuit.
+// ════════════════════════════════════════════════════════════════════════════
+export const AMBIENT = [
+  { id: 'scooter', text: 'Un scooter remonte la rue en zigzag. Les pavés le secouent comme un shaker.', effects: { noise: true } },
+  { id: 'couple_argue', text: 'Un couple se dispute sous votre fenêtre. Le sujet : qui a eu l’idée de venir ici.' },
+  { id: 'tourist_grand_place', text: 'Un touriste demande « la Grand-Place ? » à toute la terrasse. Six doigts pointent dans six directions.' },
+  { id: 'window_opens', text: 'En face, une fenêtre s’ouvre, quelqu’un regarde la rue, soupire, et la referme.' },
+  { id: 'gaufre_balcony', text: 'Gaufre s’installe au bord du balcon d’en face et fixe la terrasse, comme un huissier.', when: { to: 24 * 60 } },
+  { id: 'bottle_rolls', text: 'Une bouteille vide roule sur les pavés pendant une éternité, puis heurte un pied de chaise.', effects: { noise: true } },
+  { id: 'quinquin', text: 'Un passant éméché entonne « Le P’tit Quinquin ». Il ne connaît que le premier vers, qu’il chante quatre fois.', effects: { noise: true }, when: { from: 22 * 60 } },
+  { id: 'delivery_lost', text: 'Un livreur à vélo tourne trois fois dans la rue, téléphone à la main, perdu entre deux numéros 10.' },
+  { id: 'bell_maurice', text: 'Au loin, la cloche de Saint-Maurice sonne le quart. Personne en terrasse ne l’entend.', when: { from: 22 * 60 + 10 } },
+  { id: 'dog_bark_far', text: 'Un chien aboie quelque part vers la place, puis se ravise.' },
+  { id: 'heels_cobbles', text: 'Des talons sur les pavés : clac, clac, clac, puis un juron, puis plus de clac.' },
+  { id: 'suitcase', text: 'Une valise à roulettes traverse la rue pavée. Vous entendez chaque pavé, un par un.', effects: { noise: true } },
+  { id: 'birthday_far', text: 'Plus loin, une terrasse chante « Joyeux anniversaire ». Trois fois, pour trois prénoms différents.', effects: { noise: true } },
+  { id: 'phone_loud', text: 'Un client parle au téléphone en haut-parleur. Toute la rue sait maintenant que Kevin ne vient pas.' },
+  { id: 'toast_loud', text: '« À la nôtre ! » Une table entière se lève pour trinquer. Les verres tintent jusqu’à votre fenêtre.', effects: { noise: true } },
+  { id: 'smoker_ghislain', text: 'Ghislain sort fumer sur le pas de la porte, regarde votre fenêtre, et rentre sans finir sa cigarette.' },
+  { id: 'dede_laugh', text: 'Le rire de Dédé traverse la vitrine. Il a dû raconter la même blague qu’hier.' },
+  { id: 'klaas_light', text: 'Au bout de la rue, la lampe de Klaas s’allume. Il a entendu quelque chose.', effects: { klaas: true } },
+  { id: 'hilde_curtain', text: 'Le rideau de Hilde bouge, place Maurice-Schumann. Une silhouette, une tasse, puis plus rien.', when: { to: 23 * 60 + 30 } },
+  { id: 'tatie_window', text: 'Tatie Bouchon ouvre sa fenêtre, renifle l’air, et la referme avec la dignité d’un e-mail recommandé.' },
+  { id: 'jeremie_light', text: 'Au troisième, chez Jérémie, une lumière s’allume. Biloute grogne contre le plancher.' },
+  { id: 'seb_nico_laugh', text: 'Sur le balcon d’en face, Seb raconte quelque chose à Nico en montrant la terrasse. Ils rient.', when: { to: 23 * 60 + 30 } },
+  { id: 'tram_bell', text: 'Une cloche de vélo insiste à l’entrée de la rue : un cycliste découvre la terrasse au milieu du passage.' },
+  { id: 'glass_breaks', text: 'Un verre se brise. Une salve d’applaudissements suit, par réflexe.', effects: { noise: true } },
+  { id: 'chair_falls', text: 'Une chaise vide tombe toute seule sur les pavés. Le serveur la relève sans y croire.', effects: { noise: true } },
+  { id: 'guitar', text: 'Un musicien de rue s’installe à l’angle avec une guitare. Il commence par « Wonderwall ». Évidemment.', effects: { noise: true }, when: { to: 23 * 60 } },
+  { id: 'guitar_leaves', text: 'Le guitariste range son étui. Il a gagné trois euros et un sandwich.', when: { from: 23 * 60 } },
+  { id: 'police_car_far', text: 'Une sirène passe rue de la Barre, sans tourner. Ce n’est pas pour vous. Ce n’est jamais pour vous.' },
+  { id: 'taxi_waits', text: 'Un taxi attend au bout de la rue, warnings allumés, pendant que des clients se disent au revoir douze fois.' },
+  { id: 'group_photo', text: 'Une tablée fait une photo de groupe au flash. Vous voyez des étoiles pendant dix secondes.' },
+  { id: 'student_choir', text: 'Une bande d’étudiants passe en chantant l’hymne d’une fac. Ils ne sont pas d’accord sur les paroles.', effects: { noise: true }, when: { from: 22 * 60 + 30 } },
+  { id: 'pigeon', text: 'Un pigeon atterrit sur une table, prend une frite et repart. Personne n’ose protester.', when: { to: 22 * 60 + 30 } },
+  { id: 'kid_scooter', text: 'Un enfant en trottinette traverse la terrasse, suivi d’un père qui s’excuse auprès de chaque chaise.', when: { to: 21 * 60 + 45 } },
+  { id: 'menu_board', text: 'Le serveur efface l’ardoise. « Waterzooi » disparaît, il ne reste que « Carbonnade ». Comme d’habitude.' },
+  { id: 'exhaust_cough', text: 'La gaine d’extraction tousse, crache une bouffée de friture, et reprend son ronron.', when: { to: 23 * 60 + 30 } },
+  { id: 'ac_drip', text: 'La clim de l’estaminet goutte sur le pavé, juste sous votre fenêtre. Plic. Plic. Plic.' },
+  { id: 'neighbour_shout', text: 'Une voix, quelque part en hauteur : « IL Y A DES GENS QUI DORMENT ! » Ce n’est pas vous. Pour une fois.', when: { from: 23 * 60 } },
+  { id: 'wedding_horn', text: 'Un klaxon de mariage résonne depuis la rue de la Barre. La terrasse applaudit sans savoir pourquoi.' },
+  { id: 'bike_bell_drunk', text: 'Un V’Lille passe, son cycliste chante plus fort que sa sonnette.', when: { from: 22 * 60 } },
+  { id: 'fries_smell', text: 'Une odeur de frites monte, puis une odeur de frites plus forte. La gaine fait des heures sup.' },
+  { id: 'umbrella', text: 'Un parasol claque dans le vent. Le serveur le referme en se battant avec lui.', effects: { noise: true } },
+  { id: 'lost_keys', text: 'Un homme cherche ses clés à la lumière de son téléphone, entre deux pavés. Il les trouve dans sa poche.' },
+  { id: 'cat_fight', text: 'Deux chats se disputent une poubelle dans l’impasse. Gaufre regarde, très intéressée.', effects: { noise: true }, when: { from: 23 * 60 } },
+  { id: 'binoculars_glint', text: 'Un reflet au bout de la rue : les jumelles de Klaas. Il compte.', effects: { klaas: true }, when: { to: 25 * 60 } },
+  { id: 'rain_drops', text: 'Quelques gouttes tombent. Toute la terrasse lève les yeux au ciel, puis commande une autre tournée.', when: { rain: false, to: 23 * 60 } },
+  { id: 'rain_umbrellas', text: 'Les parapluies s’ouvrent sous les parasols. Une terrasse à deux étages.', when: { rain: true } },
+  { id: 'rain_gutter', text: 'La gouttière d’en face déborde sur le pavé. Un client y met le pied et jure en flamand.', when: { rain: true } },
+  { id: 'sat_crowd_song', text: 'Samedi soir : un groupe debout reprend « Les Corons » en chœur, à peu près juste.', effects: { noise: true }, when: { sat: true } },
+  { id: 'sat_bachelor', text: 'Un enterrement de vie de garçon passe, déguisé en Schtroumpfs. Le futur marié porte la crête.', effects: { noise: true }, when: { sat: true } },
+  { id: 'sat_glass_stack', text: 'Quelqu’un a construit une tour de gobelets sur le rebord de votre porte. Elle tient. Pour l’instant.', when: { sat: true } },
+  { id: 'sat_ambulance', text: 'Une ambulance remonte la rue au pas, la foule s’écarte en levant les verres.', when: { sat: true, from: 23 * 60 } },
+  { id: 'weekday_quiet', text: 'Un instant, la rue se tait. On entend presque le canal qui coulait dessous jusqu’en 1912.', when: { sat: false } },
+  { id: 'weekday_jogger', text: 'Un joggeur frontale allumée traverse la terrasse en s’excusant à chaque foulée.', when: { sat: false, to: 22 * 60 + 30 } },
+  { id: 'late_street_sweeper', text: 'La balayeuse de la ville passe au bout de la rue, regarde les tables encore dehors, et fait demi-tour.', when: { from: 24 * 60 } },
+  { id: 'late_last_bus', text: 'Quelqu’un court vers le dernier bus en criant « attendez ! » à un bus qui n’attend pas.', when: { from: 24 * 60 } },
+  { id: 'late_owl', text: 'Un hibou, ou un client qui imite un hibou. Difficile à dire à cette heure.', when: { from: 24 * 60 + 30 } },
+  { id: 'late_waiter_smoke', text: 'Le serveur s’assoit enfin sur une chaise de la terrasse, une cigarette, et regarde le vide.', when: { from: 24 * 60 } },
+  { id: 'late_snore', text: 'Un ronflement monte d’un balcon voisin. Quelqu’un, quelque part, a réussi à dormir.', when: { from: 24 * 60 + 30 } },
+  { id: 'early_setup', text: 'Le serveur aligne les verres sur le comptoir extérieur. Ils brillent comme une promesse non tenue.', when: { to: 21 * 60 + 15 } },
+  { id: 'early_happy_hour', text: 'Ardoise des Mal Lunés : « Happy hour jusqu’à 22h ». Vous lisez « 22h » et vous souriez, naïf.', when: { to: 21 * 60 + 30 } },
+  { id: 'early_sunset', text: 'Le soleil couchant allume les pignons à gradins. Pendant une minute, la rue est belle. Puis une chaise racle.', when: { to: 21 * 60 + 15, rain: false } },
+  { id: 'bell_22_after', text: 'La dernière note de la cloche de 22h flotte encore. Personne en terrasse n’a bougé.', when: { from: 22 * 60, to: 22 * 60 + 20 } },
+  { id: 'chti_drunk', text: '« Allez, biloute, on rinte ! » crie quelqu’un. Personne ne rentre.', when: { from: 23 * 60 } },
+  { id: 'window_lamp', text: 'Votre lampe de bureau fait un reflet dans la vitre : votre propre visage, très fatigué, vous regarde.' },
+];

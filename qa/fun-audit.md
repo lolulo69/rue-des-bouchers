@@ -8,6 +8,68 @@ est la somme des silences de plus de 30 s réelles entre deux moments (1 min de 
 Une *situation* = le gabarit d'une ligne (sans heures ni nombres) ou un type d'événement ; la **similarité** de deux nuits consécutives
 est l'indice de Jaccard de leurs ensembles de situations. Les bots sont ceux du simulateur (`src/sim/campaignBots.js`).
 
+## v1.1 + pacing (variantes, raclements regroupés, vie de la rue) · 2026-10-08 · main @ 250f53a
+
+20 campagnes par bot (graines 1000…1019).
+
+| Bot | Nuits | Temps mort moyen / nuit | Nuits > 90 s | Situations distinctes / nuit | Similarité moyenne (nuits consécutives) | Similarité max | Paires > 0,7 | Twists distincts |
+|---|---|---|---|---|---|---|---|---|
+| passive | 260 | 0 s | 0 % | 34.3 | 0.20 | 0.40 | 0/240 | 22 |
+| legal | 260 | 0 s | 0 % | 42.0 | 0.32 | 0.54 | 0/240 | 22 |
+| reckless | 88 | 0 s | 0 % | 43.7 | 0.16 | 0.25 | 0/68 | 14 |
+| stealthy | 230 | 81 s | 50 % | 36.3 | 0.19 | 0.36 | 0/210 | 21 |
+| mixed | 260 | 0 s | 0 % | 42.0 | 0.31 | 0.46 | 0/240 | 22 |
+| diplomat | 260 | 0 s | 0 % | 36.6 | 0.30 | 0.46 | 0/240 | 21 |
+| slacker | 217 | 0 s | 0 % | 38.2 | 0.30 | 0.50 | 0/197 | 21 |
+
+- Cible v1.1 temps mort : ✅ 12 s en moyenne (cible < 90 s)
+- Cible v1.1 similarité : ✅ 0 paire(s) de nuits consécutives au-dessus de 0.7 (cible : 0)
+
+Lignes les plus répétées (lignes vues au moins 2 fois dans une même campagne ; total de leurs occurrences sur ce passage) :
+- 1288 × « Quelqu’un urine contre votre porte d’entrée. Classique du samedi. »
+- 919 × « Jérémie passe avec le teckel et note Estaminet La Ch’tite Bernadette, table 1. »
+- 914 × « Jérémie compte les tables à voix haute, Biloute renifle chaque pied de chaise, vous notez. Biloute s’arrête net devant chaque table qui débo… »
+- 842 × « Jérémie passe avec le teckel et note Les Bouchers Mal Lunés, table 1. »
+- 796 × « Jérémie passe avec le teckel et note Le Goulot, table 1. »
+- 572 × « 📟 59 dB relevés et horodatés. »
+- 522 × « La rue s’éteint. Une bouteille roule quelque part sur les pavés, puis plus rien. »
+- 513 × « 01h30. La dernière chaise a raclé. La gaine s’est tue. Il reste quatre heures de nuit, en théorie. »
+- 496 × « Les derniers clients remontent vers la place, en chantant faux. La rue se tait, à regret. »
+- 400 × « 📟 36 dB. Pénible, mais pas assez pour un dossier. »
+- 370 × « 📟 60 dB relevés et horodatés. »
+- 347 × « Une table de les Mal Lunés rentre en traînant des pieds, comme un ado à l’heure du coucher. »
+
+## v1.1 twists + variantes du serveur · 2026-10-08 · main @ 165b61e
+
+20 campagnes par bot (graines 1000…1019).
+
+| Bot | Nuits | Temps mort moyen / nuit | Nuits > 90 s | Situations distinctes / nuit | Similarité moyenne (nuits consécutives) | Similarité max | Paires > 0,7 | Twists distincts |
+|---|---|---|---|---|---|---|---|---|
+| passive | 260 | 432 s | 100 % | 7.5 | 0.48 | 0.71 | 30/240 | 0 |
+| legal | 260 | 160 s | 98 % | 24.2 | 0.65 | 0.91 | 88/240 | 0 |
+| reckless | 87 | 394 s | 92 % | 15.4 | 0.41 | 0.63 | 0/67 | 0 |
+| stealthy | 229 | 351 s | 100 % | 15.2 | 0.43 | 0.85 | 7/209 | 0 |
+| mixed | 260 | 168 s | 98 % | 24.6 | 0.62 | 0.92 | 72/240 | 0 |
+| diplomat | 260 | 160 s | 98 % | 22.7 | 0.62 | 0.83 | 68/240 | 0 |
+| slacker | 217 | 164 s | 99 % | 22.4 | 0.60 | 0.89 | 44/197 | 0 |
+
+- Cible v1.1 temps mort : ❌ 248 s en moyenne (cible < 90 s)
+- Cible v1.1 similarité : ❌ 309 paire(s) de nuits consécutives au-dessus de 0.7 (cible : 0)
+
+Lignes les plus répétées (lignes vues au moins 2 fois dans une même campagne ; total de leurs occurrences sur ce passage) :
+- 2559 × « Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre une table… enfin. »
+- 2272 × « Raclement de chaises sur les pavés : Estaminet La Ch’tite Bernadette rentre une table… enfin. »
+- 1897 × « Raclement de chaises sur les pavés : Le Goulot rentre une table… enfin. »
+- 1767 × « Le serveur, gêné : « Le patron sait que c’est vous qui appelez la police… » »
+- 1478 × « Le serveur revient : « Le patron dit que les clients finissent leur verre. » »
+- 1344 × « Raclement de chaises sur les pavés : Les Bouchers Mal Lunés rentre sa terrasse… enfin. »
+- 1291 × « Raclement de chaises sur les pavés : Le Goulot rentre sa terrasse… enfin. »
+- 1277 × « Quelqu’un urine contre votre porte d’entrée. Classique du samedi. »
+- 997 × « Raclement de chaises sur les pavés : Le Goulot rentre une table. »
+- 939 × « Police : « Ah, c’est encore vous… On note, monsieur. » Personne ne viendra. »
+- 916 × « Jérémie passe avec le teckel et note Estaminet La Ch’tite Bernadette, table 1. »
+- 914 × « Jérémie compte les tables à voix haute, Biloute renifle chaque pied de chaise, vous notez. Biloute s’arrête net devant chaque table qui débo… »
+
 ## Référence v1.0 (avant les twists) · 2026-10-08 · main @ f5db49b
 
 20 campagnes par bot (graines 1000…1019).

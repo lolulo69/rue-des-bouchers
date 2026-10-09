@@ -26,8 +26,9 @@ describe('22:00 : fermeture des terrasses', () => {
     expect(sim.state.evidence.filter((e) => e.type === 'photo')).toHaveLength(0);
   });
 
+  // Texte de repli du moteur (sans pacing.js, qui varie et regroupe les raclements : voir pacing.test.js)
   it('raclement de chaises : "une table" tant qu\'il en reste, "sa terrasse" pour la dernière', () => {
-    const sim = simAt(H(21, 50), { cfg: { RESTAURANTS: restaurants({ compliance: 1 }) } });
+    const sim = simAt(H(21, 50), { cfg: { RESTAURANTS: restaurants({ compliance: 1 }), PACING: { enabled: false } } });
     sim.drainEvents();
     const goulot = sim.state.tables.filter((t) => t.restId === 'goulot');
     sim.clearTable(goulot[0], 'resto');
@@ -39,7 +40,7 @@ describe('22:00 : fermeture des terrasses', () => {
   });
 
   it('chaque resto annonce "sa terrasse" une seule fois, quand tout est rentré', () => {
-    const sim = simAt(H(21, 50), { cfg: { RESTAURANTS: restaurants({ compliance: 1 }) } });
+    const sim = simAt(H(21, 50), { cfg: { RESTAURANTS: restaurants({ compliance: 1 }), PACING: { enabled: false } } });
     const logs = advance(sim, H(22, 10));
     for (const r of sim.restaurants) expect(logs.filter((l) => l.includes(`${r.name} rentre sa terrasse`))).toHaveLength(1);
   });

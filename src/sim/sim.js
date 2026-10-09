@@ -1,6 +1,7 @@
 // Simulation d'une soirée, sans DOM ni three.js : horloge, terrasses, police, preuves, stats, actions.
 // Tout passe par sim.act(action) (joueur ou bot) et sim.tick(minutes). Les messages sortent par sim.events,
 // et sim.state.journal garde la trace structurée de tout ce qui s'est passé (vérifiée par invariants.js).
+import { attachPacing } from './pacing.js';
 import { CONFIG } from '../config.js';
 import { createRng } from './rng.js';
 import { generateLayout } from './layout.js';
@@ -167,6 +168,7 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
       // Raclement de chaises : "une table" (au plus toutes les 5 min par resto), "sa terrasse" quand c'est la dernière.
       const r = sim.rest(t.restId);
       const remaining = S.tables.filter((x) => x.restId === r.id && (x.out || x.hiddenUntil !== null)).length;
+      if (sim.pacing) { sim.pacing.clatter(r.id, { terrace: !remaining }); return; }
       const enfin = sim.isLate() ? '… enfin' : '';
       if (!remaining) {
         S.lastClatterLog[r.id] = S.min;
@@ -507,5 +509,6 @@ export function createSim({ seed = 1, day = 'mon', weekday, cfg = CONFIG, carry 
   }
 
   setupTwist(sim, twist);
+  attachPacing(sim, { carry: carry.pacing }); // pacing.js : lignes variées, raclements regroupés, vie de la rue
   return sim;
 }

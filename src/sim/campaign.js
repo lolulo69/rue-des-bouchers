@@ -611,6 +611,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
         flags: S.flags, earlyEndings: c.gateOpen(), reversal, enemyMemories: enemyMemories(), sleepEndsNight: false,
         // la drache du soir (événement r_drache tiré ce jour-là) : la sim fait pleuvoir et vider les terrasses
         weather: S.journal.some((e) => e.day === S.day && e.type === 'event' && e.id === 'r_drache') ? 'drache' : undefined,
+        pacing: S.pacingMemory ?? undefined, // pacing.js : lignes de la nuit précédente, micro-moments déjà joués
       },
       narrator,
       twist: nightTwist(c.twistTonight()),
@@ -685,6 +686,7 @@ export function createCampaign({ seed = 1, content, cfg = CONFIG, save = null, n
     const N = sim.state;
     S.nightEvents = [];
     S.nightCount++;
+    S.pacingMemory = sim.pacing?.memory() ?? S.pacingMemory ?? null;
     const sleepDelta = (N.sleep - C.sleepNeutral) * C.sleepCarry;
     setStat('sleep', S.stats.sleep + sleepDelta);
     setStat('asso', S.stats.asso + assoGain(N.asso - S.stats.asso));

@@ -14,6 +14,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
 import { normalizeContent, makeConfig, createCampaign, CAMPAIGN_BOTS } from '../src/sim/index.js';
+import { createRng } from '../src/sim/rng.js';
 import * as narrative from '../src/sim/narrative.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -36,6 +37,21 @@ const content = normalizeContent(await Promise.all(readdirSync(dir).filter((f) =
 const template = (t) => t.replace(/\d+[h:]\d+/g, '#h').replace(/\d+([.,]\d+)?/g, '#').replace(/«[^»]*»/g, '«…»')
   .replace(/table #/g, 'table').split(/\s+/).slice(0, 6).join(' ');
 const jaccard = (a, b) => { const u = new Set([...a, ...b]); let i = 0; for (const x of a) if (b.has(x)) i++; return u.size ? i / u.size : 1; };
+
+// La narration de la nuit comme dans le jeu (src/game.js › narrator) : sans elle, la sim retombe sur ses lignes de repli
+function gameNarrator(c, seed) {
+  const narrRng = createRng(((seed * 7919 + c.state.day) ^ 0x5bd1e995) >>> 0);
+  return (kind, s, a) => {
+    switch (kind) {
+      case 'police': return narrative.policeLine(a.outcome, a.patrolId, { ...narrative.nightCtx.police(s, a.entry ?? {}), asso: !!a.asso }, narrRng, s);
+      case 'waiter': return narrative.pickNightLine('waiter', s, narrRng, { result: a.result, metWaiter: c.has('met_waiter') && s.waiterId === 'theo' });
+      case 'witness': return narrative.pickNightLine('witness', s, narrRng, a.witness ? { witness: a.witness } : {});
+      case 'end': return narrative.pickNightLine('end', s, narrRng, { reason: a.reason });
+      case 'klaas': { const e = narrative.klaasEntry(a.event, a.detection, narrRng); return e ? `📓 Carnet de Klaas : ${e.text}` : null; }
+      default: return null;
+    }
+  };
+}
 
 // Joue la nuit comme campaignRunner.playNight, mais garde chaque « moment » horodaté avant que les événements soient vidés
 function playNightAudited(sim, policy, c, choose) {
@@ -92,8 +108,8 @@ function auditCampaign(seed, botName) {
       case 'koddex': c.koddex(bot.morning(c, c.koddexOptions())); break;
       case 'actions': { const id = bot.afternoon(c, c.availableActions()); if (id) c.doAction(id); else c.endAfternoon(); break; }
       case 'night': {
-        const twist = c.tonightTwist?.()?.id ?? null; // v1.1 (build note ui-v1.1), lu avant la nuit
-        const sim = c.createNight();
+        const twist = (c.twistTonight ?? c.tonightTwist)?.()?.id ?? null; // v1.1 : c.twistTonight() (moteur), lu avant la nuit
+        const sim = c.createNight({ narrator: gameNarrator(c, seed) });
         const start = sim.state.min;
         const moments = playNightAudited(sim, bot.night(c, sim), c, (card, ok) => bot.choose(c, card, ok));
         const end = sim.state.min;

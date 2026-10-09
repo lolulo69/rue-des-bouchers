@@ -151,7 +151,8 @@ export function pickNightLine(kind, sim, rng = sim?.rng, extra = {}) {
   } else {
     pool = nightPool(kind);
   }
-  const line = pick(pool, rng);
+  // pacing.js : pas la même ligne deux fois dans la nuit, ni d'une nuit à la suivante
+  const line = sim?.pacing ? sim.pacing.choose(pool, rng ?? undefined) : pick(pool, rng);
   return line === null ? null : fill(line, { ...ctx, ...extra.ctx });
 }
 
@@ -164,8 +165,10 @@ export function policePool(outcome, patrol, { asso = false } = {}) {
   if (outcome === 'ignored' || outcome === 'busy') return POLICE_LINES[outcome];
   return (POLICE_LINES[patrol] ?? POLICE_LINES.lemaire)[outcome];
 }
-export function policeLine(outcome, patrol, ctx = {}, rng) {
-  const line = pick(policePool(outcome, patrol, ctx), rng);
+// sim (facultatif) : avec pacing.js, la ligne ne revient ni dans la nuit ni la suivante
+export function policeLine(outcome, patrol, ctx = {}, rng, sim = null) {
+  const pool = policePool(outcome, patrol, ctx);
+  const line = sim?.pacing ? sim.pacing.choose(pool, rng ?? undefined) : pick(pool, rng);
   return line === null ? null : fill(line, ctx);
 }
 

@@ -34,7 +34,7 @@ const openCampaign = (save) => { try { return createCampaign({ content, cfg, sav
 const narrRng = createRng((SEED ^ 0x5bd1e995) >>> 0);
 function narrator(kind, s, a) {
   switch (kind) {
-    case 'police': return narrative.policeLine(a.outcome, a.patrolId, { ...narrative.nightCtx.police(s, a.entry ?? {}), asso: !!a.asso }, narrRng);
+    case 'police': return narrative.policeLine(a.outcome, a.patrolId, { ...narrative.nightCtx.police(s, a.entry ?? {}), asso: !!a.asso }, narrRng, s);
     // Les répliques « Théo » s'arrêtent quand il est renvoyé : le nouveau serveur est un inconnu
     case 'waiter': return narrative.pickNightLine('waiter', s, narrRng, { result: a.result, metWaiter: !!campaign?.has('met_waiter') && s.waiterId === 'theo' });
     case 'witness': return narrative.pickNightLine('witness', s, narrRng, a.witness ? { witness: a.witness } : {});
