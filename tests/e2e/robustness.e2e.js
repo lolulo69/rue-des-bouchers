@@ -108,3 +108,23 @@ test('twist « camionnette dans le couloir » : la photo de la camionnette entre
   });
   expect(r).toContain('corridor_blocked');
 });
+
+test('une scène de jour en 3D (art.day) met en pause le rendu de la nuit', async ({ page }) => {
+  await page.goto('/?nolock=1&seed=2');
+  await expect(page.locator('#loader')).toBeHidden({ timeout: 60_000 });
+  const r = await page.evaluate(async () => {
+    const R = window.__rdb;
+    const day = R.world.art?.day;
+    if (!day) return { skip: true };
+    const before = R.renderCount; R.step(3); const running = R.renderCount - before;
+    const ok = await day.start('street', { host: document.body });
+    const b2 = R.renderCount; R.step(5); const paused = R.renderCount - b2;
+    day.stop();
+    const b3 = R.renderCount; R.step(3); const resumed = R.renderCount - b3;
+    return { ok, running, paused, resumed };
+  });
+  if (r.skip) return;
+  expect(r.running).toBe(3);
+  if (r.ok) expect(r.paused).toBe(0);
+  expect(r.resumed).toBe(3);
+});

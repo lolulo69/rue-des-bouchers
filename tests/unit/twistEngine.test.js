@@ -126,6 +126,11 @@ describe('twists de nuit : chaque champ `sim` a un effet', () => {
     const after = b.noiseAt(b.cfg.ANCHORS.bed, true) - a.noiseAt(a.cfg.ANCHORS.bed, true);
     expect(after).toBeGreaterThan(before + 3);
     expect(b.state.journal.some((e) => e.type === 'twist-event')).toBe(true);
+    // pour le metteur en scène : l'événement « twist-moment » (accessoire, moment)
+    const tb = createSim({ seed: 7, cfg, twist: { id: 'tb', sim: { events: [{ at: H(21), prop: 'tv_screen', moment: 'goal', text: 'BUT' }] } } });
+    tb.drainEvents();
+    advance(tb, H(21, 1));
+    expect(tb.drainEvents().find((e) => e.type === 'twist-moment')).toMatchObject({ twistId: 'tb', prop: 'tv_screen', moment: 'goal', text: 'BUT' });
   });
   it('opportunities : une action verrouillée est ouverte pour cette nuit seulement', () => {
     const K = { ...content, TWISTS: [{ id: 'opp', pool: true, title: 'Opportunité', sim: { opportunities: ['stink_bomb'] } }] };

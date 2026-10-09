@@ -116,7 +116,8 @@ const xyz = (p) => ({ x: p.x, y: p.y, z: p.z });
 Object.assign(ANCHORS, {
   pilouWindow: xyz(world.window.pos),
   streetDoor: xyz(world.streetDoor),
-  bed: { ...xyz(world.bed), y: world.bed.y + 0.6 },
+  bed: { ...xyz(world.bed), y: world.bed.y + 0.6 }, // la chambre côté cour (art-v1.1)
+  ...(world.sofa && { sofa: { ...xyz(world.sofa), y: world.sofa.y + 0.6 } }), // le canapé du séjour, côté rue
   ...(world.exhaust && { exhaust: xyz(world.exhaust) }),
   ...(world.anchors?.balcony && { balcony: { ...xyz(world.anchors.balcony), y: world.anchors.balcony.y + 1.5 } }), // [art v0.3] yeux de Seb & Nico
 });
@@ -293,7 +294,9 @@ function interaction() {
     if (sim.waiterOnDuty() && flat(player.pos, sim.waiterPos()) < INTERACT.waiter) return { label: 'Demander au serveur de rentrer les tables', act: () => { tuto('first_waiter'); sim.act({ type: 'waiter' }); tutoEvent('waiter_asked'); } };
   } else {
     if (flat(player.pos, world.aptDoor) < INTERACT.aptDoor) return { label: 'Descendre dans la rue', act: () => teleport('street') };
-    if (flat(player.pos, world.bed) < INTERACT.bed) return { label: S.sleeping ? 'Se relever' : 'Essayer de dormir (accélère la nuit)', act: toggleSleep };
+    if (flat(player.pos, world.bed) < INTERACT.bed) return { label: S.sleeping ? 'Se relever' : 'Essayer de dormir (accélère la nuit)', act: () => toggleSleep('bed') };
+    // S'assoupir sur le canapé du séjour (côté rue) : plus de bruit, moins de repos que la chambre côté cour
+    if (world.sofa && flat(player.pos, world.sofa) < INTERACT.bed) return { label: S.sleeping ? 'Se relever' : 'S’assoupir sur le canapé (côté rue, on dort mal)', act: () => toggleSleep('sofa') };
   }
   return null;
 }
@@ -304,8 +307,8 @@ function teleport(where) {
   player.yaw = -Math.PI / 2;
   player.pitch = 0;
 }
-function toggleSleep() {
-  sim.act({ type: 'sleep', on: !S.sleeping });
+function toggleSleep(where = 'bed') {
+  sim.act({ type: 'sleep', on: !S.sleeping, where });
   player.pitch = S.sleeping ? 0.9 : 0;
   if (S.sleeping) { log('Pilou se couche. Le temps file…'); tutoEvent('bed_tried'); }
 }
@@ -622,6 +625,7 @@ function showEnd() {
 
 // ---------- Boucle ----------
 let hudTimer = 0;
+let renderCount = 0; // images de la nuit rendues (tests : la nuit se met en pause pendant une scène de jour)
 let walked = 0;
 let witnessShownSince = null;
 let lastPolicePhase = null;
@@ -658,13 +662,16 @@ function tick(dt) {
   drainSim(); // à chaque frame, même en pause : aucun événement de la simulation n'est perdu
   // Événement de nuit à son heure (campaign.nightEventDue) : le jeu se met en pause sur la carte
   if (campaign && !overlay && !S.ended) { const ev = campaign.nightEventDue?.(sim); if (ev) openNightEvent(ev); }
-  director.update(sim, campaign?.state, dt);
+  // Une scène de jour en 3D (art.day : Koddex, rue de jour, atelier, mairie) tourne sur sa propre toile :
+  // la nuit ne se dessine pas en même temps (iGPU)
+  const dayScene = world.art?.day?.active;
+  if (!dayScene) director.update(sim, campaign?.state, dt);
   syncCamera();
   updateSky();
   hudTimer -= dt;
   // !(> 0) plutôt que <= 0 : un NaN accidentel ne doit pas figer le HUD pour toute la nuit
   if (!(hudTimer > 0) && started && !S.ended) { updateHud(); hudTimer = 0.1; }
-  renderer.render(scene, camera);
+  if (!dayScene) { renderer.render(scene, camera); renderCount++; }
 }
 
 // Hooks de test (onglet en arrière-plan = pas de requestAnimationFrame) : step(n) avance n frames de 1/30 s ;
@@ -673,6 +680,7 @@ window.__rdb = {
   sim, player, world, seed: SEED,
   get campaign() { return dayUI?.campaign ?? campaign; },
   get ui() { return dayUI; },
+  get renderCount() { return renderCount; },
   goNight: () => goNight(dayUI.campaign),
   saveKey: SAVE_KEY,
   step(n = 1, dt = 1 / 30) { for (let i = 0; i < n; i++) tick(dt); return S.min; },

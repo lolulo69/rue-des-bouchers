@@ -70,6 +70,8 @@ export function updateTwist(sim) {
     if (e.done || S.min < e.at) continue;
     e.done = true;
     sim.note('twist-event', { twistId: S.twist?.id, i: e.i });
+    // Pour le metteur en scène (art.twists.trigger) : l'accessoire et le moment (ex. { prop: 'tv_screen', moment: 'goal' })
+    sim.events.push({ type: 'twist-moment', twistId: S.twist?.id, i: e.i, prop: e.prop ?? null, moment: e.moment ?? `moment${e.i}`, at: e.at, text: e.text ?? null });
     if (e.text) sim.log(e.text);
     const fx = e.simEffect ?? {};
     if (fx.noise) S.noiseBoosts.push({ db: fx.noise, until: S.min + (fx.minutes ?? EVENT_NOISE_MINUTES) });

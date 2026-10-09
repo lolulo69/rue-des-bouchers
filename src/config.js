@@ -69,8 +69,8 @@ export const RESTAURANTS = [
 export const ANCHORS = {
   pilouWindow: { x: -3.4, y: 8.4, z: -24 },  // 2e étage au-dessus de Bernadette (aplomb du milieu de sa terrasse)
   streetDoor: { x: -2.6, y: 0, z: -18.2 },   // devant la porte de l'immeuble de Pilou
-  bed: { x: -8.2, y: 7.8, z: -25.6 },        // oreille de Pilou au lit (chambre côté cour)
-  sofa: { x: -5.5, y: 7.8, z: -24 },         // canapé du salon, côté rue (§12b.D)
+  bed: { x: -11, y: 7.8, z: -25.6 },         // oreille de Pilou au lit : la chambre côté cour (appartement art-v1.1, §12b.D)
+  sofa: { x: -5.6, y: 7.8, z: -21.5 },       // canapé d'angle du séjour, côté rue (§12b.D) ; world.sofa fait foi dans le jeu
   exhaust: { x: -2.9, y: 7.0, z: -23 },      // la gaine monte jusque sous sa fenêtre
   klaasWindow: { x: 0, y: 5.7, z: 67.6 },    // au fond de la place Maurice-Schumann, en enfilade sur toute la rue
   balcony: { x: 3.0, y: 7.8, z: -22.5 },     // Seb & Nico, juste en face de Pilou
