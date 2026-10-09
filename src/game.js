@@ -33,17 +33,8 @@ const openCampaign = (save) => { try { return createCampaign({ content, cfg, sav
 
 // Narration de la nuit (src/sim/narrative.js), avec son propre RNG : le texte ne change jamais l'issue de la nuit.
 const narrRng = createRng((SEED ^ 0x5bd1e995) >>> 0);
-function narrator(kind, s, a) {
-  switch (kind) {
-    case 'police': return narrative.policeLine(a.outcome, a.patrolId, { ...narrative.nightCtx.police(s, a.entry ?? {}), asso: !!a.asso }, narrRng, s);
-    // Les répliques « Théo » s'arrêtent quand il est renvoyé : le nouveau serveur est un inconnu
-    case 'waiter': return narrative.pickNightLine('waiter', s, narrRng, { result: a.result, metWaiter: !!campaign?.has('met_waiter') && s.waiterId === 'theo' });
-    case 'witness': return narrative.pickNightLine('witness', s, narrRng, a.witness ? { witness: a.witness } : {});
-    case 'end': return narrative.pickNightLine('end', s, narrRng, { reason: a.reason });
-    case 'klaas': { const e = narrative.klaasEntry(a.event, a.detection, narrRng); return e ? `📓 Carnet de Klaas : ${e.text}` : null; }
-    default: return null;
-  }
-}
+// Les lignes viennent avec leur repère de mise en scène (§12e.6) ; les répliques « Théo » s'arrêtent quand il est renvoyé
+const narrator = narrative.nightNarrator(narrRng, { metWaiter: (s) => !!campaign?.has('met_waiter') && s.waiterId === 'theo' });
 let campaign = null;
 {
   const saved = loadSave();
@@ -199,18 +190,28 @@ $('coach-skip').addEventListener('click', () => { if (coach) { campaign.tutorial
 // Cloche de 22h (21:55, 22:00, 22:05) et bribes de terrasse quand Pilou est près des tables
 const bell = { before: false, strike: false, after: false, outAt22: null };
 let nextBark = 20;
+// Une ligne de nuit dite par le jeu (cloche, bribes) : affichée ET jouée (§12e.6 : le metteur en scène reçoit son repère)
+function staged(text, stage, cls = '') {
+  if (!text) return;
+  log(text, cls);
+  if (stage && stage.cue !== 'sim') director.onEvent({ type: 'stage', min: S.min, text, ...stage });
+}
 function ambientLines(dt) {
   const m = S.min;
-  if (!bell.before && m >= CLOSE - 5) { bell.before = true; log(narrative.pickNightLine('bell:before', sim, narrRng)); }
-  if (!bell.strike && m >= CLOSE) { bell.strike = true; bell.outAt22 = S.tables.filter((t) => t.out).length; log(narrative.pickNightLine('bell:strike', sim, narrRng)); tuto('bell_22'); }
-  if (!bell.after && m >= CLOSE + 5) { bell.after = true; log(narrative.pickNightLine('bell:after', sim, narrRng, { outAt22: bell.outAt22 })); }
+  if (!bell.before && m >= CLOSE - 5) { bell.before = true; staged(narrative.pickNightLine('bell:before', sim, narrRng), narrative.bellStage('before')); }
+  if (!bell.strike && m >= CLOSE) { bell.strike = true; bell.outAt22 = S.tables.filter((t) => t.out).length; staged(narrative.pickNightLine('bell:strike', sim, narrRng), narrative.bellStage('strike')); tuto('bell_22'); }
+  if (!bell.after && m >= CLOSE + 5) { bell.after = true; staged(narrative.pickNightLine('bell:after', sim, narrRng, { outAt22: bell.outAt22 }), narrative.bellStage('after')); }
   nextBark -= dt;
   if (nextBark <= 0) {
     nextBark = 20 + narrRng.next() * 20;
     const near = S.tables.some((t) => t.out && Math.hypot(t.x - player.pos.x, t.z - player.pos.z) < (player.loc === 'apt' ? 10 : 6));
     // Le twist de la nuit a ses propres bribes : une sur deux
     // (gardées par l'état de la rue, §13.L : narrative.twistLine)
-    if (near) log((narrRng.chance(0.5) && narrative.twistLine('barks', sim, narrRng)) || narrative.pickNightLine('bark', sim, narrRng), 'bark');
+    if (near) {
+      const tw = narrRng.chance(0.5) && narrative.twistLine('barks', sim, narrRng);
+      if (tw) staged(tw, { cue: 'bark' }, 'bark');
+      else staged(narrative.pickNightLine('bark', sim, narrRng), narrative.barkStage(sim), 'bark');
+    }
   }
   if (S.tipoffs.length) tuto('first_tipoff');
   if (S.policeLog.some((p) => p.outcome === 'complaisance')) tuto('first_complaisance');
@@ -459,7 +460,7 @@ function openOverlay(name) {
   document.exitPointerLock?.();
 }
 function closeOverlay() {
-  if (!overlay || overlay === 'menu') return; // le menu de l'interface se ferme lui-même (onResume)
+  if (!overlay || overlay === 'menu' || overlay === 'talk') return; // le menu et la conversation se ferment eux-mêmes
   $(overlay).classList.add('hidden');
   overlay = null;
   lock();
@@ -624,7 +625,7 @@ addEventListener('keydown', (e) => {
   if (e.code === 'Tab') return overlay === 'dossier' ? closeOverlay() : !overlay && openOverlay('dossier');
   if (e.code === 'KeyT') return overlay === 'phone' ? closeOverlay() : !overlay && openOverlay('phone');
   if (e.code === 'KeyN' && campaign) return overlay === 'nightmenu' ? closeOverlay() : !overlay && openOverlay('nightmenu');
-  if (overlay === 'nightmenu' && ['actions', 'talk'].includes($('nightmenu').dataset.mode) && nightMenuKey(e)) return;
+  if (overlay === 'nightmenu' && $('nightmenu').dataset.mode === 'actions' && nightMenuKey(e)) return;
   if (overlay || e.repeat) return keys.add(e.code);
   keys.add(e.code);
   if (S.sleeping && (e.code === 'Enter' || e.code === 'KeyP')) return skipToMorning();
@@ -712,6 +713,8 @@ const playerWhere = () => ({ where: player.loc === 'street' ? 'street' : nearWin
 function openNightEvent(ev) {
   openOverlay('nightmenu');
   $('nightmenu').dataset.mode = 'event';
+  // §12e.6 : l'événement existe dans la rue au moment où sa carte s'ouvre
+  if (ev.data.stage) director.onEvent({ type: 'stage', min: S.min, text: ev.data.title ?? '', ...(typeof ev.data.stage === 'string' ? { cue: ev.data.stage } : ev.data.stage) });
   $('nightmenu').querySelector('.note').textContent = '';
   $('nightmenu').querySelector('h2').textContent = ev.data.title ?? 'Cette nuit';
   const list = $('nightmenu-list');
@@ -769,46 +772,41 @@ function castAt(who) {
   if (!o?.visible && who !== 'klaas') return null;
   return o ? o.getWorldPosition(castV) && { x: castV.x, z: castV.z } : null;
 }
-const speakerName = (id) => (id ? campaign.content.CHARACTERS?.[id]?.name ?? id : null);
-function openTalk(who) {
-  const convo = campaign.talkStart(sim, who, playerWhere());
-  if (!convo) return;
-  openOverlay('nightmenu');
-  $('nightmenu').dataset.mode = 'talk';
+// La boîte de dialogue est celle de l'agent UI (src/ui/talk.js, showTalk) ; la nuit est en pause tant qu'elle est ouverte
+// (importée à la première conversation : un import statique de src/ui dans le jeu perturbe le découpage en morceaux)
+async function openTalk(who) {
+  let current = campaign.talkStart(sim, who, playerWhere());
+  if (!current) return;
+  overlay = 'talk';
   tutoEvent('talk_started');
-  renderTalk(convo);
-}
-function renderTalk(convo, said = null) {
-  const root = $('nightmenu');
-  root.querySelector('h2').textContent = speakerName(convo?.speaker ?? said?.speaker) ?? 'Conversation';
-  root.querySelector('.note').textContent = `↑ ↓ et Entrée (ou 1–3) · ${padGlyph('A')} répondre · ${padGlyph('B')} partir`;
-  const list = $('nightmenu-list');
-  list.innerHTML = '';
-  if (said?.reply) list.append(el('p', 'talk-reply', said.reply));
-  if (!convo) {
-    const done = el('button', 'talk-end', 'Continuer');
-    done.addEventListener('click', () => { closeOverlay(); drainSim(); });
-    list.append(done);
-    done.focus({ preventScroll: true });
-    return;
-  }
-  list.append(el('p', 'talk-say', convo.say));
-  convo.choices.forEach((ch, k) => {
-    const b = el('button', 'talk-choice', `${k + 1}. ${ch.label}`);
-    b.dataset.i = String(ch.i);
-    if (!ch.available) b.setAttribute('aria-disabled', 'true');
-    b.addEventListener('click', () => {
-      if (!ch.available) return;
-      const r = campaign.talkChoose(sim, convo, ch.i);
-      if (!r) return;
+  const { showTalk } = await import('./ui/talk.js');
+  showTalk({
+    step: current,
+    onChoose: async (i) => {
+      const r = campaign.talkChoose(sim, current, i);
+      if (!r) return {};
       if (r.sim === 'waiter') { tuto('first_waiter'); tutoEvent('waiter_asked'); }
-      renderTalk(r.next, r);
-    });
-    list.append(b);
+      current = r.next;
+      drainSim();
+      return { reply: r.reply, next: r.next };
+    },
+    onClose: () => { if (overlay === 'talk') overlay = null; drainSim(); lock(); },
   });
-  list.querySelector('.talk-choice:not([aria-disabled])')?.focus({ preventScroll: true });
 }
 
+// « Faire diversion » (§12e.7) : un bouton sous l'acte, qui lance les diversions les moins chères qui détournent exactement
+// ceux qui le verraient ; puis le menu se redessine, la fenêtre ouverte (la nuit est en pause tant que le menu est là)
+function divertButton(plan) {
+  const pct = Math.round(plan.traceRisk * 100);
+  const b = el('button', 'nm-divert', `👀 Faire diversion\u00a0: ${plan.steps.map((d) => d.label).join(' + ')}`);
+  b.append(el('span', 'nm-meta', `détourne ${plan.names.join(', ')}${plan.missing.length ? ` (pas ${plan.missingNames.join(', ')})` : ''} · ⏱ ${plan.minutes}\u00a0min · repéré ${pct}\u00a0%`));
+  b.addEventListener('click', () => {
+    for (const d of plan.steps) { const r = campaign.doNightAction(sim, d.id); if (r && !r.ok && r.reason) log(r.reason); }
+    drainSim();
+    renderNightMenu();
+  });
+  return b;
+}
 function renderNightMenu(focusToggle = false) {
   const root = $('nightmenu');
   root.dataset.mode = 'actions';
@@ -820,7 +818,7 @@ function renderNightMenu(focusToggle = false) {
   here.dataset.group = 'here';
   here.append(el('h3', null, `Ici, maintenant · ${LOCATIONS[playerWhere().where].label}`));
   if (!m.here.length) here.append(el('p', 'note', 'Rien à faire ici pour l’instant.'));
-  m.here.forEach((r, i) => here.append(nightMenuRow(r, i < 9 ? i + 1 : 0)));
+  m.here.forEach((r, i) => { here.append(nightMenuRow(r, i < 9 ? i + 1 : 0)); if (r.divert) here.append(divertButton(r.divert)); });
   list.append(here);
   if (m.elsewhere.length) {
     const open = nightMenuElsewhereOpen || !m.here.length; // rien ici : on montre d'emblée où aller
@@ -840,7 +838,7 @@ function renderNightMenu(focusToggle = false) {
 function nightMenuKey(e) {
   if (e.code === 'ArrowUp' || e.code === 'ArrowDown') { e.preventDefault(); moveFocus($('nightmenu'), e.code === 'ArrowUp' ? 'up' : 'down'); return true; }
   const k = /^(?:Digit|Numpad)([1-9])$/.exec(e.code);
-  if (k) { $('nightmenu-list').querySelectorAll('[data-group=here] .nm-row, .talk-choice')[k[1] - 1]?.click(); return true; }
+  if (k) { $('nightmenu-list').querySelectorAll('[data-group=here] .nm-row')[k[1] - 1]?.click(); return true; }
   return false;
 }
 

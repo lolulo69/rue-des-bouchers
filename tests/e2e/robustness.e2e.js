@@ -366,12 +366,17 @@ test('parler aux gens (§12e.3) : « Parler à Jérémie » près de lui, E ouvr
   });
   expect(prompt).toMatch(/Parler à Jérémie/);
   await page.evaluate(() => { window.__rdb.key('KeyE'); window.__rdb.step(1); });
-  const menu = page.locator('#nightmenu');
-  await expect(menu).toBeVisible();
-  await expect(menu.locator('h2')).toContainText('Jérémie');
-  const choices = menu.locator('.talk-choice');
+  const box = page.locator('[data-testid=talk]'); // boîte de l'agent UI (src/ui/talk.js), chargée à la première conversation
+  await expect(box).toBeVisible({ timeout: 30_000 });
+  await expect(box).toContainText('Jérémie');
+  const t0 = await page.evaluate(() => { window.__rdb.step(30); return window.__rdb.sim.state.min; });
+  expect(await page.evaluate(() => { window.__rdb.step(30); return window.__rdb.sim.state.min; })).toBe(t0); // la nuit attend
+  const choices = box.locator('[data-testid=talk-choice]');
   expect(await choices.count()).toBeGreaterThanOrEqual(2);
   await choices.first().click();
-  await expect(menu.locator('.talk-reply')).not.toBeEmpty();
+  await expect(box.locator('.ui-talk-reply')).toBeVisible();
   expect(await page.evaluate(() => window.__rdb.campaign.has('met_jeremie'))).toBe(true);
+  await page.keyboard.press('Escape');
+  await expect(box).toHaveCount(0);
+  expect(await page.evaluate(() => { const a = window.__rdb.sim.state.min; window.__rdb.step(30); return window.__rdb.sim.state.min > a; })).toBe(true);
 });
