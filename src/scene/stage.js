@@ -290,7 +290,7 @@ export function createStage({ scene, world, art, audio }) {
       if (o.who === 'klaas' || o.who === 'hilde') { // fenêtres de la place : une lampe s'allume (point lumineux visible de loin)
         const l = new THREE.PointLight(0xffd890, 0, 6); l.position.copy(at); r.add(l);
         const s = r.add(new THREE.Mesh(new THREE.SphereGeometry(0.25, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffe0a0, transparent: true, opacity: 0 }))); s.position.copy(at);
-        r.tick(() => { const k = Math.min(1, r.t / 0.5) * (r.t > 10 ? Math.max(0, 1 - (r.t - 10)) : 1); l.intensity = 2.5 * k; s.material.opacity = 0.9 * k; });
+        r.tick(() => { const k = o.off ? Math.max(0, 1 - r.t / 1.5) : Math.min(1, r.t / 0.5) * (r.t > 10 ? Math.max(0, 1 - (r.t - 10)) : 1); l.intensity = 2.5 * k; s.material.opacity = 0.9 * k; });
         return;
       }
       winLight(r, at);
@@ -453,6 +453,18 @@ export function createStage({ scene, world, art, audio }) {
     }),
     // Les cloches de Saint-Maurice (n coups) — le son, et un vol de pigeons au-dessus des toits vers la place
     bells: (o) => run('bells', 6, () => { if (!o.soft) audio?.bell?.(o.n ?? 1); else audio?.duck?.(3, 0.5); }),
+    // Le serveur répond à Pilou : il se tourne vers sa fenêtre, un geste (o.gesture : 'shrug' | 'nod' | 'point'), une réponse
+    waiter_reply: (o) => run('waiter_reply', 6, (r) => {
+      const w = world.waiter; if (!w?.visible) return;
+      r.borrow(w); w.rotation.y = Math.atan2(A.pilouWindow.x - w.position.x, A.pilouWindow.z - w.position.z);
+      setState(w, { anim: o.gesture === 'point' ? 'give' : o.gesture === 'nod' ? 'greet' : 'wave' });
+      sound('voice', w.position.clone().setY(1.5), { mood: 'calm', n: 6, f0: 130 });
+    }),
+    // Jérémie note quelque chose pendant sa ronde
+    round_note: () => run('round_note', 6, (r) => {
+      const j = world.cast?.jeremie; if (!j?.visible) return;
+      r.borrow(j); setState(j, { anim: 'write', held: 'notebook' }); sound('paper', j.position, { gain: 0.5 });
+    }),
     talk: (o) => run('talk', 4, () => sound('voice', o.pos ?? V(0, 1.5, bz + 3), { mood: o.mood ?? 'calm', n: o.n ?? 6, f0: o.f0 ?? 150 })),
   };
 
@@ -492,4 +504,4 @@ export function createStage({ scene, world, art, audio }) {
   };
 }
 
-export const STAGE_IDS = ['passerby', 'scooter', 'bike', 'delivery_rider', 'kid_scooter', 'tourist_lost', 'couple_argue', 'drunk_singer', 'student_choir', 'bachelor_party', 'crowd_song', 'dog_walker', 'dog_far', 'street_sweeper', 'taxi', 'ambulance', 'police_car_far', 'wedding_car', 'window_opens', 'gaufre_balcony', 'bottle_rolls', 'glass_breaks', 'chair_falls', 'toast', 'group_photo', 'phone_loud', 'birthday_far', 'dede_laugh', 'ghislain_smoke', 'seb_nico_laugh', 'exhaust_cough', 'ac_drip', 'umbrella_flap', 'cat_fight', 'binoculars_glint', 'rain_look', 'rain_umbrellas', 'gutter', 'glass_stack', 'owl', 'snore', 'quiet', 'sunset', 'desk_lamp', 'ardoise', 'waiter_board', 'waiter_setup', 'waiter_smoke', 'guitarist', 'pigeon', 'bells', 'talk'];
+export const STAGE_IDS = ['waiter_reply', 'round_note', 'passerby', 'scooter', 'bike', 'delivery_rider', 'kid_scooter', 'tourist_lost', 'couple_argue', 'drunk_singer', 'student_choir', 'bachelor_party', 'crowd_song', 'dog_walker', 'dog_far', 'street_sweeper', 'taxi', 'ambulance', 'police_car_far', 'wedding_car', 'window_opens', 'gaufre_balcony', 'bottle_rolls', 'glass_breaks', 'chair_falls', 'toast', 'group_photo', 'phone_loud', 'birthday_far', 'dede_laugh', 'ghislain_smoke', 'seb_nico_laugh', 'exhaust_cough', 'ac_drip', 'umbrella_flap', 'cat_fight', 'binoculars_glint', 'rain_look', 'rain_umbrellas', 'gutter', 'glass_stack', 'owl', 'snore', 'quiet', 'sunset', 'desk_lamp', 'ardoise', 'waiter_board', 'waiter_setup', 'waiter_smoke', 'guitarist', 'pigeon', 'bells', 'talk'];

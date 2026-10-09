@@ -42,7 +42,7 @@ export function createDirector({ scene, world, art, audio }) {
     if (!c?.cue) return null;
     const def = STAGE_CUES[c.cue];
     if (!def) return null; // motifs (twist:…, event:…, witness:…) : joués par leurs systèmes
-    if (def.status === 'stub') { console.debug?.(`stage : repère « ${c.cue} » pas encore mis en scène`); return null; }
+    if (def.status !== 'live') return null; // 'system' / 'ui' : déjà montré ailleurs
     return stage.play({ id: def.stage, ...(def.opts ?? {}), ...(c.at ? { at: c.at } : {}), ...(c.dur ? { dur: c.dur } : {}) });
   }
 

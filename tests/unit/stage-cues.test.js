@@ -7,7 +7,7 @@ describe('repères de scène (STAGE_CUES)', () => {
     for (const [id, c] of Object.entries(STAGE_CUES)) {
       expect(typeof c.stage, id).toBe('string');
       expect(c.desc.length, id).toBeGreaterThan(5);
-      expect(['live', 'stub'], id).toContain(c.status);
+      expect(['live', 'system', 'ui'], id).toContain(c.status);
     }
   });
   it('valide les repères des lignes (motifs twist / event / witness, ancres, durée)', () => {

@@ -5,8 +5,8 @@
 // Format d'une ligne : stage: { cue: '<id>', at?: '<ancre>', dur?: secondes }
 //   • cue : une clé de STAGE_CUES, ou un motif de STAGE_CUE_PATTERNS (twist:<twistId>:<n>, event:<id>, witness:<kind>)
 //   • at  : une clé de STAGE_ANCHORS (facultatif : chaque repère a sa place par défaut)
-// Chaque repère : { stage, opts?, desc, status } — stage = la scène jouée par la bibliothèque ; status 'live' (jouée) ou
-// 'stub' (pas encore construite : le metteur en scène la note dans la console, la ligne reste valide).
+// Chaque repère : { stage, opts?, desc, status } — stage = la scène jouée par la bibliothèque ; status 'live' (jouée par
+// le metteur en scène), 'system' (déjà mise en scène par son système : police, sim, cloche) ou 'ui' (montrée par le HUD).
 
 export const STAGE_ANCHORS = ['under_window', 'terrace', 'door_10', 'end_A', 'end_B', 'balcony_13', 'window_19', 'window_klaas', 'corner'];
 
@@ -87,15 +87,15 @@ export const STAGE_CUES = {
   bark: C('talk', 'un client parle (voix, à une table dehors)', { mood: 'calm' }),
   bark_shout: C('talk', 'quelqu’un crie dans la rue', { mood: 'shout' }),
   klaas_writes: C('binoculars_glint', 'Klaas à sa fenêtre, carnet et jumelles'),
-  klaas_lamp_off: C('window_opens', 'Klaas éteint sa lampe', { who: 'klaas', off: true }, 'stub'),
-  waiter_reply: C('talk', 'le serveur répond à Pilou (voix, geste)', { mood: 'calm', f0: 130 }, 'stub'),
-  bell_22: C('bells', 'les dix coups de 22h (cloche de la rue, déjà automatique)', { n: 0 }),
-  round_note: C('talk', 'Jérémie note sur sa ronde', { mood: 'calm' }, 'stub'),
-  db_meter: C('talk', 'le téléphone de Pilou affiche les dB (HUD)', undefined, 'stub'),
-  phone_buzz: C('talk', 'le téléphone de Pilou vibre (HUD + son)', undefined, 'stub'),
-  police_cafe: C('talk', 'café offert à la patrouille (déjà mis en scène par la police)', undefined, 'stub'),
-  police_tipoff: C('talk', 'les tables rentrent avant la police (déjà mis en scène par la sim)', undefined, 'stub'),
-  pee: C('talk', 'quelqu’un urine dans une porte (déjà mis en scène)', undefined, 'stub'),
+  klaas_lamp_off: C('window_opens', 'Klaas éteint sa lampe (elle s’éteint au bout de la rue)', { who: 'klaas', off: true }),
+  waiter_reply: C('waiter_reply', 'le serveur se tourne vers Pilou, un geste (opts.gesture : shrug | nod | point), une réponse'),
+  bell_22: C('bells', 'les dix coups de 22h (sonnés par l’ambiance de la rue, automatiquement)', { n: 0 }, 'system'),
+  round_note: C('round_note', 'Jérémie s’arrête et note dans son carnet'),
+  db_meter: C('talk', 'le téléphone de Pilou affiche les dB (mis en scène par le HUD)', undefined, 'ui'),
+  phone_buzz: C('talk', 'le téléphone de Pilou vibre (mis en scène par le HUD et son son)', undefined, 'ui'),
+  police_cafe: C('talk', 'café offert à la patrouille (mis en scène par la police : tasses, Dédé)', undefined, 'system'),
+  police_tipoff: C('talk', 'les tables rentrent avant la police (mis en scène par la sim : chaises qui raclent)', undefined, 'system'),
+  pee: C('talk', 'quelqu’un urine dans une porte (mis en scène par la sim)', undefined, 'system'),
 };
 
 // Motifs : twist:<twistId>:<n> (n-ième événement / fenêtre du twist, joué par la scène du twist), event:<id> (événement
