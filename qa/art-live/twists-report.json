@@ -1,0 +1,478 @@
+{
+ "influencer_night": [
+  {
+   "tag": "setup",
+   "min": 1272.5833333333314,
+   "fired": [],
+   "stages": [
+    "twist:influencer_night"
+   ]
+  },
+  {
+   "tag": "m0",
+   "min": 1293.8333333333276,
+   "fired": [
+    0
+   ],
+   "stages": [
+    "twist:influencer_night",
+    "twist:influencer"
+   ]
+  },
+  {
+   "errors": []
+  }
+ ],
+ "hen_party": [
+  {
+   "tag": "setup",
+   "min": 1272.5841833333077,
+   "fired": [],
+   "stages": [
+    "twist:hen_party"
+   ]
+  },
+  {
+   "tag": "m0",
+   "min": 1359.6955944778542,
+   "fired": [
+    0
+   ],
+   "stages": [
+    "twist:hen_party",
+    "twist:evjf_siren"
+   ]
+  },
+  {
+   "tag": "m1",
+   "min": 1405.7673684707074,
+   "fired": [
+    0,
+    1
+   ],
+   "stages": [
+    "twist:hen_party",
+    "twist:evjf_oath"
+   ]
+  },
+  {
+   "errors": []
+  }
+ ],
+ "drache_night": [
+  {
+   "tag": "setup",
+   "min": 1272.5833333333314,
+   "fired": [],
+   "stages": [
+    "twist:drache_night"
+   ]
+  },
+  {
+   "tag": "m0",
+   "min": 1278.7999999999947,
+   "fired": [
+    0
+   ],
+   "stages": [
+    "twist:drache_night",
+    "twist:drache_rush"
+   ]
+  },
+  {
+   "errors": []
+  }
+ ],
+ "heatwave": [
+  {
+   "tag": "setup",
+   "min": 1272.5967833333075,
+   "fired": [],
+   "stages": [
+    "twist:heatwave"
+   ]
+  },
+  {
+   "tag": "m0",
+   "min": 1480.6467132457321,
+   "fired": [
+    0
+   ],
+   "stages": [
+    "twist:heatwave",
+    "twist:heat_late"
+   ]
+  },
+  {
+   "errors": []
+  }
+ ],
+ "guide_tour": [
+  {
+   "tag": "setup",
+   "min": 1272.5833333333314,
+   "fired": [],
+   "stages": [
+    "twist:guide_tour"
+   ]
+  },
+  {
+   "tag": "m0",
+   "min": 1338.7833333333263,
+   "fired": [
+    0
+   ],
+   "stages": [
+    "twist:guide_tour"
+   ]
+  },
+  {
+   "errors": []
+  }
+ ],
+ "regis_party": [
+  {
+   "tag": "setup",
+   "min": 1272.5833333333314,
+   "fired": [],
+   "stages": [
+    "twist:regis_party"
+   ]
+  },
+  {
+   "tag": "m0",
+   "min": 1460.7832753973228,
+   "fired": [
+    0
+   ],
+   "stages": [
+    "twist:regis_party"
+   ]
+  },
+  {
+   "tag": "m1",
+   "min": 1510.7332562616857,
+   "fired": [
+    0,
+    1
+   ],
+   "stages": [
+    "twist:regis_party",
+    "twist:students_down"
+   ]
+  },
+  {
+   "errors": []
+  }
+ ],
+ "carbonnade_contest": [
+  {
+   "tag": "setup",
+   "min": 1272.5833333333314,
+   "fired": [],
+   "stages": [
+    "twist:carbonnade_contest"
+   ]
+  },
+  {
+   "tag": "m0",
+   "min": 1293.8166833333275,
+   "fired": [
+    0
+   ],
+   "stages": [
+    "twist:carbonnade_contest"
+   ]
+  },
+  {
+   "tag": "m1",
+   "min": 1333.5749833333232,
+   "fired": [
+    0,
+    1
+   ],
+   "stages": [
+    "twist:carbonnade_contest"
+   ]
+  },
+  {
+   "errors": []
+  }
+ ],
+ "busker": [
+  {
+   "tag": "setup",
+   "min": 1257.5999999999985,
+   "fired": [],
+   "stages": [
+    "twist:busker"
+   ]
+  },
+  {
+   "tag": "m0",
+   "min": 1263.8499666666619,
+   "fired": [
+    0
+   ],
+   "stages": [
+    "twist:busker",
+    "twist:quinquin"
+   ]
+  },
+  {
+   "tag": "m1",
+   "min": 1390.4838958024818,
+   "fired": [
+    0,
+    1
+   ],
+   "stages": [
+    "twist:busker",
+    "twist:busker_beer"
+   ]
+  },
+  {
+   "errors": []
+  }
+ ],
+ "power_cut": [
+  {
+   "tag": "setup",
+   "min": 1272.5833333333314,
+   "fired": [],
+   "stages": [
+    "twist:power_cut"
+   ]
+  },
+  {
+   "tag": "m0",
+   "min": 1370.2018370004098,
+   "fired": [
+    0
+   ],
+   "stages": [
+    "twist:power_cut"
+   ]
+  },
+  {
+   "tag": "m1",
+   "min": 1415.749964922632,
+   "fired": [
+    0,
+    1
+   ],
+   "stages": [
+    "twist:power_cut"
+   ]
+  },
+  {
+   "errors": []
+  }
+ ],
+ "waiter_last_night": [
+  {
+   "tag": "setup",
+   "min": 1272.5833333333314,
+   "fired": [],
+   "stages": [
+    "twist:waiter_last_night"
+   ]
+  },
+  {
+   "tag": "m0",
+   "min": 1480.683263245756,
+   "fired": [
+    0
+   ],
+   "stages": [
+    "twist:waiter_last_night",
+    "twist:waiter_leaves"
+   ]
+  },
+  {
+   "errors": []
+  }
+ ],
+ "fete_voisins": [
+  {
+   "tag": "setup",
+   "min": 1242.6406166667134,
+   "fired": [],
+   "stages": [
+    "twist:fete_voisins"
+   ]
+  },
+  {
+   "tag": "m0",
+   "min": 1248.8072833333767,
+   "fired": [
+    0
+   ],
+   "stages": [
+    "twist:fete_voisins",
+    "twist:tarte"
+   ]
+  },
+  {
+   "tag": "m1",
+   "min": 1323.7406166667047,
+   "fired": [
+    0,
+    1
+   ],
+   "stages": [
+    "twist:fete_voisins",
+    "twist:tarte"
+   ]
+  },
+  {
+   "errors": []
+  }
+ ],
+ "fire_inspection": [
+  {
+   "tag": "setup",
+   "min": 1272.5833333333314,
+   "fired": [],
+   "stages": [
+    "twist:fire_inspection"
+   ]
+  },
+  {
+   "tag": "m0",
+   "min": 1343.8499999999929,
+   "fired": [
+    0
+   ],
+   "stages": [
+    "twist:fire_inspection",
+    "twist:fire_measure"
+   ]
+  },
+  {
+   "errors": []
+  }
+ ],
+ "delandre_walk": [
+  {
+   "tag": "setup",
+   "min": 1272.58433333326,
+   "fired": [],
+   "stages": [
+    "twist:delandre_walk"
+   ]
+  },
+  {
+   "tag": "m0",
+   "min": 1390.4766291357469,
+   "fired": [
+    0
+   ],
+   "stages": [
+    "twist:delandre_walk",
+    "twist:mayor"
+   ]
+  },
+  {
+   "errors": []
+  }
+ ],
+ "lost_dog": [
+  {
+   "tag": "setup",
+   "min": 1272.5833333333314,
+   "fired": [],
+   "stages": [
+    "twist:lost_dog"
+   ]
+  },
+  {
+   "tag": "m0",
+   "min": 1293.7833333333276,
+   "fired": [
+    0
+   ],
+   "stages": [
+    "twist:lost_dog",
+    "twist:jeremie_search"
+   ]
+  },
+  {
+   "tag": "m1",
+   "min": 1380.5343823672408,
+   "fired": [
+    0,
+    1
+   ],
+   "stages": [
+    "twist:lost_dog",
+    "twist:dog_found",
+    "twist:jeremie_search"
+   ]
+  },
+  {
+   "errors": []
+  }
+ ],
+ "tv_crew": [
+  {
+   "tag": "setup",
+   "min": 1257.5999999999985,
+   "fired": [],
+   "stages": [
+    "twist:dede_interview",
+    "twist:tv_crew"
+   ]
+  },
+  {
+   "tag": "m0",
+   "min": 1263.8499666666619,
+   "fired": [
+    0
+   ],
+   "stages": [
+    "twist:dede_interview",
+    "twist:tv_crew"
+   ]
+  },
+  {
+   "tag": "m1",
+   "min": 1359.6531111445415,
+   "fired": [
+    0,
+    1
+   ],
+   "stages": [
+    "twist:tv_crew",
+    "twist:tables_back"
+   ]
+  },
+  {
+   "errors": []
+  }
+ ],
+ "street_sweeper": [
+  {
+   "tag": "setup",
+   "min": 1272.6103333333315,
+   "fired": [],
+   "stages": [
+    "twist:street_sweeper"
+   ]
+  },
+  {
+   "tag": "m0",
+   "min": 1420.710402218283,
+   "fired": [
+    0
+   ],
+   "stages": [
+    "twist:street_sweeper",
+    "twist:sweeper_jump"
+   ]
+  },
+  {
+   "errors": []
+  }
+ ]
+}
