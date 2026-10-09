@@ -80,6 +80,9 @@ export function createVignette(host) {
           if (!ok) { stopDay(); startFallback(next, arg); return; }
           day = true;
           host.dataset.stage = 'day3d';
+          // Une première image tout de suite : la boucle d'art.day saute les images quand la page est cachée
+          // (onglet en arrière-plan, automatisation) et la scène restait invisible (QA v1.1 : fond orange seul).
+          try { artDay().step?.(1); } catch { /* scène en cours de chargement */ }
           offRect ??= artDay().onScreenRect?.(() => frameHook?.()) ?? null;
           frameHook?.();
         }).catch(() => { if (my === token) { stopDay(); startFallback(next, arg); } });

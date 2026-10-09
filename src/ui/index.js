@@ -41,6 +41,50 @@ const store = {
 // Variables des lignes du carnet de Klaas (night.js) : jamais de {variable} laissée telle quelle
 const klaasLine = (pool, day) => (pool?.length ? narrative.fill(pool[day % pool.length], { time: '01h00', n: 0 }) : null);
 
+// ── Le titre du jeu (index.html #title, travelling 3D derrière) : un seul écran titre (QA v1.1) ─────────────────
+// Remplace ses boutons « Campagne » / « Nuit libre » par le menu complet, en gardant leurs ids (#campaign, #start) :
+//   #campaign déplie sur place « Continuer · jour N » (title-continue) et « Nouvelle campagne » (title-new, 2e clic pour
+//   écraser une sauvegarde) ; #start lance la nuit libre ; « Comment jouer » et « À propos » ouvrent le menu.
+// onNew() / onContinue() : le jeu monte l'interface de jour ; onFreeNight() : la soirée isolée.
+export function titleMenu(titleEl, { engine = {}, onNew, onContinue, onFreeNight } = {}) {
+  const create = engine.createCampaign ?? defaultCreate;
+  const content = engine.content ?? DEFAULT_CONTENT;
+  const old = [titleEl.querySelector('#campaign'), titleEl.querySelector('#start')].filter(Boolean);
+  const anchor = old[0];
+  const saved = store.get(SAVE_KEY);
+  let existing = null;
+  if (saved) { try { existing = create({ content, save: saved }); } catch { existing = null; } }
+  if (existing?.ended) existing = null;
+  const sub = h('div.ui-title-sub.hidden', { dataset: { testid: 'title-campaign' } });
+  if (existing) {
+    sub.append(h('button.ui-btn', { dataset: { testid: 'title-continue' }, onclick: () => onContinue?.() },
+      `Continuer · jour ${existing.state.day}/14, ${WEEKDAYS[existing.weekday()]}`));
+  }
+  const newBtn = h('button.ui-btn' + (existing ? '.ghost' : ''), { dataset: { testid: 'title-new' } }, 'Nouvelle campagne');
+  newBtn.onclick = () => {
+    if (saved && !newBtn.dataset.armed) { newBtn.dataset.armed = '1'; newBtn.textContent = 'Écraser la sauvegarde ? Cliquez encore'; return; }
+    onNew?.();
+  };
+  sub.append(newBtn);
+  const campaignBtn = h('button#campaign', { 'aria-expanded': 'false' }, 'Campagne (14 jours)');
+  campaignBtn.onclick = () => {
+    const open = sub.classList.toggle('hidden') === false;
+    campaignBtn.setAttribute('aria-expanded', String(open));
+    if (open) (sub.querySelector('[data-testid=title-continue]') ?? newBtn).focus();
+  };
+  const menu = h('div.ui-title-menu', { dataset: { testid: 'title-menu' } },
+    campaignBtn, sub,
+    h('button#start', { onclick: () => onFreeNight?.() }, 'Nuit libre (une soirée isolée)'),
+    h('div.ui-title-links',
+      h('button', { dataset: { testid: 'title-help' }, onclick: () => openMenu({ page: 'help' }) }, '❓ Comment jouer'),
+      h('button', { dataset: { testid: 'title-about' }, onclick: () => openMenu({ page: 'about' }) }, 'À propos')));
+  if (anchor) anchor.replaceWith(menu); else titleEl.append(menu);
+  for (const b of old.slice(1)) b.remove();
+  startPad();
+  startHints();
+  return menu;
+}
+
 export function mountDayUI({ campaign, root, content, onSave, onNight, onQuit, onNew } = {}) {
   const ui = mount({ content }, { campaign, root, onSave, onNight, onQuit, onNew, deferRender: true });
   return { show: ui.show, hide: ui.hide, destroy: ui.destroy, render: ui.render };
@@ -146,7 +190,8 @@ export function mount(engine = {}, opts = {}) {
     if (!c || view.result || shown() !== c.step) return;
     const at = `${c.state.day}:${c.state.phase}`;
     let moved = false;
-    for (let card = c.step === 'cards' ? c.card() : null; card && card.type === 'dialogue' && meta.dialogueAt === at; card = c.step === 'cards' ? c.card() : null) {
+    // (borné : un moteur qui renverrait la même carte ne doit jamais figer la page)
+    for (let n = 0, card = c.step === 'cards' ? c.card() : null; n < 30 && card && card.type === 'dialogue' && meta.dialogueAt === at; n++, card = c.step === 'cards' ? c.card() : null) {
       meta.overheard.push({ id: `overheard:${card.id}:${c.state.day}`, speaker: card.data.speaker, text: (card.data.lines ?? []).join(' '), day: c.state.day });
       if (meta.overheard.length > 120) meta.overheard.shift();
       c.resolveCard(0);
@@ -160,6 +205,7 @@ export function mount(engine = {}, opts = {}) {
     clear(layer);
     settleDialogues();
     root.dataset.step = c ? shown() : 'title';
+    if (!c && opts.onTitle && !panel) { vignette.set(null); return; } // dans le jeu : le titre est le titre 3D (#title)
     if (!c) {
       vignette.set(null);
       layer.append(panel === 'help' || panel === 'about' ? h('div.ui-wrap', panelView()) : titleScreen());
@@ -666,7 +712,8 @@ export function mount(engine = {}, opts = {}) {
     if (e.canContinue) buttons.append(h('button.ui-btn.center', { dataset: { testid: 'end-continue' }, onclick: () => { c.continueAfterEnding(); afterEngine(); view = {}; render(); } }, e.continueLabel ?? 'Continuer'));
     buttons.append(h('button.ui-btn.center' + (e.canContinue ? '.light' : ''), { dataset: { testid: 'end-new' }, onclick: () => {
       if (opts.onNew && opts.campaign) return opts.onNew();
-      store.del(SAVE_KEY); c = null; render();
+      store.del(SAVE_KEY); c = null; view = {};
+      if (opts.onTitle) opts.onTitle(); else render();
     } }, 'Nouvelle campagne'));
     return [
       // Le tableau de fin (art.scenes.ending) est rendu derrière ; ce bandeau laisse la place de le voir
@@ -731,7 +778,7 @@ export function mount(engine = {}, opts = {}) {
     return openMenu({
       campaign: c, meta,
       onResume: () => focusPrimary(true),
-      onQuit: c ? () => { saveMeta(); c = null; view = {}; phone.open = false; panel = null; render(); } : undefined,
+      onQuit: c ? () => { saveMeta(); c = null; view = {}; phone.open = false; panel = null; if (opts.onTitle) opts.onTitle(); else render(); } : undefined,
     });
   }
   applySettings();

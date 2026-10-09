@@ -135,9 +135,55 @@ test('dans le jeu, avec la vraie art.day : terminal posé sur le moniteur de Kod
   await expect(page.locator('[data-testid=terminal]')).toBeVisible();
   await expect(page.locator('#ui-root')).toHaveAttribute('data-stage', 'day3d', { timeout: 60_000 });
   await expect(page.locator('#ui-root')).toHaveClass(/on-monitor/, { timeout: 60_000 });
-  // le terminal garde sa hauteur sur le moniteur (régression : une grille l'écrasait à 0 px)
+  // la scène de jour est vraiment dessinée (QA v1.1 : fond orange seul, rien derrière)
+  const day = await page.evaluate(() => { const d = window.__rdb.world.art.day; return { active: d.active, rect: !!d.screenRect() }; });
+  expect(['koddex', 'home']).toContain(day.active);
+  expect(day.rect).toBe(true);
+    // le terminal garde sa hauteur sur le moniteur (régression : une grille l'écrasait à 0 px)
   expect(await page.locator('[data-testid=terminal]').evaluate((el) => el.getBoundingClientRect().height)).toBeGreaterThan(60);
   await page.waitForTimeout(1500);
   await page.screenshot({ path: 'test-results/v11-real-koddex.png' });
   expect(errors).toEqual([]);
+});
+
+// Page cachée (onglet en arrière-plan, automatisation) : la boucle d'art.day saute les images ; la première est dessinée quand même
+test('dans le jeu, page cachée : la scène de jour 3D a sa première image (pas de fond vide)', async ({ page }) => {
+  test.setTimeout(300_000);
+  await page.addInitScript(() => {
+    globalThis.__rdbUiSpeed = 0;
+    Object.defineProperty(document, 'hidden', { get: () => true, configurable: true });
+  });
+  await page.goto('/?nolock=1&seed=5');
+  await page.evaluate(() => { localStorage.clear(); localStorage.setItem('rdb.quality', 'moyen'); });
+  await page.reload();
+  await page.click('#campaign');
+  await page.click('[data-testid=title-new]');
+  await page.click('[data-testid=intro-skip]');
+  await expect(page.locator('#ui-root')).toHaveAttribute('data-stage', 'day3d', { timeout: 60_000 });
+  await expect.poll(() => page.evaluate(() => !!window.__rdb.world.art.day.screenRect()), { timeout: 30_000 }).toBe(true);
+});
+
+// Un seul écran titre : le titre 3D du jeu porte le menu complet (Continuer / Nouvelle campagne / Nuit libre / Aide)
+test('un seul écran titre : le menu est sur le titre 3D, pas de second titre', async ({ page }) => {
+  await page.goto('/?nolock=1&seed=5');
+  await page.evaluate(() => localStorage.clear());
+  await page.reload();
+  await expect(page.locator('#title [data-testid=title-menu]')).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator('#title #start')).toContainText('Nuit libre');
+  await expect(page.locator('#title [data-testid=title-new]')).toBeHidden();
+  await page.click('#campaign');
+  await expect(page.locator('#title [data-testid=title-new]')).toBeVisible();
+  await expect(page.locator('#title [data-testid=title-continue]')).toHaveCount(0);
+  await expect(page.locator('#ui-root .ui-title')).toHaveCount(0);
+  await page.click('[data-testid=title-new]');
+  await expect(page.locator('[data-testid=intro]')).toBeVisible();
+  await expect(page.locator('#title')).toBeHidden();
+  // Quitter vers le titre : retour au titre 3D (avec « Continuer »)
+  await page.click('[data-testid=intro-skip]');
+  await page.keyboard.press('Escape');
+  await page.click('[data-testid=menu-quit]');
+  await page.click('[data-testid=menu-quit]');
+  await expect(page.locator('#title')).toBeVisible();
+  await page.click('#campaign');
+  await expect(page.locator('#title [data-testid=title-continue]')).toContainText('jour 1');
 });
