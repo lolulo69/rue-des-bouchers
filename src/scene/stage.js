@@ -48,6 +48,24 @@ export const AMBIENT_STAGE = {
   chti_drunk: { id: 'drunk_singer', shout: true }, window_lamp: 'desk_lamp',
 };
 
+
+// Une lueur (bougie, lampe frontale, flash, lampe) : sprite additif, PAS une vraie lumière — ajouter / retirer des
+// lumières recompile tous les matériaux de la scène (saccade, et des secondes sous SwiftShader en CI)
+let glowTex = null;
+export function glowLight(color = 0xffffff, intensity = 1, distance = 3) {
+  if (!glowTex) {
+    const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d');
+    const r = g.createRadialGradient(32, 32, 0, 32, 32, 32); r.addColorStop(0, 'rgba(255,255,255,1)'); r.addColorStop(0.25, 'rgba(255,255,255,0.45)'); r.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = r; g.fillRect(0, 0, 64, 64); glowTex = new THREE.CanvasTexture(c);
+  }
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0 }));
+  const size = Math.max(0.4, distance * 0.4); s.scale.set(size, size, 1);
+  let I = 0;
+  Object.defineProperty(s, 'intensity', { get: () => I, set: (v) => { I = v; s.material.opacity = Math.max(0, Math.min(1, v / 2.5)); } });
+  s.intensity = intensity;
+  return s;
+}
+
 export function createStage({ scene, world, art, audio }) {
   const A = world.anchors;
   const W = Math.abs(A.pilouWindow.x) - 0.3;
@@ -143,13 +161,13 @@ export function createStage({ scene, world, art, audio }) {
       const p = r.add(person({ hair: o.heels ? 'long' : pick(['short', 'bob', 'quiff']), skirt: o.heels ? 0x2a2a35 : undefined, held: o.lostKeys ? 'phone' : o.suitcase ? null : Math.random() < 0.4 ? 'phone' : null, anim: o.lostKeys ? 'film' : 'idle' }));
       const speed = o.run || o.jogger ? 3.2 : 1.3;
       if (o.lostKeys) { // il cherche ses clés entre deux pavés, à la lumière du téléphone, sous la fenêtre
-        p.position.set(0.6, 0, bz + 3); const light = new THREE.PointLight(0xdfe8ff, 1.2, 2.5); light.position.set(0.6, 0.6, bz + 3.3); r.add(light);
+        p.position.set(0.6, 0, bz + 3); const light = glowLight(0xdfe8ff, 1.2, 2.5); light.position.set(0.6, 0.6, bz + 3.3); r.add(light);
         r.tick(() => { p.rotation.y = Math.sin(r.t * 0.7) * 1.2; });
         r.later(5, () => sound('voice', p.position, { mood: 'angry', n: 4, f0: 120, gain: 0.6 }));
         return;
       }
       if (o.suitcase) { const s = new THREE.Group(); box(s, 0.4, 0.55, 0.22, M(0x3a5a8c), 0, 0.32, 0); r.add(s); r.tick(() => { s.position.copy(p.position).add(V(0.3, 0, -0.45 * Math.sign(z1 - z0))); s.rotation.y = p.rotation.y; }); }
-      if (o.jogger) { const l = new THREE.PointLight(0xffffff, 1.5, 4); r.add(l); r.tick(() => l.position.copy(p.position).setY(1.6)); }
+      if (o.jogger) { const l = glowLight(0xffffff, 1.5, 4); r.add(l); r.tick(() => l.position.copy(p.position).setY(1.6)); }
       r.walk(p, walkerPath(z0, z1), { speed });
       const step = o.heels ? 'heels' : o.suitcase ? 'wheels' : null;
       if (step) { let k = 0; r.tick(() => { if (Math.abs(p.position.z - bz) < 16 && r.t > k) { k = r.t + 3.6; sound(step, p.position, { gain: 0.8, steps: 8, seconds: 3.5 }); } }); }
@@ -288,7 +306,7 @@ export function createStage({ scene, world, art, audio }) {
       const at = { klaas: A.klaasWindow, hilde: A.hildeWindow, tatie: A.tatieWindow, jeremie: A.jeremieWindow }[o.who] ?? (spot ? V(spot.x, spot.y, spot.z) : V(W, 6, bz + 2));
       if (!at) return;
       if (o.who === 'klaas' || o.who === 'hilde') { // fenêtres de la place : une lampe s'allume (point lumineux visible de loin)
-        const l = new THREE.PointLight(0xffd890, 0, 6); l.position.copy(at); r.add(l);
+        const l = glowLight(0xffd890, 0, 6); l.position.copy(at); r.add(l);
         const s = r.add(new THREE.Mesh(new THREE.SphereGeometry(0.25, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffe0a0, transparent: true, opacity: 0 }))); s.position.copy(at);
         r.tick(() => { const k = o.off ? Math.max(0, 1 - r.t / 1.5) : Math.min(1, r.t / 0.5) * (r.t > 10 ? Math.max(0, 1 - (r.t - 10)) : 1); l.intensity = 2.5 * k; s.material.opacity = 0.9 * k; });
         return;
@@ -336,7 +354,7 @@ export function createStage({ scene, world, art, audio }) {
     group_photo: () => run('group_photo', 6, (r) => {
       const t = nearTable(); if (!t) return;
       const p = t.group.position.clone().add(V(Math.sign(-t.group.position.x || 1) * 1.6, 1.2, 0));
-      const l = new THREE.PointLight(0xffffff, 0, 8); l.position.copy(p); r.add(l);
+      const l = glowLight(0xffffff, 0, 8); l.position.copy(p); r.add(l);
       const ph = r.add(person({ held: 'film', anim: 'film' })); ph.position.copy(p).setY(0); ph.rotation.y = Math.atan2(t.group.position.x - p.x, 0);
       r.tick(() => { l.intensity = r.t > 2 && r.t < 2.12 ? 40 : 0; });
       r.later(2, () => sound('shutter', p, { gain: 1 }));
@@ -411,11 +429,13 @@ export function createStage({ scene, world, art, audio }) {
     owl: () => run('owl', 4, () => sound('owl', V(W - 1, 9, bz + 8), { gain: 1 })),
     snore: () => run('snore', 6, () => sound('snore', A.balcony ?? V(W, 6, bz), { gain: 0.8 })),
     quiet: () => run('quiet', 9, () => { audio?.duck?.(8, 0.15); }),
-    sunset: () => run('sunset', 20, (r) => {
-      const l = new THREE.DirectionalLight(0xff9a4a, 0); l.position.set(-20, 12, zA); r.add(l);
-      r.tick(() => { l.intensity = 1.6 * Math.sin(Math.min(1, r.t / 20) * Math.PI); });
+    sunset: () => run('sunset', 20, (r) => { // le couchant teinte la lumière du ciel (aucune lumière ajoutée)
+      let hemi = null; scene.traverse((o) => { if (!hemi && o.isHemisphereLight) hemi = o; }); if (!hemi) return;
+      const base = hemi.color.clone(), warm = new THREE.Color(0xffa060);
+      r.tick(() => { hemi.color.copy(base).lerp(warm, 0.6 * Math.sin(Math.min(1, r.t / 20) * Math.PI)); });
+      r.end(() => hemi.color.copy(base));
     }),
-    desk_lamp: () => run('desk_lamp', 6, (r) => { const s = world.homeScreen; if (!s) return; const l = new THREE.PointLight(0xfff0d0, 0, 3); l.position.copy(s.position).add(V(-0.4, 0.3, 0)); r.add(l); r.tick(() => { l.intensity = r.t < 5 ? 1.2 : 0; }); }),
+    desk_lamp: () => run('desk_lamp', 6, (r) => { const s = world.homeScreen; if (!s) return; const l = glowLight(0xfff0d0, 0, 3); l.position.copy(s.position).add(V(-0.4, 0.3, 0)); r.add(l); r.tick(() => { l.intensity = r.t < 5 ? 1.2 : 0; }); }),
     // L'ardoise des Mal Lunés / le serveur efface « Waterzooi »
     ardoise: () => run('ardoise', 30, (r) => {
       const rp = tablesOf('malunes')[0]?.group.position ?? V(W - 2, 0, bz + 15);

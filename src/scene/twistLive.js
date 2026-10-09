@@ -10,6 +10,7 @@
 import * as THREE from 'three';
 import { humanoid, customer, setState, CAST } from '../art/characters.js';
 import { panelTex } from '../art/textures.js';
+import { glowLight } from './stage.js';
 
 const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -223,7 +224,7 @@ export function createTwistLive({ world, art, audio, stage }) {
           const carrier = r.add(humanoid({ shirt: 0x1f1f24, hair: 'quiff', anim: 'tray', expr: 'happy' })); carrier.position.copy(door).add(V(-side * 0.6, 0, 0));
           const cake = new THREE.Group(); cyl(cake, 0.18, 0.13, M(0xf3e2c8), 0, 0, 0, 16); cyl(cake, 0.185, 0.03, M(0xf28cb1), 0, 0.07, 0, 16);
           const flames = Array.from({ length: 8 }, (_, i) => { const a = (i / 8) * Math.PI * 2; cyl(cake, 0.006, 0.06, M(0xf6f2ea), Math.cos(a) * 0.12, 0.11, Math.sin(a) * 0.12, 4); return ball(cake, 0.014, glow(0xffb347, 3), Math.cos(a) * 0.12, 0.155, Math.sin(a) * 0.12); });
-          const candle = new THREE.PointLight(0xffb060, 1.6, 3); cake.add(candle); candle.position.y = 0.3; r.add(cake);
+          const candle = glowLight(0xffb060, 1.6, 3); cake.add(candle); candle.position.y = 0.3; r.add(cake);
           r.tick(() => { cake.position.copy(carrier.position).add(V(0, 1.12, 0)); flames.forEach((f, i) => f.scale.setScalar(0.8 + Math.sin(r.t * 17 + i * 3) * 0.25)); });
           r.walk(carrier, [t.group.position.clone().add(V(-side * 0.8, 0, 0))], { speed: 0.8, onArrive: () => {
             for (const q of people([t])) { r.borrow(q); setState(q, { anim: 'sing', expr: 'happy' }); }
@@ -371,7 +372,7 @@ export function createTwistLive({ world, art, audio, stage }) {
           c.show('power_cut'); audio?.setPower?.(false);
           c.candles = new THREE.Group(); c.r.add(c.candles);
           for (const t of world.tables.filter((t) => t.group.visible)) { const g = new THREE.Group(); cyl(g, 0.025, 0.08, M(0xf6f2ea), 0, 0.84, 0, 6); ball(g, 0.015, glow(0xffb347, 3), 0, 0.9, 0); g.position.copy(t.group.position); c.candles.add(g); }
-          const l = new THREE.PointLight(0xffa850, 2.5, 9); l.position.copy(door).add(V(-side * 1.5, 1.2, 1)); c.candles.add(l);
+          const l = glowLight(0xffa850, 2.5, 9); l.position.copy(door).add(V(-side * 1.5, 1.2, 1)); c.candles.add(l);
         },
         1(c) { // le courant revient : la gaine redémarre « comme un tracteur », une table applaudit, une autre râle
           c.hide('power_cut'); audio?.setPower?.(true); if (c.candles) c.r.objs.includes(c.candles) && (c.candles.visible = false);
@@ -490,7 +491,7 @@ export function createTwistLive({ world, art, audio, stage }) {
         const boomOp = humanoid({ hair: 'bun', shirt: 0x5a6b4a, anim: 'film' }); boomOp.position.set(1.0, 0, -0.2); g.add(boomOp);
         const pole = box(g, 0.025, 0.025, 2.6, M(0x8a8f96, { metalness: 0.6 }), 0.6, 2.2, 0.9); pole.rotation.x = -0.35;
         const mic = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.35, 10), M(0x6b6b6b, { roughness: 1 })); mic.rotation.x = Math.PI / 2; mic.position.set(0.6, 2.6, 2.1); g.add(mic);
-        const panel = box(g, 0.6, 0.4, 0.04, glow(0xfff6e0, 2.5), -1.1, 1.8, 0.3); const pl = new THREE.PointLight(0xfff0d8, 2.2, 6); pl.position.set(-1.1, 1.8, 0.8); g.add(pl); void panel;
+        const panel = box(g, 0.6, 0.4, 0.04, glow(0xfff6e0, 2.5), -1.1, 1.8, 0.3); const pl = glowLight(0xfff0d8, 2.2, 6); pl.position.set(-1.1, 1.8, 0.8); g.add(pl); void panel;
         const d = world.cast?.dede;
         if (d) c.db = stage.run('twist:dede_interview', Infinity, (rr) => { rr.borrow(d); setState(d, { anim: 'meeting', expr: 'happy', talk: 1 }); });
         r.tick(() => { const on = c.min < c.at(1); g.visible = on; if (!on && c.db) { stage.stop(c.db); c.db = null; } });
@@ -518,7 +519,7 @@ export function createTwistLive({ world, art, audio, stage }) {
       for (const p of c.sup ?? []) { r.borrow(p); setState(p, { anim: 'cheer', expr: 'happy' }); }
       sound('cheer', c.sup?.[0]?.position ?? door, { gain: 1, n: 18 }); r.later(1.5, () => sound('chant', c.sup?.[0]?.position ?? door, { voices: 10, gain: 0.9 }));
       const at = (c.sup?.[3]?.position ?? door).clone();
-      const l = new THREE.PointLight(0xff3020, 0, 10); l.position.copy(at).setY(2); r.add(l);
+      const l = glowLight(0xff3020, 0, 10); l.position.copy(at).setY(2); r.add(l);
       r.tick(() => { l.intensity = 3 + Math.sin(r.t * 25) * 1.2; });
       art?.fx?.smoke?.(at.clone().setY(2.1), { rate: 16, life: 2.6, color: 0xc8402e, rise: 1.1, spread: 0.12, duration: final ? 10 : 7, size: [0.2, 0.8], alpha: 0.35 });
     });
