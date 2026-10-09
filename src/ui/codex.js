@@ -5,6 +5,7 @@ import { h, portrait } from './dom.js';
 import { CODEX } from '../content/codex.js';
 import { keyHint, padControlsText } from '../input/hints.js';
 import { inputMode } from '../input/index.js';
+import { canReplayTutorials, replayTutorials } from './coach.js';
 
 export const CARNET_TABS = [
   { id: 'characters', label: '👥 Personnes' },
@@ -53,12 +54,18 @@ export function carnetView(c, meta, { tab = 'characters', onTab, onClose }) {
     h('button.ui-btn.center', { onclick: onClose, dataset: { testid: 'carnet-close' } }, `Refermer le carnet (${keyHint('C')})`));
 }
 
-export function helpView({ onClose }) {
+export function helpView({ onClose, campaign = null }) {
   return h('div.ui-codex', { dataset: { testid: 'help' } },
     h('div.ui-codex-head', h('h2', '❓ Comment jouer')),
     // En mode manette, la carte des touches montre les boutons de la manette
     h('div.ui-codex-list', (CODEX.help ?? []).map((x) => h('article.ui-codex-card', { dataset: { help: x.id } }, h('h3', x.title),
       h('p', x.id === 'h_touches' && inputMode().mode === 'pad' ? padControlsText() : x.text)))),
+    // Tutoriels de la nuit : les revoir à la prochaine nuit (si le moteur sait les rejouer)
+    canReplayTutorials(campaign) ? h('button.ui-btn.light.center', { dataset: { testid: 'help-replay' }, onclick: (e) => {
+      replayTutorials(campaign);
+      e.currentTarget.textContent = 'C’est noté : les tutoriels reviendront à la prochaine nuit';
+      e.currentTarget.disabled = true;
+    } }, 'Revoir les tutoriels') : null,
     h('button.ui-btn.center', { onclick: onClose, dataset: { testid: 'help-close' } }, 'Compris'));
 }
 

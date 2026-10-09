@@ -94,7 +94,7 @@ export function openMenu({ campaign = null, meta = {}, art = null, page: startPa
     const keep = focusKey(document.activeElement);
     clear(root);
     let body;
-    if (page === 'help') body = helpView({ onClose: back });
+    if (page === 'help') body = helpView({ onClose: back, campaign });
     else if (page === 'about') body = aboutView({ onClose: back });
     else if (page === 'carnet' && campaign) body = carnetView(campaign, meta, { tab: carnetTab, onTab: (t) => { carnetTab = t; render(); }, onClose: back });
     else body = h('div.ui-card.ui-menu', mainPage());

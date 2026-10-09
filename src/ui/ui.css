@@ -343,3 +343,16 @@ html[data-input=pad] :focus { outline: 3px solid #24406b !important; outline-off
    du 📱 reste), l'astuce se range sous l'en-tête, derrière le moniteur et sans capter les clics. */
 :is(#ui-root, #dayui, #ui-menu).on-monitor .ui-notif { display: none; }
 :is(#ui-root, #dayui, #ui-menu).on-monitor .ui-tip { position: fixed; right: 16px; top: 120px; width: min(320px, 30vw); z-index: 1; font-size: 13px; pointer-events: none; opacity: .95; }
+
+/* ── Tutoriels « en main » de la nuit : l'élément #coach du jeu (game.js), habillé ici ── */
+#coach { background: #2a1714f0 !important; color: #fff3e0; border: 2px solid #f2c45a !important; border-radius: 16px !important; box-shadow: 0 10px 30px #000a;
+  font-family: "Nunito", system-ui, sans-serif; animation: ui-pop .25s ease-out; }
+#coach kbd { background: #fff3e0; color: #2a1714; border-radius: 6px; padding: 0 7px; font-weight: 800; border: 0; }
+#coach button:focus-visible { outline: 3px solid #f2c45a; }
+/* Classes optionnelles que game.js peut poser (Build note ui-v1.1) : ancrage loin du réticule, progression, bravo */
+#coach[data-anchor=aim] { left: calc(50% + 110px); bottom: auto; top: calc(50% - 70px); transform: none; }
+#coach[data-anchor=hud] { left: 16px; bottom: auto; top: 180px; transform: none; }
+#coach .coach-step { font-size: 12px; color: #ffd2a8; white-space: nowrap; }
+#coach.congrats { border-color: #5f9e6e !important; animation: ui-coach-fade 2.6s ease-in forwards; }
+@keyframes ui-coach-fade { 0%, 70% { opacity: 1 } 100% { opacity: 0 } }
+@media (max-width: 760px) { #coach[data-anchor=aim] { left: 50%; top: auto; bottom: 120px; transform: translateX(-50%); } }

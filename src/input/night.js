@@ -11,6 +11,7 @@ import { NIGHT_MAP } from './gamepad.js';
 import { setNightHandler, sendKey, inputMode, padGlyph } from './index.js';
 import { currentSettings } from '../ui/settings.js';
 import { startHints } from './hints.js';
+import { skipActiveCoach } from '../ui/coach.js';
 
 export const HOLD_SECONDS = 1.2;
 const LOOK_SPEED = 2.6; // rad/s au stick plein, sensibilité 1
@@ -19,7 +20,7 @@ const MOVE_KEYS = { up: 'KeyW', down: 'KeyS', left: 'KeyA', right: 'KeyD' };
 const KEY_OF = { interact: 'KeyE', photo: 'KeyP', nightMenu: 'KeyN', phone: 'KeyT', db: 'KeyB', legal: 'KeyL', dossier: 'Tab' };
 
 // Logique pure (testable) : dispatch(code, 'down'|'up'|'both'), openMenu(page?), onHold(progress 0..1 | null)
-export function createNightHandler({ player, dispatch, openMenu = () => {}, onHold = () => {}, settings = () => ({ padLook: 1 }) }) {
+export function createNightHandler({ player, dispatch, openMenu = () => {}, onHold = () => {}, onBack = () => {}, settings = () => ({ padLook: 1 }) }) {
   const held = new Set(); // touches de déplacement maintenues de notre fait
   let hold = 0;
   let fired = false;
@@ -48,6 +49,7 @@ export function createNightHandler({ player, dispatch, openMenu = () => {}, onHo
     }
     // Boutons : un appui = une touche
     for (const [action, code] of Object.entries(KEY_OF)) if (s.pressed.has(btn(action))) dispatch(code, 'both');
+    if (s.pressed.has(btn('back'))) onBack(); // hors overlay : passer le tutoriel affiché
     if (s.pressed.has(btn('pause'))) openMenu();
     if (s.pressed.has(btn('carnet'))) openMenu('carnet');
     // Seau : maintenir RT
@@ -95,6 +97,7 @@ export function bindNight({ player, getOverlay = () => null } = {}) {
     dispatch: (code, type) => sendKey(code, code === 'Tab' ? 'Tab' : code.replace(/^Key/, '').toLowerCase(), type),
     openMenu: openPauseMenu,
     onHold: holdIndicator(),
+    onBack: skipActiveCoach,
     settings: currentSettings,
   });
   let menuOpen = () => !!document.querySelector('#ui-menu .ui-menu-box');

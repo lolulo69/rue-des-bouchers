@@ -237,7 +237,7 @@ export function mount(engine = {}, opts = {}) {
   function closePanel() { panel = null; render(); }
   function panelView() {
     if (panel === 'carnet' && c) return carnetView(c, meta, { tab: carnetTab, onTab: (t) => { carnetTab = t; render(); }, onClose: closePanel });
-    if (panel === 'help') return helpView({ onClose: closePanel });
+    if (panel === 'help') return helpView({ onClose: closePanel, campaign: c });
     return aboutView({ onClose: closePanel });
   }
   function closePhone() { phone.open = false; render(); }
